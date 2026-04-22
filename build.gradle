@@ -27,7 +27,13 @@ sourceSets.main.resources {
 }
 
 repositories {
-    // Add here additional repositories if required by some of the dependencies below.
+    maven {
+        name = 'GeckoLib'
+        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        content {
+            includeGroup("software.bernie.geckolib")
+        }
+    }
 }
 
 base {
@@ -139,6 +145,7 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
+    implementation "software.bernie.geckolib:geckolib-neoforge-1.21:${project.geckolib_version}"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -190,3 +197,4 @@ idea {
         downloadJavadoc = true
     }
 }
+

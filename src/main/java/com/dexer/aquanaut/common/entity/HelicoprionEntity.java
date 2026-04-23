@@ -88,6 +88,16 @@ public class HelicoprionEntity extends BaseFishEntity implements GeoEntity {
     }
 
     @Override
+    protected boolean getCurvedCruiseMovement() {
+        return true;
+    }
+
+    @Override
+    protected float getCruiseCurveTorqueDegrees() {
+        return 0.58F;
+    }
+
+    @Override
     protected double getCruiseAcceleration() {
         return 0.022D;
     }

@@ -41,8 +41,11 @@ public class IcerailEntity extends BaseFishEntity implements GeoEntity {
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, state -> {
             double speed = this.getDeltaMovement().length();
-            double maxAnimSpeed = this.isSprintingAway() ? 2.9D : 1.45D;
-            double animationSpeed = Mth.clamp(0.72D + speed * 6.2D, 0.7D, maxAnimSpeed);
+            double referenceSpeed = this.isSprintingAway() ? this.escapeMaxSpeed() : this.cruiseMaxSpeed();
+            double normalizedSpeed = referenceSpeed <= 1.0E-4D ? 0.0D : Mth.clamp(speed / referenceSpeed, 0.0D, 1.0D);
+            double minAnimSpeed = this.isSprintingAway() ? 1.0D : 0.52D;
+            double maxAnimSpeed = this.isSprintingAway() ? 2.35D : 1.02D;
+            double animationSpeed = Mth.lerp(normalizedSpeed, minAnimSpeed, maxAnimSpeed);
             state.getController().setAnimationSpeed(animationSpeed);
             return state.setAndContinue(SWIM_ANIMATION);
         }));
@@ -89,56 +92,56 @@ public class IcerailEntity extends BaseFishEntity implements GeoEntity {
 
     @Override
     protected FishResponseMode getResponseMode() {
-        return FishResponseMode.IRRITATE;
+        return FishResponseMode.AVOIDANCE;
     }
 
     @Override
     protected FishAttackMode getAttackMode() {
-        return FishAttackMode.PASS_BY_BITE;
+        return FishAttackMode.NONE;
     }
 
     protected int getBarrierCooldownTicks() {
-        return 22;
+        return 34;
     }
 
     protected int getBarrierSegmentCount() {
-        return 3;
+        return 2;
     }
 
     protected double getBarrierStartDistanceFromTail() {
-        return 0.95D;
+        return 0.28D;
     }
 
     protected double getBarrierMinDistanceFromBody() {
-        return 1.15D;
+        return 0.52D;
     }
 
     protected double getBarrierSegmentSpacing() {
-        return 0.78D;
+        return 0.58D;
     }
 
     protected int getFrozenWaterLifetimeTicks() {
-        return 90;
+        return 72;
     }
 
     @Override
     protected double getCruiseAcceleration() {
-        return 0.009D;
+        return 0.008D;
     }
 
     @Override
     protected double getCruiseMaxSpeed() {
-        return 0.125D;
+        return 0.11D;
     }
 
     @Override
     protected double getEscapeAcceleration() {
-        return 0.072D;
+        return 0.08D;
     }
 
     @Override
     protected double getEscapeMaxSpeed() {
-        return 0.74D;
+        return 0.8D;
     }
 
     @Override
@@ -252,9 +255,9 @@ public class IcerailEntity extends BaseFishEntity implements GeoEntity {
 
         Vec3 shotDirection = toPlayer.normalize();
         double rayLength = toPlayer.length();
-        int segments = Math.max(1, this.getBarrierSegmentCount());
+        int segments = this.getRandom().nextBoolean() ? 1 : Math.max(1, this.getBarrierSegmentCount());
         double spacing = Math.max(0.3D, this.getBarrierSegmentSpacing());
-        double startDistance = Math.max(this.getBarrierStartDistanceFromTail(), this.getBbWidth() * 0.9D);
+        double startDistance = Math.max(0.0D, this.getBarrierStartDistanceFromTail());
         double minBodyDistanceSqr = this.getBarrierMinDistanceFromBody() * this.getBarrierMinDistanceFromBody();
 
         if (rayLength <= startDistance + 0.1D) {

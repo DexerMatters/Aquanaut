@@ -10,6 +10,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class FishMovementController {
     private final MovementState state = new MovementState();
+    private final FishSchoolingAI schoolingAI = new FishSchoolingAI();
     private final PlayerAvoidanceLogic avoidanceLogic = new PlayerAvoidanceLogic();
 
     private int reactivePlayerId = -1;
@@ -38,8 +39,24 @@ public class FishMovementController {
         this.state.setChargingPlayer(decision.mode == MovementMode.CHARGE);
 
         if (decision.mode == MovementMode.CRUISE) {
+            FishSchoolingAI.SchoolingDecision schoolingDecision = this.schoolingAI.resolve(fish);
+            if (schoolingDecision.active()) {
+                if (this.state.steeringLockTicks() <= 0) {
+                    this.applySchoolSteering(fish, schoolingDecision);
+                }
+
+                this.applyForwardMotion(fish, fish.cruiseAcceleration() * schoolingDecision.speedMultiplier(),
+                        fish.cruiseMaxSpeed() * schoolingDecision.speedMultiplier(), true, false);
+                this.updateBodyAndHeadRotation(fish);
+                return;
+            }
+
             if (this.state.steeringLockTicks() <= 0) {
-                this.applyCruiseSteering(fish);
+                if (fish.curvedCruiseMovement()) {
+                    this.applyCurvedCruiseSteering(fish);
+                } else {
+                    this.applyCruiseSteering(fish);
+                }
             }
             this.applyForwardMotion(fish, fish.cruiseAcceleration(), fish.cruiseMaxSpeed(), true, false);
         } else if (decision.mode == MovementMode.ESCAPE) {
@@ -128,7 +145,7 @@ public class FishMovementController {
 
     private BehaviorDecision resolveBehaviorDecision(BaseFishEntity fish) {
         Player reactiveTarget = this.resolveReactiveTarget(fish);
-        Player nearestTarget = this.findNearestThreatPlayer(fish, 1.0D);
+        Player nearestTarget = this.findNearestThreatPlayer(fish, 1.0D, true);
 
         if (this.passByRetreatTicks > 0) {
             return new BehaviorDecision(MovementMode.INERTIA, null);
@@ -147,7 +164,9 @@ public class FishMovementController {
         }
 
         if (responseMode.isChargeMode()) {
-            Player chargeTriggerTarget = responseMode == FishResponseMode.IRRITATE ? reactiveTarget : nearestTarget;
+            Player chargeTriggerTarget = responseMode == FishResponseMode.IRRITATE
+                    ? reactiveTarget
+                    : this.findNearestThreatPlayer(fish, 1.0D, false);
             Player chargeTarget = this.resolveChargeTarget(fish, chargeTriggerTarget);
             if (chargeTarget != null) {
                 return new BehaviorDecision(MovementMode.CHARGE, chargeTarget);
@@ -175,7 +194,8 @@ public class FishMovementController {
 
     private Player resolveChargeTarget(BaseFishEntity fish, Player triggerTarget) {
         Player currentTarget = this.findPlayerById(fish, this.activeChargeTargetId);
-        if (currentTarget != null && this.isTargetablePlayer(fish, currentTarget, fish.behaviorPersistenceRangeMultiplier())) {
+        if (currentTarget != null
+                && this.isTargetablePlayer(fish, currentTarget, fish.behaviorPersistenceRangeMultiplier())) {
             if (fish.hasLineOfSight(currentTarget)) {
                 this.lostChargeTargetTicks = 0;
             } else {
@@ -187,7 +207,8 @@ public class FishMovementController {
             }
         }
 
-        if (triggerTarget != null && this.isTargetablePlayer(fish, triggerTarget, fish.behaviorPersistenceRangeMultiplier())) {
+        if (triggerTarget != null
+                && this.isTargetablePlayer(fish, triggerTarget, fish.behaviorPersistenceRangeMultiplier())) {
             this.activeChargeTargetId = triggerTarget.getId();
             this.lostChargeTargetTicks = 0;
             return triggerTarget;
@@ -198,7 +219,7 @@ public class FishMovementController {
         return null;
     }
 
-    private Player findNearestThreatPlayer(BaseFishEntity fish, double rangeMultiplier) {
+    private Player findNearestThreatPlayer(BaseFishEntity fish, double rangeMultiplier, boolean requireLineOfSight) {
         double detectionRange = fish.playerDetectionRange() * rangeMultiplier;
         Player nearest = fish.level().getNearestPlayer(fish, detectionRange);
 
@@ -206,7 +227,11 @@ public class FishMovementController {
             return null;
         }
 
-        return fish.hasLineOfSight(nearest) ? nearest : null;
+        if (requireLineOfSight && !fish.hasLineOfSight(nearest)) {
+            return null;
+        }
+
+        return nearest;
     }
 
     private Player findPlayerById(BaseFishEntity fish, int playerId) {
@@ -267,7 +292,8 @@ public class FishMovementController {
 
         Vec3 desiredDirection = avoidanceResult.escapeDirection();
         float targetYaw = this.yawFromDirection(desiredDirection);
-        float targetPitch = Mth.clamp(this.pitchFromDirection(desiredDirection), -fish.maxTiltDegrees(), fish.maxTiltDegrees());
+        float targetPitch = Mth.clamp(this.pitchFromDirection(desiredDirection), -fish.maxTiltDegrees(),
+                fish.maxTiltDegrees());
 
         fish.setYRot(this.rotateTowards(fish.getYRot(), targetYaw, fish.escapeTurnRateDegrees()));
         fish.setXRot(this.rotateTowards(fish.getXRot(), targetPitch, fish.escapeTurnRateDegrees() * 0.7F));
@@ -295,7 +321,8 @@ public class FishMovementController {
 
         desiredDirection = desiredDirection.normalize();
         float targetYaw = this.yawFromDirection(desiredDirection);
-        float targetPitch = Mth.clamp(this.pitchFromDirection(desiredDirection), -fish.maxTiltDegrees(), fish.maxTiltDegrees());
+        float targetPitch = Mth.clamp(this.pitchFromDirection(desiredDirection), -fish.maxTiltDegrees(),
+                fish.maxTiltDegrees());
 
         fish.setYRot(this.rotateTowards(fish.getYRot(), targetYaw, fish.chargeTurnRateDegrees()));
         fish.setXRot(this.rotateTowards(fish.getXRot(), targetPitch, fish.chargePitchTurnRateDegrees()));
@@ -325,7 +352,44 @@ public class FishMovementController {
 
         this.updateCruiseDepthTarget(fish);
         this.updateCruisePitchTarget(fish);
-        fish.setXRot(this.rotateTowards(fish.getXRot(), this.state.cruisePitchTarget(), fish.cruisePitchTurnRateDegrees()));
+        fish.setXRot(
+                this.rotateTowards(fish.getXRot(), this.state.cruisePitchTarget(), fish.cruisePitchTurnRateDegrees()));
+    }
+
+    private void applyCurvedCruiseSteering(BaseFishEntity fish) {
+        this.updateCruiseDepthTarget(fish);
+        this.updateCruisePitchTarget(fish);
+        fish.setXRot(
+                this.rotateTowards(fish.getXRot(), this.state.cruisePitchTarget(), fish.cruisePitchTurnRateDegrees()));
+
+        float curveTorque = fish.cruiseCurveTorqueDegrees();
+        if (Math.abs(curveTorque) <= 1.0E-4F) {
+            return;
+        }
+
+        float curveDirection = (fish.getUUID().hashCode() & 1) == 0 ? 1.0F : -1.0F;
+        fish.setYRot(fish.getYRot() + curveDirection * curveTorque);
+        this.state.setCruiseYawTarget(fish.getYRot());
+    }
+
+    private void applySchoolSteering(BaseFishEntity fish, FishSchoolingAI.SchoolingDecision schoolingDecision) {
+        Vec3 desiredDirection = schoolingDecision.desiredDirection();
+        if (desiredDirection.lengthSqr() < 1.0E-6D) {
+            return;
+        }
+
+        float targetYaw = this.yawFromDirection(desiredDirection);
+        float targetPitch = Mth.clamp(this.pitchFromDirection(desiredDirection), -fish.maxTiltDegrees(),
+                fish.maxTiltDegrees());
+
+        fish.setYRot(this.rotateTowards(fish.getYRot(), targetYaw, fish.cruiseYawTurnRateDegrees()));
+        fish.setXRot(this.rotateTowards(fish.getXRot(), targetPitch, fish.cruisePitchTurnRateDegrees()));
+        this.state.setCruiseYawTarget(fish.getYRot());
+        this.state.setCruisePitchTarget(targetPitch);
+
+        double depthDelta = schoolingDecision.schoolCenterY() - fish.getY();
+        double depthCorrection = Math.abs(depthDelta) < 0.6D ? 0.0D : Mth.clamp(depthDelta * 0.08D, -0.14D, 0.14D);
+        this.state.setCruiseTargetY(fish.getY() + depthCorrection);
     }
 
     private void updateCruiseYawTarget(BaseFishEntity fish) {
@@ -337,7 +401,8 @@ public class FishMovementController {
 
         this.state.setCruiseYawDecisionCooldown(this.state.cruiseYawDecisionCooldown() - 1);
         if (this.state.cruiseYawDecisionCooldown() <= 0) {
-            this.state.setCruiseYawDecisionCooldown(fish.cruiseYawDecisionMinTicks() + fish.getRandom().nextInt(fish.cruiseYawDecisionRandomTicks()));
+            this.state.setCruiseYawDecisionCooldown(
+                    fish.cruiseYawDecisionMinTicks() + fish.getRandom().nextInt(fish.cruiseYawDecisionRandomTicks()));
             if (fish.getRandom().nextFloat() < fish.cruiseTurnChance()) {
                 float yawOffset = (fish.getRandom().nextFloat() - 0.5F) * fish.cruiseTurnRangeDegrees();
                 this.state.setCruiseYawTarget(fish.getYRot() + yawOffset);
@@ -351,8 +416,10 @@ public class FishMovementController {
         this.state.setCruiseDepthDecisionCooldown(this.state.cruiseDepthDecisionCooldown() - 1);
 
         if (this.state.cruiseDepthDecisionCooldown() <= 0) {
-            this.state.setCruiseDepthDecisionCooldown(fish.cruisePitchDecisionMinTicks() + fish.getRandom().nextInt(fish.cruisePitchDecisionRandomTicks()));
-            double offsetMagnitude = 1.5D + fish.getRandom().nextDouble() * Math.max(0.1D, fish.cruiseDepthRange() - 1.5D);
+            this.state.setCruiseDepthDecisionCooldown(fish.cruisePitchDecisionMinTicks()
+                    + fish.getRandom().nextInt(fish.cruisePitchDecisionRandomTicks()));
+            double offsetMagnitude = 1.5D
+                    + fish.getRandom().nextDouble() * Math.max(0.1D, fish.cruiseDepthRange() - 1.5D);
             double offset = fish.getRandom().nextBoolean() ? offsetMagnitude : -offsetMagnitude;
             this.state.setCruiseTargetY(fish.getY() + offset);
         }
@@ -368,7 +435,8 @@ public class FishMovementController {
         this.state.setCruisePitchDecisionCooldown(this.state.cruisePitchDecisionCooldown() - 1);
 
         if (this.state.cruisePitchDecisionCooldown() <= 0) {
-            this.state.setCruisePitchDecisionCooldown(fish.cruisePitchDecisionMinTicks() + fish.getRandom().nextInt(fish.cruisePitchDecisionRandomTicks()));
+            this.state.setCruisePitchDecisionCooldown(fish.cruisePitchDecisionMinTicks()
+                    + fish.getRandom().nextInt(fish.cruisePitchDecisionRandomTicks()));
             this.state.setCruiseTargetY(this.state.cruiseTargetY() + (fish.getRandom().nextFloat() - 0.5F) * 1.5F);
         }
 
@@ -377,13 +445,16 @@ public class FishMovementController {
         this.state.setCruisePitchTarget(Mth.clamp(depthPitchTarget, -fish.maxTiltDegrees(), fish.maxTiltDegrees()));
     }
 
-    private void applyForwardMotion(BaseFishEntity fish, double acceleration, double maxSpeed, boolean includeVerticalAssist, boolean useSprintPropulsion) {
+    private void applyForwardMotion(BaseFishEntity fish, double acceleration, double maxSpeed,
+            boolean includeVerticalAssist, boolean useSprintPropulsion) {
         double propulsionMultiplier = this.computePropulsionMultiplier(fish, useSprintPropulsion);
         Vec3 movementDirection = Vec3.directionFromRotation(fish.getXRot(), fish.getYRot()).normalize();
-        Vec3 nextVelocity = fish.getDeltaMovement().scale(fish.waterDrag()).add(movementDirection.scale(acceleration * propulsionMultiplier));
+        Vec3 nextVelocity = fish.getDeltaMovement().scale(fish.waterDrag())
+                .add(movementDirection.scale(acceleration * propulsionMultiplier));
 
         if (includeVerticalAssist) {
-            double verticalAssist = Mth.clamp(this.state.cruiseTargetY() - fish.getY(), -1.0D, 1.0D) * fish.cruiseVerticalAssist();
+            double verticalAssist = Mth.clamp(this.state.cruiseTargetY() - fish.getY(), -1.0D, 1.0D)
+                    * fish.cruiseVerticalAssist();
             nextVelocity = nextVelocity.add(0.0D, verticalAssist, 0.0D);
         }
 
@@ -397,10 +468,13 @@ public class FishMovementController {
     }
 
     private double computePropulsionMultiplier(BaseFishEntity fish, boolean sprinting) {
-        int intervalTicks = Math.max(1, sprinting ? fish.sprintPropulsionIntervalTicks() : fish.cruisePropulsionIntervalTicks());
-        int burstTicks = Mth.clamp(sprinting ? fish.sprintPropulsionBurstTicks() : fish.cruisePropulsionBurstTicks(), 1, intervalTicks);
+        int intervalTicks = Math.max(1,
+                sprinting ? fish.sprintPropulsionIntervalTicks() : fish.cruisePropulsionIntervalTicks());
+        int burstTicks = Mth.clamp(sprinting ? fish.sprintPropulsionBurstTicks() : fish.cruisePropulsionBurstTicks(), 1,
+                intervalTicks);
 
-        if (this.state.propulsionSprintingMode() != sprinting || this.state.propulsionBurstDurationTicks() != burstTicks) {
+        if (this.state.propulsionSprintingMode() != sprinting
+                || this.state.propulsionBurstDurationTicks() != burstTicks) {
             this.state.setPropulsionSprintingMode(sprinting);
             this.state.setPropulsionBurstDurationTicks(burstTicks);
             this.state.setPropulsionBurstTicksRemaining(0);
@@ -410,7 +484,8 @@ public class FishMovementController {
         if (this.state.propulsionBurstTicksRemaining() <= 0) {
             if (this.state.propulsionTicksUntilBurst() > 0) {
                 this.state.setPropulsionTicksUntilBurst(this.state.propulsionTicksUntilBurst() - 1);
-                return sprinting ? fish.sprintPropulsionGlideAccelerationFactor() : fish.cruisePropulsionGlideAccelerationFactor();
+                return sprinting ? fish.sprintPropulsionGlideAccelerationFactor()
+                        : fish.cruisePropulsionGlideAccelerationFactor();
             }
 
             this.state.setPropulsionBurstTicksRemaining(burstTicks);
@@ -425,7 +500,8 @@ public class FishMovementController {
 
         this.state.setPropulsionBurstTicksRemaining(ticksRemaining - 1);
 
-        double pulseFactor = sprinting ? fish.sprintPropulsionBurstAccelerationFactor() : fish.cruisePropulsionBurstAccelerationFactor();
+        double pulseFactor = sprinting ? fish.sprintPropulsionBurstAccelerationFactor()
+                : fish.cruisePropulsionBurstAccelerationFactor();
         return pulseFactor * (0.72D + envelope * 0.28D);
     }
 
@@ -438,7 +514,14 @@ public class FishMovementController {
             return;
         }
 
-        if (!fish.hasLineOfSight(target)) {
+        if (fish.getBoundingBox().inflate(0.28D).intersects(target.getBoundingBox().inflate(0.15D))) {
+            this.dealBiteDamage(fish, target);
+            return;
+        }
+
+        double closeContactReach = Math.max(1.45D, fish.getBbWidth() * 0.95D + target.getBbWidth() * 0.85D);
+        if (fish.distanceToSqr(target) <= closeContactReach * closeContactReach) {
+            this.dealBiteDamage(fish, target);
             return;
         }
 
@@ -453,6 +536,10 @@ public class FishMovementController {
             }
         }
 
+        this.dealBiteDamage(fish, target);
+    }
+
+    private void dealBiteDamage(BaseFishEntity fish, Player target) {
         float damage = (float) Math.max(fish.baseBiteDamage(), fish.getAttributeValue(Attributes.ATTACK_DAMAGE));
         if (!target.hurt(fish.damageSources().mobAttack(fish), damage)) {
             return;

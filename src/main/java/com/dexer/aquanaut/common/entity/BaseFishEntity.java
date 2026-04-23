@@ -13,8 +13,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 public abstract class BaseFishEntity extends WaterAnimal {
-    private static final EntityDataAccessor<Boolean> SPRINTING_AWAY = SynchedEntityData.defineId(BaseFishEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> CHARGING_PLAYER = SynchedEntityData.defineId(BaseFishEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> SPRINTING_AWAY = SynchedEntityData.defineId(BaseFishEntity.class,
+            EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> CHARGING_PLAYER = SynchedEntityData.defineId(BaseFishEntity.class,
+            EntityDataSerializers.BOOLEAN);
 
     private final FishMovementController movementController = new FishMovementController();
 
@@ -119,6 +121,30 @@ public abstract class BaseFishEntity extends WaterAnimal {
 
     protected double getCruiseMaxSpeed() {
         return 0.15D;
+    }
+
+    public final boolean schoolingEnabled() {
+        return this.getSchoolingEnabled();
+    }
+
+    protected boolean getSchoolingEnabled() {
+        return false;
+    }
+
+    public final boolean curvedCruiseMovement() {
+        return this.getCurvedCruiseMovement();
+    }
+
+    protected boolean getCurvedCruiseMovement() {
+        return false;
+    }
+
+    public final float cruiseCurveTorqueDegrees() {
+        return this.getCruiseCurveTorqueDegrees();
+    }
+
+    protected float getCruiseCurveTorqueDegrees() {
+        return 0.0F;
     }
 
     public final double escapeAcceleration() {

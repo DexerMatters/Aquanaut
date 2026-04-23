@@ -25,7 +25,8 @@ public class SardineEntity extends BaseFishEntity implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, state -> {
-            state.getController().setAnimationSpeed(this.isSprintingAway() ? this.getSprintAnimationSpeed() : this.getCruiseAnimationSpeed());
+            state.getController().setAnimationSpeed(
+                    this.isSprintingAway() ? this.getSprintAnimationSpeed() : this.getCruiseAnimationSpeed());
             return state.setAndContinue(SWIM_ANIMATION);
         }));
     }
@@ -38,7 +39,7 @@ public class SardineEntity extends BaseFishEntity implements GeoEntity {
     public static AttributeSupplier createAttributes() {
         return WaterAnimal.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 4.0D)
-                .add(Attributes.MOVEMENT_SPEED, 0.28D)
+                .add(Attributes.MOVEMENT_SPEED, 0.32D)
                 .build();
     }
 
@@ -47,32 +48,47 @@ public class SardineEntity extends BaseFishEntity implements GeoEntity {
         return FishResponseMode.AVOIDANCE;
     }
 
+    @Override
+    protected boolean getSchoolingEnabled() {
+        return true;
+    }
+
+    @Override
+    protected boolean getCurvedCruiseMovement() {
+        return true;
+    }
+
+    @Override
+    protected float getCruiseCurveTorqueDegrees() {
+        return 0.82F;
+    }
+
     protected double getCruiseAnimationSpeed() {
-        return 1.0D;
+        return 1.12D;
     }
 
     protected double getSprintAnimationSpeed() {
-        return 1.85D;
+        return 2.05D;
     }
 
     @Override
     protected double getCruiseAcceleration() {
-        return 0.017D;
+        return 0.022D;
     }
 
     @Override
     protected double getCruiseMaxSpeed() {
-        return 0.23D;
+        return 0.29D;
     }
 
     @Override
     protected double getEscapeAcceleration() {
-        return 0.05D;
+        return 0.065D;
     }
 
     @Override
     protected double getEscapeMaxSpeed() {
-        return 0.52D;
+        return 0.64D;
     }
 
     @Override

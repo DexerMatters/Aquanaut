@@ -4,7 +4,8 @@ public enum FishResponseMode {
     AVOIDANCE,
     STRESS,
     CHARGE,
-    IRRITATE;
+    IRRITATE,
+    PASSIVE;
 
     public boolean isHitTriggered() {
         return this == STRESS || this == IRRITATE;

@@ -13,7 +13,7 @@ Full legal code:
 https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode
 
 Scope in this repository:
-- All files under `src/main/resources/assets/aquanaut/**`
+- All files under `src/main/resources/assets/aquanaut/ (including subdirectories)`
 
 You are free to:
 - Share — copy and redistribute the material in any medium or format

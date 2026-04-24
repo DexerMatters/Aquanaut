@@ -17,6 +17,8 @@ public abstract class BaseFishEntity extends WaterAnimal {
             EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> CHARGING_PLAYER = SynchedEntityData.defineId(BaseFishEntity.class,
             EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> ESCAPE_LAUNCHING = SynchedEntityData.defineId(BaseFishEntity.class,
+            EntityDataSerializers.BOOLEAN);
 
     private final FishMovementController movementController = new FishMovementController();
 
@@ -29,6 +31,7 @@ public abstract class BaseFishEntity extends WaterAnimal {
         super.defineSynchedData(builder);
         builder.define(SPRINTING_AWAY, false);
         builder.define(CHARGING_PLAYER, false);
+        builder.define(ESCAPE_LAUNCHING, false);
     }
 
     @Override
@@ -42,6 +45,7 @@ public abstract class BaseFishEntity extends WaterAnimal {
         this.movementController.tick(this);
         this.entityData.set(SPRINTING_AWAY, this.movementController.isSprintingAway());
         this.entityData.set(CHARGING_PLAYER, this.movementController.isChargingPlayer());
+        this.entityData.set(ESCAPE_LAUNCHING, this.movementController.isEscapeLaunching());
     }
 
     @Override
@@ -68,6 +72,14 @@ public abstract class BaseFishEntity extends WaterAnimal {
         }
 
         return this.movementController.isChargingPlayer();
+    }
+
+    public boolean isEscapeLaunching() {
+        if (this.level().isClientSide) {
+            return this.entityData.get(ESCAPE_LAUNCHING);
+        }
+
+        return this.movementController.isEscapeLaunching();
     }
 
     @Override
@@ -532,5 +544,77 @@ public abstract class BaseFishEntity extends WaterAnimal {
 
     protected int getCollisionTurnCooldownTicks() {
         return 8;
+    }
+
+    public final boolean escapeLaunchBehaviorEnabled() {
+        return this.getEscapeLaunchBehaviorEnabled();
+    }
+
+    protected boolean getEscapeLaunchBehaviorEnabled() {
+        return false;
+    }
+
+    public final int escapeLaunchAnimationTicks() {
+        return this.getEscapeLaunchAnimationTicks();
+    }
+
+    protected int getEscapeLaunchAnimationTicks() {
+        return 0;
+    }
+
+    public final int escapeLaunchBurstLeadTicks() {
+        return this.getEscapeLaunchBurstLeadTicks();
+    }
+
+    protected int getEscapeLaunchBurstLeadTicks() {
+        return 0;
+    }
+
+    public final double escapeLaunchPrepDrag() {
+        return this.getEscapeLaunchPrepDrag();
+    }
+
+    protected double getEscapeLaunchPrepDrag() {
+        return 0.84D;
+    }
+
+    public final double escapeLaunchBurstSpeed() {
+        return this.getEscapeLaunchBurstSpeed();
+    }
+
+    protected double getEscapeLaunchBurstSpeed() {
+        return this.escapeMaxSpeed();
+    }
+
+    public final double escapeLaunchPostBurstDrag() {
+        return this.getEscapeLaunchPostBurstDrag();
+    }
+
+    protected double getEscapeLaunchPostBurstDrag() {
+        return this.waterDrag();
+    }
+
+    public final double escapeLaunchSustainAcceleration() {
+        return this.getEscapeLaunchSustainAcceleration();
+    }
+
+    protected double getEscapeLaunchSustainAcceleration() {
+        return this.escapeAcceleration();
+    }
+
+    public final double escapeLaunchMaxSpeed() {
+        return this.getEscapeLaunchMaxSpeed();
+    }
+
+    protected double getEscapeLaunchMaxSpeed() {
+        return Math.max(this.escapeMaxSpeed(), this.escapeLaunchBurstSpeed());
+    }
+
+    public final int escapeLaunchSteeringLockTicks() {
+        return this.getEscapeLaunchSteeringLockTicks();
+    }
+
+    protected int getEscapeLaunchSteeringLockTicks() {
+        return 0;
     }
 }

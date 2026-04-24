@@ -1,6 +1,8 @@
 package com.dexer.aquanaut.common.ai;
 
 import com.dexer.aquanaut.common.entity.BaseFishEntity;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -22,6 +24,9 @@ public class FishMovementController {
     private int biteCooldownTicks;
     private int passByRetreatTicks;
     private int passByReengageCooldownTicks;
+    private int escapeLaunchTicksRemaining;
+    private boolean escapeLaunchBurstTriggered;
+    private Vec3 escapeLaunchDirection = Vec3.ZERO;
 
     public void tick(BaseFishEntity fish) {
         if (!fish.isInWater()) {
@@ -60,13 +65,19 @@ public class FishMovementController {
             }
             this.applyForwardMotion(fish, fish.cruiseAcceleration(), fish.cruiseMaxSpeed(), true, false);
         } else if (decision.mode == MovementMode.ESCAPE) {
-            if (this.state.steeringLockTicks() <= 0) {
-                this.applyEscapeSteering(fish, decision.target);
+            if (fish.escapeLaunchBehaviorEnabled()) {
+                this.applyEscapeLaunchMotion(fish, decision.target);
+            } else {
+                if (this.state.steeringLockTicks() <= 0) {
+                    this.applyEscapeSteering(fish, decision.target);
+                }
+                this.applyForwardMotion(fish, fish.escapeAcceleration(), fish.escapeMaxSpeed(), false, true);
             }
-            this.applyForwardMotion(fish, fish.escapeAcceleration(), fish.escapeMaxSpeed(), false, true);
         } else if (decision.mode == MovementMode.INERTIA) {
+            this.clearEscapeLaunchState();
             this.applyPassByInertiaMotion(fish);
         } else {
+            this.clearEscapeLaunchState();
             if (this.state.steeringLockTicks() <= 0) {
                 this.applyChargeSteering(fish, decision.target);
             }
@@ -105,6 +116,10 @@ public class FishMovementController {
         return this.state.isChargingPlayer();
     }
 
+    public boolean isEscapeLaunching() {
+        return this.escapeLaunchTicksRemaining > 0;
+    }
+
     private void resetRuntimeState(BaseFishEntity fish) {
         this.avoidanceLogic.reset();
 
@@ -117,6 +132,7 @@ public class FishMovementController {
         this.biteCooldownTicks = 0;
         this.passByRetreatTicks = 0;
         this.passByReengageCooldownTicks = 0;
+        this.clearEscapeLaunchState();
 
         this.state.reset(fish.getYRot(), fish.getY());
     }
@@ -154,12 +170,13 @@ public class FishMovementController {
         FishResponseMode responseMode = fish.responseMode();
         if (responseMode.isEscapeMode()) {
             Player escapeTarget = responseMode == FishResponseMode.STRESS ? reactiveTarget : nearestTarget;
-            if (escapeTarget != null) {
+            if (escapeTarget != null || this.isEscapeLaunchActive(fish)) {
                 return new BehaviorDecision(MovementMode.ESCAPE, escapeTarget);
             }
         }
 
         if (this.passByReengageCooldownTicks > 0) {
+            this.clearEscapeLaunchState();
             return new BehaviorDecision(MovementMode.CRUISE, null);
         }
 
@@ -175,7 +192,12 @@ public class FishMovementController {
 
         this.activeChargeTargetId = -1;
         this.lostChargeTargetTicks = 0;
+        this.clearEscapeLaunchState();
         return new BehaviorDecision(MovementMode.CRUISE, null);
+    }
+
+    private boolean isEscapeLaunchActive(BaseFishEntity fish) {
+        return fish.escapeLaunchBehaviorEnabled() && this.escapeLaunchTicksRemaining > 0;
     }
 
     private Player resolveReactiveTarget(BaseFishEntity fish) {
@@ -282,15 +304,10 @@ public class FishMovementController {
     }
 
     private void applyEscapeSteering(BaseFishEntity fish, Player escapeFrom) {
-        PlayerAvoidanceLogic.AvoidanceResult avoidanceResult = escapeFrom != null
-                ? this.avoidanceLogic.computeAgainst(fish, escapeFrom)
-                : this.avoidanceLogic.compute(fish, fish.playerDetectionRange());
-
-        if (avoidanceResult == null) {
+        Vec3 desiredDirection = this.resolveEscapeDirection(fish, escapeFrom);
+        if (desiredDirection.lengthSqr() < 1.0E-6D) {
             return;
         }
-
-        Vec3 desiredDirection = avoidanceResult.escapeDirection();
         float targetYaw = this.yawFromDirection(desiredDirection);
         float targetPitch = Mth.clamp(this.pitchFromDirection(desiredDirection), -fish.maxTiltDegrees(),
                 fish.maxTiltDegrees());
@@ -298,6 +315,123 @@ public class FishMovementController {
         fish.setYRot(this.rotateTowards(fish.getYRot(), targetYaw, fish.escapeTurnRateDegrees()));
         fish.setXRot(this.rotateTowards(fish.getXRot(), targetPitch, fish.escapeTurnRateDegrees() * 0.7F));
         this.state.setCruiseYawTarget(fish.getYRot());
+    }
+
+    private void applyEscapeLaunchMotion(BaseFishEntity fish, Player escapeFrom) {
+        Vec3 desiredDirection = this.resolveEscapeDirection(fish, escapeFrom);
+        if (desiredDirection.lengthSqr() < 1.0E-6D) {
+            desiredDirection = this.escapeLaunchDirection.lengthSqr() > 1.0E-6D
+                    ? this.escapeLaunchDirection
+                    : Vec3.directionFromRotation(fish.getXRot(), fish.getYRot()).normalize();
+        }
+
+        desiredDirection = desiredDirection.normalize();
+
+        if (this.escapeLaunchTicksRemaining <= 0) {
+            this.escapeLaunchTicksRemaining = Math.max(1, fish.escapeLaunchAnimationTicks());
+            this.escapeLaunchBurstTriggered = false;
+            this.escapeLaunchDirection = desiredDirection;
+        }
+
+        if (!this.escapeLaunchBurstTriggered) {
+            this.escapeLaunchDirection = desiredDirection;
+
+            if (this.state.steeringLockTicks() <= 0) {
+                float targetYaw = this.yawFromDirection(this.escapeLaunchDirection);
+                float targetPitch = Mth.clamp(this.pitchFromDirection(this.escapeLaunchDirection),
+                        -fish.maxTiltDegrees(), fish.maxTiltDegrees());
+                fish.setYRot(this.rotateTowards(fish.getYRot(), targetYaw, fish.escapeTurnRateDegrees()));
+                fish.setXRot(this.rotateTowards(fish.getXRot(), targetPitch, fish.escapeTurnRateDegrees() * 0.7F));
+                this.state.setCruiseYawTarget(fish.getYRot());
+            }
+
+            fish.setDeltaMovement(fish.getDeltaMovement().scale(fish.escapeLaunchPrepDrag()));
+            fish.hasImpulse = true;
+
+            if (this.escapeLaunchTicksRemaining <= fish.escapeLaunchBurstLeadTicks()) {
+                this.triggerEscapeLaunchBurst(fish);
+            }
+        } else {
+            this.applyEscapeLaunchSustainMotion(fish);
+        }
+
+        this.escapeLaunchTicksRemaining--;
+        if (this.escapeLaunchTicksRemaining <= 0) {
+            this.clearEscapeLaunchState();
+        }
+    }
+
+    private void triggerEscapeLaunchBurst(BaseFishEntity fish) {
+        Vec3 burstDirection = this.escapeLaunchDirection.lengthSqr() > 1.0E-6D
+                ? this.escapeLaunchDirection.normalize()
+                : Vec3.directionFromRotation(fish.getXRot(), fish.getYRot()).normalize();
+        double burstSpeed = fish.escapeLaunchBurstSpeed();
+
+        fish.setDeltaMovement(burstDirection.scale(burstSpeed));
+        fish.hasImpulse = true;
+        this.spawnEscapeLaunchSplash(fish, burstDirection, burstSpeed);
+        this.escapeLaunchBurstTriggered = true;
+        this.state.setSteeringLockTicks(
+                Math.max(this.state.steeringLockTicks(), Math.max(0, fish.escapeLaunchSteeringLockTicks())));
+    }
+
+    private void spawnEscapeLaunchSplash(BaseFishEntity fish, Vec3 burstDirection, double burstSpeed) {
+        if (!(fish.level() instanceof ServerLevel level)) {
+            return;
+        }
+
+        Vec3 trailOffset = burstDirection.scale(-Math.max(0.12D, fish.getBbWidth() * 0.45D));
+        Vec3 splashOrigin = fish.position()
+                .add(0.0D, fish.getBbHeight() * 0.45D, 0.0D)
+                .add(trailOffset);
+        double spread = 0.08D + Math.min(0.16D, burstSpeed * 0.04D);
+        double speed = 0.02D + Math.min(0.08D, burstSpeed * 0.025D);
+
+        level.sendParticles(ParticleTypes.SPLASH,
+                splashOrigin.x, splashOrigin.y, splashOrigin.z,
+                10,
+                spread, spread * 0.55D, spread,
+                speed);
+        level.sendParticles(ParticleTypes.BUBBLE,
+                splashOrigin.x, splashOrigin.y, splashOrigin.z,
+                14,
+                spread * 0.9D, spread * 0.6D, spread * 0.9D,
+                speed * 0.9D);
+    }
+
+    private void applyEscapeLaunchSustainMotion(BaseFishEntity fish) {
+        Vec3 forwardDirection = this.escapeLaunchDirection.lengthSqr() > 1.0E-6D
+                ? this.escapeLaunchDirection.normalize()
+                : Vec3.directionFromRotation(fish.getXRot(), fish.getYRot()).normalize();
+        Vec3 nextVelocity = fish.getDeltaMovement().scale(fish.escapeLaunchPostBurstDrag())
+                .add(forwardDirection.scale(fish.escapeLaunchSustainAcceleration()));
+
+        double maxSpeed = fish.escapeLaunchMaxSpeed();
+        double maxSpeedSqr = maxSpeed * maxSpeed;
+        if (nextVelocity.lengthSqr() > maxSpeedSqr) {
+            nextVelocity = nextVelocity.normalize().scale(maxSpeed);
+        }
+
+        fish.setDeltaMovement(nextVelocity);
+        fish.hasImpulse = true;
+    }
+
+    private Vec3 resolveEscapeDirection(BaseFishEntity fish, Player escapeFrom) {
+        PlayerAvoidanceLogic.AvoidanceResult avoidanceResult = escapeFrom != null
+                ? this.avoidanceLogic.computeAgainst(fish, escapeFrom)
+                : this.avoidanceLogic.compute(fish, fish.playerDetectionRange());
+
+        if (avoidanceResult == null) {
+            return Vec3.ZERO;
+        }
+
+        return avoidanceResult.escapeDirection();
+    }
+
+    private void clearEscapeLaunchState() {
+        this.escapeLaunchTicksRemaining = 0;
+        this.escapeLaunchBurstTriggered = false;
+        this.escapeLaunchDirection = Vec3.ZERO;
     }
 
     private void applyChargeSteering(BaseFishEntity fish, Player target) {

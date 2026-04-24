@@ -1,11 +1,10 @@
 {
-  "itemGroup.examplemod": "Example Mod Tab",
-  "block.examplemod.example_block": "Example Block",
-  "item.examplemod.example_item": "Example Item",
   "entity.aquanaut.octopus": "Octopus",
   "entity.aquanaut.sardine": "Sardine",
   "entity.aquanaut.anglerfish": "Anglerfish",
   "entity.aquanaut.electrofish": "Electrofish",
+  "entity.aquanaut.donutfish": "Donutfish",
+  "entity.aquanaut.springfish": "Springfish",
   "entity.aquanaut.icerail": "Icerail",
   "entity.aquanaut.helicoprion": "Helicoprion"
 }

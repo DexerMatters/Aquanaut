@@ -146,6 +146,43 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     implementation "software.bernie.geckolib:geckolib-neoforge-1.21:${project.geckolib_version}"
+    annotationProcessor "net.fabricmc:sponge-mixin:0.15.2+mixin.0.8.7"
+}
+
+def mixinRefmapFile = layout.buildDirectory.file("resources/main/${mod_id}.refmap.json")
+def mixinMappingsFile = layout.buildDirectory.file("moddev/artifacts/namedToIntermediate.tsrg")
+
+// Produce a minimal named→notch TSRG for the two methods our mixins target.
+// The Mixin AP requires this to resolve obfuscation mappings when generating the refmap.
+tasks.register("generateMixinMappings") {
+    def outputFile = mixinMappingsFile
+    outputs.file(outputFile)
+    doLast {
+        def f = outputFile.get().asFile
+        f.parentFile.mkdirs()
+        f.text = "tsrg2 named notch\n" +
+                "net/minecraft/world/entity/Entity bsr\n" +
+                "\tgetMaxAirSupply ()I cl\n" +
+                "\tbaseTick ()V aw\n" +
+                "\thurt (Lnet/minecraft/world/damagesource/DamageSource;F)Z a\n" +
+                "net/minecraft/world/entity/LivingEntity btn\n" +
+                "\tgetMaxAirSupply ()I cl\n" +
+                "\tincreaseAirSupply (I)I n\n"
+    }
+}
+
+tasks.named("compileJava", org.gradle.api.tasks.compile.JavaCompile).configure {
+    dependsOn tasks.named("generateMixinMappings")
+    options.compilerArgs.addAll([
+            "-AreobfTsrgFile=${mixinMappingsFile.get().asFile.absolutePath}",
+            "-AoutRefMapFile=${mixinRefmapFile.get().asFile.absolutePath}",
+            "-AmappingTypes=tsrg",
+            "-AdefaultObfuscationEnv=notch",
+    ])
+}
+
+tasks.named("jar", org.gradle.jvm.tasks.Jar).configure {
+    from(mixinRefmapFile)
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

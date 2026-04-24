@@ -1,0 +1,12 @@
+{
+    "required": true,
+    "package": "com.dexer.aquanaut.mixin",
+    "refmap": "aquanaut.refmap.json",
+    "mixins": [
+        "EntityMixin",
+        "LivingEntityMixin"
+    ],
+    "injectors": {
+        "defaultRequire": 1
+    }
+}

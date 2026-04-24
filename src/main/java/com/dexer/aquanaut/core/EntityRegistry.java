@@ -1,12 +1,15 @@
 package com.dexer.aquanaut.core;
 
 import com.dexer.aquanaut.Aquanaut;
+import com.dexer.aquanaut.common.entity.AirBubbleEntity;
 import com.dexer.aquanaut.common.entity.AnglerfishEntity;
+import com.dexer.aquanaut.common.entity.DonutfishEntity;
 import com.dexer.aquanaut.common.entity.ElectrofishEntity;
 import com.dexer.aquanaut.common.entity.HelicoprionEntity;
 import com.dexer.aquanaut.common.entity.IcerailEntity;
 import com.dexer.aquanaut.common.entity.OctopusEntity;
 import com.dexer.aquanaut.common.entity.SardineEntity;
+import com.dexer.aquanaut.common.entity.SpringfishEntity;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -51,6 +54,20 @@ public class EntityRegistry {
                     .sized(1.15F, 1.35F)
                     .build("electrofish"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<DonutfishEntity>> DONUTFISH = ENTITIES.register(
+            "donutfish",
+            () -> EntityType.Builder
+                    .<DonutfishEntity>of(DonutfishEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(1.96F, 1.96F)
+                    .build("donutfish"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SpringfishEntity>> SPRINGFISH = ENTITIES.register(
+            "springfish",
+            () -> EntityType.Builder
+                    .<SpringfishEntity>of(SpringfishEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(0.75F, 0.58F)
+                    .build("springfish"));
+
     public static final DeferredHolder<EntityType<?>, EntityType<IcerailEntity>> ICERAIL = ENTITIES.register(
             "icerail",
             () -> EntityType.Builder
@@ -65,6 +82,13 @@ public class EntityRegistry {
                     .sized(1.6F, 1.45F)
                     .build("helicoprion"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<AirBubbleEntity>> AIR_BUBBLE = ENTITIES.register(
+            "air_bubble",
+            () -> EntityType.Builder
+                    .<AirBubbleEntity>of(AirBubbleEntity::new, MobCategory.MISC)
+                    .sized(0.9375F, 0.9375F)
+                    .build("air_bubble"));
+
     public static void register(IEventBus eventBus) {
         ENTITIES.register(eventBus);
     }
@@ -75,6 +99,8 @@ public class EntityRegistry {
         event.put(EntityRegistry.SARDINE.get(), SardineEntity.createAttributes());
         event.put(EntityRegistry.ANGLERFISH.get(), AnglerfishEntity.createAttributes());
         event.put(EntityRegistry.ELECTROFISH.get(), ElectrofishEntity.createAttributes());
+        event.put(EntityRegistry.DONUTFISH.get(), DonutfishEntity.createAttributes());
+        event.put(EntityRegistry.SPRINGFISH.get(), SpringfishEntity.createAttributes());
         event.put(EntityRegistry.ICERAIL.get(), IcerailEntity.createAttributes());
         event.put(EntityRegistry.HELICOPRION.get(), HelicoprionEntity.createAttributes());
     }

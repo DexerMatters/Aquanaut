@@ -15,7 +15,7 @@ import software.bernie.geckolib.cache.object.BakedGeoModel;
 
 public class ElectrofishRenderer extends BaseFishRenderer<ElectrofishEntity> {
     private static final ResourceLocation GLOW_TEXTURE = ResourceLocation.fromNamespaceAndPath("aquanaut",
-            "textures/entity/eletrofish_glowmask.png");
+            "textures/entity/electrofish_glowmask.png");
 
     public ElectrofishRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new ElectrofishModel());

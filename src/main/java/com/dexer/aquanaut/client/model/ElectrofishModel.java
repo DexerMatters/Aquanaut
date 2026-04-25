@@ -13,7 +13,7 @@ public class ElectrofishModel extends GeoModel<ElectrofishEntity> {
 
     @Override
     public ResourceLocation getTextureResource(ElectrofishEntity animatable) {
-        return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/eletrofish.png");
+        return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/electrofish.png");
     }
 
     @Override

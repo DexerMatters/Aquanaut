@@ -1,0 +1,6 @@
+{
+    "parent": "minecraft:item/generated",
+    "textures": {
+        "layer0": "aquanaut:item/anglerfish_spawn_egg"
+    }
+}

@@ -1,6 +1,8 @@
 package com.dexer.aquanaut;
 
+import com.dexer.aquanaut.core.AttachmentRegistry;
 import com.dexer.aquanaut.core.EntityRegistry;
+import com.dexer.aquanaut.core.ItemRegistry;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -23,7 +25,9 @@ public class Aquanaut {
         modEventBus.addListener(this::commonSetup);
 
         // Registers
+        AttachmentRegistry.register(modEventBus);
         EntityRegistry.register(modEventBus);
+        ItemRegistry.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }

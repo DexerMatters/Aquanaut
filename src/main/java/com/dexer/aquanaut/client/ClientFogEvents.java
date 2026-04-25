@@ -34,15 +34,24 @@ public final class ClientFogEvents {
     private static final float CLEAR_SPEED = 1.0F / 60.0F;
     /** Drown damage per hit (matches the @ModifyArg double: 2.0 * 2 = 4.0). */
     private static final float DROWN_DAMAGE_PER_HIT = 4.0F;
-    /** Vanilla ticks between drown damage hits. */
-    private static final float DROWN_TICKS_PER_HIT = 20.0F;
-    /** Assumed client frame rate for timer calculations. */
-    private static final float ASSUMED_FPS = 60.0F;
+    /** Real-time milliseconds between drown damage hits (20 ticks × 50 ms/tick). */
+    private static final float DROWN_MS_PER_HIT = 1000.0F;
 
-    /** Smooth client-side darkness level [0, 1] driven by the drowning timer. */
+    /** Smooth client-side darkness level [0, 1]. */
     private static float drowningDarkness = 0.0F;
-    /** Darken increment per frame, computed from health at drowning start. */
-    private static float darkenSpeed = 0.0F;
+    /**
+     * System.currentTimeMillis() when the current drowning episode started. -1 = no
+     * episode.
+     */
+    private static long drowningStartMs = -1L;
+    /** Estimated milliseconds from episode start until death. */
+    private static float drowningDurationMs = 0.0F;
+    /**
+     * True once we have seen airSupply < 0, meaning the damage counter is active.
+     * Used to distinguish the initial air=0 (just ran out) from the post-damage
+     * air=0 reset.
+     */
+    private static boolean hadNegativeAir = false;
 
     private ClientFogEvents() {
     }
@@ -109,23 +118,35 @@ public final class ClientFogEvents {
     }
 
     private static void tickDrowningDarkness(Entity entity) {
-        boolean isDrowning = entity instanceof LivingEntity living
-                && living.isInWater()
-                && living.getAirSupply() <= 0;
-
-        if (isDrowning) {
-            // On the first frame of drowning, calculate how many frames until death
-            // based on *current* health so the darkness fills up exactly by the time
-            // the player would die.
-            if (darkenSpeed == 0.0F && entity instanceof LivingEntity living) {
-                float hitsUntilDeath = living.getHealth() / DROWN_DAMAGE_PER_HIT;
-                float framesUntilDeath = hitsUntilDeath * DROWN_TICKS_PER_HIT * (ASSUMED_FPS / 20.0F);
-                darkenSpeed = framesUntilDeath > 0 ? 1.0F / framesUntilDeath : 1.0F;
-            }
-            drowningDarkness = Math.min(1.0F, drowningDarkness + darkenSpeed);
-        } else {
-            darkenSpeed = 0.0F;
+        if (!(entity instanceof LivingEntity living)
+                || !living.isInWater()
+                || living.getAirSupply() > 0) {
+            drowningStartMs = -1L;
+            hadNegativeAir = false;
             drowningDarkness = Math.max(0.0F, drowningDarkness - CLEAR_SPEED);
+            return;
         }
+
+        int air = living.getAirSupply();
+
+        // Track when the damage countdown goes negative (i.e., < 0).
+        if (air < 0) {
+            hadNegativeAir = true;
+        }
+
+        if (drowningStartMs < 0) {
+            // Start the episode only on the FIRST DAMAGE HIT.
+            if (hadNegativeAir && air == 0) {
+                drowningStartMs = System.currentTimeMillis();
+                float hitsToLive = Math.max(1.0F, living.getHealth() / DROWN_DAMAGE_PER_HIT);
+                drowningDurationMs = hitsToLive * DROWN_MS_PER_HIT * 2.0F;
+            }
+            return;
+        }
+
+        // Episode active: smoothly map real elapsed time to [0, 1].
+        long elapsed = System.currentTimeMillis() - drowningStartMs;
+        drowningDarkness = Mth.clamp(elapsed / drowningDurationMs, 0.0F, 1.0F);
+
     }
 }

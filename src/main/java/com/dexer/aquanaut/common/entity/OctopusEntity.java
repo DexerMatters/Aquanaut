@@ -122,11 +122,11 @@ public class OctopusEntity extends BaseFishEntity implements GeoEntity {
 
     @Override
     protected float getHitboxPickInflation() {
-        return 0.46F;
+        return 0.40F;
     }
 
     @Override
     protected double getHitboxVisualYOffset() {
-        return -0.225D;
+        return 0.75D;
     }
 }

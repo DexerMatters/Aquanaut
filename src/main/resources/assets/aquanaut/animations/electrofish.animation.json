@@ -5,7 +5,7 @@
       "loop": true,
       "animation_length": 4.8,
       "bones": {
-        "eletrofish": {
+        "electrofish": {
           "rotation": {
             "0.0": {
               "vector": [

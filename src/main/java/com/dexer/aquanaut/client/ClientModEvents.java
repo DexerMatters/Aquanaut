@@ -11,14 +11,29 @@ import com.dexer.aquanaut.client.renderer.OctopusRenderer;
 import com.dexer.aquanaut.client.renderer.SardineRenderer;
 import com.dexer.aquanaut.client.renderer.SpringfishRenderer;
 import com.dexer.aquanaut.core.EntityRegistry;
+import com.dexer.aquanaut.core.ItemRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 
 @EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class ClientModEvents {
     private ClientModEvents() {
+    }
+
+    @SubscribeEvent
+    public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
+        event.register((stack, tintIndex) -> -1,
+                ItemRegistry.OCTOPUS_SPAWN_EGG.get(),
+                ItemRegistry.SARDINE_SPAWN_EGG.get(),
+                ItemRegistry.ANGLERFISH_SPAWN_EGG.get(),
+                ItemRegistry.ELECTROFISH_SPAWN_EGG.get(),
+                ItemRegistry.DONUTFISH_SPAWN_EGG.get(),
+                ItemRegistry.SPRINGFISH_SPAWN_EGG.get(),
+                ItemRegistry.ICERAIL_SPAWN_EGG.get(),
+                ItemRegistry.HELICOPRION_SPAWN_EGG.get());
     }
 
     @SubscribeEvent

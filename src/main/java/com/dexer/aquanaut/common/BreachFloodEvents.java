@@ -63,6 +63,7 @@ public final class BreachFloodEvents {
     private static final int DEFAULT_SCAN_RADIUS = 2;
     private static final int SPONGE_SCAN_RADIUS = 7;
     private static final int MAX_SCAN_ATTEMPTS = 20;
+    private static final int MIN_DEPTH = 10;
     private static final double SUCTION_RADIUS = 6.0D;
     private static final double SUCTION_STRENGTH = 0.06D;
     private static final Direction[] DIRECTIONS = Direction.values();
@@ -230,6 +231,10 @@ public final class BreachFloodEvents {
             return;
 
         int waterlineY = computeWaterlineY(level, entryPoints);
+        if (waterlineY - breachPos.getY() < MIN_DEPTH) {
+            ACTIVE_KEYS.remove(key);
+            return;
+        }
         float pressure = PressureHelper.getPressure(level, (double) breachPos.getY());
         FloodTask task = new FloodTask(level, keyPos, entryPoints, pressure, key, waterlineY);
         if (task.isEmpty()) {

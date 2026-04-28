@@ -44,6 +44,9 @@ public class BubbleGunItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+        if (stack.getDamageValue() >= stack.getMaxDamage()) {
+            return InteractionResultHolder.fail(stack);
+        }
         player.startUsingItem(hand);
         return InteractionResultHolder.consume(stack);
     }
@@ -54,10 +57,13 @@ public class BubbleGunItem extends Item {
             return;
         if (!(livingEntity instanceof Player player))
             return;
+        if (stack.getDamageValue() >= stack.getMaxDamage())
+            return;
 
         int elapsed = MAX_USE_DURATION - remainingUseDuration;
         if (elapsed % BUBBLE_SPAWN_INTERVAL == 0) {
             spawnBubble(player);
+            stack.setDamageValue(Math.min(stack.getDamageValue() + 1, stack.getMaxDamage()));
         }
     }
 

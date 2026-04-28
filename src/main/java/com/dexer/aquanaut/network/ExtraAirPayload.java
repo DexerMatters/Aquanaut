@@ -9,13 +9,13 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record ExtraAirPayload(int extraAir, int maxExtraAir) implements CustomPacketPayload {
+/** Syncs only max extra-air capacity; current air uses vanilla entity sync. */
+public record ExtraAirPayload(int maxExtraAir) implements CustomPacketPayload {
 
     public static final Type<ExtraAirPayload> TYPE = new Type<>(
             ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, "extra_air"));
 
     public static final StreamCodec<ByteBuf, ExtraAirPayload> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.INT, ExtraAirPayload::extraAir,
             ByteBufCodecs.INT, ExtraAirPayload::maxExtraAir,
             ExtraAirPayload::new);
 
@@ -25,6 +25,6 @@ public record ExtraAirPayload(int extraAir, int maxExtraAir) implements CustomPa
     }
 
     public static void handle(ExtraAirPayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> ClientAirData.set(payload.extraAir(), payload.maxExtraAir()));
+        context.enqueueWork(() -> ClientAirData.setMaxExtraAir(payload.maxExtraAir()));
     }
 }

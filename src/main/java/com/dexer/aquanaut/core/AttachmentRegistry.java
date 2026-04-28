@@ -12,12 +12,9 @@ public final class AttachmentRegistry {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister
             .create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, Aquanaut.MODID);
 
-    /** Current extra air supply granted by equipment or effects. Default: 0. */
-    public static final DeferredHolder<AttachmentType<?>, AttachmentType<Integer>> EXTRA_AIR_SUPPLY = ATTACHMENT_TYPES
-            .register("extra_air_supply",
-                    () -> AttachmentType.builder(() -> 0).serialize(Codec.INT).build());
-
-    /** Maximum extra air supply the player can hold. Default: 0. */
+    /**
+     * Maximum extra air capacity added on top of the base 1200 ticks. Default: 0.
+     */
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<Integer>> MAX_EXTRA_AIR_SUPPLY = ATTACHMENT_TYPES
             .register("max_extra_air_supply",
                     () -> AttachmentType.builder(() -> 0).serialize(Codec.INT).build());

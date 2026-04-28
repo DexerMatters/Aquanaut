@@ -4,7 +4,6 @@
     "refmap": "aquanaut.refmap.json",
     "mixins": [
         "EntityMixin",
-        "ExtraAirLivingEntityMixin",
         "LivingEntityMixin"
     ],
     "injectors": {

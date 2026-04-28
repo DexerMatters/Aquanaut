@@ -1,6 +1,7 @@
 package com.dexer.aquanaut.client;
 
 import com.dexer.aquanaut.Aquanaut;
+import com.dexer.aquanaut.common.AirSupplyHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
@@ -17,8 +18,8 @@ import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
  *
  * <h3>Visual design</h3>
  * <ul>
- * <li>Each "layer" equals one full vanilla air bar (=
- * {@code player.getMaxAirSupply()} ticks, 10 bubbles).</li>
+ * <li>Each "layer" equals one base air bar
+ * ({@code AirSupplyHelper.BASE_AIR_SUPPLY_TICKS} ticks, 10 bubbles).</li>
  * <li>The currently draining layer loses bubbles from the <b>left</b>; the
  * vanilla bar loses from the right,
  * so the two directions are visually distinct.</li>
@@ -88,22 +89,24 @@ public final class ClientHudEvents {
             return;
         }
 
-        // Only show when extra air exists and the overlay is needed.
-        int extraAir = ClientAirData.getExtraAir();
+        int baseAirSupply = AirSupplyHelper.BASE_AIR_SUPPLY_TICKS;
         int maxExtraAir = ClientAirData.getMaxExtraAir();
-        if (extraAir <= 0 || maxExtraAir <= 0) {
+        if (maxExtraAir <= 0) {
+            return;
+        }
+
+        // Current air is always read from vanilla sync.
+        int totalAir = player.getAirSupply();
+        int totalMaxAir = baseAirSupply + maxExtraAir;
+        int extraAir = Math.max(0, totalAir - baseAirSupply);
+        if (extraAir <= 0) {
             return;
         }
 
         // Hide only when both the main air bar is hidden AND extra air is full.
         if (!player.isUnderWater()
-                && player.getAirSupply() >= player.getMaxAirSupply()
+                && totalAir >= totalMaxAir
                 && extraAir >= maxExtraAir) {
-            return;
-        }
-
-        int maxAirSupply = player.getMaxAirSupply();
-        if (maxAirSupply <= 0) {
             return;
         }
 
@@ -117,22 +120,22 @@ public final class ClientHudEvents {
         // ── Decompose extraAir into layers ─────────────────────────────────────
         // layer = index of the currently-draining layer (0 = last tank remaining).
         // totalLayers = total number of tanks based on maxExtraAir.
-        int totalLayers = Mth.ceil((float) maxExtraAir / maxAirSupply);
+        int totalLayers = Mth.ceil((float) maxExtraAir / baseAirSupply);
 
         // When extra air is still filling but the player is on the surface with
         // a full main bar, vanilla has already hidden its bubble row. Draw a
         // white (untinted) full row ourselves so the bar never disappears.
         boolean mainBarHiddenByVanilla = !player.isUnderWater()
-                && player.getAirSupply() >= player.getMaxAirSupply();
+                && totalAir >= totalMaxAir;
         if (mainBarHiddenByVanilla && extraAir < maxExtraAir) {
             drawBubbles(graphics, guiWidth, airBarY, 0, 10, AIR_SPRITE);
         }
 
         // Only draw extra-air layers when there is actually some extra air left.
         if (extraAir > 0) {
-            int layer = (extraAir - 1) / maxAirSupply;
-            int topLayerAir = extraAir - layer * maxAirSupply;
-            int topLayerBubbles = Mth.ceil((double) topLayerAir * 10.0 / maxAirSupply); // [1..10]
+            int layer = (extraAir - 1) / baseAirSupply;
+            int topLayerAir = extraAir - layer * baseAirSupply;
+            int topLayerBubbles = Mth.ceil((double) topLayerAir * 10.0 / baseAirSupply); // [1..10]
 
             // ── Draw from back to front ─────────────────────────────────────────────
             // Full layers (depth layer … depth 1): all 10 bubbles.

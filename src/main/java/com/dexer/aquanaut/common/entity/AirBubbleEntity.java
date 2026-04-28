@@ -1,6 +1,6 @@
 package com.dexer.aquanaut.common.entity;
 
-import com.dexer.aquanaut.common.IExtraAirSupply;
+import com.dexer.aquanaut.common.AirSupplyHelper;
 import com.dexer.aquanaut.core.EntityRegistry;
 import com.dexer.aquanaut.core.SoundRegistry;
 import net.minecraft.nbt.CompoundTag;
@@ -132,24 +132,16 @@ public class AirBubbleEntity extends Entity {
     }
 
     private void grantAirOnBurst() {
-        // 4 bubbles per SIZE level. 1 bubble = maxAirSupply / 10 ticks.
+        // Rebalanced for unified-air system: 1 base bubble (120 ticks) per SIZE.
         int bubblesPerSize = 1;
+        int baseTicksPerBubble = AirSupplyHelper.BASE_AIR_SUPPLY_TICKS / 10;
         float radius = getDimensions(getPose()).width() * 1.5f;
         AABB searchBox = this.getBoundingBox().inflate(radius);
 
         List<LivingEntity> creatures = this.level().getEntitiesOfClass(LivingEntity.class, searchBox);
         for (LivingEntity entity : creatures) {
-            int ticksPerBubble = entity.getMaxAirSupply() / 10;
-            int airGrant = bubblesPerSize * getSize() * ticksPerBubble;
-
-            // Replenish vanilla air supply
-            entity.setAirSupply(Math.min(entity.getAirSupply() + airGrant, entity.getMaxAirSupply()));
-
-            // Top up extra air supply (works for any LivingEntity via mixin)
-            IExtraAirSupply extra = (IExtraAirSupply) entity;
-            int newExtra = Math.min(extra.aquanaut$getExtraAirSupply() + airGrant,
-                    extra.aquanaut$getMaxExtraAirSupply());
-            extra.aquanaut$setExtraAirSupply(newExtra);
+            int airGrant = bubblesPerSize * getSize() * baseTicksPerBubble;
+            AirSupplyHelper.addAir(entity, airGrant);
         }
     }
 

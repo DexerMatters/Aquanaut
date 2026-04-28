@@ -1,8 +1,8 @@
 package com.dexer.aquanaut.client;
 
 /**
- * Client-side cache of the local player's max extra-air capacity, synced from
- * the server.
+ * Client-side cache of the local player's effective extra-air capacity, synced
+ * from the server.
  */
 public final class ClientAirData {
 

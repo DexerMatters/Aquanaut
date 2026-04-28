@@ -1,5 +1,6 @@
 package com.dexer.aquanaut.common;
 
+import com.dexer.aquanaut.common.diving.DivingEquipmentHelper;
 import com.dexer.aquanaut.core.AttachmentRegistry;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -8,8 +9,8 @@ import net.minecraft.world.entity.LivingEntity;
  *
  * <p>
  * The vanilla air bar remains the single source of truth. Extra capacity is
- * stored as {@code MAX_EXTRA_AIR_SUPPLY}, and max air is computed as
- * {@code BASE_AIR_SUPPLY_TICKS + maxExtra}.
+ * stored as {@code MAX_EXTRA_AIR_SUPPLY}, with logical diving equipment adding
+ * a separate tank bonus on top.
  */
 public final class AirSupplyHelper {
 
@@ -38,15 +39,22 @@ public final class AirSupplyHelper {
     public static void setMaxExtraAir(LivingEntity entity, int value) {
         int maxExtra = sanitizeExtraCapacity(value);
         entity.setData(AttachmentRegistry.MAX_EXTRA_AIR_SUPPLY.get(), maxExtra);
+        clampAirToUnifiedMax(entity);
+    }
 
-        int unifiedMax = BASE_AIR_SUPPLY_TICKS + maxExtra;
-        if (entity.getAirSupply() > unifiedMax) {
-            entity.setAirSupply(unifiedMax);
-        }
+    public static int getEffectiveExtraCapacity(LivingEntity entity) {
+        return sanitizeExtraCapacity(getMaxExtraAir(entity) + DivingEquipmentHelper.getTankCapacityBonus(entity));
     }
 
     public static int getUnifiedMaxAir(LivingEntity entity) {
-        return BASE_AIR_SUPPLY_TICKS + getMaxExtraAir(entity);
+        return BASE_AIR_SUPPLY_TICKS + getEffectiveExtraCapacity(entity);
+    }
+
+    public static void clampAirToUnifiedMax(LivingEntity entity) {
+        int unifiedMax = getUnifiedMaxAir(entity);
+        if (entity.getAirSupply() > unifiedMax) {
+            entity.setAirSupply(unifiedMax);
+        }
     }
 
     public static void addAir(LivingEntity entity, int amount) {
@@ -64,7 +72,7 @@ public final class AirSupplyHelper {
      * Capacity tiers are counted in multiples of BASE_AIR_SUPPLY_TICKS.
      */
     public static int getRegenPerTick(LivingEntity entity) {
-        int maxExtra = getMaxExtraAir(entity);
+        int maxExtra = getEffectiveExtraCapacity(entity);
         if (maxExtra <= 0) {
             return 0;
         }

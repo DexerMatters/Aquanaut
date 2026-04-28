@@ -4,7 +4,11 @@
     "refmap": "aquanaut.refmap.json",
     "mixins": [
         "EntityMixin",
-        "LivingEntityMixin"
+        "LivingEntityMixin",
+        "InventoryMenuMixin"
+    ],
+    "client": [
+        "CreativeModeInventoryScreenMixin"
     ],
     "injectors": {
         "defaultRequire": 1

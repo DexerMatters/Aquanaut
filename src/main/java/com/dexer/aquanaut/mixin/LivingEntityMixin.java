@@ -1,6 +1,8 @@
 package com.dexer.aquanaut.mixin;
 
+import com.dexer.aquanaut.Config;
 import com.dexer.aquanaut.common.AirSupplyHelper;
+import com.dexer.aquanaut.common.diving.DivingEquipmentHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,6 +19,7 @@ public abstract class LivingEntityMixin {
             return;
         }
         int regenPerTick = AirSupplyHelper.getRegenPerTick(livingEntity);
+        regenPerTick += DivingEquipmentHelper.getMaskRegenBonus(livingEntity);
         if (regenPerTick <= 0) {
             return;
         }

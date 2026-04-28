@@ -53,6 +53,13 @@ public final class ItemRegistry {
     public static final DeferredItem<Item> ICE_FIN = ITEMS.registerSimpleItem("ice_fin");
     public static final DeferredItem<Item> ICE_CORE = ITEMS.registerSimpleItem("ice_core");
 
+    public static final DeferredItem<Item> IRON_OXYGEN_TANK = equipmentItem("iron_oxygen_tank");
+    public static final DeferredItem<Item> WOOD_OXYGEN_TANK = equipmentItem("wood_oxygen_tank");
+    public static final DeferredItem<Item> SHARK_SKIN = ITEMS.registerSimpleItem("shark_skin");
+    public static final DeferredItem<Item> SHARK_FLIPPERS = equipmentItem("shark_flippers");
+    public static final DeferredItem<Item> WOOD_FLIPPERS = equipmentItem("wood_flippers");
+    public static final DeferredItem<Item> CORAL_FLIPPERS = equipmentItem("coral_flippers");
+
     // Coral block items (log-like blocks)
     public static final DeferredItem<BlockItem> RED_CORAL_BLOCK = blockItem("red_coral_block",
             BlockRegistry.RED_CORAL_BLOCK);
@@ -130,6 +137,7 @@ public final class ItemRegistry {
                 output.accept(OCTOPUS_SHREDS.get());
                 output.accept(SARDINE.get());
                 output.accept(SHARK_FINS.get());
+                output.accept(SHARK_SKIN.get());
                 output.accept(FANG.get());
                 output.accept(ICE_FIN.get());
                 output.accept(ICE_CORE.get());
@@ -138,6 +146,15 @@ public final class ItemRegistry {
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TOOLS_TAB = tab("tools",
             BUBBLE_GUN, output -> {
                 output.accept(BUBBLE_GUN.get());
+            });
+
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> EQUIPMENT_TAB = tab("equipment",
+            IRON_OXYGEN_TANK, output -> {
+                output.accept(IRON_OXYGEN_TANK.get());
+                output.accept(WOOD_OXYGEN_TANK.get());
+                output.accept(SHARK_FLIPPERS.get());
+                output.accept(WOOD_FLIPPERS.get());
+                output.accept(CORAL_FLIPPERS.get());
             });
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> ENVIRONMENT_TAB = tab("environment",
@@ -181,6 +198,10 @@ public final class ItemRegistry {
             Supplier<? extends net.minecraft.world.level.block.Block> block) {
         return ITEMS.registerItem(name,
                 properties -> new BlockItem(block.get(), properties));
+    }
+
+    private static DeferredItem<Item> equipmentItem(String name) {
+        return ITEMS.registerItem(name, properties -> new Item(properties.stacksTo(1)));
     }
 
     private static DeferredHolder<CreativeModeTab, CreativeModeTab> tab(String name,

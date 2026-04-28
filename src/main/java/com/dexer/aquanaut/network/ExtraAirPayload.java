@@ -9,7 +9,10 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-/** Syncs only max extra-air capacity; current air uses vanilla entity sync. */
+/**
+ * Syncs only effective extra-air capacity; current air uses vanilla entity
+ * sync.
+ */
 public record ExtraAirPayload(int maxExtraAir) implements CustomPacketPayload {
 
     public static final Type<ExtraAirPayload> TYPE = new Type<>(

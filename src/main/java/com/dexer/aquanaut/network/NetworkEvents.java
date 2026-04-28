@@ -19,5 +19,13 @@ public final class NetworkEvents {
                 ExtraAirPayload.TYPE,
                 ExtraAirPayload.STREAM_CODEC,
                 ExtraAirPayload::handle);
+        registrar.playToClient(
+                DivingEquipmentSyncPayload.TYPE,
+                DivingEquipmentSyncPayload.STREAM_CODEC,
+                DivingEquipmentSyncPayload::handle);
+        registrar.playToServer(
+                DivingEquipmentClickPayload.TYPE,
+                DivingEquipmentClickPayload.STREAM_CODEC,
+                DivingEquipmentClickPayload::handle);
     }
 }

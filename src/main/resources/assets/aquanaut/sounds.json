@@ -1,0 +1,47 @@
+{
+    "bubble_burst": {
+        "subtitle": "subtitles.aquanaut.bubble_burst",
+        "sounds": [
+            {
+                "name": "minecraft:block/bubble_column/bubble_column_upwards_ambient",
+                "volume": 0.6,
+                "pitch": 1.5
+            },
+            {
+                "name": "minecraft:block/bubble_column/bubble_column_upwards_ambient",
+                "volume": 0.5,
+                "pitch": 1.8
+            }
+        ]
+    },
+    "bubble_ambient": {
+        "subtitle": "subtitles.aquanaut.bubble_ambient",
+        "sounds": [
+            {
+                "name": "minecraft:block/bubble_column/bubble_column_whirlpool_ambient",
+                "volume": 0.2,
+                "pitch": 1.2
+            },
+            {
+                "name": "minecraft:block/bubble_column/bubble_column_upwards_ambient",
+                "volume": 0.15,
+                "pitch": 1.3
+            }
+        ]
+    },
+    "bubble_merge": {
+        "subtitle": "subtitles.aquanaut.bubble_merge",
+        "sounds": [
+            {
+                "name": "minecraft:block/bubble_column/bubble_column_upwards_ambient",
+                "volume": 0.4,
+                "pitch": 1.2
+            },
+            {
+                "name": "minecraft:block/bubble_column/bubble_column_whirlpool_ambient",
+                "volume": 0.3,
+                "pitch": 1.1
+            }
+        ]
+    }
+}

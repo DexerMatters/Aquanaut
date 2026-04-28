@@ -16,14 +16,15 @@ public class AirBubbleRenderer extends EntityRenderer<AirBubbleEntity> {
 
     private static final ResourceLocation BUBBLE_TEXTURE = ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID,
             "textures/entity/airbubble.png");
+    private static final ResourceLocation GLOW_TEXTURE = ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID,
+            "textures/entity/airbubble_glowmask.png");
     private static final ResourceLocation BURST_TEXTURE = ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID,
             "textures/entity/airbubble_burst.png");
 
     private static final int BURST_FRAMES = 8;
 
-    // 15 pixels out of 16 per block = 0.9375 blocks
-    private static final float SIZE = 15f / 16f;
-    private static final float HALF = SIZE / 2f;
+    /** Base half-size: 15/16 block ÷ 2 = 15/32. */
+    private static final float BASE_HALF = (15f / 16f) / 2f;
 
     public AirBubbleRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -37,58 +38,82 @@ public class AirBubbleRenderer extends EntityRenderer<AirBubbleEntity> {
         // Billboard: apply camera orientation so the quad always faces the player
         poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
 
-        int burstFrame = entity.getBurstFrame();
-        ResourceLocation texture;
-        float v0, v1;
+        // SIZE directly controls scale, matching getDimensions (like vanilla Slime)
+        float scale = entity.getSize();
+        float half = BASE_HALF * scale;
 
-        if (burstFrame == 0) {
-            // Intact bubble — full texture
-            texture = BUBBLE_TEXTURE;
+        int burstFrame = entity.getBurstFrame();
+        boolean intact = burstFrame == 0;
+
+        // Compute UV for intact vs burst spritesheet
+        float v0, v1;
+        if (intact) {
             v0 = 0f;
             v1 = 1f;
         } else {
-            // Burst animation — slice the vertical spritesheet
-            // burstFrame 1–7 maps to spritesheet rows 1–7 out of 8
-            texture = BURST_TEXTURE;
             v0 = (float) burstFrame / BURST_FRAMES;
             v1 = (float) (burstFrame + 1) / BURST_FRAMES;
         }
 
         Matrix4f matrix = poseStack.last().pose();
-        VertexConsumer consumer = bufferSource.getBuffer(RenderType.entityTranslucentCull(texture));
 
+        // First pass: normal opaque texture
+        VertexConsumer mainBuf = bufferSource.getBuffer(RenderType.entityCutout(
+                intact ? BUBBLE_TEXTURE : BURST_TEXTURE));
+        renderQuad(matrix, mainBuf, half, v0, v1, packedLight);
+
+        // Second pass: glow overlay (only for intact bubbles)
+        if (intact) {
+            VertexConsumer glowBuf = bufferSource.getBuffer(RenderType.eyes(GLOW_TEXTURE));
+            renderQuad(matrix, glowBuf, half, v0, v1, 2728640);
+        }
+
+        poseStack.popPose();
+
+        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+    }
+
+    /**
+     * Draws a single billboarded quad with the given parameters.
+     *
+     * @param matrix      the current pose matrix
+     * @param consumer    the vertex consumer (buffered via the appropriate
+     *                    RenderType)
+     * @param half        half the quad size (width/2)
+     * @param v0          top V coordinate
+     * @param v1          bottom V coordinate
+     * @param packedLight light value (use 15728640 for full-bright glow)
+     */
+    private void renderQuad(Matrix4f matrix, VertexConsumer consumer, float half,
+            float v0, float v1, int packedLight) {
         // Quad vertices: TL -> BL -> BR -> TR
-        consumer.addVertex(matrix, -HALF, HALF, 0f)
+        consumer.addVertex(matrix, -half, half, 0f)
                 .setColor(255, 255, 255, 255)
                 .setUv(0f, v0)
                 .setOverlay(OverlayTexture.NO_OVERLAY)
                 .setLight(packedLight)
                 .setNormal(0f, 0f, 1f);
 
-        consumer.addVertex(matrix, -HALF, -HALF, 0f)
+        consumer.addVertex(matrix, -half, -half, 0f)
                 .setColor(255, 255, 255, 255)
                 .setUv(0f, v1)
                 .setOverlay(OverlayTexture.NO_OVERLAY)
                 .setLight(packedLight)
                 .setNormal(0f, 0f, 1f);
 
-        consumer.addVertex(matrix, HALF, -HALF, 0f)
+        consumer.addVertex(matrix, half, -half, 0f)
                 .setColor(255, 255, 255, 255)
                 .setUv(1f, v1)
                 .setOverlay(OverlayTexture.NO_OVERLAY)
                 .setLight(packedLight)
                 .setNormal(0f, 0f, 1f);
 
-        consumer.addVertex(matrix, HALF, HALF, 0f)
+        consumer.addVertex(matrix, half, half, 0f)
                 .setColor(255, 255, 255, 255)
                 .setUv(1f, v0)
                 .setOverlay(OverlayTexture.NO_OVERLAY)
                 .setLight(packedLight)
                 .setNormal(0f, 0f, 1f);
-
-        poseStack.popPose();
-
-        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
     }
 
     @Override

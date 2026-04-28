@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "aquanaut:red_coral_block",
+    "aquanaut:blue_coral_block",
+    "aquanaut:purple_coral_block",
+    "aquanaut:green_coral_block",
+    "aquanaut:fluorescent_blue_coral_block",
+    "aquanaut:ringed_blue_coral_block",
+    "aquanaut:ringed_green_coral_block",
+    "aquanaut:ringed_purple_coral_block",
+    "aquanaut:ringed_red_coral_block",
+    "aquanaut:ringed_fluorescent_blue_coral_block"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+    "variants": {
+        "axis=x": {
+            "model": "aquanaut:block/ringed_green_coral_block_horizontal",
+            "x": 90,
+            "y": 90
+        },
+        "axis=y": {
+            "model": "aquanaut:block/ringed_green_coral_block"
+        },
+        "axis=z": {
+            "model": "aquanaut:block/ringed_green_coral_block_horizontal",
+            "x": 90
+        }
+    }
+}

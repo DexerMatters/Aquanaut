@@ -1,7 +1,6 @@
 package com.dexer.aquanaut.client;
 
 import com.dexer.aquanaut.Aquanaut;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
@@ -23,9 +22,8 @@ import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
  * <li>The currently draining layer loses bubbles from the <b>left</b>; the
  * vanilla bar loses from the right,
  * so the two directions are visually distinct.</li>
- * <li>Every layer has a unique colour tint; lower (older) layers peek through
- * the empty slots
- * of the layer above them.</li>
+ * <li>Every layer uses a baked sprite variant; lower (older) layers peek
+ * through the empty slots of the layer above them.</li>
  * </ul>
  *
  * <h3>Rendering order (back → front)</h3>
@@ -40,15 +38,15 @@ public final class ClientHudEvents {
     private static final ResourceLocation AIR_SPRITE = ResourceLocation.withDefaultNamespace("hud/air");
 
     /**
-     * Tints applied per absolute layer slot (index 0 = topmost/first-consumed).
-     * ARGB — alpha 0xFF so blitSprite honours RenderSystem colour.
+     * Baked sprites applied per absolute layer slot (index 0 =
+     * topmost/first-consumed).
      */
-    private static final int[] LAYER_COLORS = {
-            0xFFFFCC00, // gold – 1st tank (topmost, first consumed)
-            0xFF00CCFF, // cyan – 2nd tank
-            0xFF44FF44, // lime – 3rd tank
-            0xFFFF55CC, // pink – 4th tank
-            0xFFAA66FF, // violet – 5th+ tank
+    private static final ResourceLocation[] LAYER_SPRITES = {
+            ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, "hud/air_layer_0"),
+            ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, "hud/air_layer_1"),
+            ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, "hud/air_layer_2"),
+            ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, "hud/air_layer_3"),
+            ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, "hud/air_layer_4"),
     };
 
     private ClientHudEvents() {
@@ -82,6 +80,11 @@ public final class ClientHudEvents {
         }
         LocalPlayer player = mc.player;
         if (player == null) {
+            return;
+        }
+
+        // Creative/spectator — no air HUD needed
+        if (player.isCreative() || player.isSpectator()) {
             return;
         }
 
@@ -122,7 +125,7 @@ public final class ClientHudEvents {
         boolean mainBarHiddenByVanilla = !player.isUnderWater()
                 && player.getAirSupply() >= player.getMaxAirSupply();
         if (mainBarHiddenByVanilla && extraAir < maxExtraAir) {
-            drawBubbles(graphics, guiWidth, airBarY, 0, 10, 0xFFFFFFFF);
+            drawBubbles(graphics, guiWidth, airBarY, 0, 10, AIR_SPRITE);
         }
 
         // Only draw extra-air layers when there is actually some extra air left.
@@ -136,42 +139,32 @@ public final class ClientHudEvents {
             for (int depth = layer; depth >= 1; depth--) {
                 int absLayer = layer - depth;
                 int slot = totalLayers - 1 - absLayer;
-                drawBubbles(graphics, guiWidth, airBarY, 0, 10, colorAt(slot));
+                drawBubbles(graphics, guiWidth, airBarY, 0, 10, spriteAt(slot));
             }
             // Draining layer: leftmost (10 - topLayerBubbles) slots are empty.
             int drainingSlot = totalLayers - 1 - layer;
             int emptySlots = 10 - topLayerBubbles;
-            drawBubbles(graphics, guiWidth, airBarY, emptySlots, 10, colorAt(drainingSlot));
+            drawBubbles(graphics, guiWidth, airBarY, emptySlots, 10, spriteAt(drainingSlot));
         }
     }
 
     /**
-     * Draws bubble sprites for slots [startSlot, endSlot) using the given ARGB
-     * tint.
+     * Draws bubble sprites for slots [startSlot, endSlot) using the given sprite.
      * Slot 0 = leftmost bubble, slot 9 = rightmost (matching vanilla's j1=9 and
      * j1=0).
      */
     private static void drawBubbles(
             net.minecraft.client.gui.GuiGraphics graphics,
-            int guiWidth, int y, int startSlot, int endSlot, int argb) {
-        float r = ((argb >> 16) & 0xFF) / 255f;
-        float g = ((argb >> 8) & 0xFF) / 255f;
-        float b = (argb & 0xFF) / 255f;
-        float a = ((argb >> 24) & 0xFF) / 255f;
-
-        RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(r, g, b, a);
+            int guiWidth, int y, int startSlot, int endSlot, ResourceLocation sprite) {
         for (int i = startSlot; i < endSlot; i++) {
             // Convert slot index (left=0) to vanilla x formula (j1 counts from right):
             // vanilla: x = guiWidth/2 + 91 - 9 - j1*8, j1 = 9-i
             int x = guiWidth / 2 + 91 - 9 - (9 - i) * 8;
-            graphics.blitSprite(AIR_SPRITE, x, y, 9, 9);
+            graphics.blitSprite(sprite, x, y, 9, 9);
         }
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        RenderSystem.disableBlend();
     }
 
-    private static int colorAt(int depth) {
-        return LAYER_COLORS[Math.min(depth, LAYER_COLORS.length - 1)];
+    private static ResourceLocation spriteAt(int depth) {
+        return LAYER_SPRITES[Math.min(depth, LAYER_SPRITES.length - 1)];
     }
 }

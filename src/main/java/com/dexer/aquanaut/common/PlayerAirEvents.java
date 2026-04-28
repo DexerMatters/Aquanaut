@@ -16,9 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import com.mojang.logging.LogUtils;
-
 /**
  * Intercepts vanilla air-supply drain by comparing air before and after
  * {@code Entity.baseTick()} runs each tick. When the player's air went down
@@ -41,8 +38,6 @@ public final class PlayerAirEvents {
     /** Stores each server-player's air supply sampled just before their tick. */
     private static final Map<UUID, Integer> PRE_TICK_AIR = new HashMap<>();
 
-    private static final Logger LOGGER = LogUtils.getLogger();
-
     /**
      * Tracks the display state sent to each client so we only re-send when
      * something visible has changed (avoids one packet per tick while diving).
@@ -52,16 +47,13 @@ public final class PlayerAirEvents {
     private PlayerAirEvents() {
     }
 
-    /** TEST: give every player 2 full extra tanks on join. */
+    /** Clean up tracked state when a player disconnects. */
     @SubscribeEvent
-    public static void onPlayerJoin(PlayerEvent.PlayerLoggedInEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player))
-            return;
-        int twoTanks = player.getMaxAirSupply() * 2;
-        player.setData(AttachmentRegistry.MAX_EXTRA_AIR_SUPPLY.get(), twoTanks);
-        player.setData(AttachmentRegistry.EXTRA_AIR_SUPPLY.get(), twoTanks);
-        LOGGER.info("[AquaExtraAir] JOIN: player={} maxAirSupply={} setExtraAir={} setMaxExtraAir={}",
-                player.getName().getString(), player.getMaxAirSupply(), twoTanks, twoTanks);
+    public static void onPlayerDisconnect(PlayerEvent.PlayerLoggedOutEvent event) {
+        UUID uuid = event.getEntity().getUUID();
+        PRE_TICK_AIR.remove(uuid);
+        LAST_SENT_STATE.remove(uuid);
+        AirRegenTracker.AIR_INCREASE_CALLED.remove(uuid);
     }
 
     @SubscribeEvent
@@ -88,37 +80,26 @@ public final class PlayerAirEvents {
         int maxExtraAir = player.getData(AttachmentRegistry.MAX_EXTRA_AIR_SUPPLY.get());
         int maxAirSupply = player.getMaxAirSupply();
 
-        // Log every 20 ticks to avoid spam
-        if (player.tickCount % 20 == 0) {
-            LOGGER.info("[AquaExtraAir] TICK: player={} prevAir={} currAir={} extraAir={} maxExtraAir={}",
-                    player.getName().getString(), prevAir, currAir, extraAirBefore, maxExtraAir);
-        }
-
         // Vanilla drained some air this tick — consume extra air instead.
         if (currAir < prevAir) {
-            LOGGER.info("[AquaExtraAir] DRAIN detected: player={} prevAir={} currAir={} drained={} extraAir={}",
-                    player.getName().getString(), prevAir, currAir, prevAir - currAir, extraAirBefore);
             if (extraAirBefore > 0) {
                 int drained = prevAir - currAir;
                 int consumed = Math.min(drained, extraAirBefore);
                 player.setAirSupply(currAir + consumed);
                 int newExtra = extraAirBefore - consumed;
                 player.setData(AttachmentRegistry.EXTRA_AIR_SUPPLY.get(), newExtra);
-                LOGGER.info("[AquaExtraAir] CONSUMED: consumed={} extraAir now={} mainAir restored to={}",
-                        consumed, newExtra, currAir + consumed);
-            } else {
-                LOGGER.info("[AquaExtraAir] DRAIN but extraAir=0, no restore.");
             }
-        } else if (extraAirBefore < maxExtraAir) {
+        } else if (extraAirBefore < maxExtraAir && maxExtraAir > 0) {
             // Extra air only regens once the main bar is fully topped off.
             // - AIR_INCREASE_CALLED flag: increaseAirSupply was invoked but main bar was
             // already full (bubble column while extra tanks are keeping air at max)
-            // - surface with full main bar (passive surface regen)
+            // - surfaced: player is not underwater — start slow regen regardless
+            // of whether the main bar ticked up this frame.
             boolean mainBarFull = currAir == maxAirSupply;
             boolean vanillaRegenning = mainBarFull
                     && AirRegenTracker.AIR_INCREASE_CALLED.remove(player.getUUID());
-            boolean surfaceFullBar = mainBarFull && !player.isUnderWater();
-            if (vanillaRegenning || surfaceFullBar) {
+            boolean surfaced = !player.isUnderWater();
+            if (vanillaRegenning || surfaced) {
                 int regenPerTick = computeRegenPerTick(maxAirSupply, maxExtraAir);
                 int newExtra = Math.min(extraAirBefore + regenPerTick, maxExtraAir);
                 player.setData(AttachmentRegistry.EXTRA_AIR_SUPPLY.get(), newExtra);

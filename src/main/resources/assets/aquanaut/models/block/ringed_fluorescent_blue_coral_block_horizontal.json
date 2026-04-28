@@ -1,0 +1,195 @@
+{
+    "parent": "minecraft:block/block",
+    "render_type": "minecraft:cutout",
+    "textures": {
+        "particle": "aquanaut:block/ringed_fluorescent_blue_coral_block",
+        "down": "aquanaut:block/ringed_fluorescent_blue_coral_block_top",
+        "up": "aquanaut:block/ringed_fluorescent_blue_coral_block_top",
+        "north": "aquanaut:block/ringed_fluorescent_blue_coral_block",
+        "south": "aquanaut:block/ringed_fluorescent_blue_coral_block",
+        "east": "aquanaut:block/ringed_fluorescent_blue_coral_block",
+        "west": "aquanaut:block/ringed_fluorescent_blue_coral_block",
+        "glow_down": "aquanaut:block/ringed_fluorescent_blue_coral_block_top_glowmask",
+        "glow_up": "aquanaut:block/ringed_fluorescent_blue_coral_block_top_glowmask",
+        "glow_north": "aquanaut:block/ringed_fluorescent_blue_coral_block_glowmask",
+        "glow_south": "aquanaut:block/ringed_fluorescent_blue_coral_block_glowmask",
+        "glow_east": "aquanaut:block/ringed_fluorescent_blue_coral_block_glowmask",
+        "glow_west": "aquanaut:block/ringed_fluorescent_blue_coral_block_glowmask"
+    },
+    "elements": [
+        {
+            "from": [
+                0,
+                0,
+                0
+            ],
+            "to": [
+                16,
+                16,
+                16
+            ],
+            "faces": {
+                "down": {
+                    "uv": [
+                        0,
+                        0,
+                        16,
+                        16
+                    ],
+                    "texture": "#down",
+                    "cullface": "down"
+                },
+                "up": {
+                    "uv": [
+                        0,
+                        0,
+                        16,
+                        16
+                    ],
+                    "texture": "#up",
+                    "rotation": 180,
+                    "cullface": "up"
+                },
+                "north": {
+                    "uv": [
+                        0,
+                        0,
+                        16,
+                        16
+                    ],
+                    "texture": "#north",
+                    "cullface": "north"
+                },
+                "south": {
+                    "uv": [
+                        0,
+                        0,
+                        16,
+                        16
+                    ],
+                    "texture": "#south",
+                    "cullface": "south"
+                },
+                "west": {
+                    "uv": [
+                        0,
+                        0,
+                        16,
+                        16
+                    ],
+                    "texture": "#west",
+                    "cullface": "west"
+                },
+                "east": {
+                    "uv": [
+                        0,
+                        0,
+                        16,
+                        16
+                    ],
+                    "texture": "#east",
+                    "cullface": "east"
+                }
+            }
+        },
+        {
+            "from": [
+                -0.01,
+                -0.01,
+                -0.01
+            ],
+            "to": [
+                16.01,
+                16.01,
+                16.01
+            ],
+            "faces": {
+                "down": {
+                    "uv": [
+                        0,
+                        0,
+                        16,
+                        16
+                    ],
+                    "texture": "#glow_down",
+                    "cullface": "down",
+                    "neoforge_data": {
+                        "block_light": 15,
+                        "sky_light": 15
+                    }
+                },
+                "up": {
+                    "uv": [
+                        0,
+                        0,
+                        16,
+                        16
+                    ],
+                    "texture": "#glow_up",
+                    "rotation": 180,
+                    "cullface": "up",
+                    "neoforge_data": {
+                        "block_light": 15,
+                        "sky_light": 15
+                    }
+                },
+                "north": {
+                    "uv": [
+                        0,
+                        0,
+                        16,
+                        16
+                    ],
+                    "texture": "#glow_north",
+                    "cullface": "north",
+                    "neoforge_data": {
+                        "block_light": 15,
+                        "sky_light": 15
+                    }
+                },
+                "south": {
+                    "uv": [
+                        0,
+                        0,
+                        16,
+                        16
+                    ],
+                    "texture": "#glow_south",
+                    "cullface": "south",
+                    "neoforge_data": {
+                        "block_light": 15,
+                        "sky_light": 15
+                    }
+                },
+                "west": {
+                    "uv": [
+                        0,
+                        0,
+                        16,
+                        16
+                    ],
+                    "texture": "#glow_west",
+                    "cullface": "west",
+                    "neoforge_data": {
+                        "block_light": 15,
+                        "sky_light": 15
+                    }
+                },
+                "east": {
+                    "uv": [
+                        0,
+                        0,
+                        16,
+                        16
+                    ],
+                    "texture": "#glow_east",
+                    "cullface": "east",
+                    "neoforge_data": {
+                        "block_light": 15,
+                        "sky_light": 15
+                    }
+                }
+            }
+        }
+    ]
+}

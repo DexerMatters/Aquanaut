@@ -3,6 +3,7 @@ package com.dexer.aquanaut.core;
 import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.entity.AirBubbleEntity;
 import com.dexer.aquanaut.common.entity.AnglerfishEntity;
+import com.dexer.aquanaut.common.entity.CatfishEntity;
 import com.dexer.aquanaut.common.entity.DonutfishEntity;
 import com.dexer.aquanaut.common.entity.ElectrofishEntity;
 import com.dexer.aquanaut.common.entity.HelicoprionEntity;
@@ -86,6 +87,13 @@ public class EntityRegistry {
                                                         .sized(1.6F, 1.45F)
                                                         .build("helicoprion"));
 
+        public static final DeferredHolder<EntityType<?>, EntityType<CatfishEntity>> CATFISH = ENTITIES.register(
+                        "catfish",
+                        () -> EntityType.Builder
+                                        .<CatfishEntity>of(CatfishEntity::new, MobCategory.WATER_CREATURE)
+                                        .sized(0.9F, 0.9F)
+                                        .build("catfish"));
+
         public static final DeferredHolder<EntityType<?>, EntityType<AirBubbleEntity>> AIR_BUBBLE = ENTITIES.register(
                         "air_bubble",
                         () -> EntityType.Builder
@@ -107,5 +115,6 @@ public class EntityRegistry {
                 event.put(EntityRegistry.SPRINGFISH.get(), SpringfishEntity.createAttributes());
                 event.put(EntityRegistry.ICERAIL.get(), IcerailEntity.createAttributes());
                 event.put(EntityRegistry.HELICOPRION.get(), HelicoprionEntity.createAttributes());
+                event.put(EntityRegistry.CATFISH.get(), CatfishEntity.createAttributes());
         }
 }

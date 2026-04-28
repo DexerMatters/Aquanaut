@@ -4,8 +4,8 @@
     "refmap": "aquanaut.refmap.json",
     "mixins": [
         "EntityMixin",
-        "LivingEntityMixin",
-        "PlayerMixin"
+        "ExtraAirLivingEntityMixin",
+        "LivingEntityMixin"
     ],
     "injectors": {
         "defaultRequire": 1

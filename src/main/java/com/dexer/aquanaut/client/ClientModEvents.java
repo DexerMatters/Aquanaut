@@ -3,6 +3,7 @@ package com.dexer.aquanaut.client;
 import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.client.renderer.AirBubbleRenderer;
 import com.dexer.aquanaut.client.renderer.AnglerfishRenderer;
+import com.dexer.aquanaut.client.renderer.CatfishRenderer;
 import com.dexer.aquanaut.client.renderer.DonutfishRenderer;
 import com.dexer.aquanaut.client.renderer.ElectrofishRenderer;
 import com.dexer.aquanaut.client.renderer.HelicoprionRenderer;
@@ -33,7 +34,8 @@ public final class ClientModEvents {
                 ItemRegistry.DONUTFISH_SPAWN_EGG.get(),
                 ItemRegistry.SPRINGFISH_SPAWN_EGG.get(),
                 ItemRegistry.ICERAIL_SPAWN_EGG.get(),
-                ItemRegistry.HELICOPRION_SPAWN_EGG.get());
+                ItemRegistry.HELICOPRION_SPAWN_EGG.get(),
+                ItemRegistry.CATFISH_SPAWN_EGG.get());
     }
 
     @SubscribeEvent
@@ -46,6 +48,7 @@ public final class ClientModEvents {
         event.registerEntityRenderer(EntityRegistry.SPRINGFISH.get(), SpringfishRenderer::new);
         event.registerEntityRenderer(EntityRegistry.ICERAIL.get(), IcerailRenderer::new);
         event.registerEntityRenderer(EntityRegistry.HELICOPRION.get(), HelicoprionRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.CATFISH.get(), CatfishRenderer::new);
         event.registerEntityRenderer(EntityRegistry.AIR_BUBBLE.get(), AirBubbleRenderer::new);
     }
 }

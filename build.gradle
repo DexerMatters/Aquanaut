@@ -34,6 +34,13 @@ repositories {
             includeGroup("software.bernie.geckolib")
         }
     }
+    maven {
+        name = 'TerraBlender'
+        url 'https://maven.minecraftforge.net/releases/'
+        content {
+            includeGroup("com.github.glitchfiend")
+        }
+    }
 }
 
 base {
@@ -146,6 +153,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     implementation "software.bernie.geckolib:geckolib-neoforge-1.21:${project.geckolib_version}"
+    implementation "com.github.glitchfiend:TerraBlender-neoforge:1.21-${project.terra_blender_version}"
     annotationProcessor "net.fabricmc:sponge-mixin:0.15.2+mixin.0.8.7"
 }
 

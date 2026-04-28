@@ -1,0 +1,7 @@
+{
+    "parent": "minecraft:block/cube_column",
+    "textures": {
+        "end": "aquanaut:block/purple_coral_block_top",
+        "side": "aquanaut:block/purple_coral_block"
+    }
+}

@@ -1,8 +1,10 @@
 package com.dexer.aquanaut;
 
+import com.dexer.aquanaut.core.BlockRegistry;
 import com.dexer.aquanaut.core.AttachmentRegistry;
 import com.dexer.aquanaut.core.EntityRegistry;
 import com.dexer.aquanaut.core.ItemRegistry;
+import com.dexer.aquanaut.core.SoundRegistry;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -25,14 +27,19 @@ public class Aquanaut {
         modEventBus.addListener(this::commonSetup);
 
         // Registers
+        BlockRegistry.register(modEventBus);
         AttachmentRegistry.register(modEventBus);
         EntityRegistry.register(modEventBus);
         ItemRegistry.register(modEventBus);
+        SoundRegistry.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
-
+        event.enqueueWork(() -> {
+            // Placeholder for any setup that needs to be done after registry, but before
+            // the game starts. For example, registering capabilities.
+        });
     }
 }

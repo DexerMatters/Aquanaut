@@ -1,12 +1,15 @@
 package com.dexer.aquanaut.common.diving;
 
-import com.dexer.aquanaut.Config;
 import com.dexer.aquanaut.common.AirSupplyHelper;
+import com.dexer.aquanaut.common.item.DivingEquipmentItem;
 import com.dexer.aquanaut.core.AttachmentRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -34,7 +37,8 @@ public final class DivingEquipmentHelper {
     public static void setState(LivingEntity entity, DivingEquipmentState state) {
         DivingEquipmentState normalized = state == null ? DivingEquipmentState.EMPTY : state;
         entity.setData(AttachmentRegistry.DIVING_EQUIPMENT_STATE.get(), normalized);
-        AirSupplyHelper.clampAirToUnifiedMax(entity);
+        AirSupplyHelper.clampAir(entity);
+        AirSupplyHelper.fillExtraAirToMax(entity);
     }
 
     public static void setTankEquipped(LivingEntity entity, boolean equipped) {
@@ -72,7 +76,8 @@ public final class DivingEquipmentHelper {
         }
 
         syncStateWithStacks(entity);
-        AirSupplyHelper.clampAirToUnifiedMax(entity);
+        AirSupplyHelper.clampAir(entity);
+        AirSupplyHelper.fillExtraAirToMax(entity);
     }
 
     public static void handleSlotClick(ServerPlayer player, DivingEquipmentSlotType slotType, int button,
@@ -148,15 +153,35 @@ public final class DivingEquipmentHelper {
     }
 
     public static int getTankCapacityBonus(LivingEntity entity) {
-        return hasTank(entity) ? Config.DIVING_TANK_CAPACITY_BONUS.get() : 0;
+        DivingEquipmentItem tank = getEquippedItem(entity, DivingEquipmentSlotType.TANK);
+        return tank == null ? 0 : AirSupplyHelper.bubblesToAirTicks(tank.tankAirBubbles());
     }
 
     public static int getMaskRegenBonus(LivingEntity entity) {
-        return hasMask(entity) ? Config.DIVING_MASK_REGEN_BONUS.get() : 0;
+        DivingEquipmentItem mask = getEquippedItem(entity, DivingEquipmentSlotType.MASK);
+        return mask == null ? 0 : mask.maskRegenBonus();
     }
 
     public static float getFlipperSpeedMultiplier(LivingEntity entity) {
-        return hasFlippers(entity) ? Config.DIVING_FLIPPER_SPEED_MULTIPLIER.get().floatValue() : 1.0F;
+        DivingEquipmentItem flippers = getEquippedItem(entity, DivingEquipmentSlotType.FLIPPERS);
+        return flippers == null ? 1.0F : flippers.underwaterSpeedMultiplier();
+    }
+
+    public static void hurtEquippedItem(Player player, DivingEquipmentSlotType slotType, DamageSource damageSource,
+            float damageAmount, EquipmentSlot visualSlot) {
+        if (!(player.level() instanceof net.minecraft.server.level.ServerLevel serverLevel) || damageAmount <= 0.0F) {
+            return;
+        }
+
+        ItemStack equippedStack = getEquippedStack(player, slotType);
+        if (equippedStack.isEmpty() || !equippedStack.isDamageableItem() || !equippedStack.canBeHurtBy(damageSource)) {
+            return;
+        }
+
+        int durabilityDamage = (int) Math.max(1.0F, damageAmount / 4.0F);
+        equippedStack.hurtAndBreak(durabilityDamage, serverLevel, player,
+                item -> player.onEquippedItemBroken(item, visualSlot));
+        setEquippedStack(player, slotType, equippedStack);
     }
 
     public static String getSyncItemId(LivingEntity entity, DivingEquipmentSlotType slotType) {
@@ -174,6 +199,15 @@ public final class DivingEquipmentHelper {
                 !getEquippedStack(entity, DivingEquipmentSlotType.MASK).isEmpty(),
                 !getEquippedStack(entity, DivingEquipmentSlotType.FLIPPERS).isEmpty());
         entity.setData(AttachmentRegistry.DIVING_EQUIPMENT_STATE.get(), state);
+    }
+
+    private static DivingEquipmentItem getEquippedItem(LivingEntity entity, DivingEquipmentSlotType slotType) {
+        ItemStack stack = getEquippedStack(entity, slotType);
+        if (stack.isEmpty() || !(stack.getItem() instanceof DivingEquipmentItem divingEquipmentItem)) {
+            return null;
+        }
+
+        return divingEquipmentItem.slotType() == slotType ? divingEquipmentItem : null;
     }
 
     private static ItemStack stackFromItemId(String rawId) {

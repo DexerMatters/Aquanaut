@@ -54,8 +54,7 @@ public class AirSupplyItem extends Item {
 
     private void applyAirSupply(Player player) {
         // Air food never increases capacity. It only refills within the current max.
-        int ticksPerBubble = AirSupplyHelper.BASE_AIR_SUPPLY_TICKS / 10;
-        int airTicks = bubbleCount * ticksPerBubble;
+        int airTicks = AirSupplyHelper.bubblesToAirTicks(bubbleCount);
         AirSupplyHelper.addAir(player, airTicks);
     }
 }

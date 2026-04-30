@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class EntityMixin {
     @Inject(method = "getMaxAirSupply", at = @At("HEAD"), cancellable = true)
     private void aquanaut$getMaxAirSupply(CallbackInfoReturnable<Integer> cir) {
-        if ((Object) this instanceof LivingEntity livingEntity) {
-            cir.setReturnValue(AirSupplyHelper.getUnifiedMaxAir(livingEntity));
+        if ((Object) this instanceof LivingEntity) {
+            cir.setReturnValue(AirSupplyHelper.BASE_AIR_SUPPLY_TICKS);
         }
     }
 

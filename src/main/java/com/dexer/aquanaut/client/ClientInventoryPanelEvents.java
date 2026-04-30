@@ -4,8 +4,10 @@ import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.diving.DivingEquipmentSlotType;
 import com.dexer.aquanaut.common.diving.inventory.DivingEquipmentContainer;
 import com.dexer.aquanaut.common.diving.inventory.DivingEquipmentMenuSlot;
+import com.dexer.aquanaut.common.diving.inventory.DivingInventoryLayout;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -16,6 +18,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ContainerScreenEvent;
+import net.neoforged.neoforge.client.event.ScreenEvent;
 
 /**
  * Renders an Aquanaut equipment side panel next to the vanilla inventory.
@@ -78,6 +81,20 @@ public final class ClientInventoryPanelEvents {
         drawEmptySlotIcons(event.getGuiGraphics(), screen, true);
     }
 
+    @SubscribeEvent
+    public static void onCreativeInventoryRender(ScreenEvent.Render.Post event) {
+        Screen screen = event.getScreen();
+        if (!(screen instanceof CreativeModeInventoryScreen creativeScreen)
+                || !(screen instanceof AbstractContainerScreen<?> containerScreen)
+                || !creativeScreen.isInventoryOpen()) {
+            return;
+        }
+
+        drawEquipmentPanel(event.getGuiGraphics(), containerScreen.getGuiLeft(), containerScreen.getGuiTop());
+        drawSlotBackgrounds(event.getGuiGraphics(), containerScreen, false);
+        drawEmptySlotIcons(event.getGuiGraphics(), containerScreen, false);
+    }
+
     private static void drawEquipmentPanel(GuiGraphics graphics, int inventoryLeft, int inventoryTop) {
 
         int panelX = inventoryLeft - PANEL_GAP - PANEL_WIDTH;
@@ -131,7 +148,8 @@ public final class ClientInventoryPanelEvents {
         }
 
         if (slot.container instanceof DivingEquipmentContainer) {
-            return slot.getContainerSlot() == slotType.toIndex();
+            return slot.getContainerSlot() == slotType.toIndex()
+                    || (slot.x == DivingInventoryLayout.SLOT_X && slot.y == DivingInventoryLayout.slotY(slotType));
         }
 
         return false;

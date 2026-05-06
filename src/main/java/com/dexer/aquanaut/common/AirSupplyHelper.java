@@ -3,7 +3,9 @@ package com.dexer.aquanaut.common;
 import com.dexer.aquanaut.common.diving.DivingEquipmentHelper;
 import com.dexer.aquanaut.core.AttachmentRegistry;
 import com.dexer.aquanaut.core.GameRuleRegistry;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.WaterAnimal;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,6 +38,10 @@ public final class AirSupplyHelper {
         return (BASE_AIR_SUPPLY_TICKS / BUBBLE_COUNT) * Math.max(0, bubbles);
     }
 
+    public static boolean usesExtraAirSupply(LivingEntity entity) {
+        return !(entity instanceof WaterAnimal) && !entity.getType().is(EntityTypeTags.CAN_BREATHE_UNDER_WATER);
+    }
+
     public static int getMaxExtraAir(LivingEntity entity) {
         if (!entity.hasData(AttachmentRegistry.MAX_EXTRA_AIR_SUPPLY.get())) {
             return 0;
@@ -47,7 +53,6 @@ public final class AirSupplyHelper {
         int maxExtra = sanitizeExtraCapacity(value);
         entity.setData(AttachmentRegistry.MAX_EXTRA_AIR_SUPPLY.get(), maxExtra);
         clampAir(entity);
-        fillExtraAirToMax(entity);
     }
 
     public static int getEffectiveExtraCapacity(LivingEntity entity) {
@@ -91,6 +96,10 @@ public final class AirSupplyHelper {
         return EXTRA_AIR.getOrDefault(entity.getId(), 0);
     }
 
+    public static int getTotalAir(LivingEntity entity) {
+        return Math.max(0, entity.getAirSupply()) + getExtraAir(entity);
+    }
+
     public static void setExtraAir(LivingEntity entity, int value) {
         int maxExtra = getEffectiveExtraCapacity(entity);
         int clamped = Math.max(0, Math.min(value, maxExtra));
@@ -116,6 +125,17 @@ public final class AirSupplyHelper {
         return amount - consumed;
     }
 
+    public static void removeAir(LivingEntity entity, int amount) {
+        if (amount <= 0) {
+            return;
+        }
+
+        int remainder = consumeExtraAir(entity, amount);
+        if (remainder > 0) {
+            entity.setAirSupply(Math.max(0, entity.getAirSupply() - remainder));
+        }
+    }
+
     public static void fillExtraAir(LivingEntity entity, int amount) {
         int maxExtra = getEffectiveExtraCapacity(entity);
         if (maxExtra <= 0 || amount <= 0) {
@@ -135,9 +155,8 @@ public final class AirSupplyHelper {
             return;
         }
 
-        // Fill base air first so equipping a tank immediately provides
-        // breathable air to the player's lungs, then any leftover capacity
-        // becomes extra air (visible as layers above the base bar).
+        // Top off the full air reserve, filling base air first and then storing
+        // any remaining capacity as extra air.
         int baseMax = BASE_AIR_SUPPLY_TICKS;
         int baseAir = entity.getAirSupply();
         int baseRoom = Math.max(0, baseMax - baseAir);
@@ -155,9 +174,10 @@ public final class AirSupplyHelper {
     }
 
     /**
-     * Proportional regen that fills all oxygen bubbles in a configurable number of
-     * ticks (default 50 = 2.5 s) regardless of total capacity. The mask bonus is
-     * scaled proportionally so that total fill time stays constant for any
+     * Uniform regen that refills one base air bar in a configurable number of
+     * ticks (default {@link GameRuleRegistry#DEFAULT_REGEN_FILL_TIME_TICKS}).
+     * Extra air uses the same per-tick amount after base air is full, so every
+     * bubble layer fills at the same speed and total refill time scales with total
      * capacity.
      *
      * <p>
@@ -165,15 +185,18 @@ public final class AirSupplyHelper {
      * aquanautRegenFillTimeTicks <value>}.
      */
     public static int getRegenPerTick(LivingEntity entity) {
+        if (!usesExtraAirSupply(entity)) {
+            return 0;
+        }
+
         if (!DivingEquipmentHelper.hasMask(entity) && !DivingEquipmentHelper.hasTank(entity)) {
             return 0;
         }
 
-        int totalMax = getTotalMaxAir(entity);
         int fillTimeTicks = Math.max(1, entity.level().getGameRules().getInt(GameRuleRegistry.REGEN_FILL_TIME_TICKS));
-        int base = Math.max(1, totalMax / fillTimeTicks);
+        int base = Math.max(1, BASE_AIR_SUPPLY_TICKS / fillTimeTicks);
         int maskBonus = DivingEquipmentHelper.getMaskRegenBonus(entity);
-        int maskContribution = maskBonus > 0 ? Math.max(1, totalMax * maskBonus / BASE_AIR_SUPPLY_TICKS) : 0;
+        int maskContribution = Math.max(0, maskBonus);
 
         return base + maskContribution;
     }

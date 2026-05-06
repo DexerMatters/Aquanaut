@@ -8,14 +8,19 @@ public final class DivingEquipmentItem extends Item {
     private final DivingEquipmentSlotType slotType;
     private final int tankAirBubbles;
     private final int maskRegenBonus;
+    /**
+     * Additional pressure threshold before narcosis triggers (0 = no resistance).
+     */
+    private final float maskNarcosisResistance;
     private final float underwaterSpeedMultiplier;
 
     public DivingEquipmentItem(Properties properties, DivingEquipmentSlotType slotType, int tankAirBubbles,
-            int maskRegenBonus, float underwaterSpeedMultiplier) {
+            int maskRegenBonus, float maskNarcosisResistance, float underwaterSpeedMultiplier) {
         super(properties);
         this.slotType = slotType;
         this.tankAirBubbles = Math.max(0, tankAirBubbles);
         this.maskRegenBonus = Math.max(0, maskRegenBonus);
+        this.maskNarcosisResistance = Math.max(0.0F, maskNarcosisResistance);
         this.underwaterSpeedMultiplier = Math.max(1.0F, underwaterSpeedMultiplier);
     }
 
@@ -29,6 +34,10 @@ public final class DivingEquipmentItem extends Item {
 
     public int maskRegenBonus() {
         return maskRegenBonus;
+    }
+
+    public float maskNarcosisResistance() {
+        return maskNarcosisResistance;
     }
 
     public float underwaterSpeedMultiplier() {

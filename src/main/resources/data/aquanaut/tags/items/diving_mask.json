@@ -1,4 +1,13 @@
 {
   "replace": false,
-  "values": []
+  "values": [
+    "aquanaut:iron_mask",
+    "aquanaut:coral_mask",
+    "aquanaut:shell_mask",
+    "aquanaut:hard_shell_mask",
+    "aquanaut:marine_alloy_mask",
+    "aquanaut:anglerfish_mask",
+    "aquanaut:ender_mask",
+    "aquanaut:slime_mask"
+  ]
 }

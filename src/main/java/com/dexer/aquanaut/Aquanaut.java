@@ -5,6 +5,7 @@ import com.dexer.aquanaut.core.AttachmentRegistry;
 import com.dexer.aquanaut.core.EntityRegistry;
 import com.dexer.aquanaut.core.GameRuleRegistry;
 import com.dexer.aquanaut.core.ItemRegistry;
+import com.dexer.aquanaut.core.MobEffectRegistry;
 import com.dexer.aquanaut.core.SoundRegistry;
 import org.slf4j.Logger;
 
@@ -33,6 +34,7 @@ public class Aquanaut {
         EntityRegistry.register(modEventBus);
         GameRuleRegistry.register(modEventBus);
         ItemRegistry.register(modEventBus);
+        MobEffectRegistry.register(modEventBus);
         SoundRegistry.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);

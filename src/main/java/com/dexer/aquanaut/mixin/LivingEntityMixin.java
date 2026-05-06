@@ -20,6 +20,10 @@ public abstract class LivingEntityMixin {
     @Inject(method = "increaseAirSupply(I)I", at = @At("HEAD"), cancellable = true)
     private void aquanaut$increaseAirSupply(int air, CallbackInfoReturnable<Integer> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
+        if (!AirSupplyHelper.usesExtraAirSupply(self)) {
+            return;
+        }
+
         int regenPerTick = AirSupplyHelper.getRegenPerTick(self);
         if (regenPerTick <= 0) {
             return;

@@ -38,7 +38,6 @@ public final class DivingEquipmentHelper {
         DivingEquipmentState normalized = state == null ? DivingEquipmentState.EMPTY : state;
         entity.setData(AttachmentRegistry.DIVING_EQUIPMENT_STATE.get(), normalized);
         AirSupplyHelper.clampAir(entity);
-        AirSupplyHelper.fillExtraAirToMax(entity);
     }
 
     public static void setTankEquipped(LivingEntity entity, boolean equipped) {
@@ -77,7 +76,6 @@ public final class DivingEquipmentHelper {
 
         syncStateWithStacks(entity);
         AirSupplyHelper.clampAir(entity);
-        AirSupplyHelper.fillExtraAirToMax(entity);
     }
 
     public static void handleSlotClick(ServerPlayer player, DivingEquipmentSlotType slotType, int button,
@@ -160,6 +158,11 @@ public final class DivingEquipmentHelper {
     public static int getMaskRegenBonus(LivingEntity entity) {
         DivingEquipmentItem mask = getEquippedItem(entity, DivingEquipmentSlotType.MASK);
         return mask == null ? 0 : mask.maskRegenBonus();
+    }
+
+    public static float getMaskNarcosisResistance(LivingEntity entity) {
+        DivingEquipmentItem mask = getEquippedItem(entity, DivingEquipmentSlotType.MASK);
+        return mask == null ? 0.0F : mask.maskNarcosisResistance();
     }
 
     public static float getFlipperSpeedMultiplier(LivingEntity entity) {

@@ -38,6 +38,7 @@ import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 public final class ClientHudEvents {
 
     private static final ResourceLocation AIR_SPRITE = ResourceLocation.withDefaultNamespace("hud/air");
+    private static final ResourceLocation AIR_EMPTY_SPRITE = ResourceLocation.withDefaultNamespace("hud/air_empty");
 
     /**
      * Baked sprites applied per absolute layer slot (index 0 =
@@ -54,9 +55,7 @@ public final class ClientHudEvents {
     private ClientHudEvents() {
     }
 
-    /**
-     * Y coordinate of the air bar row, captured before vanilla processes the layer.
-     */
+    /** Air bar Y captured in Pre, used by Post for drawing. */
     private static int cachedAirBarY = 0;
 
     @SubscribeEvent
@@ -64,76 +63,70 @@ public final class ClientHudEvents {
         if (!VanillaGuiLayers.AIR_LEVEL.equals(event.getName())) {
             return;
         }
+        // Capture Y before vanilla increments rightHeight. Do NOT cancel so that
+        // Post still fires (NeoForge only fires Post when Pre is not cancelled).
         Minecraft mc = Minecraft.getInstance();
         cachedAirBarY = mc.getWindow().getGuiScaledHeight() - mc.gui.rightHeight;
     }
 
     @SubscribeEvent
     public static void onRenderAirLevelPost(RenderGuiLayerEvent.Post event) {
-        if (!VanillaGuiLayers.AIR_LEVEL.equals(event.getName())) {
+        if (!VanillaGuiLayers.AIR_LEVEL.equals(event.getName()))
             return;
-        }
 
         Minecraft mc = Minecraft.getInstance();
-        if (mc.options.hideGui) {
+        if (mc.options.hideGui)
             return;
-        }
         LocalPlayer player = mc.player;
-        if (player == null) {
+        if (player == null || player.isCreative() || player.isSpectator())
             return;
-        }
 
-        if (player.isCreative() || player.isSpectator()) {
-            return;
-        }
+        int maxExtraAir = ClientAirData.getMaxExtraAir();
+        if (maxExtraAir <= 0)
+            return; // no extra capacity – vanilla already drew everything correctly
 
         int baseAirSupply = AirSupplyHelper.BASE_AIR_SUPPLY_TICKS;
-        int maxExtraAir = ClientAirData.getMaxExtraAir();
-        if (maxExtraAir <= 0) {
-            return;
-        }
-
         int currentExtraAir = ClientAirData.getCurrentExtraAir();
         int totalAir = player.getAirSupply() + currentExtraAir;
         int totalMaxAir = baseAirSupply + maxExtraAir;
 
         // Hide only when not underwater and everything is full.
-        if (!player.isUnderWater() && totalAir >= totalMaxAir) {
+        if (!player.isUnderWater() && totalAir >= totalMaxAir)
             return;
-        }
 
         var graphics = event.getGuiGraphics();
         int guiWidth = graphics.guiWidth();
         int airBarY = cachedAirBarY;
 
-        // Draw base bubbles at the surface so they remain visible when
-        // vanilla hides the bar (air full, not underwater) while extra
-        // layers are still filling. Underwater, vanilla handles the bar
-        // with its pop animation — we only draw extra layers there.
+        // Base row ─────────────────────────────────────────────────────────────────
+        // When UNDERWATER: vanilla's own AIR_LEVEL render already drew the base row.
+        // Drawing it again here would double-render bubbles on the same pixels.
+        // When NOT underwater: vanilla hides the bar entirely, so we draw it
+        // ourselves to give visual context alongside the still-refilling extra layers.
         if (!player.isUnderWater()) {
-            int baseAir = Math.min(player.getAirSupply(), baseAirSupply);
-            int baseBubbles = Mth.ceil((double) baseAir * 10.0 / baseAirSupply);
+            // While extra air exists the server keeps airSupply full each tick.
+            int visualBaseAir = currentExtraAir > 0
+                    ? baseAirSupply
+                    : Math.min(player.getAirSupply(), baseAirSupply);
+            int baseBubbles = Mth.ceil((double) visualBaseAir * 10.0 / baseAirSupply);
+            int baseEmptySlots = 10 - baseBubbles;
+            if (baseEmptySlots > 0) {
+                drawBubbles(graphics, guiWidth, airBarY, 0, baseEmptySlots, AIR_EMPTY_SPRITE);
+            }
             if (baseBubbles > 0) {
-                drawBubbles(graphics, guiWidth, airBarY, 0, baseBubbles, AIR_SPRITE);
+                drawBubbles(graphics, guiWidth, airBarY, baseEmptySlots, 10, AIR_SPRITE);
             }
         }
 
-        int totalLayers = Mth.ceil((float) maxExtraAir / baseAirSupply);
-
+        // Extra layers ─────────────────────────────────────────────────────────────
         if (currentExtraAir > 0) {
+            int totalLayers = Mth.ceil((float) maxExtraAir / baseAirSupply);
             int layer = (currentExtraAir - 1) / baseAirSupply;
-            int topLayerAir = currentExtraAir - layer * baseAirSupply;
-            int topLayerBubbles = Mth.ceil((double) topLayerAir * 10.0 / baseAirSupply);
-
             for (int depth = layer; depth >= 1; depth--) {
                 int absLayer = layer - depth;
                 int slot = totalLayers - 1 - absLayer;
                 drawBubbles(graphics, guiWidth, airBarY, 0, 10, spriteAt(slot));
             }
-
-            int drainingSlot = totalLayers - 1 - layer;
-            int emptySlots = 10 - topLayerBubbles;
-            drawBubbles(graphics, guiWidth, airBarY, emptySlots, 10, spriteAt(drainingSlot));
         }
     }
 

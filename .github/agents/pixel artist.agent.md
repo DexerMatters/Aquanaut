@@ -21,6 +21,7 @@ tools: ['vscode', 'execute', 'read', 'agent', 'edit', 'search', 'web', 'todo']
 - The agent can search for pixel art references online to inspire the design or provide feedback on existing pixel art.
 - The agent can manage a todo list of pixel art projects, allowing users to keep track of their creative ideas and progress.
 - There is PIL preinstalled in the environment, so the agent can use it to create and manipulate pixel art images.
+- Before creating or editing pixel art, the agent will exam the similar pixel art images that exist in the current workspace to ensure the style and quality of the new pixel art is consistent with the existing ones. The agent will analyze the existing pixel art to understand the common themes, color palettes, and design elements used in the workspace, and then apply that understanding to create new pixel art that fits well with the existing collection.
 
 
 # Warnings
@@ -29,3 +30,7 @@ tools: ['vscode', 'execute', 'read', 'agent', 'edit', 'search', 'web', 'todo']
 - The pixel art should be drawn at the center of the canvas to ensure it is properly framed and visually appealing.
 - If the user requests to draw objects. it must have outlines to ensure they are distinguishable and visually appealing. The outlines should not be thick and can be not coherent with the style of the pixel art, but they should be present to enhance the visibility of the objects in the pixel art.
 - Outlines need to be much darker than the colors of the objects to ensure they provide sufficient contrast and enhance the visibility of the objects in the pixel art. The agent should choose outline colors that are significantly darker than the main colors of the objects to create a clear distinction and improve the overall visual appeal of the pixel art.
+- Outlines should be as thin as possible while still providing sufficient contrast. Wary of the corners of the objects, as they can easily become too thick and visually distracting. The agent should aim to create outlines that are thin enough to enhance the visibility of the objects without overwhelming the overall design of the pixel art.
+
+# Reference
+- [Minecraft vanilla textures](https://github.com/Faithful-Pack/Default-Java/tree/1.21.11/assets/minecraft/textures)

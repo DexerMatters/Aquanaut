@@ -3,6 +3,8 @@
   "values": [
     "aquanaut:shark_flippers",
     "aquanaut:wood_flippers",
-    "aquanaut:coral_flippers"
+    "aquanaut:coral_flippers",
+    "aquanaut:shell_flippers",
+    "aquanaut:hard_shell_flippers"
   ]
 }

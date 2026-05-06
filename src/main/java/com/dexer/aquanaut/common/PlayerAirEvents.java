@@ -7,12 +7,11 @@ import com.dexer.aquanaut.network.DivingEquipmentSyncPayload;
 import com.dexer.aquanaut.network.ExtraAirPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -45,7 +44,8 @@ public final class PlayerAirEvents {
         LAST_SENT_EXTRA_AIR.remove(uuid);
         LAST_SENT_DIVING_ITEMS.remove(uuid);
         PREVIOUS_BASE_AIR.remove(uuid);
-        AttributeInstance attr = event.getEntity().getAttribute(Attributes.WATER_MOVEMENT_EFFICIENCY);
+        AirSupplyHelper.clearExtraAir(event.getEntity().getId());
+        AttributeInstance attr = event.getEntity().getAttribute(NeoForgeMod.SWIM_SPEED);
         if (attr != null) {
             attr.removeModifier(FLIPPER_SPEED_MODIFIER_ID);
         }
@@ -62,9 +62,18 @@ public final class PlayerAirEvents {
     public static void onPlayerClone(PlayerEvent.Clone event) {
         if (event.isWasDeath()) {
             PREVIOUS_BASE_AIR.remove(event.getOriginal().getUUID());
+            AirSupplyHelper.clearExtraAir(event.getOriginal().getId());
         }
         if (event.getEntity() instanceof ServerPlayer newPlayer) {
-            AirSupplyHelper.fillExtraAirToMax(newPlayer);
+            if (event.isWasDeath()) {
+                AirSupplyHelper.fillExtraAirToMax(newPlayer);
+            } else {
+                int oldExtra = AirSupplyHelper.getExtraAir(event.getOriginal());
+                AirSupplyHelper.clearExtraAir(event.getOriginal().getId());
+                if (oldExtra > 0) {
+                    AirSupplyHelper.setExtraAir(newPlayer, oldExtra);
+                }
+            }
         }
     }
 
@@ -98,7 +107,7 @@ public final class PlayerAirEvents {
         }
 
         // Extra air regen: when breathing and base is full, fill extra tanks.
-        if (!serverPlayer.isEyeInFluid(FluidTags.WATER)
+        if (!serverPlayer.isEyeInFluidType(NeoForgeMod.WATER_TYPE.value())
                 && serverPlayer.getAirSupply() >= AirSupplyHelper.BASE_AIR_SUPPLY_TICKS) {
             int regenPerTick = AirSupplyHelper.getRegenPerTick(serverPlayer);
             if (regenPerTick > 0) {
@@ -136,7 +145,7 @@ public final class PlayerAirEvents {
 
     private static void applyFlipperBoost(ServerPlayer serverPlayer) {
         float multiplier = DivingEquipmentHelper.getFlipperSpeedMultiplier(serverPlayer);
-        AttributeInstance attr = serverPlayer.getAttribute(Attributes.WATER_MOVEMENT_EFFICIENCY);
+        AttributeInstance attr = serverPlayer.getAttribute(NeoForgeMod.SWIM_SPEED);
         if (attr == null) {
             return;
         }
@@ -149,6 +158,6 @@ public final class PlayerAirEvents {
         attr.addOrUpdateTransientModifier(new AttributeModifier(
                 FLIPPER_SPEED_MODIFIER_ID,
                 multiplier - 1.0F,
-                AttributeModifier.Operation.ADD_VALUE));
+                AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
     }
 }

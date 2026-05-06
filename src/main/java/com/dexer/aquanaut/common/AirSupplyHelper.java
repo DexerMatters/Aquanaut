@@ -131,9 +131,27 @@ public final class AirSupplyHelper {
 
     public static void fillExtraAirToMax(LivingEntity entity) {
         int maxExtra = getEffectiveExtraCapacity(entity);
-        if (maxExtra > 0) {
-            setExtraAir(entity, maxExtra);
+        if (maxExtra <= 0) {
+            return;
         }
+
+        // Fill base air first so equipping a tank immediately provides
+        // breathable air to the player's lungs, then any leftover capacity
+        // becomes extra air (visible as layers above the base bar).
+        int baseMax = BASE_AIR_SUPPLY_TICKS;
+        int baseAir = entity.getAirSupply();
+        int baseRoom = Math.max(0, baseMax - baseAir);
+        int toBase = Math.min(maxExtra, baseRoom);
+
+        if (toBase > 0) {
+            entity.setAirSupply(baseAir + toBase);
+        }
+
+        setExtraAir(entity, maxExtra - toBase);
+    }
+
+    public static void clearExtraAir(int entityId) {
+        EXTRA_AIR.remove(entityId);
     }
 
     /**

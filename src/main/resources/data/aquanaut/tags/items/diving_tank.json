@@ -2,6 +2,8 @@
   "replace": false,
   "values": [
     "aquanaut:iron_oxygen_tank",
-    "aquanaut:wood_oxygen_tank"
+    "aquanaut:wood_oxygen_tank",
+    "aquanaut:shell_oxygen_tank",
+    "aquanaut:hard_shell_oxygen_tank"
   ]
 }

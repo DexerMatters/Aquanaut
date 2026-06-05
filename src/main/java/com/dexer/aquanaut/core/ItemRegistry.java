@@ -8,6 +8,7 @@ import com.dexer.aquanaut.common.diving.DivingEquipmentSlotType;
 import com.dexer.aquanaut.common.item.AirSupplyItem;
 import com.dexer.aquanaut.common.item.BubbleGunItem;
 import com.dexer.aquanaut.common.item.DivingEquipmentItem;
+import com.dexer.aquanaut.common.item.HarpoonItem;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -26,6 +27,7 @@ import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.SimpleTier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
@@ -121,6 +123,37 @@ public final class ItemRegistry {
         public static final DeferredItem<Item> MARINE_ALLOY_SHOVEL = shovelItem("marine_alloy_shovel",
                         MARINE_ALLOY_TIER);
         public static final DeferredItem<Item> MARINE_ALLOY_HOE = hoeItem("marine_alloy_hoe", MARINE_ALLOY_TIER);
+        // Copper tier (between stone and iron)
+        private static final Tier COPPER_TIER = new SimpleTier(
+                        BlockTags.INCORRECT_FOR_IRON_TOOL,
+                        190, 5.0F, 1.5F, 10,
+                        () -> Ingredient.of(Items.COPPER_INGOT));
+
+        // Harpoons
+        public static final DeferredItem<HarpoonItem> WOOD_HARPOON = ITEMS.registerItem("wood_harpoon",
+                        props -> new HarpoonItem(props.durability(Tiers.WOOD.getUses()).stacksTo(1), 6.0F));
+        public static final DeferredItem<HarpoonItem> STONE_HARPOON = ITEMS.registerItem("stone_harpoon",
+                        props -> new HarpoonItem(props.durability(Tiers.STONE.getUses()).stacksTo(1), 7.5F));
+        public static final DeferredItem<HarpoonItem> COPPER_HARPOON = ITEMS.registerItem("copper_harpoon",
+                        props -> new HarpoonItem(props.durability(COPPER_TIER.getUses()).stacksTo(1), 8.25F));
+        public static final DeferredItem<HarpoonItem> IRON_HARPOON = ITEMS.registerItem("iron_harpoon",
+                        props -> new HarpoonItem(props.durability(Tiers.IRON.getUses()).stacksTo(1), 9.0F));
+        public static final DeferredItem<HarpoonItem> GOLD_HARPOON = ITEMS.registerItem("gold_harpoon",
+                        props -> new HarpoonItem(props.durability(Tiers.GOLD.getUses()).stacksTo(1), 6.0F));
+        public static final DeferredItem<HarpoonItem> DIAMOND_HARPOON = ITEMS.registerItem("diamond_harpoon",
+                        props -> new HarpoonItem(props.durability(Tiers.DIAMOND.getUses()).stacksTo(1), 10.5F));
+        public static final DeferredItem<HarpoonItem> NETHERITE_HARPOON = ITEMS.registerItem("netherite_harpoon",
+                        props -> new HarpoonItem(props.durability(Tiers.NETHERITE.getUses()).stacksTo(1)
+                                        .fireResistant(), 12.0F));
+        public static final DeferredItem<HarpoonItem> CORAL_HARPOON = ITEMS.registerItem("coral_harpoon",
+                        props -> new HarpoonItem(props.durability(Tiers.STONE.getUses()).stacksTo(1), 7.5F));
+        public static final DeferredItem<HarpoonItem> SHELL_HARPOON = ITEMS.registerItem("shell_harpoon",
+                        props -> new HarpoonItem(props.durability(Tiers.STONE.getUses()).stacksTo(1), 8.25F));
+        public static final DeferredItem<HarpoonItem> HARD_SHELL_HARPOON = ITEMS.registerItem("hard_shell_harpoon",
+                        props -> new HarpoonItem(props.durability(Tiers.IRON.getUses()).stacksTo(1), 9.0F));
+        public static final DeferredItem<HarpoonItem> MARINE_ALLOY_HARPOON = ITEMS.registerItem("marine_alloy_harpoon",
+                        props -> new HarpoonItem(props.durability(MARINE_ALLOY_TIER.getUses()).stacksTo(1), 10.5F));
+
         public static final DeferredItem<Item> LIGHTNING_PEARL = ITEMS.registerSimpleItem("lightning_pearl");
         public static final DeferredItem<Item> ORGANIC_MATTER = ITEMS.registerSimpleItem("organic_matter");
         public static final DeferredItem<Item> KELP = ITEMS.registerSimpleItem("kelp");
@@ -159,6 +192,11 @@ public final class ItemRegistry {
                         BlockRegistry.RED_CORAL_BLOCK);
         public static final DeferredItem<BlockItem> BLUE_CORAL_BLOCK = blockItem("blue_coral_block",
                         BlockRegistry.BLUE_CORAL_BLOCK);
+        public static final DeferredItem<BlockItem> BLUE_SMOOTH_CORAL_BLOCK = blockItem(
+                        "blue_smooth_coral_block",
+                        BlockRegistry.BLUE_SMOOTH_CORAL_BLOCK);
+        public static final DeferredItem<BlockItem> BLUE_CORAL_BRICKS = blockItem("blue_coral_bricks",
+                        BlockRegistry.BLUE_CORAL_BRICKS);
         public static final DeferredItem<BlockItem> PURPLE_CORAL_BLOCK = blockItem("purple_coral_block",
                         BlockRegistry.PURPLE_CORAL_BLOCK);
         public static final DeferredItem<BlockItem> GREEN_CORAL_BLOCK = blockItem("green_coral_block",
@@ -179,6 +217,33 @@ public final class ItemRegistry {
         public static final DeferredItem<BlockItem> RINGED_FLUORASCENT_BLUE_CORAL_BLOCK = blockItem(
                         "ringed_fluorescent_blue_coral_block",
                         BlockRegistry.RINGED_FLUORASCENT_BLUE_CORAL_BLOCK);
+        public static final DeferredItem<BlockItem> SHELL_BLOCK = blockItem("shell_block",
+                        BlockRegistry.SHELL_BLOCK);
+        public static final DeferredItem<BlockItem> SHELL_BRICKS = blockItem("shell_bricks",
+                        BlockRegistry.SHELL_BRICKS);
+        public static final DeferredItem<BlockItem> HARD_SHELL_BLOCK = blockItem("hard_shell_block",
+                        BlockRegistry.HARD_SHELL_BLOCK);
+        public static final DeferredItem<BlockItem> HARD_SHELL_BRICKS = blockItem("hard_shell_bricks",
+                        BlockRegistry.HARD_SHELL_BRICKS);
+        public static final DeferredItem<BlockItem> POLISHED_HARD_SHELL_BLOCK = blockItem(
+                        "polished_hard_shell_block",
+                        BlockRegistry.POLISHED_HARD_SHELL_BLOCK);
+        public static final DeferredItem<BlockItem> HARD_SHELL_FRAME = blockItem("hard_shell_frame",
+                        BlockRegistry.HARD_SHELL_FRAME);
+        public static final DeferredItem<BlockItem> GAS_PIPE = blockItem("gas_pipe",
+                        BlockRegistry.GAS_PIPE);
+        public static final DeferredItem<BlockItem> LIGHTNING_GENERATOR = blockItem("lightning_generator",
+                        BlockRegistry.LIGHTNING_GENERATOR);
+        public static final DeferredItem<BlockItem> BUBBLE_MACHINE = blockItem("bubble_machine",
+                        BlockRegistry.BUBBLE_MACHINE);
+        public static final DeferredItem<BlockItem> SWIRL_GENERATOR = blockItem("swirl_generator",
+                        BlockRegistry.SWIRL_GENERATOR);
+        public static final DeferredItem<BlockItem> TORPEDO_LAUNCHER = blockItem("torpedo_launcher",
+                        BlockRegistry.TORPEDO_LAUNCHER);
+        public static final DeferredItem<BlockItem> SHIELD_GENERATOR = blockItem("shield_generator",
+                        BlockRegistry.SHIELD_GENERATOR);
+        public static final DeferredItem<BlockItem> AIR_SUPPLY_BLOCK = blockItem("air_supply",
+                        BlockRegistry.AIR_SUPPLY);
 
         public static final DeferredItem<Item> BUBBLE_GUN = ITEMS.registerItem("bubble_gun",
                         properties -> new BubbleGunItem(properties.durability(60).stacksTo(1)));
@@ -201,6 +266,14 @@ public final class ItemRegistry {
                         EntityRegistry.HELICOPRION, 0xA98F75, 0x624634);
         public static final DeferredItem<DeferredSpawnEggItem> CATFISH_SPAWN_EGG = spawnEgg("catfish_spawn_egg",
                         EntityRegistry.CATFISH, 0xF7A35C, 0x5C4033);
+        public static final DeferredItem<DeferredSpawnEggItem> MANTA_RAY_SPAWN_EGG = spawnEgg("manta_ray_spawn_egg",
+                        EntityRegistry.MANTA_RAY, 0x28333D, 0x7CA8B8);
+        public static final DeferredItem<DeferredSpawnEggItem> GIANT_OCTOPUS_TENTACLE_SPAWN_EGG = spawnEgg(
+                        "giant_octopus_tentacle_spawn_egg",
+                        EntityRegistry.GIANT_OCTOPUS_TENTACLE, 0x8E6B6B, 0xD7C9BA);
+        public static final DeferredItem<DeferredSpawnEggItem> GIANT_ABYSS_WORM_SPAWN_EGG = spawnEgg(
+                        "giant_abyss_worm_spawn_egg",
+                        EntityRegistry.GIANT_ABYSS_WORM, 0x1A0A2E, 0x6A1E8C);
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FOOD_TAB = tab("food",
                         COOKED_SARDINE, output -> {
@@ -224,6 +297,9 @@ public final class ItemRegistry {
                                 output.accept(ICERAIL_SPAWN_EGG.get());
                                 output.accept(HELICOPRION_SPAWN_EGG.get());
                                 output.accept(CATFISH_SPAWN_EGG.get());
+                                output.accept(MANTA_RAY_SPAWN_EGG.get());
+                                output.accept(GIANT_OCTOPUS_TENTACLE_SPAWN_EGG.get());
+                                output.accept(GIANT_ABYSS_WORM_SPAWN_EGG.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MATERIALS_TAB = tab("materials",
@@ -261,6 +337,17 @@ public final class ItemRegistry {
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TOOLS_TAB = tab("tools",
                         BUBBLE_GUN, output -> {
                                 output.accept(BUBBLE_GUN.get());
+                                output.accept(WOOD_HARPOON.get());
+                                output.accept(STONE_HARPOON.get());
+                                output.accept(COPPER_HARPOON.get());
+                                output.accept(IRON_HARPOON.get());
+                                output.accept(GOLD_HARPOON.get());
+                                output.accept(DIAMOND_HARPOON.get());
+                                output.accept(NETHERITE_HARPOON.get());
+                                output.accept(CORAL_HARPOON.get());
+                                output.accept(SHELL_HARPOON.get());
+                                output.accept(HARD_SHELL_HARPOON.get());
+                                output.accept(MARINE_ALLOY_HARPOON.get());
                                 output.accept(CORAL_AXE.get());
                                 output.accept(CORAL_PICKAXE.get());
                                 output.accept(CORAL_SHOVEL.get());
@@ -306,6 +393,8 @@ public final class ItemRegistry {
                         RED_CORAL_BLOCK, output -> {
                                 output.accept(RED_CORAL_BLOCK.get());
                                 output.accept(BLUE_CORAL_BLOCK.get());
+                                output.accept(BLUE_SMOOTH_CORAL_BLOCK.get());
+                                output.accept(BLUE_CORAL_BRICKS.get());
                                 output.accept(PURPLE_CORAL_BLOCK.get());
                                 output.accept(GREEN_CORAL_BLOCK.get());
                                 output.accept(FLUORASCENT_BLUE_CORAL_BLOCK.get());
@@ -315,6 +404,19 @@ public final class ItemRegistry {
                                 output.accept(RINGED_PURPLE_CORAL_BLOCK.get());
                                 output.accept(RINGED_GREEN_CORAL_BLOCK.get());
                                 output.accept(RINGED_FLUORASCENT_BLUE_CORAL_BLOCK.get());
+                                output.accept(SHELL_BLOCK.get());
+                                output.accept(SHELL_BRICKS.get());
+                                output.accept(HARD_SHELL_BLOCK.get());
+                                output.accept(HARD_SHELL_BRICKS.get());
+                                output.accept(POLISHED_HARD_SHELL_BLOCK.get());
+                                output.accept(HARD_SHELL_FRAME.get());
+                                output.accept(GAS_PIPE.get());
+                                output.accept(LIGHTNING_GENERATOR.get());
+                                output.accept(BUBBLE_MACHINE.get());
+                                output.accept(SWIRL_GENERATOR.get());
+                                output.accept(TORPEDO_LAUNCHER.get());
+                                output.accept(SHIELD_GENERATOR.get());
+                                output.accept(AIR_SUPPLY_BLOCK.get());
                         });
 
         private ItemRegistry() {

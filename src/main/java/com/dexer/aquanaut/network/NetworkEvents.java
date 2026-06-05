@@ -27,5 +27,9 @@ public final class NetworkEvents {
                 DivingEquipmentClickPayload.TYPE,
                 DivingEquipmentClickPayload.STREAM_CODEC,
                 DivingEquipmentClickPayload::handle);
+        registrar.playToServer(
+                RecallHarpoonPayload.TYPE,
+                RecallHarpoonPayload.STREAM_CODEC,
+                RecallHarpoonPayload::handle);
     }
 }

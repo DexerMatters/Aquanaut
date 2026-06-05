@@ -3,6 +3,8 @@
   "values": [
     "aquanaut:red_coral_block",
     "aquanaut:blue_coral_block",
+    "aquanaut:blue_smooth_coral_block",
+    "aquanaut:blue_coral_bricks",
     "aquanaut:purple_coral_block",
     "aquanaut:green_coral_block",
     "aquanaut:fluorescent_blue_coral_block",
@@ -10,6 +12,10 @@
     "aquanaut:ringed_green_coral_block",
     "aquanaut:ringed_purple_coral_block",
     "aquanaut:ringed_red_coral_block",
-    "aquanaut:ringed_fluorescent_blue_coral_block"
+    "aquanaut:ringed_fluorescent_blue_coral_block",
+    "aquanaut:shell_block",
+    "aquanaut:shell_bricks",
+    "aquanaut:hard_shell_block",
+    "aquanaut:hard_shell_bricks"
   ]
 }

@@ -38,7 +38,13 @@ public abstract class BaseFishEntity extends WaterAnimal {
     public void aiStep() {
         super.aiStep();
 
-        if (!this.isEffectiveAi()) {
+        if (!this.isEffectiveAi() || this.isVehicle()) {
+            // Keep the synced animation flags authoritative from the server only.
+            if (!this.level().isClientSide) {
+                this.entityData.set(SPRINTING_AWAY, false);
+                this.entityData.set(CHARGING_PLAYER, false);
+                this.entityData.set(ESCAPE_LAUNCHING, false);
+            }
             return;
         }
 
@@ -397,6 +403,14 @@ public abstract class BaseFishEntity extends WaterAnimal {
 
     protected float getHitboxPickInflation() {
         return 0.14F;
+    }
+
+    public final boolean shouldApplyPitchRotation() {
+        return this.getShouldApplyPitchRotation();
+    }
+
+    protected boolean getShouldApplyPitchRotation() {
+        return true;
     }
 
     public final double passByStrikeForwardDistance() {

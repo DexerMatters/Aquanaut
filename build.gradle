@@ -191,6 +191,7 @@ tasks.named("compileJava", org.gradle.api.tasks.compile.JavaCompile).configure {
 
 tasks.named("jar", org.gradle.jvm.tasks.Jar).configure {
     from(mixinRefmapFile)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

@@ -1,0 +1,6 @@
+{
+    "parent": "minecraft:item/generated",
+    "textures": {
+        "layer0": "aquanaut:item/giant_abyss_worm_spawn_egg"
+    }
+}

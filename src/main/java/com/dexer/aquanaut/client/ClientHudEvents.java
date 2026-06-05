@@ -38,7 +38,6 @@ import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 public final class ClientHudEvents {
 
     private static final ResourceLocation AIR_SPRITE = ResourceLocation.withDefaultNamespace("hud/air");
-    private static final ResourceLocation AIR_EMPTY_SPRITE = ResourceLocation.withDefaultNamespace("hud/air_empty");
 
     /**
      * Baked sprites applied per absolute layer slot (index 0 =
@@ -110,9 +109,6 @@ public final class ClientHudEvents {
                     : Math.min(player.getAirSupply(), baseAirSupply);
             int baseBubbles = Mth.ceil((double) visualBaseAir * 10.0 / baseAirSupply);
             int baseEmptySlots = 10 - baseBubbles;
-            if (baseEmptySlots > 0) {
-                drawBubbles(graphics, guiWidth, airBarY, 0, baseEmptySlots, AIR_EMPTY_SPRITE);
-            }
             if (baseBubbles > 0) {
                 drawBubbles(graphics, guiWidth, airBarY, baseEmptySlots, 10, AIR_SPRITE);
             }
@@ -121,11 +117,23 @@ public final class ClientHudEvents {
         // Extra layers ─────────────────────────────────────────────────────────────
         if (currentExtraAir > 0) {
             int totalLayers = Mth.ceil((float) maxExtraAir / baseAirSupply);
-            int layer = (currentExtraAir - 1) / baseAirSupply;
-            for (int depth = layer; depth >= 1; depth--) {
-                int absLayer = layer - depth;
+            int currentLayer = (currentExtraAir - 1) / baseAirSupply; // 0-based, 0 = bottom-most extra layer
+
+            // Draw complete layers below the draining one (back → front).
+            for (int depth = currentLayer; depth >= 1; depth--) {
+                int absLayer = currentLayer - depth;
                 int slot = totalLayers - 1 - absLayer;
                 drawBubbles(graphics, guiWidth, airBarY, 0, 10, spriteAt(slot));
+            }
+
+            // Draw the actively draining layer on top.
+            // Filled bubbles sit on the right; empty slots on the left stay transparent
+            // so deeper layers (or the base row) show through.
+            int drainingSlot = totalLayers - 1 - currentLayer;
+            int airInLayer = currentExtraAir - currentLayer * baseAirSupply;
+            int filledBubbles = Mth.ceil((double) airInLayer * 10.0 / baseAirSupply);
+            if (filledBubbles > 0) {
+                drawBubbles(graphics, guiWidth, airBarY, 10 - filledBubbles, 10, spriteAt(drainingSlot));
             }
         }
     }

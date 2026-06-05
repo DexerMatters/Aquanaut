@@ -1,0 +1,389 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_clamp_center"
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "north": "false",
+            "south": "true"
+          },
+          {
+            "north": "false",
+            "east": "false"
+          },
+          {
+            "north": "false",
+            "west": "false"
+          },
+          {
+            "north": "false",
+            "up": "true"
+          },
+          {
+            "north": "false",
+            "down": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_glass_face"
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "south": "false",
+            "north": "true"
+          },
+          {
+            "south": "false",
+            "east": "false"
+          },
+          {
+            "south": "false",
+            "west": "false"
+          },
+          {
+            "south": "false",
+            "up": "true"
+          },
+          {
+            "south": "false",
+            "down": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_glass_face",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "east": "false"
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_glass_face_x",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "false"
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_glass_face_x"
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "up": "false",
+            "north": "true"
+          },
+          {
+            "up": "false",
+            "south": "true"
+          },
+          {
+            "up": "false",
+            "east": "false"
+          },
+          {
+            "up": "false",
+            "west": "false"
+          },
+          {
+            "up": "false",
+            "down": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_glass_face",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "down": "false",
+            "north": "true"
+          },
+          {
+            "down": "false",
+            "south": "true"
+          },
+          {
+            "down": "false",
+            "east": "false"
+          },
+          {
+            "down": "false",
+            "west": "false"
+          },
+          {
+            "down": "false",
+            "up": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_glass_face",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "north": "false",
+        "south": "false",
+        "east": "true",
+        "west": "true",
+        "up": "false",
+        "down": "false"
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_glass_straight_x"
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "north": "true",
+            "south": "false"
+          },
+          {
+            "north": "true",
+            "east": "false"
+          },
+          {
+            "north": "true",
+            "west": "false"
+          },
+          {
+            "north": "true",
+            "up": "true"
+          },
+          {
+            "north": "true",
+            "down": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_glass_arm"
+      }
+    },
+    {
+      "when": {
+        "north": "true"
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_clamp_arm"
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "south": "true",
+            "north": "false"
+          },
+          {
+            "south": "true",
+            "east": "false"
+          },
+          {
+            "south": "true",
+            "west": "false"
+          },
+          {
+            "south": "true",
+            "up": "true"
+          },
+          {
+            "south": "true",
+            "down": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_glass_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "south": "true"
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_clamp_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "east": "true",
+            "west": "false"
+          },
+          {
+            "east": "true",
+            "north": "true"
+          },
+          {
+            "east": "true",
+            "south": "true"
+          },
+          {
+            "east": "true",
+            "up": "true"
+          },
+          {
+            "east": "true",
+            "down": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_glass_arm_x",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "east": "true"
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_clamp_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "west": "true",
+            "east": "false"
+          },
+          {
+            "west": "true",
+            "north": "true"
+          },
+          {
+            "west": "true",
+            "south": "true"
+          },
+          {
+            "west": "true",
+            "up": "true"
+          },
+          {
+            "west": "true",
+            "down": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_glass_arm_x"
+      }
+    },
+    {
+      "when": {
+        "west": "true"
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_clamp_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "up": "true",
+            "down": "false"
+          },
+          {
+            "up": "true",
+            "north": "true"
+          },
+          {
+            "up": "true",
+            "south": "true"
+          },
+          {
+            "up": "true",
+            "east": "false"
+          },
+          {
+            "up": "true",
+            "west": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_glass_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "up": "true"
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_clamp_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "OR": [
+          {
+            "down": "true",
+            "up": "false"
+          },
+          {
+            "down": "true",
+            "north": "true"
+          },
+          {
+            "down": "true",
+            "south": "true"
+          },
+          {
+            "down": "true",
+            "east": "false"
+          },
+          {
+            "down": "true",
+            "west": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_glass_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "true"
+      },
+      "apply": {
+        "model": "aquanaut:block/gas_pipe_clamp_arm",
+        "x": 90
+      }
+    }
+  ]
+}

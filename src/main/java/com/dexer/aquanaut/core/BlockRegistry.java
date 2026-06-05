@@ -1,6 +1,9 @@
 package com.dexer.aquanaut.core;
 
 import com.dexer.aquanaut.Aquanaut;
+import com.dexer.aquanaut.common.block.GasPipeBlock;
+import com.dexer.aquanaut.common.block.OmnidirectionalMachineBlock;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -17,6 +20,11 @@ public final class BlockRegistry {
             MapColor.COLOR_RED, 1.5F, 2.0F);
     public static final DeferredBlock<RotatedPillarBlock> BLUE_CORAL_BLOCK = log("blue_coral_block",
             MapColor.COLOR_BLUE, 1.5F, 2.0F);
+    public static final DeferredBlock<RotatedPillarBlock> BLUE_SMOOTH_CORAL_BLOCK = log(
+            "blue_smooth_coral_block",
+            MapColor.COLOR_BLUE, 1.5F, 2.0F);
+    public static final DeferredBlock<RotatedPillarBlock> BLUE_CORAL_BRICKS = log("blue_coral_bricks",
+            MapColor.COLOR_BLUE, 2.0F, 3.0F);
     public static final DeferredBlock<RotatedPillarBlock> PURPLE_CORAL_BLOCK = log("purple_coral_block",
             MapColor.COLOR_PURPLE, 1.5F, 2.0F);
     public static final DeferredBlock<RotatedPillarBlock> GREEN_CORAL_BLOCK = log("green_coral_block",
@@ -37,18 +45,73 @@ public final class BlockRegistry {
     public static final DeferredBlock<RotatedPillarBlock> RINGED_FLUORASCENT_BLUE_CORAL_BLOCK = log(
             "ringed_fluorescent_blue_coral_block",
             MapColor.COLOR_LIGHT_BLUE, 1.5F, 2.0F);
+    public static final DeferredBlock<RotatedPillarBlock> SHELL_BLOCK = pillar("shell_block",
+            MapColor.TERRACOTTA_LIGHT_GRAY, 2.0F, 3.0F, SoundType.STONE);
+    public static final DeferredBlock<RotatedPillarBlock> SHELL_BRICKS = pillar("shell_bricks",
+            MapColor.TERRACOTTA_LIGHT_GRAY, 2.25F, 3.5F, SoundType.STONE);
+    public static final DeferredBlock<RotatedPillarBlock> HARD_SHELL_BLOCK = pillar("hard_shell_block",
+            MapColor.STONE, 3.0F, 4.5F, SoundType.STONE);
+    public static final DeferredBlock<RotatedPillarBlock> HARD_SHELL_BRICKS = pillar("hard_shell_bricks",
+            MapColor.STONE, 3.25F, 4.75F, SoundType.STONE);
+    public static final DeferredBlock<Block> POLISHED_HARD_SHELL_BLOCK = cube("polished_hard_shell_block",
+            MapColor.QUARTZ, 3.5F, 5.0F, SoundType.STONE);
+    public static final DeferredBlock<Block> HARD_SHELL_FRAME = cube("hard_shell_frame",
+            MapColor.QUARTZ, 3.5F, 5.0F, SoundType.STONE);
+    public static final DeferredBlock<GasPipeBlock> GAS_PIPE = pipe("gas_pipe");
+
+    public static final DeferredBlock<OmnidirectionalMachineBlock> LIGHTNING_GENERATOR = machine(
+            "lightning_generator");
+    public static final DeferredBlock<OmnidirectionalMachineBlock> BUBBLE_MACHINE = machine("bubble_machine");
+    public static final DeferredBlock<OmnidirectionalMachineBlock> SWIRL_GENERATOR = machine("swirl_generator");
+    public static final DeferredBlock<OmnidirectionalMachineBlock> TORPEDO_LAUNCHER = machine("torpedo_launcher");
+    public static final DeferredBlock<Block> SHIELD_GENERATOR = cube("shield_generator",
+            MapColor.QUARTZ, 3.5F, 5.0F, SoundType.STONE);
+    public static final DeferredBlock<Block> AIR_SUPPLY = cube("air_supply",
+            MapColor.QUARTZ, 3.5F, 5.0F, SoundType.STONE);
 
     private BlockRegistry() {
     }
 
     private static DeferredBlock<RotatedPillarBlock> log(String name, MapColor color, float hardness,
             float resistance) {
+        return pillar(name, color, hardness, resistance, SoundType.CORAL_BLOCK);
+    }
+
+    private static DeferredBlock<RotatedPillarBlock> pillar(String name, MapColor color, float hardness,
+            float resistance, SoundType sound) {
         return BLOCKS.register(name, () -> new RotatedPillarBlock(BlockBehaviour.Properties.of()
                 .mapColor(state -> state.getValue(RotatedPillarBlock.AXIS) == net.minecraft.core.Direction.Axis.Y
                         ? color
                         : color)
                 .strength(hardness, resistance)
-                .sound(SoundType.CORAL_BLOCK)
+                .sound(sound)
+                .requiresCorrectToolForDrops()));
+    }
+
+    private static DeferredBlock<Block> cube(String name, MapColor color, float hardness, float resistance,
+            SoundType sound) {
+        return BLOCKS.register(name, () -> new Block(BlockBehaviour.Properties.of()
+                .mapColor(color)
+                .strength(hardness, resistance)
+                .sound(sound)
+                .requiresCorrectToolForDrops()));
+    }
+
+    private static DeferredBlock<OmnidirectionalMachineBlock> machine(String name) {
+        return BLOCKS.register(name, () -> new OmnidirectionalMachineBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.QUARTZ)
+                .strength(3.5F, 5.0F)
+                .sound(SoundType.STONE)
+                .requiresCorrectToolForDrops()));
+    }
+
+    private static DeferredBlock<GasPipeBlock> pipe(String name) {
+        return BLOCKS.register(name, () -> new GasPipeBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_LIGHT_GRAY)
+                .strength(2.5F, 4.0F)
+                .sound(SoundType.METAL)
+                .noOcclusion()
+                .dynamicShape()
                 .requiresCorrectToolForDrops()));
     }
 

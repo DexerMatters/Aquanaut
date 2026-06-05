@@ -27,4 +27,5 @@ public abstract class EntityMixin {
     private float aquanaut$doubledrownDamage(float amount) {
         return (Object) this instanceof Player ? amount * 4.0F : amount;
     }
+
 }

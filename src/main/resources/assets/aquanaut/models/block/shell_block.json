@@ -1,0 +1,7 @@
+{
+    "parent": "minecraft:block/cube_column",
+    "textures": {
+        "end": "aquanaut:block/shell_block_top",
+        "side": "aquanaut:block/shell_block"
+    }
+}

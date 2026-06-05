@@ -1,0 +1,6 @@
+{
+    "parent": "minecraft:block/cube_all",
+    "textures": {
+        "all": "aquanaut:block/polished_hard_shell_block"
+    }
+}

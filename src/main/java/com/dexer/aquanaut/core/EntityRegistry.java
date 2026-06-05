@@ -6,9 +6,14 @@ import com.dexer.aquanaut.common.entity.AnglerfishEntity;
 import com.dexer.aquanaut.common.entity.CatfishEntity;
 import com.dexer.aquanaut.common.entity.DonutfishEntity;
 import com.dexer.aquanaut.common.entity.ElectrofishEntity;
+import com.dexer.aquanaut.common.entity.LightningEntity;
+import com.dexer.aquanaut.common.entity.HarpoonEntity;
 import com.dexer.aquanaut.common.entity.HelicoprionEntity;
 import com.dexer.aquanaut.common.entity.IcerailEntity;
+import com.dexer.aquanaut.common.entity.MantaRayEntity;
 import com.dexer.aquanaut.common.entity.OctopusEntity;
+import com.dexer.aquanaut.common.entity.GiantAbyssWormEntity;
+import com.dexer.aquanaut.common.entity.GiantOctopusTentacleEntity;
 import com.dexer.aquanaut.common.entity.SardineEntity;
 import com.dexer.aquanaut.common.entity.SpringfishEntity;
 
@@ -94,12 +99,58 @@ public class EntityRegistry {
                     .sized(0.9F, 0.9F)
                     .build("catfish"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<MantaRayEntity>> MANTA_RAY = ENTITIES.register(
+            "manta_ray",
+            () -> EntityType.Builder
+                    .<MantaRayEntity>of(MantaRayEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(2.6F, 0.55F)
+                    .build("manta_ray"));
+
     public static final DeferredHolder<EntityType<?>, EntityType<AirBubbleEntity>> AIR_BUBBLE = ENTITIES.register(
             "air_bubble",
             () -> EntityType.Builder
                     .<AirBubbleEntity>of(AirBubbleEntity::new, MobCategory.MISC)
                     .sized(0.9375F, 0.9375F)
                     .build("air_bubble"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<HarpoonEntity>> HARPOON = ENTITIES.register(
+            "harpoon",
+            () -> EntityType.Builder
+                    .<HarpoonEntity>of(HarpoonEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .clientTrackingRange(4)
+                    .updateInterval(20)
+                    .build("harpoon"));
+
+        public static final DeferredHolder<EntityType<?>, EntityType<LightningEntity>> LIGHTNING = ENTITIES.register(
+                        "lightning",
+                        () -> EntityType.Builder
+                                        .<LightningEntity>of(LightningEntity::new, MobCategory.MISC)
+                                        .sized(1.0F, 10.0F)
+                                        .clientTrackingRange(10)
+                                        .updateInterval(1)
+                                        .build("lightning"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<GiantAbyssWormEntity>> GIANT_ABYSS_WORM = ENTITIES
+            .register(
+                    "giant_abyss_worm",
+                    () -> EntityType.Builder
+                            .<GiantAbyssWormEntity>of(GiantAbyssWormEntity::new,
+                                    MobCategory.WATER_CREATURE)
+                            .sized(4.0F, 4.0F)
+                            .clientTrackingRange(12)
+                            .updateInterval(1)
+                            .build("giant_abyss_worm"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<GiantOctopusTentacleEntity>> GIANT_OCTOPUS_TENTACLE = ENTITIES
+            .register(
+                    "giant_octopus_tentacle",
+                    () -> EntityType.Builder
+                            .<GiantOctopusTentacleEntity>of(GiantOctopusTentacleEntity::new,
+                                    MobCategory.WATER_CREATURE)
+                            .sized(4.0F, 4.0F)
+                            .clientTrackingRange(10)
+                            .build("giant_octopus_tentacle"));
 
     public static void register(IEventBus eventBus) {
         ENTITIES.register(eventBus);
@@ -116,5 +167,8 @@ public class EntityRegistry {
         event.put(EntityRegistry.ICERAIL.get(), IcerailEntity.createAttributes());
         event.put(EntityRegistry.HELICOPRION.get(), HelicoprionEntity.createAttributes());
         event.put(EntityRegistry.CATFISH.get(), CatfishEntity.createAttributes());
+        event.put(EntityRegistry.MANTA_RAY.get(), MantaRayEntity.createAttributes());
+        event.put(EntityRegistry.GIANT_ABYSS_WORM.get(), GiantAbyssWormEntity.createAttributes());
+        event.put(EntityRegistry.GIANT_OCTOPUS_TENTACLE.get(), GiantOctopusTentacleEntity.createAttributes());
     }
 }

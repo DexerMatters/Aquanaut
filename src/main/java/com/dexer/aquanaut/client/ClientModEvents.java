@@ -6,9 +6,14 @@ import com.dexer.aquanaut.client.renderer.AnglerfishRenderer;
 import com.dexer.aquanaut.client.renderer.CatfishRenderer;
 import com.dexer.aquanaut.client.renderer.DonutfishRenderer;
 import com.dexer.aquanaut.client.renderer.ElectrofishRenderer;
+import com.dexer.aquanaut.client.renderer.HarpoonRenderer;
+import com.dexer.aquanaut.client.renderer.LightningRenderer;
 import com.dexer.aquanaut.client.renderer.HelicoprionRenderer;
 import com.dexer.aquanaut.client.renderer.IcerailRenderer;
+import com.dexer.aquanaut.client.renderer.MantaRayRenderer;
 import com.dexer.aquanaut.client.renderer.OctopusRenderer;
+import com.dexer.aquanaut.client.renderer.GiantAbyssWormRenderer;
+import com.dexer.aquanaut.client.renderer.GiantOctopusTentacleRenderer;
 import com.dexer.aquanaut.client.renderer.SardineRenderer;
 import com.dexer.aquanaut.client.renderer.SpringfishRenderer;
 import com.dexer.aquanaut.core.EntityRegistry;
@@ -35,7 +40,10 @@ public final class ClientModEvents {
                 ItemRegistry.SPRINGFISH_SPAWN_EGG.get(),
                 ItemRegistry.ICERAIL_SPAWN_EGG.get(),
                 ItemRegistry.HELICOPRION_SPAWN_EGG.get(),
-                ItemRegistry.CATFISH_SPAWN_EGG.get());
+                ItemRegistry.CATFISH_SPAWN_EGG.get(),
+                ItemRegistry.MANTA_RAY_SPAWN_EGG.get(),
+                ItemRegistry.GIANT_OCTOPUS_TENTACLE_SPAWN_EGG.get(),
+                ItemRegistry.GIANT_ABYSS_WORM_SPAWN_EGG.get());
     }
 
     @SubscribeEvent
@@ -49,6 +57,11 @@ public final class ClientModEvents {
         event.registerEntityRenderer(EntityRegistry.ICERAIL.get(), IcerailRenderer::new);
         event.registerEntityRenderer(EntityRegistry.HELICOPRION.get(), HelicoprionRenderer::new);
         event.registerEntityRenderer(EntityRegistry.CATFISH.get(), CatfishRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.MANTA_RAY.get(), MantaRayRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.GIANT_OCTOPUS_TENTACLE.get(), GiantOctopusTentacleRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.GIANT_ABYSS_WORM.get(), GiantAbyssWormRenderer::new);
         event.registerEntityRenderer(EntityRegistry.AIR_BUBBLE.get(), AirBubbleRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.HARPOON.get(), HarpoonRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.LIGHTNING.get(), LightningRenderer::new);
     }
 }

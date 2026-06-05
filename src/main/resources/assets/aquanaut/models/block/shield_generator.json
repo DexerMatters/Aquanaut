@@ -1,0 +1,8 @@
+{
+  "parent": "aquanaut:block/template_station",
+  "textures": {
+    "side": "aquanaut:block/shield_generator",
+    "top": "aquanaut:block/shield_generator_top",
+    "bottom": "aquanaut:block/hard_shell_frame"
+  }
+}

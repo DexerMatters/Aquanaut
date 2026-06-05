@@ -24,7 +24,7 @@ public class BaseFishRenderer<T extends BaseFishEntity & GeoEntity> extends GeoE
         }
 
         float pitch = Mth.lerp(partialTick, animatable.xRotO, animatable.getXRot());
-        if (Math.abs(pitch) < 0.01F) {
+        if (Math.abs(pitch) < 0.01F || !animatable.shouldApplyPitchRotation()) {
             return;
         }
 

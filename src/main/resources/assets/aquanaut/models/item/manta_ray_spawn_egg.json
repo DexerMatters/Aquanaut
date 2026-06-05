@@ -1,0 +1,6 @@
+{
+    "parent": "minecraft:item/generated",
+    "textures": {
+        "layer0": "aquanaut:item/manta_ray_spawn_egg"
+    }
+}

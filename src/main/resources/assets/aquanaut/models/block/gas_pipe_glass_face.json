@@ -1,0 +1,24 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "aquanaut:block/gas_pipe_glass",
+    "wall": "aquanaut:block/gas_pipe_glass"
+  },
+  "elements": [
+    {
+      "from": [4.0, 4.0, 4.01],
+      "to": [12.0, 12.0, 4.02],
+      "faces": {
+        "north": {
+          "uv": [4, 4, 12, 12],
+          "texture": "#wall"
+        },
+        "south": {
+          "uv": [4, 4, 12, 12],
+          "texture": "#wall"
+        }
+      }
+    }
+  ]
+}

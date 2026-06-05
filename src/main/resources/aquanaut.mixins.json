@@ -6,10 +6,14 @@
         "EntityMixin",
         "LivingEntityMixin",
         "InventoryMenuMixin",
-        "PlayerMixin"
+        "PlayerMixin",
+        "ItemStackMixin"
     ],
     "client": [
-        "CreativeModeInventoryScreenMixin"
+        "CreativeModeInventoryScreenMixin",
+        "ItemRendererMixin",
+        "BufferSourceMixin",
+        "HarpoonRendererMixin"
     ],
     "injectors": {
         "defaultRequire": 1

@@ -1,0 +1,6 @@
+{
+    "parent": "aquanaut:item/harpoon",
+    "textures": {
+        "layer0": "aquanaut:item/wood_harpoon"
+    }
+}

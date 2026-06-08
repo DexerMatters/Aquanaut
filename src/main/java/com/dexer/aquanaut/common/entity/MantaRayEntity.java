@@ -178,11 +178,6 @@ public class MantaRayEntity extends BaseFishEntity implements GeoEntity {
     }
 
     @Override
-    protected float getCruisePitchTurnRateDegrees() {
-        return 0.85F;
-    }
-
-    @Override
     protected double getCruiseVerticalAssist() {
         return 0.012D;
     }
@@ -233,11 +228,6 @@ public class MantaRayEntity extends BaseFishEntity implements GeoEntity {
     }
 
     @Override
-    protected float getMaxTiltDegrees() {
-        return 18.0F;
-    }
-
-    @Override
     protected double getPlayerDetectionRange() {
         return 13.0D;
     }
@@ -250,10 +240,5 @@ public class MantaRayEntity extends BaseFishEntity implements GeoEntity {
     @Override
     protected double getHitboxVisualYOffset() {
         return -0.18D;
-    }
-
-    @Override
-    protected boolean getShouldApplyPitchRotation() {
-        return false;
     }
 }

@@ -1,8 +1,12 @@
 package com.dexer.aquanaut.core;
 
 import com.dexer.aquanaut.Aquanaut;
+import com.dexer.aquanaut.common.block.AirPumpBlock;
+import com.dexer.aquanaut.common.block.AirSupplyBlock;
+import com.dexer.aquanaut.common.block.BubbleMachineBlock;
 import com.dexer.aquanaut.common.block.GasPipeBlock;
 import com.dexer.aquanaut.common.block.OmnidirectionalMachineBlock;
+import com.dexer.aquanaut.common.block.ShieldGeneratorBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SoundType;
@@ -61,13 +65,12 @@ public final class BlockRegistry {
 
     public static final DeferredBlock<OmnidirectionalMachineBlock> LIGHTNING_GENERATOR = machine(
             "lightning_generator");
-    public static final DeferredBlock<OmnidirectionalMachineBlock> BUBBLE_MACHINE = machine("bubble_machine");
+    public static final DeferredBlock<BubbleMachineBlock> BUBBLE_MACHINE = bubbleMachine("bubble_machine");
     public static final DeferredBlock<OmnidirectionalMachineBlock> SWIRL_GENERATOR = machine("swirl_generator");
     public static final DeferredBlock<OmnidirectionalMachineBlock> TORPEDO_LAUNCHER = machine("torpedo_launcher");
-    public static final DeferredBlock<Block> SHIELD_GENERATOR = cube("shield_generator",
-            MapColor.QUARTZ, 3.5F, 5.0F, SoundType.STONE);
-    public static final DeferredBlock<Block> AIR_SUPPLY = cube("air_supply",
-            MapColor.QUARTZ, 3.5F, 5.0F, SoundType.STONE);
+    public static final DeferredBlock<AirPumpBlock> AIR_PUMP = airPump("air_pump");
+    public static final DeferredBlock<ShieldGeneratorBlock> SHIELD_GENERATOR = shieldGenerator("shield_generator");
+    public static final DeferredBlock<AirSupplyBlock> AIR_SUPPLY = airSupply("air_supply");
 
     private BlockRegistry() {
     }
@@ -99,6 +102,38 @@ public final class BlockRegistry {
 
     private static DeferredBlock<OmnidirectionalMachineBlock> machine(String name) {
         return BLOCKS.register(name, () -> new OmnidirectionalMachineBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.QUARTZ)
+                .strength(3.5F, 5.0F)
+                .sound(SoundType.STONE)
+                .requiresCorrectToolForDrops()));
+    }
+
+    private static DeferredBlock<BubbleMachineBlock> bubbleMachine(String name) {
+        return BLOCKS.register(name, () -> new BubbleMachineBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.QUARTZ)
+                .strength(3.5F, 5.0F)
+                .sound(SoundType.STONE)
+                .requiresCorrectToolForDrops()));
+    }
+
+    private static DeferredBlock<AirPumpBlock> airPump(String name) {
+        return BLOCKS.register(name, () -> new AirPumpBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.QUARTZ)
+                .strength(3.5F, 5.0F)
+                .sound(SoundType.STONE)
+                .requiresCorrectToolForDrops()));
+    }
+
+    private static DeferredBlock<AirSupplyBlock> airSupply(String name) {
+        return BLOCKS.register(name, () -> new AirSupplyBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.QUARTZ)
+                .strength(3.5F, 5.0F)
+                .sound(SoundType.STONE)
+                .requiresCorrectToolForDrops()));
+    }
+
+    private static DeferredBlock<ShieldGeneratorBlock> shieldGenerator(String name) {
+        return BLOCKS.register(name, () -> new ShieldGeneratorBlock(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.QUARTZ)
                 .strength(3.5F, 5.0F)
                 .sound(SoundType.STONE)

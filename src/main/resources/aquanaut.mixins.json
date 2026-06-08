@@ -7,13 +7,15 @@
         "LivingEntityMixin",
         "InventoryMenuMixin",
         "PlayerMixin",
-        "ItemStackMixin"
+        "ItemStackMixin",
+        "WaterAnimalMixin"
     ],
     "client": [
         "CreativeModeInventoryScreenMixin",
         "ItemRendererMixin",
         "BufferSourceMixin",
-        "HarpoonRendererMixin"
+        "HarpoonRendererMixin",
+        "HumanoidModelMixin"
     ],
     "injectors": {
         "defaultRequire": 1

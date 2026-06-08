@@ -116,6 +116,16 @@ public class OctopusEntity extends BaseFishEntity implements GeoEntity {
     }
 
     @Override
+    protected boolean getIsFlexibleBody() {
+        return true;
+    }
+
+    @Override
+    protected float getMaxTiltDegrees() {
+        return 50.0F;
+    }
+
+    @Override
     protected float getBodyTurnRateDegrees() {
         return 7.5F;
     }

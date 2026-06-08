@@ -1,0 +1,6 @@
+{
+    "parent": "minecraft:item/handheld",
+    "textures": {
+        "layer0": "aquanaut:item/medium_scoop_net"
+    }
+}

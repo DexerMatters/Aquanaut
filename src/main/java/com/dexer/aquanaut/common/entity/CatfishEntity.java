@@ -123,11 +123,6 @@ public class CatfishEntity extends BaseFishEntity implements GeoEntity {
     }
 
     @Override
-    protected float getMaxTiltDegrees() {
-        return 35.0F;
-    }
-
-    @Override
     protected double getPlayerDetectionRange() {
         return 12.0D;
     }

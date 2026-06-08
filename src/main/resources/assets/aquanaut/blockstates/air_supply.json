@@ -1,7 +1,10 @@
 {
   "variants": {
-    "": {
+    "active=false": {
       "model": "aquanaut:block/air_supply"
+    },
+    "active=true": {
+      "model": "aquanaut:block/air_supply_active"
     }
   }
 }

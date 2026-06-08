@@ -107,11 +107,6 @@ public class SardineEntity extends BaseFishEntity implements GeoEntity {
     }
 
     @Override
-    protected float getMaxTiltDegrees() {
-        return 30.0F;
-    }
-
-    @Override
     protected float getHitboxPickInflation() {
         return 0.2F;
     }

@@ -148,6 +148,9 @@ public abstract class AbstractPipeBlock extends Block implements SimpleWaterlogg
     }
 
     protected boolean canConnectToBlock(BlockState state, BlockState neighborState, Direction direction) {
+        if (neighborState.getBlock() instanceof AirConnector connector) {
+            return connector.connectsOnFace(neighborState, direction.getOpposite());
+        }
         return false;
     }
 

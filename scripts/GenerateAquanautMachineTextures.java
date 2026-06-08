@@ -1,9 +1,11 @@
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 public final class GenerateAquanautMachineTextures {
     private static final int SIZE = 16;
@@ -32,25 +34,36 @@ public final class GenerateAquanautMachineTextures {
 
         write("lightning_generator.png", lightningSide(base));
         write("lightning_generator_front.png", lightningFront(base));
+        writeAnimated("lightning_generator_front_active.png", lightningActiveFrames(base), 2);
 
         write("bubble_machine.png", bubbleSide(base));
         write("bubble_machine_front.png", bubbleFront(base));
+        writeAnimated("bubble_machine_front_active.png", bubbleActiveFrames(base), 4);
 
         write("swirl_generator.png", swirlSide(base));
         write("swirl_generator_front.png", swirlFront(base));
+        writeAnimated("swirl_generator_front_active.png", swirlActiveFrames(base), 3);
 
         write("torpedo_launcher.png", torpedoSide(base));
         write("torpedo_launcher_front.png", torpedoFront(base));
+        writeAnimated("torpedo_launcher_front_active.png", torpedoActiveFrames(base), 2);
+
+        write("air_pump.png", airPumpSide(base));
+        write("air_pump_front.png", airPumpFront(base));
+        writeAnimated("air_pump_front_active.png", airPumpActiveFrames(base), 2);
 
         write("shield_generator.png", shieldSide(base));
         write("shield_generator_top.png", shieldTop(base));
+        write("shield_generator_active.png", shieldSideActive(base));
         write("air_supply.png", airSupplySide(base));
         write("air_supply_top.png", airSupplyTop(base));
+        write("air_supply_active.png", airSupplySideActive(base));
         write("hard_shell_frame.png", hardShellFrame(base));
         write("gas_pipe_glass.png", gasPipeGlassWall());
         write("gas_pipe_clamp.png", gasPipeClamp(base));
 
-        System.out.println("Generated 15 Aquanaut machine textures in " + BLOCK_TEXTURE_DIR);
+        System.out.println("Generated 24 Aquanaut machine textures and 5 animation metadata files in "
+                + BLOCK_TEXTURE_DIR);
     }
 
     private static BufferedImage readBase() throws IOException {
@@ -63,6 +76,34 @@ public final class GenerateAquanautMachineTextures {
     private static void write(String fileName, BufferedImage image) throws IOException {
         Path out = BLOCK_TEXTURE_DIR.resolve(fileName);
         ImageIO.write(image, "png", out.toFile());
+    }
+
+    private static void writeAnimated(String fileName, List<BufferedImage> frames, int frametime) throws IOException {
+        write(fileName, stackFrames(frames));
+        writeAnimationMeta(fileName, frametime);
+    }
+
+    private static void writeAnimationMeta(String fileName, int frametime) throws IOException {
+        String json = "{\n"
+                + "  \"animation\": {\n"
+                + "    \"frametime\": " + frametime + "\n"
+                + "  }\n"
+                + "}\n";
+        Files.writeString(BLOCK_TEXTURE_DIR.resolve(fileName + ".mcmeta"), json, StandardCharsets.UTF_8);
+    }
+
+    private static BufferedImage stackFrames(List<BufferedImage> frames) {
+        BufferedImage sheet = new BufferedImage(SIZE, SIZE * frames.size(), BufferedImage.TYPE_INT_ARGB);
+        for (int i = 0; i < frames.size(); i++) {
+            BufferedImage frame = frames.get(i);
+            int yOffset = i * SIZE;
+            for (int y = 0; y < SIZE; y++) {
+                for (int x = 0; x < SIZE; x++) {
+                    sheet.setRGB(x, y + yOffset, frame.getRGB(x, y));
+                }
+            }
+        }
+        return sheet;
     }
 
     private static BufferedImage lightningSide(BufferedImage base) {
@@ -129,6 +170,22 @@ public final class GenerateAquanautMachineTextures {
         return img;
     }
 
+    private static BufferedImage airPumpSide(BufferedImage base) {
+        BufferedImage img = copy(base);
+        drawShellFrameBase(img);
+        drawAirPumpSideHint(img);
+        softMottle(img, 43, 0.014f);
+        return img;
+    }
+
+    private static BufferedImage airPumpFront(BufferedImage base) {
+        BufferedImage img = copy(base);
+        drawShellFrameBase(img);
+        drawAirPumpFrontBay(img);
+        softMottle(img, 44, 0.018f);
+        return img;
+    }
+
     private static BufferedImage shieldSide(BufferedImage base) {
         BufferedImage img = copy(base);
         drawShellFrameBase(img);
@@ -158,6 +215,211 @@ public final class GenerateAquanautMachineTextures {
         drawShellFrameBase(img);
         drawAirTopStation(img);
         softMottle(img, 62, 0.018f);
+        return img;
+    }
+
+    private static BufferedImage shieldSideActive(BufferedImage base) {
+        BufferedImage img = copy(base);
+        drawShellFrameBase(img);
+        drawShieldSideStation(img);
+        ring(img, 7, 8, 5, mix(AQUA, GLOW, 0.38f));
+        drawLine(img, 5, 8, 9, 8, mix(GLOW, PALE_GLOW, 0.34f));
+        pixel(img, 7, 8, PALE_GLOW);
+        pixel(img, 6, 7, GLOW);
+        pixel(img, 8, 7, GLOW);
+        pixel(img, 7, 9, mix(GLOW, HIGHLIGHT, 0.30f));
+        softMottle(img, 53, 0.020f);
+        return img;
+    }
+
+    private static BufferedImage airSupplySideActive(BufferedImage base) {
+        BufferedImage img = copy(base);
+        drawShellFrameBase(img);
+        drawAirSideStation(img);
+        drawAirManifold(img, 7, 8, STEEL, HIGHLIGHT, BRASS, PALE_GLOW, GLOW);
+        drawLine(img, 5, 7, 10, 7, mix(PALE_GLOW, GLOW, 0.42f));
+        pixel(img, 7, 6, PALE_GLOW);
+        pixel(img, 8, 6, GLOW);
+        pixel(img, 7, 9, GLOW);
+        pixel(img, 8, 9, PALE_GLOW);
+        softMottle(img, 63, 0.020f);
+        return img;
+    }
+
+    private static List<BufferedImage> lightningActiveFrames(BufferedImage base) {
+        return List.of(
+                lightningActiveFrame(base, 0),
+                lightningActiveFrame(base, 1),
+                lightningActiveFrame(base, 2),
+                lightningActiveFrame(base, 3));
+    }
+
+    private static BufferedImage lightningActiveFrame(BufferedImage base, int phase) {
+        BufferedImage img = lightningFront(base);
+        switch (phase) {
+            case 0 -> {
+                drawLightningGlyph(img, 7, 7, PALE_GLOW, GLOW);
+                pixel(img, 6, 6, GLOW);
+                pixel(img, 8, 6, GLOW);
+                pixel(img, 7, 8, PALE_GLOW);
+            }
+            case 1 -> {
+                lightningArcs(img, 7, 7, GLOW, PALE_GLOW);
+                drawLine(img, 6, 5, 7, 7, PALE_GLOW);
+                drawLine(img, 8, 5, 7, 7, PALE_GLOW);
+                pixel(img, 7, 6, PALE_GLOW);
+                pixel(img, 7, 8, GLOW);
+            }
+            case 2 -> {
+                prongs(img, 7, 7, COPPER, BRASS);
+                lightningCrown(img, 7, 7, COPPER, BRASS, GLOW);
+                drawLine(img, 7, 4, 7, 10, PALE_GLOW);
+                pixel(img, 6, 7, GLOW);
+                pixel(img, 8, 7, GLOW);
+            }
+            case 3 -> {
+                drawLightningGlyph(img, 7, 7, GLOW, PALE_GLOW);
+                pixel(img, 7, 7, PALE_GLOW);
+                pixel(img, 7, 6, GLOW);
+                pixel(img, 7, 8, GLOW);
+            }
+            default -> throw new IllegalArgumentException("Unsupported lightning phase: " + phase);
+        }
+        return img;
+    }
+
+    private static List<BufferedImage> bubbleActiveFrames(BufferedImage base) {
+        return List.of(
+                bubbleActiveFrame(base, 0),
+                bubbleActiveFrame(base, 1),
+                bubbleActiveFrame(base, 2),
+                bubbleActiveFrame(base, 3));
+    }
+
+    private static BufferedImage bubbleActiveFrame(BufferedImage base, int phase) {
+        BufferedImage img = bubbleFront(base);
+        switch (phase) {
+            case 0 -> {
+                ring(img, 7, 8, 1, BUBBLE);
+                ring(img, 8, 7, 1, GLOW);
+                pixel(img, 7, 8, rgba(248, 252, 253));
+            }
+            case 1 -> {
+                bubbleCluster(img, GLOW);
+                ring(img, 7, 6, 1, BUBBLE);
+                ring(img, 9, 5, 1, PALE_GLOW);
+            }
+            case 2 -> {
+                ring(img, 7, 5, 1, BUBBLE);
+                ring(img, 8, 4, 1, GLOW);
+                ring(img, 6, 3, 1, PALE_GLOW);
+                pixel(img, 7, 5, rgba(248, 252, 253));
+            }
+            case 3 -> {
+                bubbleBell(img, 7, 8, GLASS, BUBBLE, GLOW);
+                pixel(img, 7, 7, PALE_GLOW);
+                pixel(img, 8, 7, GLOW);
+                pixel(img, 7, 6, GLOW);
+            }
+            default -> throw new IllegalArgumentException("Unsupported bubble phase: " + phase);
+        }
+        return img;
+    }
+
+    private static List<BufferedImage> swirlActiveFrames(BufferedImage base) {
+        return List.of(
+                swirlActiveFrame(base, 0),
+                swirlActiveFrame(base, 1),
+                swirlActiveFrame(base, 2),
+                swirlActiveFrame(base, 3));
+    }
+
+    private static BufferedImage swirlActiveFrame(BufferedImage base, int phase) {
+        BufferedImage img = swirlFront(base);
+        switch (phase) {
+            case 0 -> {
+                drawSwirlVortex(img, 7, 7, AQUA, CORE, GLOW, PALE_GLOW);
+                drawLine(img, 7, 4, 9, 5, AQUA);
+                drawLine(img, 10, 7, 9, 9, GLOW);
+            }
+            case 1 -> {
+                drawSwirlVortex(img, 7, 7, AQUA, CORE, GLOW, PALE_GLOW);
+                drawLine(img, 9, 5, 10, 7, GLOW);
+                drawLine(img, 9, 9, 7, 10, PALE_GLOW);
+                pixel(img, 8, 6, GLOW);
+            }
+            case 2 -> {
+                drawSwirlVortex(img, 7, 7, AQUA, CORE, GLOW, PALE_GLOW);
+                drawLine(img, 7, 10, 5, 9, AQUA);
+                drawLine(img, 4, 7, 5, 5, GLOW);
+                pixel(img, 6, 8, PALE_GLOW);
+            }
+            case 3 -> {
+                drawSwirlVortex(img, 7, 7, AQUA, CORE, GLOW, PALE_GLOW);
+                drawLine(img, 5, 5, 7, 4, GLOW);
+                drawLine(img, 5, 9, 4, 7, PALE_GLOW);
+                pixel(img, 6, 6, GLOW);
+            }
+            default -> throw new IllegalArgumentException("Unsupported swirl phase: " + phase);
+        }
+        return img;
+    }
+
+    private static List<BufferedImage> torpedoActiveFrames(BufferedImage base) {
+        return List.of(
+                torpedoActiveFrame(base, 0),
+                torpedoActiveFrame(base, 1),
+                torpedoActiveFrame(base, 2),
+                torpedoActiveFrame(base, 3));
+    }
+
+    private static BufferedImage torpedoActiveFrame(BufferedImage base, int phase) {
+        BufferedImage img = torpedoFront(base);
+        switch (phase) {
+            case 0 -> {
+                ring(img, 7, 8, 1, PALE_GLOW);
+                pixel(img, 7, 8, GLOW);
+                pixel(img, 8, 8, PALE_GLOW);
+            }
+            case 1 -> {
+                ring(img, 7, 8, 2, GLOW);
+                ring(img, 7, 8, 1, PALE_GLOW);
+                drawLine(img, 6, 8, 8, 8, PALE_GLOW);
+            }
+            case 2 -> {
+                ring(img, 7, 8, 3, PALE_GLOW);
+                drawLine(img, 7, 5, 7, 11, GLOW);
+                pixel(img, 6, 7, GLOW);
+                pixel(img, 8, 7, GLOW);
+            }
+            case 3 -> {
+                drawTorpedoBarrel(img, 7, 8, GRAPHITE, STEEL, BRASS, GLOW, PALE_GLOW);
+                drawLine(img, 5, 8, 10, 8, PALE_GLOW);
+                pixel(img, 7, 7, GLOW);
+            }
+            default -> throw new IllegalArgumentException("Unsupported torpedo phase: " + phase);
+        }
+        return img;
+    }
+
+    private static List<BufferedImage> airPumpActiveFrames(BufferedImage base) {
+        return List.of(
+                airPumpActiveFrame(base, 0),
+                airPumpActiveFrame(base, 1),
+                airPumpActiveFrame(base, 2),
+                airPumpActiveFrame(base, 3));
+    }
+
+    private static BufferedImage airPumpActiveFrame(BufferedImage base, int phase) {
+        BufferedImage img = airPumpFront(base);
+        drawAirPumpFan(img, 7, 7, phase, true);
+        switch (phase) {
+            case 0 -> drawAirPumpMotion(img, 7, 7, 0);
+            case 1 -> drawAirPumpMotion(img, 7, 7, 1);
+            case 2 -> drawAirPumpMotion(img, 7, 7, 2);
+            case 3 -> drawAirPumpMotion(img, 7, 7, 3);
+            default -> throw new IllegalArgumentException("Unsupported air pump phase: " + phase);
+        }
         return img;
     }
 
@@ -218,15 +480,16 @@ public final class GenerateAquanautMachineTextures {
 
     private static BufferedImage gasPipeClamp(BufferedImage base) {
         BufferedImage img = clear();
-        int baseTone = rgba(93, 116, 124);
-        int top = mix(baseTone, HIGHLIGHT, 0.24f);
-        int side = mix(baseTone, HIGHLIGHT, 0.10f);
-        int front = mix(baseTone, STEEL, 0.18f);
-        int shadow = mix(baseTone, SHADOW, 0.24f);
-        int deep = mix(baseTone, GRAPHITE, 0.32f);
-        int accent = mix(CORE, HIGHLIGHT, 0.22f);
+        int baseTone = rgba(88, 109, 118);
+        int top = mix(baseTone, HIGHLIGHT, 0.26f);
+        int side = mix(baseTone, STEEL, 0.16f);
+        int front = mix(baseTone, GRAPHITE, 0.10f);
+        int shadow = mix(baseTone, SHADOW, 0.28f);
+        int deep = mix(baseTone, GRAPHITE, 0.38f);
+        int accent = mix(CORE, HIGHLIGHT, 0.18f);
+        int seam = mix(baseTone, HIGHLIGHT, 0.08f);
 
-        // First 3x2 texels are the live palette sampled by the 1px framework rods.
+        // Small palette cells used by the 1px rods.
         pixel(img, 0, 0, side);
         pixel(img, 1, 0, top);
         pixel(img, 2, 0, accent);
@@ -234,22 +497,50 @@ public final class GenerateAquanautMachineTextures {
         pixel(img, 1, 1, shadow);
         pixel(img, 2, 1, deep);
 
-        // The rest of the tile gives the texture a proper hard-shell look for particles/item preview.
-        fillRect(img, 3, 3, 12, 12, rgba(0, 0, 0, 0));
-        drawLine(img, 4, 3, 11, 3, top);
-        drawLine(img, 3, 4, 3, 11, side);
-        drawLine(img, 12, 4, 12, 11, shadow);
-        drawLine(img, 4, 12, 11, 12, deep);
-        drawLine(img, 5, 5, 10, 5, mix(top, accent, 0.30f));
-        drawLine(img, 5, 10, 10, 10, mix(shadow, deep, 0.35f));
-        drawLine(img, 5, 6, 5, 9, mix(side, accent, 0.22f));
-        drawLine(img, 10, 6, 10, 9, mix(shadow, baseTone, 0.10f));
-        pixel(img, 6, 6, accent);
-        pixel(img, 9, 6, top);
-        pixel(img, 6, 9, front);
-        pixel(img, 9, 9, deep);
-        pixel(img, 7, 7, mix(accent, HIGHLIGHT, 0.30f));
-        pixel(img, 8, 8, mix(baseTone, SHADOW, 0.18f));
+        // Banded atlas: the rods sample broad 8px strips instead of a single flat texel.
+        fillRect(img, 0, 0, 15, 15, deep);
+        fillRect(img, 1, 1, 14, 14, baseTone);
+
+        drawLine(img, 1, 0, 14, 0, top);
+        drawLine(img, 1, 1, 14, 1, mix(top, side, 0.72f));
+        drawLine(img, 1, 2, 14, 2, side);
+        drawLine(img, 1, 3, 14, 3, mix(side, accent, 0.22f));
+        drawLine(img, 1, 4, 14, 4, front);
+        drawLine(img, 1, 5, 14, 5, mix(front, shadow, 0.42f));
+        drawLine(img, 1, 6, 14, 6, shadow);
+        drawLine(img, 1, 7, 14, 7, mix(shadow, deep, 0.26f));
+
+        drawLine(img, 2, 0, 2, 15, mix(top, seam, 0.40f));
+        drawLine(img, 5, 0, 5, 15, mix(side, seam, 0.22f));
+        drawLine(img, 8, 0, 8, 15, mix(front, seam, 0.24f));
+        drawLine(img, 11, 0, 11, 15, mix(shadow, seam, 0.28f));
+        drawLine(img, 13, 0, 13, 15, mix(deep, seam, 0.20f));
+
+        drawLine(img, 0, 8, 15, 8, mix(baseTone, SHADOW, 0.12f));
+        drawLine(img, 0, 9, 15, 9, mix(baseTone, HIGHLIGHT, 0.06f));
+        drawLine(img, 0, 10, 15, 10, mix(baseTone, GRAPHITE, 0.12f));
+        drawLine(img, 0, 11, 15, 11, mix(baseTone, STEEL, 0.10f));
+
+        pixel(img, 2, 2, HIGHLIGHT);
+        pixel(img, 5, 2, accent);
+        pixel(img, 8, 2, HIGHLIGHT);
+        pixel(img, 11, 2, accent);
+        pixel(img, 13, 2, HIGHLIGHT);
+        pixel(img, 3, 5, mix(accent, HIGHLIGHT, 0.35f));
+        pixel(img, 6, 5, mix(front, HIGHLIGHT, 0.25f));
+        pixel(img, 9, 5, mix(front, accent, 0.28f));
+        pixel(img, 12, 5, mix(shadow, HIGHLIGHT, 0.18f));
+        pixel(img, 2, 9, mix(shadow, GRAPHITE, 0.20f));
+        pixel(img, 5, 9, mix(front, shadow, 0.26f));
+        pixel(img, 8, 9, mix(baseTone, HIGHLIGHT, 0.12f));
+        pixel(img, 11, 9, mix(deep, HIGHLIGHT, 0.18f));
+        pixel(img, 13, 9, mix(deep, accent, 0.15f));
+        pixel(img, 7, 7, mix(accent, HIGHLIGHT, 0.22f));
+        pixel(img, 8, 8, mix(baseTone, SHADOW, 0.16f));
+        pixel(img, 7, 11, mix(shadow, GRAPHITE, 0.20f));
+        pixel(img, 8, 11, mix(front, SHADOW, 0.18f));
+
+        softMottle(img, 93, 0.014f);
         return img;
     }
 
@@ -317,6 +608,41 @@ public final class GenerateAquanautMachineTextures {
         pixel(img, 8, 7, mix(PALE_GLOW, STEEL, 0.45f));
     }
 
+    private static void drawAirPumpSideHint(BufferedImage img) {
+        fillRect(img, 4, 4, 11, 11, rgba(31, 43, 49));
+        drawLine(img, 5, 4, 10, 4, mix(STEEL, HIGHLIGHT, 0.14f));
+        drawLine(img, 5, 11, 10, 11, mix(STEEL, SHADOW, 0.14f));
+        drawLine(img, 5, 7, 10, 7, mix(AQUA, STEEL, 0.12f));
+        drawLine(img, 6, 5, 6, 10, mix(STEEL, HIGHLIGHT, 0.08f));
+        drawLine(img, 9, 5, 9, 10, mix(STEEL, SHADOW, 0.10f));
+        drawLine(img, 6, 6, 9, 6, mix(STEEL, HIGHLIGHT, 0.08f));
+        drawLine(img, 6, 9, 9, 9, mix(STEEL, SHADOW, 0.08f));
+        drawLine(img, 6, 7, 9, 7, mix(STEEL, AQUA, 0.10f));
+        pixel(img, 7, 7, mix(STEEL, HIGHLIGHT, 0.12f));
+        pixel(img, 8, 7, mix(STEEL, SHADOW, 0.10f));
+    }
+
+    private static void drawAirPumpFrontBay(BufferedImage img) {
+        fillRect(img, 3, 3, 12, 12, rgba(17, 25, 31));
+        panel(img, 4, 4, 11, 11, rgba(20, 29, 35), rgba(42, 57, 64), 0.30f);
+        ring(img, 7, 7, 5, mix(STEEL, AQUA, 0.28f));
+        ring(img, 7, 7, 4, mix(DARK_STEEL, STEEL, 0.26f));
+        drawLine(img, 4, 4, 11, 4, mix(STEEL, HIGHLIGHT, 0.18f));
+        drawLine(img, 4, 11, 11, 11, mix(STEEL, SHADOW, 0.18f));
+        drawLine(img, 4, 4, 4, 11, mix(STEEL, HIGHLIGHT, 0.10f));
+        drawLine(img, 11, 4, 11, 11, mix(STEEL, SHADOW, 0.12f));
+        drawAirPumpFan(img, 7, 7, 0, false);
+        pixel(img, 7, 7, PALE_GLOW);
+        pixel(img, 7, 3, GLOW);
+        pixel(img, 7, 11, SHADOW);
+        pixel(img, 3, 7, HIGHLIGHT);
+        pixel(img, 11, 7, HIGHLIGHT);
+        drawLine(img, 5, 5, 6, 6, mix(STEEL, HIGHLIGHT, 0.12f));
+        drawLine(img, 9, 5, 10, 6, mix(STEEL, HIGHLIGHT, 0.12f));
+        drawLine(img, 5, 9, 6, 10, mix(STEEL, SHADOW, 0.12f));
+        drawLine(img, 9, 9, 10, 10, mix(STEEL, SHADOW, 0.12f));
+    }
+
     private static void drawShieldSideHint(BufferedImage img) {
         fillRect(img, 4, 4, 11, 11, rgba(31, 43, 49));
         drawLine(img, 5, 5, 10, 5, mix(STEEL, HIGHLIGHT, 0.16f));
@@ -336,6 +662,90 @@ public final class GenerateAquanautMachineTextures {
         drawLine(img, 7, 9, 8, 9, GLOW);
         pixel(img, 6, 7, BRASS);
         pixel(img, 9, 7, BRASS);
+    }
+
+    private static void drawAirPumpFan(BufferedImage img, int cx, int cy, int phase, boolean spinning) {
+        int rim = mix(STEEL, AQUA, spinning ? 0.38f : 0.28f);
+        int innerRim = mix(DARK_STEEL, STEEL, 0.32f);
+        int bladeLight = mix(AQUA, HIGHLIGHT, spinning ? 0.82f : 0.68f);
+        int bladeMid = mix(STEEL, AQUA, spinning ? 0.56f : 0.42f);
+        int bladeDark = mix(DARK_STEEL, STEEL, 0.42f);
+        int hubDark = rgba(10, 15, 19);
+        int hubGlow = spinning ? PALE_GLOW : GLOW;
+
+        ring(img, cx, cy, 4, rim);
+        ring(img, cx, cy, 3, innerRim);
+
+        boolean primaryDiagonal = phase % 2 == 0;
+        int tipShift = phase >= 2 ? 1 : 0;
+
+        drawAirPumpFanBlade(img, cx, cy, -1, -1, primaryDiagonal ? bladeLight : bladeMid,
+                primaryDiagonal ? bladeMid : bladeDark, hubGlow, tipShift);
+        drawAirPumpFanBlade(img, cx, cy, 1, -1, primaryDiagonal ? bladeDark : bladeLight,
+                primaryDiagonal ? bladeDark : bladeMid, hubGlow, tipShift);
+        drawAirPumpFanBlade(img, cx, cy, 1, 1, primaryDiagonal ? bladeLight : bladeMid,
+                primaryDiagonal ? bladeMid : bladeDark, hubGlow, tipShift);
+        drawAirPumpFanBlade(img, cx, cy, -1, 1, primaryDiagonal ? bladeDark : bladeLight,
+                primaryDiagonal ? bladeDark : bladeMid, hubGlow, tipShift);
+
+        fillRect(img, cx - 1, cy - 1, cx + 1, cy + 1, hubDark);
+        ring(img, cx, cy, 1, mix(bladeDark, STEEL, 0.32f));
+        pixel(img, cx, cy, hubGlow);
+        pixel(img, cx, cy - 1, spinning ? bladeLight : HIGHLIGHT);
+        pixel(img, cx + 1, cy, spinning ? bladeLight : HIGHLIGHT);
+        pixel(img, cx, cy + 1, spinning ? bladeDark : SHADOW);
+        pixel(img, cx - 1, cy, spinning ? bladeMid : BRASS);
+        pixel(img, cx + 2, cy, rim);
+        pixel(img, cx - 2, cy, rim);
+        pixel(img, cx, cy - 2, rim);
+        pixel(img, cx, cy + 2, rim);
+    }
+
+    private static void drawAirPumpFanBlade(BufferedImage img, int cx, int cy, int dx, int dy, int light,
+            int mid, int glow, int tipShift) {
+        int innerX = cx + dx;
+        int innerY = cy + dy;
+        int midX = cx + dx * 2;
+        int midY = cy + dy * 2;
+        int tipX = cx + dx * (4 + tipShift);
+        int tipY = cy + dy * (4 + tipShift);
+
+        fillRect(img, Math.min(innerX, midX), Math.min(innerY, midY), Math.max(innerX, midX), Math.max(innerY, midY), mid);
+        fillRect(img, Math.min(midX, tipX), Math.min(midY, tipY), Math.max(midX, tipX), Math.max(midY, tipY), light);
+        drawLine(img, innerX, innerY, tipX, tipY, light);
+        drawLine(img, innerX, cy, tipX - dx, tipY - dy, mix(mid, SHADOW, 0.30f));
+        pixel(img, tipX, tipY, glow);
+        pixel(img, tipX - dx, tipY - dy, light);
+        pixel(img, innerX, innerY, mix(light, HIGHLIGHT, 0.20f));
+        pixel(img, midX, midY, mix(mid, HIGHLIGHT, 0.18f));
+    }
+
+    private static void drawAirPumpMotion(BufferedImage img, int cx, int cy, int phase) {
+        int arc = phase % 4;
+        switch (arc) {
+            case 0 -> {
+                pixel(img, cx + 4, cy - 1, PALE_GLOW);
+                pixel(img, cx + 3, cy - 2, GLOW);
+                pixel(img, cx - 4, cy + 1, SHADOW);
+            }
+            case 1 -> {
+                pixel(img, cx + 4, cy + 1, PALE_GLOW);
+                pixel(img, cx + 3, cy + 2, GLOW);
+                pixel(img, cx - 4, cy - 1, SHADOW);
+            }
+            case 2 -> {
+                pixel(img, cx - 1, cy + 4, PALE_GLOW);
+                pixel(img, cx - 2, cy + 3, GLOW);
+                pixel(img, cx + 1, cy - 4, SHADOW);
+            }
+            case 3 -> {
+                pixel(img, cx + 1, cy - 4, PALE_GLOW);
+                pixel(img, cx + 2, cy - 3, GLOW);
+                pixel(img, cx - 1, cy + 4, SHADOW);
+            }
+        }
+        drawLine(img, cx - 3, cy - 3, cx - 2, cy - 4, mix(GLOW, PALE_GLOW, 0.35f));
+        drawLine(img, cx + 3, cy + 3, cx + 4, cy + 2, mix(GLOW, PALE_GLOW, 0.35f));
     }
 
     private static BufferedImage copy(BufferedImage src) {

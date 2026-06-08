@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 
 public class ElectrofishRenderer extends BaseFishRenderer<ElectrofishEntity> {
@@ -31,9 +32,26 @@ public class ElectrofishRenderer extends BaseFishRenderer<ElectrofishEntity> {
     public void actuallyRender(PoseStack poseStack, ElectrofishEntity animatable, BakedGeoModel model,
             @Nullable RenderType renderType, MultiBufferSource bufferSource, @Nullable VertexConsumer buffer,
             boolean isReRender, float partialTick, int packedLight, int packedOverlay, int colour) {
+
+        float chargeProgress = animatable.getChargeProgress();
+
+        int bodyLight = packedLight;
+        int bodyColour = colour;
+        if (chargeProgress > 0.01F) {
+            bodyLight = (int) Mth.lerp(chargeProgress, (float) packedLight, 15728640.0F);
+            int r = (colour >> 16) & 0xFF;
+            int g = (colour >> 8) & 0xFF;
+            int b = colour & 0xFF;
+            int a = (colour >> 24) & 0xFF;
+            int rLerp = (int) Mth.lerp(chargeProgress, (float) r, 255.0F);
+            int gLerp = (int) Mth.lerp(chargeProgress, (float) g, 255.0F);
+            int bLerp = (int) Mth.lerp(chargeProgress, (float) b, 255.0F);
+            bodyColour = (a << 24) | (rLerp << 16) | (gLerp << 8) | bLerp;
+        }
+
         if (isReRender) {
             super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, buffer, true, partialTick,
-                    packedLight, packedOverlay, colour);
+                    bodyLight, packedOverlay, bodyColour);
             return;
         }
 
@@ -43,6 +61,6 @@ public class ElectrofishRenderer extends BaseFishRenderer<ElectrofishEntity> {
 
         VertexConsumer bodyBuffer = renderType == null ? buffer : bufferSource.getBuffer(renderType);
         super.actuallyRender(poseStack, animatable, model, renderType, bufferSource, bodyBuffer, true, partialTick,
-                packedLight, packedOverlay, colour);
+                bodyLight, packedOverlay, bodyColour);
     }
 }

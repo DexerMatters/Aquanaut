@@ -15,6 +15,13 @@ public final class LightningBoltGeometry {
         public Vec3 toVec3() {
             return new Vec3(x, y, z);
         }
+
+        public static Point lerp(Point a, Point b, float t) {
+            return new Point(
+                    a.x + (b.x - a.x) * t,
+                    a.y + (b.y - a.y) * t,
+                    a.z + (b.z - a.z) * t);
+        }
     }
 
     public record Path(List<Point> points, float width, int depth) {

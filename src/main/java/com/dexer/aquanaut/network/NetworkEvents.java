@@ -23,6 +23,10 @@ public final class NetworkEvents {
                 DivingEquipmentSyncPayload.TYPE,
                 DivingEquipmentSyncPayload.STREAM_CODEC,
                 DivingEquipmentSyncPayload::handle);
+        registrar.playToClient(
+                AquariumInventorySyncPayload.TYPE,
+                AquariumInventorySyncPayload.STREAM_CODEC,
+                AquariumInventorySyncPayload::handle);
         registrar.playToServer(
                 DivingEquipmentClickPayload.TYPE,
                 DivingEquipmentClickPayload.STREAM_CODEC,
@@ -31,5 +35,17 @@ public final class NetworkEvents {
                 RecallHarpoonPayload.TYPE,
                 RecallHarpoonPayload.STREAM_CODEC,
                 RecallHarpoonPayload::handle);
+        registrar.playToServer(
+                OpenAquariumPayload.TYPE,
+                OpenAquariumPayload.STREAM_CODEC,
+                OpenAquariumPayload::handle);
+        registrar.playToServer(
+                CloseAquariumPayload.TYPE,
+                CloseAquariumPayload.STREAM_CODEC,
+                CloseAquariumPayload::handle);
+        registrar.playToServer(
+                AquariumFishTransferPayload.TYPE,
+                AquariumFishTransferPayload.STREAM_CODEC,
+                AquariumFishTransferPayload::handle);
     }
 }

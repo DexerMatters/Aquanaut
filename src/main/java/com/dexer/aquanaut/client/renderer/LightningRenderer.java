@@ -46,8 +46,8 @@ public class LightningRenderer extends EntityRenderer<LightningEntity> {
                     .subtract(renderOrigin);
             float plateWidth = renderPlateWidth(local);
             VertexConsumer bodyBuffer = bufferSource.getBuffer(RenderType.entityTranslucent(TEXTURE));
-            renderSegment(pose, bodyBuffer, start, end, cameraLocal, plateWidth * (0.88F + twinkle * 0.16F),
-                    FULL_BRIGHT, (int) (84.0F + twinkle * 156.0F));
+            renderSegment(pose, bodyBuffer, start, end, cameraLocal, plateWidth * (0.95F + twinkle * 0.12F),
+                    FULL_BRIGHT, (int) (150.0F + twinkle * 105.0F));
         }
 
         // BufferSource reuses a shared builder for these render types, so glow and body
@@ -60,7 +60,7 @@ public class LightningRenderer extends EntityRenderer<LightningEntity> {
             float plateWidth = renderPlateWidth(local);
             VertexConsumer glowBuffer = bufferSource.getBuffer(RenderType.lightning());
             renderGlowSegment(pose, glowBuffer, start, end, cameraLocal, plateWidth * (1.45F + twinkle * 0.42F),
-                    0.06F + twinkle * 0.28F);
+                    0.15F + twinkle * 0.30F);
         }
 
         poseStack.popPose();
@@ -143,13 +143,13 @@ public class LightningRenderer extends EntityRenderer<LightningEntity> {
         Vec3 endLeft = end.add(offset);
 
         buffer.addVertex(matrix, (float) startLeft.x, (float) startLeft.y, (float) startLeft.z)
-                .setColor(0.72F, 0.82F, 1.0F, alpha);
+                .setColor(0.88F, 0.92F, 1.0F, alpha);
         buffer.addVertex(matrix, (float) startRight.x, (float) startRight.y, (float) startRight.z)
-                .setColor(0.72F, 0.82F, 1.0F, alpha);
+                .setColor(0.88F, 0.92F, 1.0F, alpha);
         buffer.addVertex(matrix, (float) endRight.x, (float) endRight.y, (float) endRight.z)
-                .setColor(0.72F, 0.82F, 1.0F, alpha);
+                .setColor(0.88F, 0.92F, 1.0F, alpha);
         buffer.addVertex(matrix, (float) endLeft.x, (float) endLeft.y, (float) endLeft.z)
-                .setColor(0.72F, 0.82F, 1.0F, alpha);
+                .setColor(0.88F, 0.92F, 1.0F, alpha);
     }
 
     private float twinkleStrength(LightningEntity entity, float partialTick) {
@@ -158,7 +158,7 @@ public class LightningRenderer extends EntityRenderer<LightningEntity> {
         float phase = age * 2.25F + (seed & 1023L) * 0.012F;
         float pulse = 0.5F + 0.5F * Mth.sin(phase);
         float shimmer = 0.5F + 0.5F * Mth.sin(phase * 3.1F + 1.7F);
-        return Mth.clamp(0.55F + pulse * 0.30F + shimmer * 0.15F, 0.35F, 1.0F);
+        return Mth.clamp(0.65F + pulse * 0.25F + shimmer * 0.10F, 0.50F, 1.0F);
     }
 
     private Vec3 billboardOffset(Vec3 start, Vec3 end, Vec3 cameraLocal, float width) {

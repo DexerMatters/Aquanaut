@@ -129,11 +129,6 @@ public class AnglerfishEntity extends BaseFishEntity implements GeoEntity {
     }
 
     @Override
-    protected float getMaxTiltDegrees() {
-        return 32.0F;
-    }
-
-    @Override
     protected double getCruiseVerticalAssist() {
         return 0.02D;
     }

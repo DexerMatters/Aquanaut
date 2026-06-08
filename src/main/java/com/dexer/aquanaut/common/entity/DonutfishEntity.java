@@ -168,11 +168,6 @@ public class DonutfishEntity extends BaseFishEntity implements GeoEntity {
     }
 
     @Override
-    protected float getMaxTiltDegrees() {
-        return 18.0F;
-    }
-
-    @Override
     protected float getHitboxPickInflation() {
         return 0.02F;
     }

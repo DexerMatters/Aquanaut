@@ -1,0 +1,50 @@
+{
+  "variants": {
+    "active=false,facing=down": {
+      "model": "aquanaut:block/air_pump",
+      "x": 90
+    },
+    "active=false,facing=up": {
+      "model": "aquanaut:block/air_pump",
+      "x": 270
+    },
+    "active=false,facing=north": {
+      "model": "aquanaut:block/air_pump"
+    },
+    "active=false,facing=south": {
+      "model": "aquanaut:block/air_pump",
+      "y": 180
+    },
+    "active=false,facing=west": {
+      "model": "aquanaut:block/air_pump",
+      "y": 270
+    },
+    "active=false,facing=east": {
+      "model": "aquanaut:block/air_pump",
+      "y": 90
+    },
+    "active=true,facing=down": {
+      "model": "aquanaut:block/air_pump_active",
+      "x": 90
+    },
+    "active=true,facing=up": {
+      "model": "aquanaut:block/air_pump_active",
+      "x": 270
+    },
+    "active=true,facing=north": {
+      "model": "aquanaut:block/air_pump_active"
+    },
+    "active=true,facing=south": {
+      "model": "aquanaut:block/air_pump_active",
+      "y": 180
+    },
+    "active=true,facing=west": {
+      "model": "aquanaut:block/air_pump_active",
+      "y": 270
+    },
+    "active=true,facing=east": {
+      "model": "aquanaut:block/air_pump_active",
+      "y": 90
+    }
+  }
+}

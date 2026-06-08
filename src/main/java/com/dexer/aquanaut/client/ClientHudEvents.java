@@ -1,16 +1,28 @@
 package com.dexer.aquanaut.client;
 
 import com.dexer.aquanaut.Aquanaut;
+import com.dexer.aquanaut.client.model.GasFlowMeterReadoutHelper;
 import com.dexer.aquanaut.common.AirSupplyHelper;
+import com.dexer.aquanaut.common.block.AirPumpBlock;
+import com.dexer.aquanaut.common.block.AbstractPipeBlock;
+import com.dexer.aquanaut.common.block.entity.AbstractPipeBlockEntity;
+import com.dexer.aquanaut.core.ItemRegistry;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 
 /**
  * Renders extra air supply as stacked bubble layers on top of the vanilla air
@@ -38,6 +50,9 @@ import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 public final class ClientHudEvents {
 
     private static final ResourceLocation AIR_SPRITE = ResourceLocation.withDefaultNamespace("hud/air");
+    private static final int TARGET_READOUT_BG = 0x99E8FFFF;
+    private static final int TARGET_READOUT_TEXT = 0xFF12343B;
+    private static final double TARGET_READOUT_MAX_DISTANCE_SQ = 25.0D;
 
     /**
      * Baked sprites applied per absolute layer slot (index 0 =
@@ -138,6 +153,55 @@ public final class ClientHudEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onRenderCrosshairPost(RenderGuiLayerEvent.Post event) {
+        if (!VanillaGuiLayers.CROSSHAIR.equals(event.getName())) {
+            return;
+        }
+
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.options.hideGui) {
+            return;
+        }
+
+        LocalPlayer player = mc.player;
+        if (player == null || !player.isUsingItem()) {
+            return;
+        }
+
+        ItemStack useItem = player.getUseItem();
+        if (!useItem.is(ItemRegistry.GAS_FLOW_METER.get())) {
+            return;
+        }
+
+        HitResult hitResult = mc.hitResult;
+        if (!(hitResult instanceof BlockHitResult blockHitResult)) {
+            return;
+        }
+
+        BlockPos pos = blockHitResult.getBlockPos();
+        if (player.distanceToSqr(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D) > TARGET_READOUT_MAX_DISTANCE_SQ) {
+            return;
+        }
+
+        BlockState state = player.level().getBlockState(pos);
+        if (state.getBlock() instanceof AirPumpBlock airPump) {
+            GasFlowMeterReadoutHelper.Readout readout = GasFlowMeterReadoutHelper.airPump(
+                    state.getValue(AirPumpBlock.ACTIVE),
+                    airPump.getFlowStrength(state));
+            drawTargetReadout(event.getGuiGraphics(), mc.font, readout);
+            return;
+        }
+
+        if (!(state.getBlock() instanceof AbstractPipeBlock)
+                || !(player.level().getBlockEntity(pos) instanceof AbstractPipeBlockEntity pipeEntity)) {
+            return;
+        }
+
+        GasFlowMeterReadoutHelper.Readout readout = GasFlowMeterReadoutHelper.airPipe(pipeEntity.getFlow());
+        drawTargetReadout(event.getGuiGraphics(), mc.font, readout);
+    }
+
     private static void drawBubbles(
             net.minecraft.client.gui.GuiGraphics graphics,
             int guiWidth, int y, int startSlot, int endSlot, ResourceLocation sprite) {
@@ -149,5 +213,24 @@ public final class ClientHudEvents {
 
     private static ResourceLocation spriteAt(int depth) {
         return LAYER_SPRITES[Math.min(depth, LAYER_SPRITES.length - 1)];
+    }
+
+    private static void drawTargetReadout(GuiGraphics graphics, Font font, GasFlowMeterReadoutHelper.Readout readout) {
+        int centerX = graphics.guiWidth() / 2;
+        int centerY = graphics.guiHeight() / 2;
+
+        int titleWidth = font.width(readout.title());
+        int valueWidth = font.width(readout.value());
+        int boxWidth = Math.max(titleWidth, valueWidth) + 12;
+        int boxHeight = font.lineHeight * 2 + 10;
+        int boxX = centerX - boxWidth / 2;
+        int boxY = centerY - 28;
+        int textX = centerX;
+        int titleY = boxY + 4;
+        int valueY = titleY + font.lineHeight + 1;
+
+        graphics.fill(boxX, boxY, boxX + boxWidth, boxY + boxHeight, TARGET_READOUT_BG);
+        graphics.drawString(font, readout.title(), textX - titleWidth / 2, titleY, TARGET_READOUT_TEXT, false);
+        graphics.drawString(font, readout.value(), textX - valueWidth / 2, valueY, TARGET_READOUT_TEXT, false);
     }
 }

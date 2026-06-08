@@ -1,0 +1,38 @@
+{
+  "parent": "minecraft:builtin/entity",
+  "gui_light": "front",
+  "textures": {
+    "particle": "aquanaut:item/gas_flow_meter"
+  },
+  "display": {
+    "ground": {
+      "translation": [0, 2, 0],
+      "scale": [0.75, 0.75, 0.75]
+    },
+    "fixed": {
+      "rotation": [0, 180, 0],
+      "translation": [0, 0, -2],
+      "scale": [1, 1, 1]
+    },
+    "thirdperson_righthand": {
+      "rotation": [0, 90, 0],
+      "translation": [0.35, 1.1, -0.35],
+      "scale": [0.82, 0.82, 0.82]
+    },
+    "thirdperson_lefthand": {
+      "rotation": [0, -90, 0],
+      "translation": [0.35, 1.1, -0.35],
+      "scale": [0.82, 0.82, 0.82]
+    },
+    "firstperson_righthand": {
+      "rotation": [0, 82, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.88, 0.88, 0.88]
+    },
+    "firstperson_lefthand": {
+      "rotation": [0, -82, 0],
+      "translation": [0, 0, 0],
+      "scale": [0.88, 0.88, 0.88]
+    }
+  }
+}

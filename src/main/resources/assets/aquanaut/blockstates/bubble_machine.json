@@ -1,26 +1,49 @@
 {
   "variants": {
-    "facing=down": {
+    "active=false,facing=down": {
       "model": "aquanaut:block/bubble_machine",
       "x": 90
     },
-    "facing=up": {
+    "active=false,facing=up": {
       "model": "aquanaut:block/bubble_machine",
       "x": 270
     },
-    "facing=north": {
+    "active=false,facing=north": {
       "model": "aquanaut:block/bubble_machine"
     },
-    "facing=south": {
+    "active=false,facing=south": {
       "model": "aquanaut:block/bubble_machine",
       "y": 180
     },
-    "facing=west": {
+    "active=false,facing=west": {
       "model": "aquanaut:block/bubble_machine",
       "y": 270
     },
-    "facing=east": {
+    "active=false,facing=east": {
       "model": "aquanaut:block/bubble_machine",
+      "y": 90
+    },
+    "active=true,facing=down": {
+      "model": "aquanaut:block/bubble_machine_active",
+      "x": 90
+    },
+    "active=true,facing=up": {
+      "model": "aquanaut:block/bubble_machine_active",
+      "x": 270
+    },
+    "active=true,facing=north": {
+      "model": "aquanaut:block/bubble_machine_active"
+    },
+    "active=true,facing=south": {
+      "model": "aquanaut:block/bubble_machine_active",
+      "y": 180
+    },
+    "active=true,facing=west": {
+      "model": "aquanaut:block/bubble_machine_active",
+      "y": 270
+    },
+    "active=true,facing=east": {
+      "model": "aquanaut:block/bubble_machine_active",
       "y": 90
     }
   }

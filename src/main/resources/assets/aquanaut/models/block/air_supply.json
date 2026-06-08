@@ -3,6 +3,7 @@
   "textures": {
     "side": "aquanaut:block/air_supply",
     "top": "aquanaut:block/air_supply_top",
-    "bottom": "aquanaut:block/hard_shell_frame"
+    "bottom": "aquanaut:block/hard_shell_frame",
+    "back": "aquanaut:block/air_supply"
   }
 }

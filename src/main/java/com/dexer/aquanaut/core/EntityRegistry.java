@@ -4,9 +4,11 @@ import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.entity.AirBubbleEntity;
 import com.dexer.aquanaut.common.entity.AnglerfishEntity;
 import com.dexer.aquanaut.common.entity.CatfishEntity;
+import com.dexer.aquanaut.common.entity.CreeporpedoEntity;
 import com.dexer.aquanaut.common.entity.DonutfishEntity;
 import com.dexer.aquanaut.common.entity.ElectrofishEntity;
 import com.dexer.aquanaut.common.entity.LightningEntity;
+import com.dexer.aquanaut.common.entity.LightingWormEntity;
 import com.dexer.aquanaut.common.entity.HarpoonEntity;
 import com.dexer.aquanaut.common.entity.HelicoprionEntity;
 import com.dexer.aquanaut.common.entity.IcerailEntity;
@@ -16,14 +18,19 @@ import com.dexer.aquanaut.common.entity.GiantAbyssWormEntity;
 import com.dexer.aquanaut.common.entity.GiantOctopusTentacleEntity;
 import com.dexer.aquanaut.common.entity.SardineEntity;
 import com.dexer.aquanaut.common.entity.SpringfishEntity;
+import com.dexer.aquanaut.common.entity.SwirlEntity;
+import com.dexer.aquanaut.common.entity.SwirlMakerEntity;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -152,6 +159,44 @@ public class EntityRegistry {
                             .clientTrackingRange(10)
                             .build("giant_octopus_tentacle"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<LightingWormEntity>> LIGHTING_WORM = ENTITIES
+            .register(
+                    "lighting_worm",
+                    () -> EntityType.Builder
+                            .<LightingWormEntity>of(LightingWormEntity::new,
+                                    MobCategory.WATER_CREATURE)
+                            .sized(1.3F, 0.5F)
+                            .build("lighting_worm"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<CreeporpedoEntity>> CREEPORPEDO = ENTITIES
+            .register(
+                    "creeporpedo",
+                    () -> EntityType.Builder
+                            .<CreeporpedoEntity>of(CreeporpedoEntity::new,
+                                    MobCategory.WATER_CREATURE)
+                            .sized(1.4F, 0.75F)
+                            .build("creeporpedo"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SwirlMakerEntity>> SWIRL_MAKER = ENTITIES
+            .register(
+                    "swirl_maker",
+                    () -> EntityType.Builder
+                            .<SwirlMakerEntity>of(SwirlMakerEntity::new,
+                                    MobCategory.WATER_CREATURE)
+                            .sized(2.2F, 1.8F)
+                            .build("swirl_maker"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SwirlEntity>> SWIRL = ENTITIES
+            .register(
+                    "swirl",
+                    () -> EntityType.Builder
+                            .<SwirlEntity>of(SwirlEntity::new,
+                                    MobCategory.MISC)
+                            .sized(0.1F, 0.1F)
+                            .clientTrackingRange(8)
+                            .updateInterval(1)
+                            .build("swirl"));
+
     public static void register(IEventBus eventBus) {
         ENTITIES.register(eventBus);
     }
@@ -170,5 +215,13 @@ public class EntityRegistry {
         event.put(EntityRegistry.MANTA_RAY.get(), MantaRayEntity.createAttributes());
         event.put(EntityRegistry.GIANT_ABYSS_WORM.get(), GiantAbyssWormEntity.createAttributes());
         event.put(EntityRegistry.GIANT_OCTOPUS_TENTACLE.get(), GiantOctopusTentacleEntity.createAttributes());
+        event.put(EntityRegistry.LIGHTING_WORM.get(), LightingWormEntity.createAttributes());
+        event.put(EntityRegistry.CREEPORPEDO.get(), CreeporpedoEntity.createAttributes());
+        event.put(EntityRegistry.SWIRL_MAKER.get(), SwirlMakerEntity.createAttributes());
+    }
+
+    @SubscribeEvent
+    public static void modifyEntityAttributes(EntityAttributeModificationEvent event) {
+        event.add(EntityType.PLAYER, NeoForgeMod.SWIM_SPEED);
     }
 }

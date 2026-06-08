@@ -6,6 +6,7 @@ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -51,6 +52,7 @@ public abstract class AbstractBranchingLightningEntity extends Entity {
             AbstractBranchingLightningEntity.class, EntityDataSerializers.FLOAT);
 
     private final Set<Integer> damagedEntityIds = new HashSet<>();
+    private boolean causesFire;
     private static final PartEntity<?>[] NO_PARTS = new PartEntity<?>[0];
 
     private LightningBranchSegment[] segments = new LightningBranchSegment[0];
@@ -280,6 +282,14 @@ public abstract class AbstractBranchingLightningEntity extends Entity {
         return this.makeBoundingBox();
     }
 
+    public void excludeEntity(int entityId) {
+        this.damagedEntityIds.add(entityId);
+    }
+
+    public void setCausesFire(boolean causesFire) {
+        this.causesFire = causesFire;
+    }
+
     @Override
     protected AABB makeBoundingBox() {
         if (segments == null) {
@@ -318,6 +328,7 @@ public abstract class AbstractBranchingLightningEntity extends Entity {
 
         if (this.getLightningAge() < getLightningActiveTicks()) {
             damageEntities();
+            spawnParticles();
         }
     }
 
@@ -523,6 +534,9 @@ public abstract class AbstractBranchingLightningEntity extends Entity {
             }
 
             if (target.hurt(this.damageSources().lightningBolt(), damage)) {
+                if (this.causesFire) {
+                    target.setRemainingFireTicks(target.getRemainingFireTicks() + 100);
+                }
                 this.damagedEntityIds.add(target.getId());
             } else {
                 this.damagedEntityIds.add(target.getId());
@@ -534,5 +548,38 @@ public abstract class AbstractBranchingLightningEntity extends Entity {
         this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
                 SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 10000.0F,
                 0.8F + this.random.nextFloat() * 0.2F);
+    }
+
+    private void spawnParticles() {
+        if (!(this.level() instanceof ServerLevel serverLevel)) {
+            return;
+        }
+
+        Vec3 origin = this.position();
+        float yaw = getLightningYaw();
+        float pitch = getLightningPitch();
+        List<LightningBoltGeometry.Segment> segments = this.localRenderSegments;
+        if (segments.isEmpty()) {
+            return;
+        }
+
+        int totalSegments = segments.size();
+        int particlesPerTick = Math.min(6 + totalSegments / 3, 24);
+
+        for (int i = 0; i < particlesPerTick; i++) {
+            int segIndex = this.random.nextInt(totalSegments);
+            LightningBoltGeometry.Segment seg = segments.get(segIndex);
+            float t = this.random.nextFloat();
+            LightningBoltGeometry.Point sampled = LightningBoltGeometry.Point.lerp(seg.start(), seg.end(), t);
+            Vec3 worldPos = LightningBoltGeometry.transformPoint(sampled, origin, yaw, pitch);
+
+            double offsetX = (this.random.nextDouble() - 0.5D) * 0.15D;
+            double offsetY = (this.random.nextDouble() - 0.5D) * 0.15D;
+            double offsetZ = (this.random.nextDouble() - 0.5D) * 0.15D;
+
+            serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK,
+                    worldPos.x + offsetX, worldPos.y + offsetY, worldPos.z + offsetZ,
+                    1, 0.0D, 0.0D, 0.0D, 0.02D);
+        }
     }
 }

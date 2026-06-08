@@ -1,7 +1,10 @@
 {
   "variants": {
-    "": {
+    "active=false": {
       "model": "aquanaut:block/shield_generator"
+    },
+    "active=true": {
+      "model": "aquanaut:block/shield_generator_active"
     }
   }
 }

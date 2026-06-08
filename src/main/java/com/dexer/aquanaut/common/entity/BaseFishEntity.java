@@ -410,7 +410,15 @@ public abstract class BaseFishEntity extends WaterAnimal {
     }
 
     protected boolean getShouldApplyPitchRotation() {
-        return true;
+        return this.isFlexibleBody();
+    }
+
+    public final boolean isFlexibleBody() {
+        return this.getIsFlexibleBody();
+    }
+
+    protected boolean getIsFlexibleBody() {
+        return false;
     }
 
     public final double passByStrikeForwardDistance() {
@@ -549,7 +557,7 @@ public abstract class BaseFishEntity extends WaterAnimal {
     }
 
     protected float getMaxTiltDegrees() {
-        return 35.0F;
+        return 0.0F;
     }
 
     public final int collisionTurnCooldownTicks() {

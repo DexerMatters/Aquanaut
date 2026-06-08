@@ -113,11 +113,6 @@ public class SpringfishEntity extends BaseFishEntity implements GeoEntity {
     }
 
     @Override
-    protected float getMaxTiltDegrees() {
-        return 32.0F;
-    }
-
-    @Override
     protected double getPlayerDetectionRange() {
         return 11.5D;
     }

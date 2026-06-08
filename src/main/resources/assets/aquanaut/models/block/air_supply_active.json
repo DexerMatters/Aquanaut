@@ -1,0 +1,9 @@
+{
+  "parent": "aquanaut:block/template_station",
+  "textures": {
+    "side": "aquanaut:block/air_supply_active",
+    "top": "aquanaut:block/air_supply_top",
+    "bottom": "aquanaut:block/hard_shell_frame",
+    "back": "aquanaut:block/air_supply_active"
+  }
+}

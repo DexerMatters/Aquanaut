@@ -2,6 +2,7 @@ package com.dexer.aquanaut.core;
 
 import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.diving.DivingEquipmentState;
+import com.dexer.aquanaut.common.inventory.aquarium.AquariumInventoryData;
 import com.mojang.serialization.Codec;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
@@ -14,16 +15,10 @@ public final class AttachmentRegistry {
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister
             .create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, Aquanaut.MODID);
 
-    /**
-     * Maximum extra air capacity added on top of the base 1200 ticks. Default: 0.
-     */
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<Integer>> MAX_EXTRA_AIR_SUPPLY = ATTACHMENT_TYPES
             .register("max_extra_air_supply",
                     () -> AttachmentType.builder(() -> 0).serialize(Codec.INT).build());
 
-    /**
-     * Logical diving equipment state tracked independently from vanilla armor.
-     */
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<DivingEquipmentState>> DIVING_EQUIPMENT_STATE = ATTACHMENT_TYPES
             .register("diving_equipment_state",
                     () -> AttachmentType.builder(() -> DivingEquipmentState.EMPTY)
@@ -49,6 +44,12 @@ public final class AttachmentRegistry {
                     () -> AttachmentType.builder(() -> ItemStack.EMPTY)
                             .serialize(ItemStack.CODEC,
                                     stack -> stack != null && !stack.isEmpty())
+                            .build());
+
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<AquariumInventoryData>> AQUARIUM_INVENTORY =
+            ATTACHMENT_TYPES.register("aquarium_inventory",
+                    () -> AttachmentType.builder(() -> AquariumInventoryData.EMPTY)
+                            .serialize(AquariumInventoryData.CODEC)
                             .build());
 
     private AttachmentRegistry() {

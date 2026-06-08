@@ -16,6 +16,7 @@ public final class SoundRegistry {
     public static final DeferredHolder<SoundEvent, SoundEvent> BUBBLE_BURST = register("bubble_burst");
     public static final DeferredHolder<SoundEvent, SoundEvent> BUBBLE_AMBIENT = register("bubble_ambient");
     public static final DeferredHolder<SoundEvent, SoundEvent> BUBBLE_MERGE = register("bubble_merge");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CREEPORPEDO_IGNITE = register("creeporpedo_ignite");
 
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         ResourceLocation id = ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, name);

@@ -217,6 +217,10 @@ public abstract class AbstractLightningEntity extends Entity {
         this.entityData.set(DATA_PITCH, pitch);
     }
 
+    public void excludeEntity(int entityId) {
+        this.damagedEntityIds.add(entityId);
+    }
+
     public int getLightningAge() {
         return this.tickCount;
     }

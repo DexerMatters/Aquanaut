@@ -153,11 +153,6 @@ public class HelicoprionEntity extends BaseFishEntity implements GeoEntity {
     }
 
     @Override
-    protected float getMaxTiltDegrees() {
-        return 26.0F;
-    }
-
-    @Override
     protected int getBiteCooldownTicks() {
         return 14;
     }

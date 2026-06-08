@@ -8,6 +8,7 @@ import com.dexer.aquanaut.common.diving.DivingEquipmentSlotType;
 import com.dexer.aquanaut.common.item.AirSupplyItem;
 import com.dexer.aquanaut.common.item.BubbleGunItem;
 import com.dexer.aquanaut.common.item.DivingEquipmentItem;
+import com.dexer.aquanaut.common.item.GasFlowMeterItem;
 import com.dexer.aquanaut.common.item.HarpoonItem;
 
 import net.minecraft.core.registries.Registries;
@@ -173,6 +174,12 @@ public final class ItemRegistry {
         public static final DeferredItem<Item> SHELL = ITEMS.registerSimpleItem("shell");
         public static final DeferredItem<Item> HARD_SHELL = ITEMS.registerSimpleItem("hard_shell");
 
+        // Scoop nets
+        public static final DeferredItem<Item> SCOOP_NET = ITEMS.registerSimpleItem("scoop_net");
+        public static final DeferredItem<Item> MEDIUM_SCOOP_NET = ITEMS.registerSimpleItem("medium_scoop_net");
+        public static final DeferredItem<Item> BIG_SCOOP_NET = ITEMS.registerSimpleItem("big_scoop_net");
+        public static final DeferredItem<Item> LARGE_SCOOP_NET = ITEMS.registerSimpleItem("large_scoop_net");
+
         // Tool sets
         public static final DeferredItem<Item> CORAL_AXE = axeItem("coral_axe", Tiers.STONE);
         public static final DeferredItem<Item> CORAL_PICKAXE = pickaxeItem("coral_pickaxe", Tiers.STONE);
@@ -240,11 +247,15 @@ public final class ItemRegistry {
                         BlockRegistry.SWIRL_GENERATOR);
         public static final DeferredItem<BlockItem> TORPEDO_LAUNCHER = blockItem("torpedo_launcher",
                         BlockRegistry.TORPEDO_LAUNCHER);
+        public static final DeferredItem<BlockItem> AIR_PUMP = blockItem("air_pump",
+                        BlockRegistry.AIR_PUMP);
         public static final DeferredItem<BlockItem> SHIELD_GENERATOR = blockItem("shield_generator",
                         BlockRegistry.SHIELD_GENERATOR);
         public static final DeferredItem<BlockItem> AIR_SUPPLY_BLOCK = blockItem("air_supply",
                         BlockRegistry.AIR_SUPPLY);
 
+        public static final DeferredItem<GasFlowMeterItem> GAS_FLOW_METER = ITEMS.registerItem("gas_flow_meter",
+                        properties -> new GasFlowMeterItem(properties.stacksTo(1)));
         public static final DeferredItem<Item> BUBBLE_GUN = ITEMS.registerItem("bubble_gun",
                         properties -> new BubbleGunItem(properties.durability(60).stacksTo(1)));
 
@@ -275,6 +286,18 @@ public final class ItemRegistry {
                         "giant_abyss_worm_spawn_egg",
                         EntityRegistry.GIANT_ABYSS_WORM, 0x1A0A2E, 0x6A1E8C);
 
+        public static final DeferredItem<DeferredSpawnEggItem> LIGHTING_WORM_SPAWN_EGG = spawnEgg(
+                        "lighting_worm_spawn_egg",
+                        EntityRegistry.LIGHTING_WORM, 0x50285A, 0xFFEB3C);
+
+        public static final DeferredItem<DeferredSpawnEggItem> CREEPORPEDO_SPAWN_EGG = spawnEgg(
+                        "creeporpedo_spawn_egg",
+                        EntityRegistry.CREEPORPEDO, 0x358838, 0xE86B1C);
+
+        public static final DeferredItem<DeferredSpawnEggItem> SWIRL_MAKER_SPAWN_EGG = spawnEgg(
+                        "swirl_maker_spawn_egg",
+                        EntityRegistry.SWIRL_MAKER, 0x889098, 0xC8B8A0);
+
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FOOD_TAB = tab("food",
                         COOKED_SARDINE, output -> {
                                 output.accept(COOKED_OCTOPUS_SHREDS.get());
@@ -300,6 +323,9 @@ public final class ItemRegistry {
                                 output.accept(MANTA_RAY_SPAWN_EGG.get());
                                 output.accept(GIANT_OCTOPUS_TENTACLE_SPAWN_EGG.get());
                                 output.accept(GIANT_ABYSS_WORM_SPAWN_EGG.get());
+                                output.accept(LIGHTING_WORM_SPAWN_EGG.get());
+                                output.accept(CREEPORPEDO_SPAWN_EGG.get());
+                                output.accept(SWIRL_MAKER_SPAWN_EGG.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MATERIALS_TAB = tab("materials",
@@ -336,6 +362,7 @@ public final class ItemRegistry {
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TOOLS_TAB = tab("tools",
                         BUBBLE_GUN, output -> {
+                                output.accept(GAS_FLOW_METER.get());
                                 output.accept(BUBBLE_GUN.get());
                                 output.accept(WOOD_HARPOON.get());
                                 output.accept(STONE_HARPOON.get());
@@ -348,6 +375,10 @@ public final class ItemRegistry {
                                 output.accept(SHELL_HARPOON.get());
                                 output.accept(HARD_SHELL_HARPOON.get());
                                 output.accept(MARINE_ALLOY_HARPOON.get());
+                                output.accept(SCOOP_NET.get());
+                                output.accept(MEDIUM_SCOOP_NET.get());
+                                output.accept(BIG_SCOOP_NET.get());
+                                output.accept(LARGE_SCOOP_NET.get());
                                 output.accept(CORAL_AXE.get());
                                 output.accept(CORAL_PICKAXE.get());
                                 output.accept(CORAL_SHOVEL.get());
@@ -415,6 +446,7 @@ public final class ItemRegistry {
                                 output.accept(BUBBLE_MACHINE.get());
                                 output.accept(SWIRL_GENERATOR.get());
                                 output.accept(TORPEDO_LAUNCHER.get());
+                                output.accept(AIR_PUMP.get());
                                 output.accept(SHIELD_GENERATOR.get());
                                 output.accept(AIR_SUPPLY_BLOCK.get());
                         });

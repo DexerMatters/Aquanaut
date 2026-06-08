@@ -43,5 +43,20 @@
                 "pitch": 1.1
             }
         ]
+    },
+    "creeporpedo_ignite": {
+        "subtitle": "subtitles.aquanaut.creeporpedo_ignite",
+        "sounds": [
+            {
+                "name": "minecraft:entity/creeper/primed",
+                "volume": 0.8,
+                "pitch": 1.2
+            },
+            {
+                "name": "minecraft:entity/tnt/primed",
+                "volume": 0.6,
+                "pitch": 1.0
+            }
+        ]
     }
 }

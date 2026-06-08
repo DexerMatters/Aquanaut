@@ -20,9 +20,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
 
-/**
- * Appends three real menu slots to the player's inventory menu for diving gear.
- */
 @Mixin(value = InventoryMenu.class, remap = false)
 public abstract class InventoryMenuMixin extends AbstractContainerMenu {
 

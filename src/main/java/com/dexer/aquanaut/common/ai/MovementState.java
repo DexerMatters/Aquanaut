@@ -14,6 +14,7 @@ public class MovementState {
     private int cruiseDepthDecisionCooldown;
     private float cruiseYawTarget;
     private float cruisePitchTarget;
+    private float motionPitchTarget;
     private double cruiseTargetY;
 
     public boolean isSprintingAway() {
@@ -120,6 +121,14 @@ public class MovementState {
         this.cruisePitchTarget = cruisePitchTarget;
     }
 
+    public float motionPitchTarget() {
+        return this.motionPitchTarget;
+    }
+
+    public void setMotionPitchTarget(float motionPitchTarget) {
+        this.motionPitchTarget = motionPitchTarget;
+    }
+
     public double cruiseTargetY() {
         return this.cruiseTargetY;
     }
@@ -142,6 +151,7 @@ public class MovementState {
         this.cruiseDepthDecisionCooldown = 0;
         this.cruiseYawTarget = currentYaw;
         this.cruisePitchTarget = 0.0F;
+        this.motionPitchTarget = 0.0F;
         this.cruiseTargetY = currentY;
     }
 }

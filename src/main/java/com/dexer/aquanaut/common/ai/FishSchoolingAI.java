@@ -1,6 +1,8 @@
 package com.dexer.aquanaut.common.ai;
 
 import com.dexer.aquanaut.common.entity.BaseFishEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
@@ -13,6 +15,8 @@ public final class FishSchoolingAI {
     private static final double SEPARATION_RADIUS = 1.15D;
     private static final double FOLLOW_DISTANCE = 2.15D;
     private static final int LEADER_THRESHOLD = 4;
+    private static final double BARRIER_REPULSION_RANGE = 2.4D;
+    private static final double BARRIER_REPULSION_STRENGTH = 0.65D;
 
     public SchoolingDecision resolve(BaseFishEntity fish) {
         if (!fish.schoolingEnabled()) {
@@ -57,13 +61,16 @@ public final class FishSchoolingAI {
         Vec3 schoolHeading = this.normalizeOrFallback(headingSum, this.forwardVector(fish));
         BaseFishEntity leader = this.electLeader(fish, schoolmates, schoolCenter, schoolHeading);
 
+        Vec3 barrierRepulsion = this.computeBarrierRepulsion(fish);
+
         Vec3 desiredDirection;
         double speedMultiplier;
         if (leader == fish) {
             Vec3 cohesion = schoolCenter.subtract(selfCenter);
             desiredDirection = schoolHeading.scale(1.4D)
                     .add(cohesion.scale(0.55D))
-                    .add(separationSum.scale(2.1D));
+                    .add(separationSum.scale(2.1D))
+                    .add(barrierRepulsion.scale(BARRIER_REPULSION_STRENGTH));
             speedMultiplier = memberCount >= LEADER_THRESHOLD ? 1.04D : 1.0D;
         } else {
             Vec3 leaderCenter = this.centerOf(leader);
@@ -78,21 +85,54 @@ public final class FishSchoolingAI {
             Vec3 followVector = followPoint.subtract(selfCenter);
             desiredDirection = followVector.scale(1.55D)
                     .add(schoolHeading.scale(0.9D))
-                    .add(separationSum.scale(2.35D));
+                    .add(separationSum.scale(2.35D))
+                    .add(barrierRepulsion.scale(BARRIER_REPULSION_STRENGTH));
 
             double distanceToLeader = leaderCenter.distanceTo(selfCenter);
             double distanceRatio = Mth.clamp(distanceToLeader / Math.max(1.0D, followDistance), 0.0D, 1.6D);
             speedMultiplier = Mth.clamp(0.94D + distanceRatio * 0.05D, 0.92D, 1.03D);
         }
 
-        desiredDirection = new Vec3(desiredDirection.x, 0.0D, desiredDirection.z);
-        desiredDirection = this.normalizeOrFallback(desiredDirection, new Vec3(schoolHeading.x, 0.0D, schoolHeading.z));
+        desiredDirection = this.normalizeOrFallback(desiredDirection, schoolHeading);
         return new SchoolingDecision(true, leader == fish, desiredDirection, speedMultiplier, schoolCenter.y,
                 memberCount);
     }
 
+    private Vec3 computeBarrierRepulsion(BaseFishEntity fish) {
+        Vec3 repulsion = new Vec3(0.0D, 0.0D, 0.0D);
+        Vec3 selfCenter = this.centerOf(fish);
+        int horizontalRadius = (int) Math.ceil(BARRIER_REPULSION_RANGE);
+        int verticalRadius = Math.max(1, (int) Math.ceil(fish.getBbHeight() * 0.75D));
+        double effectiveRange = BARRIER_REPULSION_RANGE + fish.getBbHeight() * 0.35D;
+
+        for (int dx = -horizontalRadius; dx <= horizontalRadius; dx++) {
+            for (int dy = -verticalRadius; dy <= verticalRadius; dy++) {
+                for (int dz = -horizontalRadius; dz <= horizontalRadius; dz++) {
+                    BlockPos pos = new BlockPos(
+                            (int) Math.floor(selfCenter.x + dx),
+                            (int) Math.floor(selfCenter.y + dy),
+                            (int) Math.floor(selfCenter.z + dz));
+
+                    if (!fish.level().getFluidState(pos).is(FluidTags.WATER)
+                            && fish.level().getBlockState(pos).isSolid()) {
+                        Vec3 blockCenter = new Vec3(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D);
+                        Vec3 awayFromBlock = selfCenter.subtract(blockCenter);
+                        double dist = awayFromBlock.length();
+                        if (dist > 0.01D && dist < effectiveRange) {
+                            double intensity = 1.0D - Mth.clamp(dist / effectiveRange, 0.0D, 1.0D);
+                            repulsion = repulsion.add(
+                                    this.normalizeOrFallback(awayFromBlock, Vec3.ZERO).scale(intensity * 1.6D));
+                        }
+                    }
+                }
+            }
+        }
+
+        return repulsion;
+    }
+
     private List<BaseFishEntity> findSchoolmates(BaseFishEntity fish) {
-        AABB searchBox = fish.getBoundingBox().inflate(SEARCH_RADIUS, SEARCH_RADIUS * 0.6D, SEARCH_RADIUS);
+        AABB searchBox = fish.getBoundingBox().inflate(SEARCH_RADIUS, SEARCH_RADIUS, SEARCH_RADIUS);
         return fish.level().getEntitiesOfClass(Entity.class, searchBox, entity -> entity instanceof BaseFishEntity other
                 && other != fish && other.isAlive() && other.isInWater() && other.getClass() == fish.getClass())
                 .stream()

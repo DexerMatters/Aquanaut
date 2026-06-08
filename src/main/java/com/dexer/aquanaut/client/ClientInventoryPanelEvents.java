@@ -5,6 +5,7 @@ import com.dexer.aquanaut.common.diving.DivingEquipmentSlotType;
 import com.dexer.aquanaut.common.diving.inventory.DivingEquipmentContainer;
 import com.dexer.aquanaut.common.diving.inventory.DivingEquipmentMenuSlot;
 import com.dexer.aquanaut.common.diving.inventory.DivingInventoryLayout;
+import com.dexer.aquanaut.common.diving.inventory.DivingInventoryLayout;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -20,9 +21,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ContainerScreenEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 
-/**
- * Renders an Aquanaut equipment side panel next to the vanilla inventory.
- */
 @EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public final class ClientInventoryPanelEvents {
 
@@ -55,10 +53,6 @@ public final class ClientInventoryPanelEvents {
     private ClientInventoryPanelEvents() {
     }
 
-    /**
-     * ContainerScreenEvent.Render.Background is the modern NeoForge hook for
-     * adding background elements to container screens.
-     */
     @SubscribeEvent
     public static void onContainerBackground(ContainerScreenEvent.Render.Background event) {
         AbstractContainerScreen<?> screen = event.getContainerScreen();
@@ -95,8 +89,14 @@ public final class ClientInventoryPanelEvents {
         drawEmptySlotIcons(event.getGuiGraphics(), containerScreen, false);
     }
 
-    private static void drawEquipmentPanel(GuiGraphics graphics, int inventoryLeft, int inventoryTop) {
+    private static boolean isSupportedInventoryScreen(AbstractContainerScreen<?> screen) {
+        if (screen instanceof InventoryScreen) {
+            return true;
+        }
+        return screen instanceof CreativeModeInventoryScreen creativeScreen && creativeScreen.isInventoryOpen();
+    }
 
+    private static void drawEquipmentPanel(GuiGraphics graphics, int inventoryLeft, int inventoryTop) {
         int panelX = inventoryLeft - PANEL_GAP - PANEL_WIDTH;
         int panelY = inventoryTop;
 
@@ -123,14 +123,6 @@ public final class ClientInventoryPanelEvents {
         drawSlotBackground(graphics, screen, maskSlot, translatedToGuiOrigin);
         drawSlotBackground(graphics, screen, tankSlot, translatedToGuiOrigin);
         drawSlotBackground(graphics, screen, flippersSlot, translatedToGuiOrigin);
-    }
-
-    private static boolean isSupportedInventoryScreen(AbstractContainerScreen<?> screen) {
-        if (screen instanceof InventoryScreen) {
-            return true;
-        }
-
-        return screen instanceof CreativeModeInventoryScreen creativeScreen && creativeScreen.isInventoryOpen();
     }
 
     private static Slot findSlot(AbstractContainerScreen<?> screen, DivingEquipmentSlotType slotType) {
@@ -202,12 +194,9 @@ public final class ClientInventoryPanelEvents {
     }
 
     private static void drawPanel(GuiGraphics graphics, int x, int y, int width, int height) {
-        // Core fill with stronger corner cut so the panel does not read as a plain
-        // rectangle.
         graphics.fill(x + 2, y + 2, x + width - 2, y + height - 2, PANEL_FILL);
         graphics.fill(x + 3, y + 3, x + width - 3, y + height - 3, PANEL_INNER);
 
-        // Beveled frame segments (2px chamfered corners, vanilla-like).
         graphics.fill(x + 2, y, x + width - 2, y + 1, PANEL_LIGHT);
         graphics.fill(x + 1, y + 1, x + width - 1, y + 2, PANEL_LIGHT);
         graphics.fill(x, y + 2, x + 1, y + height - 2, PANEL_LIGHT);
@@ -218,7 +207,6 @@ public final class ClientInventoryPanelEvents {
         graphics.fill(x + 2, y + height - 2, x + width - 2, y + height - 1, PANEL_DARK);
         graphics.fill(x + 2, y + height - 1, x + width - 2, y + height, PANEL_DARK);
 
-        // Corner bridge pixels for diagonal transitions.
         graphics.fill(x + 1, y + 1, x + 2, y + 2, PANEL_LIGHT);
         graphics.fill(x + width - 2, y + 1, x + width - 1, y + 2, PANEL_LIGHT);
         graphics.fill(x + 1, y + height - 2, x + 2, y + height - 1, PANEL_DARK);

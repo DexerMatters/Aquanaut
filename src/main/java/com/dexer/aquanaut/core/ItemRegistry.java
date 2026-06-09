@@ -8,6 +8,7 @@ import com.dexer.aquanaut.common.diving.DivingEquipmentSlotType;
 import com.dexer.aquanaut.common.item.AirSupplyItem;
 import com.dexer.aquanaut.common.item.BubbleGunItem;
 import com.dexer.aquanaut.common.item.DivingEquipmentItem;
+import com.dexer.aquanaut.common.item.FishingNetBlockItem;
 import com.dexer.aquanaut.common.item.GasFlowMeterItem;
 import com.dexer.aquanaut.common.item.HarpoonItem;
 import com.dexer.aquanaut.common.item.ScoopNetItem;
@@ -244,6 +245,8 @@ public final class ItemRegistry {
                         BlockRegistry.HARD_SHELL_FRAME);
         public static final DeferredItem<BlockItem> GAS_PIPE = blockItem("gas_pipe",
                         BlockRegistry.GAS_PIPE);
+        public static final DeferredItem<FishingNetBlockItem> FISHING_NET = ITEMS.registerItem("fishing_net",
+                props -> new FishingNetBlockItem(BlockRegistry.FISHING_NET.get(), props));
         public static final DeferredItem<BlockItem> LIGHTNING_GENERATOR = blockItem("lightning_generator",
                         BlockRegistry.LIGHTNING_GENERATOR);
         public static final DeferredItem<BlockItem> BUBBLE_MACHINE = blockItem("bubble_machine",
@@ -447,6 +450,7 @@ public final class ItemRegistry {
                                 output.accept(POLISHED_HARD_SHELL_BLOCK.get());
                                 output.accept(HARD_SHELL_FRAME.get());
                                 output.accept(GAS_PIPE.get());
+                                output.accept(FISHING_NET.get());
                                 output.accept(LIGHTNING_GENERATOR.get());
                                 output.accept(BUBBLE_MACHINE.get());
                                 output.accept(SWIRL_GENERATOR.get());

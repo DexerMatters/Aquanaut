@@ -398,7 +398,7 @@ public class AquariumScreen extends AbstractContainerScreen<AquariumContainerMen
         }
 
         Component name = previewEntity.getDisplayName();
-        float health = AquariumHealthTracker.getHealth(hit.entry());
+        float health = previewEntity.getHealth();
         float maxHealth = previewEntity.getMaxHealth();
 
         graphics.renderTooltip(this.font, List.of(

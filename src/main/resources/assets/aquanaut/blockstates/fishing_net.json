@@ -1,10 +1,10 @@
 {
   "multipart": [
-    {"when": {"north": "true"}, "apply": {"model": "aquanaut:block/fishing_net_panel"}},
-    {"when": {"south": "true"}, "apply": {"model": "aquanaut:block/fishing_net_panel", "y": 180}},
-    {"when": {"east": "true"}, "apply": {"model": "aquanaut:block/fishing_net_panel", "y": 90}},
-    {"when": {"west": "true"}, "apply": {"model": "aquanaut:block/fishing_net_panel", "y": 270}},
-    {"when": {"up": "true"}, "apply": {"model": "aquanaut:block/fishing_net_panel", "x": 270}},
-    {"when": {"down": "true"}, "apply": {"model": "aquanaut:block/fishing_net_panel", "x": 90}}
+    {"when": {"north": "false"}, "apply": {"model": "aquanaut:block/fishing_net_panel"}},
+    {"when": {"south": "false"}, "apply": {"model": "aquanaut:block/fishing_net_panel", "y": 180}},
+    {"when": {"east": "false"}, "apply": {"model": "aquanaut:block/fishing_net_panel", "y": 90}},
+    {"when": {"west": "false"}, "apply": {"model": "aquanaut:block/fishing_net_panel", "y": 270}},
+    {"when": {"up": "false"}, "apply": {"model": "aquanaut:block/fishing_net_panel", "x": 270}},
+    {"when": {"down": "false"}, "apply": {"model": "aquanaut:block/fishing_net_panel", "x": 90}}
   ]
 }

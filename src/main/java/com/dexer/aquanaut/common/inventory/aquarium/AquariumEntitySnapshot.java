@@ -30,10 +30,23 @@ public final class AquariumEntitySnapshot {
             return Optional.empty();
         }
 
+        float health = entity instanceof LivingEntity le ? le.getHealth() : 20.0F;
+
         CompoundTag tag = new CompoundTag();
-        entity.saveWithoutId(tag);
-        sanitize(tag);
-        return Optional.of(new AquariumFishEntry(id.toString(), tag.isEmpty() ? "" : tag.toString()));
+        entity.save(tag);
+        tag.remove("id");
+        tag.remove("Pos");
+        tag.remove("Motion");
+        tag.remove("Rotation");
+        tag.remove("UUID");
+        tag.remove("Passengers");
+        tag.remove("Leash");
+        tag.remove("OnGround");
+        tag.remove("FallDistance");
+        tag.remove("PortalCooldown");
+        tag.remove("Health");
+
+        return Optional.of(new AquariumFishEntry(id, health, tag.toString()));
     }
 
     public static Optional<Entity> createEntity(Level level, AquariumFishEntry entry) {
@@ -54,10 +67,13 @@ public final class AquariumEntitySnapshot {
 
         if (!entry.entityData().isBlank()) {
             try {
-                entity.load(TagParser.parseTag(entry.entityData()));
+                CompoundTag tag = TagParser.parseTag(entry.entityData());
+                entity.load(tag);
             } catch (Exception ignored) {
-                // Fall back to the type defaults if the snapshot data is malformed.
             }
+        }
+        if (entity instanceof LivingEntity le && entry.health() > 0.0F) {
+            le.setHealth(Math.min(entry.health(), le.getMaxHealth()));
         }
 
         return Optional.of(entity);
@@ -69,17 +85,5 @@ public final class AquariumEntitySnapshot {
             return Optional.of(livingEntity);
         }
         return Optional.empty();
-    }
-
-    private static void sanitize(CompoundTag tag) {
-        tag.remove("Pos");
-        tag.remove("Motion");
-        tag.remove("Rotation");
-        tag.remove("UUID");
-        tag.remove("Passengers");
-        tag.remove("Leash");
-        tag.remove("OnGround");
-        tag.remove("FallDistance");
-        tag.remove("PortalCooldown");
     }
 }

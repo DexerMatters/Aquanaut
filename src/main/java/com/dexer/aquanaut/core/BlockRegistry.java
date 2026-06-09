@@ -4,6 +4,7 @@ import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.block.AirPumpBlock;
 import com.dexer.aquanaut.common.block.AirSupplyBlock;
 import com.dexer.aquanaut.common.block.BubbleMachineBlock;
+import com.dexer.aquanaut.common.block.FishingNetBlock;
 import com.dexer.aquanaut.common.block.GasPipeBlock;
 import com.dexer.aquanaut.common.block.OmnidirectionalMachineBlock;
 import com.dexer.aquanaut.common.block.ShieldGeneratorBlock;
@@ -62,6 +63,8 @@ public final class BlockRegistry {
     public static final DeferredBlock<Block> HARD_SHELL_FRAME = cube("hard_shell_frame",
             MapColor.QUARTZ, 3.5F, 5.0F, SoundType.STONE);
     public static final DeferredBlock<GasPipeBlock> GAS_PIPE = pipe("gas_pipe");
+
+    public static final DeferredBlock<FishingNetBlock> FISHING_NET = fishingNet("fishing_net");
 
     public static final DeferredBlock<OmnidirectionalMachineBlock> LIGHTNING_GENERATOR = machine(
             "lightning_generator");
@@ -148,6 +151,15 @@ public final class BlockRegistry {
                 .noOcclusion()
                 .dynamicShape()
                 .requiresCorrectToolForDrops()));
+    }
+
+    private static DeferredBlock<FishingNetBlock> fishingNet(String name) {
+        return BLOCKS.register(name, () -> new FishingNetBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_BROWN)
+                .strength(1.5F, 2.0F)
+                .sound(SoundType.WOOL)
+                .noOcclusion()
+                .dynamicShape()));
     }
 
     public static void register(IEventBus eventBus) {

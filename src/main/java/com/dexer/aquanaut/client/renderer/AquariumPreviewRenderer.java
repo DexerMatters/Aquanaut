@@ -30,10 +30,15 @@ public final class AquariumPreviewRenderer {
             return;
         }
 
-        if (entry != null && AquariumHealthTracker.isRecentlyHurt(entry)) {
-            entity.hurtTime = entity.hurtDuration = 10;
-        } else {
-            entity.hurtTime = entity.hurtDuration = 0;
+        if (entry != null) {
+            if (entry.health() > 0.0F && entry.health() != entity.getHealth()) {
+                entity.setHealth(Math.min(entry.health(), entity.getMaxHealth()));
+            }
+            if (AquariumHealthTracker.isRecentlyHurt(entry)) {
+                entity.hurtTime = entity.hurtDuration = 10;
+            } else {
+                entity.hurtTime = entity.hurtDuration = 0;
+            }
         }
 
         entity.tickCount = (int) (System.currentTimeMillis() / 50);
@@ -84,6 +89,9 @@ public final class AquariumPreviewRenderer {
         String cacheKey = entry == null ? spec.id().toString() : entry.cacheKey();
         LivingEntity cached = ENTITY_CACHE.get(cacheKey);
         if (cached != null) {
+            if (entry != null && entry.health() > 0.0F && entry.health() != cached.getHealth()) {
+                cached.setHealth(Math.min(entry.health(), cached.getMaxHealth()));
+            }
             return cached;
         }
 

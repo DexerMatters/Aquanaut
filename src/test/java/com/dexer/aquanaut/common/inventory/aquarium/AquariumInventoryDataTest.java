@@ -10,7 +10,7 @@ public final class AquariumInventoryDataTest {
 
     private void roundTripsEntityEntriesThroughSyncSerialization() {
         AquariumInventoryData data = new AquariumInventoryData(java.util.List.of(
-                new AquariumFishEntry("aquanaut:sardine", "{Health:5.0f}"),
+                new AquariumFishEntry("aquanaut:sardine", 5.0F, "{Health:5.0f}"),
                 AquariumFishEntry.EMPTY));
 
         AquariumInventoryData decoded = AquariumInventoryData.deserialize(data.serialize());
@@ -22,6 +22,9 @@ public final class AquariumInventoryDataTest {
         }
         if (!"{Health:5.0f}".equals(first.entityData())) {
             throw new AssertionError("expected entity snapshot to round trip unchanged but was " + first.entityData());
+        }
+        if (Math.abs(first.health() - 5.0F) > 0.01F) {
+            throw new AssertionError("expected health 5.0 but was " + first.health());
         }
     }
 

@@ -1,8 +1,6 @@
 package com.dexer.aquanaut.common.inventory.aquarium;
 
 import com.dexer.aquanaut.Aquanaut;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.TagParser;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -17,15 +15,12 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME)
 public final class AquariumHealthTracker {
 
-    private static final String ENTERED_AT_KEY = "AquariumEnteredAt";
-    private static final String LAST_HURT_AT_KEY = "AquariumLastHurtAt";
     private static final long GRACE_PERIOD_MS = 30_000L;
     private static final long HURT_INTERVAL_MS = 2_000L;
     private static final float DAMAGE_PER_TICK = 0.5F;
@@ -50,8 +45,8 @@ public final class AquariumHealthTracker {
 
     private static void tickPlayer(ServerPlayer player) {
         AquariumInventoryData data = AquariumInventoryHelper.getAquarium(player);
-        List<AquariumFishEntry> entries = data.mutableCopy();
         boolean changed = false;
+        var entries = data.mutableCopy();
 
         for (int i = 0; i < entries.size(); i++) {
             AquariumFishEntry entry = entries.get(i);
@@ -78,16 +73,15 @@ public final class AquariumHealthTracker {
                 continue;
             }
 
-            float currentHealth = getHealth(entry);
-            float newHealth = currentHealth - DAMAGE_PER_TICK;
-
+            float newHealth = entry.health() - DAMAGE_PER_TICK;
             if (newHealth <= 0.0F) {
-                killFish(player, entry, i, entries);
+                killFish(player, entry);
+                entries.set(i, AquariumFishEntry.EMPTY);
                 changed = true;
-                break;
+                continue;
             }
 
-            entry = setHealth(entry, newHealth);
+            entry = entry.withHealth(newHealth);
             entry = setLastHurtAt(entry, now);
             entries.set(i, entry);
             changed = true;
@@ -98,17 +92,13 @@ public final class AquariumHealthTracker {
         }
     }
 
-    private static void killFish(ServerPlayer player, AquariumFishEntry entry, int index,
-            List<AquariumFishEntry> entries) {
-        entries.set(index, AquariumFishEntry.EMPTY);
-
+    private static void killFish(ServerPlayer player, AquariumFishEntry entry) {
         Optional<Entity> entityOpt = AquariumEntitySnapshot.createEntity(player.serverLevel(), entry);
         if (entityOpt.isEmpty() || !(entityOpt.get() instanceof LivingEntity living)) {
             return;
         }
 
         List<ItemStack> drops = generateLoot(living, player.serverLevel());
-
         for (ItemStack drop : drops) {
             if (!drop.isEmpty()) {
                 if (!player.getInventory().add(drop)) {
@@ -134,59 +124,36 @@ public final class AquariumHealthTracker {
         return lootTable.getRandomItems(params);
     }
 
-    public static String setEnteredAt(String entityData, long timestamp) {
+    public static AquariumFishEntry setLastHurtAt(AquariumFishEntry entry, long timestamp) {
+        String data = entry.entityData();
         try {
-            CompoundTag tag = entityData.isBlank() ? new CompoundTag()
-                    : TagParser.parseTag(entityData);
-            tag.putLong(ENTERED_AT_KEY, timestamp);
-            return tag.toString();
+            net.minecraft.nbt.CompoundTag tag = data.isBlank() ? new net.minecraft.nbt.CompoundTag()
+                    : net.minecraft.nbt.TagParser.parseTag(data);
+            tag.putLong("AquariumLastHurtAt", timestamp);
+            return new AquariumFishEntry(entry.entityId(), entry.health(), tag.toString());
         } catch (Exception e) {
-            return entityData;
+            return entry;
+        }
+    }
+
+    public static long getLastHurtAt(AquariumFishEntry entry) {
+        return getLongFromData(entry.entityData(), "AquariumLastHurtAt");
+    }
+
+    private static AquariumFishEntry setEnteredAt(AquariumFishEntry entry, long timestamp) {
+        String data = entry.entityData();
+        try {
+            net.minecraft.nbt.CompoundTag tag = data.isBlank() ? new net.minecraft.nbt.CompoundTag()
+                    : net.minecraft.nbt.TagParser.parseTag(data);
+            tag.putLong("AquariumEnteredAt", timestamp);
+            return new AquariumFishEntry(entry.entityId(), entry.health(), tag.toString());
+        } catch (Exception e) {
+            return entry;
         }
     }
 
     public static long getEnteredAt(AquariumFishEntry entry) {
-        return getLongFromData(entry.entityData(), ENTERED_AT_KEY);
-    }
-
-    public static AquariumFishEntry setEnteredAt(AquariumFishEntry entry, long timestamp) {
-        return new AquariumFishEntry(entry.entityId(), setEnteredAt(entry.entityData(), timestamp));
-    }
-
-    public static long getLastHurtAt(AquariumFishEntry entry) {
-        return getLongFromData(entry.entityData(), LAST_HURT_AT_KEY);
-    }
-
-    public static AquariumFishEntry setLastHurtAt(AquariumFishEntry entry, long timestamp) {
-        try {
-            CompoundTag tag = entry.entityData().isBlank() ? new CompoundTag()
-                    : TagParser.parseTag(entry.entityData());
-            tag.putLong(LAST_HURT_AT_KEY, timestamp);
-            return new AquariumFishEntry(entry.entityId(), tag.toString());
-        } catch (Exception e) {
-            return entry;
-        }
-    }
-
-    public static float getHealth(AquariumFishEntry entry) {
-        try {
-            CompoundTag tag = entry.entityData().isBlank() ? new CompoundTag()
-                    : TagParser.parseTag(entry.entityData());
-            return tag.contains("Health") ? tag.getFloat("Health") : 20.0F;
-        } catch (Exception e) {
-            return 20.0F;
-        }
-    }
-
-    public static AquariumFishEntry setHealth(AquariumFishEntry entry, float health) {
-        try {
-            CompoundTag tag = entry.entityData().isBlank() ? new CompoundTag()
-                    : TagParser.parseTag(entry.entityData());
-            tag.putFloat("Health", Math.max(0.0F, health));
-            return new AquariumFishEntry(entry.entityId(), tag.toString());
-        } catch (Exception e) {
-            return entry;
-        }
+        return getLongFromData(entry.entityData(), "AquariumEnteredAt");
     }
 
     public static boolean isRecentlyHurt(AquariumFishEntry entry) {
@@ -199,8 +166,8 @@ public final class AquariumHealthTracker {
 
     private static long getLongFromData(String entityData, String key) {
         try {
-            CompoundTag tag = entityData.isBlank() ? new CompoundTag()
-                    : TagParser.parseTag(entityData);
+            net.minecraft.nbt.CompoundTag tag = entityData.isBlank() ? new net.minecraft.nbt.CompoundTag()
+                    : net.minecraft.nbt.TagParser.parseTag(entityData);
             return tag.getLong(key);
         } catch (Exception e) {
             return 0L;

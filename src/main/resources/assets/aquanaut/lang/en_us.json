@@ -43,6 +43,7 @@
   "block.aquanaut.air_pump": "Air Pump",
   "block.aquanaut.shield_generator": "Shield Generator",
   "block.aquanaut.air_supply": "Air Supply",
+  "block.aquanaut.fishing_net": "Fishing Net",
   "item.aquanaut.octopus_shreds": "Octopus Shreds",
   "item.aquanaut.cooked_octopus_shreds": "Cooked Octopus Shreds",
   "item.aquanaut.sardine": "Sardine",
@@ -178,5 +179,7 @@
   "gui.aquanaut.inventory": "Inventory",
   "command.aquanaut.givefish.unknown_fish": "Unknown fish type: %s",
   "command.aquanaut.givefish.no_room": "No room in %s's aquarium for %s",
-  "command.aquanaut.givefish.success": "Added %s to %s's aquarium."
+  "command.aquanaut.givefish.success": "Added %s to %s's aquarium.",
+  "item.aquanaut.scoop_net.desc": "Fish size with 100%% chance: %s",
+  "item.aquanaut.harpoon.desc": "%s thrown damage"
 }

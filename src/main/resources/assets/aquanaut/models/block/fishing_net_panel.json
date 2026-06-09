@@ -1,0 +1,18 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "aquanaut:block/fishing_net",
+    "texture": "aquanaut:block/fishing_net"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0.01],
+      "to": [16, 16, 0.02],
+      "faces": {
+        "north": {"uv": [0, 0, 16, 16], "texture": "#texture", "cullface": "north"},
+        "south": {"uv": [0, 0, 16, 16], "texture": "#texture"}
+      }
+    }
+  ]
+}

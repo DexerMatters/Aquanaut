@@ -178,5 +178,7 @@
   "gui.aquanaut.inventory": "背包",
   "command.aquanaut.givefish.unknown_fish": "未知鱼类类型：%s",
   "command.aquanaut.givefish.no_room": "%s的水族馆没有空位容纳%s",
-  "command.aquanaut.givefish.success": "已将%s添加至%s的水族馆。"
+  "command.aquanaut.givefish.success": "已将%s添加至%s的水族馆。",
+  "item.aquanaut.scoop_net.desc": "100%%概率可捞取的最大鱼体尺寸：%s",
+  "item.aquanaut.harpoon.desc": "%s 投掷伤害"
 }

@@ -4,6 +4,7 @@ import com.dexer.aquanaut.common.inventory.aquarium.AquariumContainerMenu;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumFishEntry;
 import com.dexer.aquanaut.client.renderer.AquariumPreviewRenderer;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumFishSpec;
+import com.dexer.aquanaut.common.inventory.aquarium.AquariumHealthTracker;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumInventoryData;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumInventoryHelper;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumPlacementMath;
@@ -396,15 +397,19 @@ public class AquariumScreen extends AbstractContainerScreen<AquariumContainerMen
             return false;
         }
 
+        Component name = previewEntity.getDisplayName();
+        float health = AquariumHealthTracker.getHealth(hit.entry());
+        float maxHealth = previewEntity.getMaxHealth();
+
         graphics.renderTooltip(this.font, List.of(
-                previewEntity.getDisplayName(),
-                healthTooltip(previewEntity)), Optional.empty(), mouseX, mouseY);
+                name,
+                healthTooltip(health, maxHealth)), Optional.empty(), mouseX, mouseY);
         return true;
     }
 
-    private Component healthTooltip(LivingEntity entity) {
-        float health = Mth.clamp(entity.getHealth(), 0.0F, entity.getMaxHealth());
-        int totalHearts = Math.max(1, Mth.ceil(entity.getMaxHealth() * 0.5F));
+    private Component healthTooltip(float health, float maxHealth) {
+        float clampedHealth = Mth.clamp(health, 0.0F, maxHealth);
+        int totalHearts = Math.max(1, Mth.ceil(maxHealth * 0.5F));
         int filledHalfHearts = Mth.clamp(Mth.floor((health * 2.0F) + 1.0E-4F), 0, totalHearts * 2);
         int fullHearts = filledHalfHearts / 2;
         boolean hasHalfHeart = (filledHalfHearts & 1) == 1;

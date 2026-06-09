@@ -71,19 +71,26 @@ public final class AquariumInventoryHelper {
     }
 
     public static boolean addFish(ServerPlayer player, AquariumFishSpec fish) {
-        AquariumInventoryData data = getAquarium(player);
-        OptionalInt placement = findDensePlacement(data, fish);
-        if (placement.isEmpty()) {
-            return false;
-        }
-
         Optional<AquariumFishEntry> entry = AquariumEntitySnapshot.createDefault(player.serverLevel(), fish);
         if (entry.isEmpty()) {
             return false;
         }
+        return addFishEntry(player, entry.get());
+    }
+
+    public static boolean addFishEntry(ServerPlayer player, AquariumFishEntry entry) {
+        AquariumInventoryData data = getAquarium(player);
+        Optional<AquariumFishSpec> fish = entry.resourceId().flatMap(AquariumFishCatalog::byId);
+        if (fish.isEmpty()) {
+            return false;
+        }
+        OptionalInt placement = findDensePlacement(data, fish.get());
+        if (placement.isEmpty()) {
+            return false;
+        }
 
         List<AquariumFishEntry> fishEntries = data.mutableCopy();
-        fishEntries.set(placement.getAsInt(), entry.get());
+        fishEntries.set(placement.getAsInt(), entry);
         setAquarium(player, new AquariumInventoryData(fishEntries));
         return true;
     }

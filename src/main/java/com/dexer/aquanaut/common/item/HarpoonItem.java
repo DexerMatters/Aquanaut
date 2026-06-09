@@ -3,6 +3,7 @@ package com.dexer.aquanaut.common.item;
 import com.dexer.aquanaut.common.entity.HarpoonEntity;
 import com.dexer.aquanaut.common.gaze.GazeCatalog;
 import com.dexer.aquanaut.common.gaze.GazeHelper;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -15,7 +16,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
+
+import java.util.List;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -34,6 +38,12 @@ public class HarpoonItem extends Item {
 
     public float getThrownDamage() {
         return this.thrownDamage;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(Component.translatable("item.aquanaut.harpoon.desc", thrownDamage)
+                .withStyle(net.minecraft.ChatFormatting.DARK_GREEN));
     }
 
     @Override

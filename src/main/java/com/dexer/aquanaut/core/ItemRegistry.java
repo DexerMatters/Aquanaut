@@ -10,6 +10,7 @@ import com.dexer.aquanaut.common.item.BubbleGunItem;
 import com.dexer.aquanaut.common.item.DivingEquipmentItem;
 import com.dexer.aquanaut.common.item.GasFlowMeterItem;
 import com.dexer.aquanaut.common.item.HarpoonItem;
+import com.dexer.aquanaut.common.item.ScoopNetItem;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -174,11 +175,15 @@ public final class ItemRegistry {
         public static final DeferredItem<Item> SHELL = ITEMS.registerSimpleItem("shell");
         public static final DeferredItem<Item> HARD_SHELL = ITEMS.registerSimpleItem("hard_shell");
 
-        // Scoop nets
-        public static final DeferredItem<Item> SCOOP_NET = ITEMS.registerSimpleItem("scoop_net");
-        public static final DeferredItem<Item> MEDIUM_SCOOP_NET = ITEMS.registerSimpleItem("medium_scoop_net");
-        public static final DeferredItem<Item> BIG_SCOOP_NET = ITEMS.registerSimpleItem("big_scoop_net");
-        public static final DeferredItem<Item> LARGE_SCOOP_NET = ITEMS.registerSimpleItem("large_scoop_net");
+        // Scoop nets — maxSize, extraSize
+        public static final DeferredItem<ScoopNetItem> SCOOP_NET = ITEMS.registerItem("scoop_net",
+                props -> new ScoopNetItem(props.stacksTo(1).durability(32), 1, 0));
+        public static final DeferredItem<ScoopNetItem> MEDIUM_SCOOP_NET = ITEMS.registerItem("medium_scoop_net",
+                props -> new ScoopNetItem(props.stacksTo(1).durability(64), 2, 0));
+        public static final DeferredItem<ScoopNetItem> BIG_SCOOP_NET = ITEMS.registerItem("big_scoop_net",
+                props -> new ScoopNetItem(props.stacksTo(1).durability(128), 4, 0));
+        public static final DeferredItem<ScoopNetItem> LARGE_SCOOP_NET = ITEMS.registerItem("large_scoop_net",
+                props -> new ScoopNetItem(props.stacksTo(1).durability(256), 6, 0));
 
         // Tool sets
         public static final DeferredItem<Item> CORAL_AXE = axeItem("coral_axe", Tiers.STONE);

@@ -4,6 +4,7 @@ import com.dexer.aquanaut.common.inventory.aquarium.AquariumEntitySnapshot;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumFish;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumFishEntry;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumFishSpec;
+import com.dexer.aquanaut.common.inventory.aquarium.AquariumHealthTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
@@ -27,6 +28,12 @@ public final class AquariumPreviewRenderer {
         LivingEntity entity = getOrCreatePreviewEntity(entry, spec);
         if (entity == null) {
             return;
+        }
+
+        if (entry != null && AquariumHealthTracker.isRecentlyHurt(entry)) {
+            entity.hurtTime = entity.hurtDuration = 10;
+        } else {
+            entity.hurtTime = entity.hurtDuration = 0;
         }
 
         entity.tickCount = (int) (System.currentTimeMillis() / 50);

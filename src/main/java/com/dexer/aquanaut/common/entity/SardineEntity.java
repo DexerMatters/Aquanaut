@@ -25,8 +25,7 @@ public class SardineEntity extends BaseFishEntity implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, state -> {
-            state.getController().setAnimationSpeed(
-                    this.isSprintingAway() ? this.getSprintAnimationSpeed() : this.getCruiseAnimationSpeed());
+            state.getController().setAnimationSpeed(animSpeed(0.5, 1.12, 1.2, 2.05));
             return state.setAndContinue(SWIM_ANIMATION);
         }));
     }

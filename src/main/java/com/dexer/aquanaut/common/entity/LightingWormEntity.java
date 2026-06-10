@@ -41,11 +41,7 @@ public class LightingWormEntity extends BaseFishEntity implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, state -> {
-            double animationSpeed = LightingWormAnimationSpeed.resolve(
-                    this.getDeltaMovement().length(),
-                    this.isSprintingAway() ? this.escapeMaxSpeed() : this.cruiseMaxSpeed(),
-                    this.isSprintingAway());
-            state.getController().setAnimationSpeed(animationSpeed);
+            state.getController().setAnimationSpeed(animSpeed(0.78, 1.08, 1.0, 1.55));
             return state.setAndContinue(SWIM_ANIMATION);
         }));
     }

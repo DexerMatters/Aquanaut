@@ -26,6 +26,7 @@ public class OctopusEntity extends BaseFishEntity implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, state -> {
+            state.getController().setAnimationSpeed(animSpeed(0.4, 0.9, 1.2, 2.0));
             if (this.isSprintingAway()) {
                 return state.setAndContinue(SPRINT_ANIMATION);
             }

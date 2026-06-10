@@ -7,6 +7,7 @@ import com.dexer.aquanaut.common.block.BubbleMachineBlock;
 import com.dexer.aquanaut.common.block.FishingNetBlock;
 import com.dexer.aquanaut.common.block.GasPipeBlock;
 import com.dexer.aquanaut.common.block.OmnidirectionalMachineBlock;
+import com.dexer.aquanaut.common.block.PlexiglassBlock;
 import com.dexer.aquanaut.common.block.ShieldGeneratorBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
@@ -51,13 +52,13 @@ public final class BlockRegistry {
             "ringed_fluorescent_blue_coral_block",
             MapColor.COLOR_LIGHT_BLUE, 1.5F, 2.0F);
     public static final DeferredBlock<RotatedPillarBlock> SHELL_BLOCK = pillar("shell_block",
-            MapColor.TERRACOTTA_LIGHT_GRAY, 2.0F, 3.0F, SoundType.STONE);
+            MapColor.TERRACOTTA_LIGHT_GRAY, 2.0F, 3.0F, SoundType.STONE, true);
     public static final DeferredBlock<RotatedPillarBlock> SHELL_BRICKS = pillar("shell_bricks",
-            MapColor.TERRACOTTA_LIGHT_GRAY, 2.25F, 3.5F, SoundType.STONE);
+            MapColor.TERRACOTTA_LIGHT_GRAY, 2.25F, 3.5F, SoundType.STONE, true);
     public static final DeferredBlock<RotatedPillarBlock> HARD_SHELL_BLOCK = pillar("hard_shell_block",
-            MapColor.STONE, 3.0F, 4.5F, SoundType.STONE);
+            MapColor.STONE, 3.0F, 4.5F, SoundType.STONE, true);
     public static final DeferredBlock<RotatedPillarBlock> HARD_SHELL_BRICKS = pillar("hard_shell_bricks",
-            MapColor.STONE, 3.25F, 4.75F, SoundType.STONE);
+            MapColor.STONE, 3.25F, 4.75F, SoundType.STONE, true);
     public static final DeferredBlock<Block> POLISHED_HARD_SHELL_BLOCK = cube("polished_hard_shell_block",
             MapColor.QUARTZ, 3.5F, 5.0F, SoundType.STONE);
     public static final DeferredBlock<Block> HARD_SHELL_FRAME = cube("hard_shell_frame",
@@ -65,6 +66,7 @@ public final class BlockRegistry {
     public static final DeferredBlock<GasPipeBlock> GAS_PIPE = pipe("gas_pipe");
 
     public static final DeferredBlock<FishingNetBlock> FISHING_NET = fishingNet("fishing_net");
+    public static final DeferredBlock<PlexiglassBlock> PLEXIGLASS = plexiglass("plexiglass");
 
     public static final DeferredBlock<OmnidirectionalMachineBlock> LIGHTNING_GENERATOR = machine(
             "lightning_generator");
@@ -80,18 +82,18 @@ public final class BlockRegistry {
 
     private static DeferredBlock<RotatedPillarBlock> log(String name, MapColor color, float hardness,
             float resistance) {
-        return pillar(name, color, hardness, resistance, SoundType.CORAL_BLOCK);
+        return pillar(name, color, hardness, resistance, SoundType.CORAL_BLOCK, false);
     }
 
     private static DeferredBlock<RotatedPillarBlock> pillar(String name, MapColor color, float hardness,
-            float resistance, SoundType sound) {
-        return BLOCKS.register(name, () -> new RotatedPillarBlock(BlockBehaviour.Properties.of()
-                .mapColor(state -> state.getValue(RotatedPillarBlock.AXIS) == net.minecraft.core.Direction.Axis.Y
-                        ? color
-                        : color)
+            float resistance, SoundType sound, boolean requiresTool) {
+        var base = BlockBehaviour.Properties.of()
+                .mapColor(color)
                 .strength(hardness, resistance)
-                .sound(sound)
-                .requiresCorrectToolForDrops()));
+                .sound(sound);
+        if (requiresTool) base = base.requiresCorrectToolForDrops();
+        BlockBehaviour.Properties props = base;
+        return BLOCKS.register(name, () -> new RotatedPillarBlock(props));
     }
 
     private static DeferredBlock<Block> cube(String name, MapColor color, float hardness, float resistance,
@@ -156,8 +158,17 @@ public final class BlockRegistry {
     private static DeferredBlock<FishingNetBlock> fishingNet(String name) {
         return BLOCKS.register(name, () -> new FishingNetBlock(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.COLOR_BROWN)
-                .strength(1.5F, 2.0F)
+                .strength(0.3F)
                 .sound(SoundType.WOOL)
+                .noOcclusion()
+                .dynamicShape()));
+    }
+
+    private static DeferredBlock<PlexiglassBlock> plexiglass(String name) {
+        return BLOCKS.register(name, () -> new PlexiglassBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.ICE)
+                .strength(0.4F)
+                .sound(SoundType.GLASS)
                 .noOcclusion()
                 .dynamicShape()));
     }

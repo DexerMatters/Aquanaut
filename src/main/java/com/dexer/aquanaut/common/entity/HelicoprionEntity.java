@@ -33,9 +33,8 @@ public class HelicoprionEntity extends BaseFishEntity implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, state -> {
+            state.getController().setAnimationSpeed(animSpeed(0.5, 1.0, 1.0, 1.45));
             boolean charging = this.isChargingPlayer();
-            state.getController()
-                    .setAnimationSpeed(charging ? this.getChargeAnimationSpeed() : this.getSwimAnimationSpeed());
 
             if (charging) {
                 if (!this.mouthOpenedVisual) {

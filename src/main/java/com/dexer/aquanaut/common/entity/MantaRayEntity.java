@@ -34,12 +34,7 @@ public class MantaRayEntity extends BaseFishEntity implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, state -> {
-            double speed = this.getDeltaMovement().length();
-            double referenceSpeed = this.isSprintingAway() ? this.escapeMaxSpeed() : this.cruiseMaxSpeed();
-            double normalizedSpeed = referenceSpeed <= 1.0E-4D ? 0.0D : Mth.clamp(speed / referenceSpeed, 0.0D, 1.0D);
-            double minAnimSpeed = this.isSprintingAway() ? 1.25D : 0.35D;
-            double maxAnimSpeed = this.isSprintingAway() ? 2.25D : 0.85D;
-            state.getController().setAnimationSpeed(Mth.lerp(normalizedSpeed, minAnimSpeed, maxAnimSpeed));
+            state.getController().setAnimationSpeed(animSpeed(0.35, 0.85, 1.25, 2.25));
             return state.setAndContinue(SWIM_ANIMATION);
         }));
     }

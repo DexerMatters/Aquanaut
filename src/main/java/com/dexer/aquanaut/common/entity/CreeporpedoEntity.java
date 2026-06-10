@@ -59,11 +59,7 @@ public class CreeporpedoEntity extends BaseFishEntity implements GeoEntity {
                 return state.setAndContinue(IGNITE_ANIMATION);
             }
 
-            if (this.isChargingPlayer()) {
-                state.getController().setAnimationSpeed(this.getChargeAnimationSpeed());
-            } else {
-                state.getController().setAnimationSpeed(this.getSwimAnimationSpeed());
-            }
+            state.getController().setAnimationSpeed(animSpeed(0.25, 0.5, 1.0, 1.4));
             return state.setAndContinue(SWIM_ANIMATION);
         }));
     }

@@ -65,6 +65,10 @@ public final class ItemRegistry {
                         props -> new AirSupplyItem(props.food(new FoodProperties.Builder()
                                         .nutrition(9).saturationModifier(1.0F).build()),
                                         6));
+        public static final DeferredItem<AirSupplyItem> AIR_SAC = ITEMS.registerItem("air_sac",
+                        props -> new AirSupplyItem(props.food(new FoodProperties.Builder()
+                                        .nutrition(0).saturationModifier(0.0F).build()),
+                                        2));
         public static final DeferredItem<Item> FANG = ITEMS.registerSimpleItem("fang");
         public static final DeferredItem<Item> ICE_FIN = ITEMS.registerSimpleItem("ice_fin");
         public static final DeferredItem<Item> ICE_CORE = ITEMS.registerSimpleItem("ice_core");
@@ -175,6 +179,15 @@ public final class ItemRegistry {
         public static final DeferredItem<Item> ESSENCE_OF_THE_FEAR = ITEMS.registerSimpleItem("essence_of_the_fear");
         public static final DeferredItem<Item> SHELL = ITEMS.registerSimpleItem("shell");
         public static final DeferredItem<Item> HARD_SHELL = ITEMS.registerSimpleItem("hard_shell");
+        public static final DeferredItem<Item> TRANSPARENT_TISSUE = ITEMS.registerSimpleItem("transparent_tissue");
+        public static final DeferredItem<Item> HARD_RIB = ITEMS.registerSimpleItem("hard_rib");
+        public static final DeferredItem<Item> RED_JELLY = ITEMS.registerSimpleItem("red_jelly");
+        public static final DeferredItem<Item> WHITE_JELLY = ITEMS.registerSimpleItem("white_jelly");
+        public static final DeferredItem<Item> LIGHT_CYAN_JELLY = ITEMS.registerSimpleItem("light_cyan_jelly");
+        public static final DeferredItem<Item> GOLDEN_JELLY = ITEMS.registerSimpleItem("golden_jelly");
+        public static final DeferredItem<Item> RING_RIB = ITEMS.registerSimpleItem("ring_rib");
+        public static final DeferredItem<Item> ROTTEN_TISSUE = ITEMS.registerSimpleItem("rotten_tissue");
+        public static final DeferredItem<Item> SPRING = ITEMS.registerSimpleItem("spring");
 
         // Scoop nets — maxSize, extraSize
         public static final DeferredItem<ScoopNetItem> SCOOP_NET = ITEMS.registerItem("scoop_net",
@@ -247,6 +260,8 @@ public final class ItemRegistry {
                         BlockRegistry.GAS_PIPE);
         public static final DeferredItem<FishingNetBlockItem> FISHING_NET = ITEMS.registerItem("fishing_net",
                 props -> new FishingNetBlockItem(BlockRegistry.FISHING_NET.get(), props));
+        public static final DeferredItem<BlockItem> PLEXIGLASS = ITEMS.registerItem("plexiglass",
+                props -> new BlockItem(BlockRegistry.PLEXIGLASS.get(), props));
         public static final DeferredItem<BlockItem> LIGHTNING_GENERATOR = blockItem("lightning_generator",
                         BlockRegistry.LIGHTNING_GENERATOR);
         public static final DeferredItem<BlockItem> BUBBLE_MACHINE = blockItem("bubble_machine",
@@ -306,6 +321,30 @@ public final class ItemRegistry {
                         "swirl_maker_spawn_egg",
                         EntityRegistry.SWIRL_MAKER, 0x889098, 0xC8B8A0);
 
+        public static final DeferredItem<DeferredSpawnEggItem> GLOOMGAZER_SPAWN_EGG = spawnEgg(
+                        "gloomgazer_spawn_egg",
+                        EntityRegistry.GLOOMGAZER, 0x4B322D, 0xD5C8BE);
+
+        public static final DeferredItem<DeferredSpawnEggItem> RADIOANEMONE_SPAWN_EGG = spawnEgg(
+                        "radioanemone_spawn_egg",
+                        EntityRegistry.RADIOANEMONE, 0x326428, 0x78B464);
+
+        public static final DeferredItem<DeferredSpawnEggItem> OXYGEN_BREEDER_SPAWN_EGG = spawnEgg(
+                        "oxygen_breeder_spawn_egg",
+                        EntityRegistry.OXYGEN_BREEDER, 0x588232, 0xBEDCAA);
+
+        public static final DeferredItem<DeferredSpawnEggItem> RED_JELLYFISH_SPAWN_EGG = spawnEgg(
+                        "red_jellyfish_spawn_egg",
+                        EntityRegistry.RED_JELLYFISH, 0xC32D46, 0xFAB4BE);
+
+        public static final DeferredItem<DeferredSpawnEggItem> RINGFISH_SPAWN_EGG = spawnEgg(
+                        "ringfish_spawn_egg",
+                        EntityRegistry.RINGFISH, 0x8C9196, 0xDCE1E6);
+
+        public static final DeferredItem<DeferredSpawnEggItem> TRIPOD_SPAWN_EGG = spawnEgg(
+                        "tripod_spawn_egg",
+                        EntityRegistry.TRIPOD, 0x805650, 0xD2B4A5);
+
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FOOD_TAB = tab("food",
                         COOKED_SARDINE, output -> {
                                 output.accept(COOKED_OCTOPUS_SHREDS.get());
@@ -315,6 +354,7 @@ public final class ItemRegistry {
                                 output.accept(COOKED_FISHNUT.get());
                                 output.accept(AIR_SOUP.get());
                                 output.accept(AIR_SANDWICH.get());
+                                output.accept(AIR_SAC.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATURES_TAB = tab("creatures",
@@ -334,6 +374,12 @@ public final class ItemRegistry {
                                 output.accept(LIGHTING_WORM_SPAWN_EGG.get());
                                 output.accept(CREEPORPEDO_SPAWN_EGG.get());
                                 output.accept(SWIRL_MAKER_SPAWN_EGG.get());
+                                output.accept(GLOOMGAZER_SPAWN_EGG.get());
+                                output.accept(RADIOANEMONE_SPAWN_EGG.get());
+                                output.accept(OXYGEN_BREEDER_SPAWN_EGG.get());
+                                output.accept(RED_JELLYFISH_SPAWN_EGG.get());
+                                output.accept(RINGFISH_SPAWN_EGG.get());
+                                output.accept(TRIPOD_SPAWN_EGG.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MATERIALS_TAB = tab("materials",
@@ -366,6 +412,15 @@ public final class ItemRegistry {
                                 output.accept(ESSENCE_OF_THE_FEAR.get());
                                 output.accept(SHELL.get());
                                 output.accept(HARD_SHELL.get());
+                                output.accept(TRANSPARENT_TISSUE.get());
+                                output.accept(HARD_RIB.get());
+                                output.accept(RED_JELLY.get());
+                                output.accept(WHITE_JELLY.get());
+                                output.accept(LIGHT_CYAN_JELLY.get());
+                                output.accept(GOLDEN_JELLY.get());
+                                output.accept(RING_RIB.get());
+                                output.accept(ROTTEN_TISSUE.get());
+                                output.accept(SPRING.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TOOLS_TAB = tab("tools",
@@ -451,6 +506,7 @@ public final class ItemRegistry {
                                 output.accept(HARD_SHELL_FRAME.get());
                                 output.accept(GAS_PIPE.get());
                                 output.accept(FISHING_NET.get());
+                                output.accept(PLEXIGLASS.get());
                                 output.accept(LIGHTNING_GENERATOR.get());
                                 output.accept(BUBBLE_MACHINE.get());
                                 output.accept(SWIRL_GENERATOR.get());

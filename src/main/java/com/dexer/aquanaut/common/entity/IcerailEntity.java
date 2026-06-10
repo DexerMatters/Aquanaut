@@ -40,13 +40,7 @@ public class IcerailEntity extends BaseFishEntity implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, state -> {
-            double speed = this.getDeltaMovement().length();
-            double referenceSpeed = this.isSprintingAway() ? this.escapeMaxSpeed() : this.cruiseMaxSpeed();
-            double normalizedSpeed = referenceSpeed <= 1.0E-4D ? 0.0D : Mth.clamp(speed / referenceSpeed, 0.0D, 1.0D);
-            double minAnimSpeed = this.isSprintingAway() ? 1.0D : 0.52D;
-            double maxAnimSpeed = this.isSprintingAway() ? 2.35D : 1.02D;
-            double animationSpeed = Mth.lerp(normalizedSpeed, minAnimSpeed, maxAnimSpeed);
-            state.getController().setAnimationSpeed(animationSpeed);
+            state.getController().setAnimationSpeed(animSpeed(0.52, 1.02, 1.0, 2.35));
             return state.setAndContinue(SWIM_ANIMATION);
         }));
     }

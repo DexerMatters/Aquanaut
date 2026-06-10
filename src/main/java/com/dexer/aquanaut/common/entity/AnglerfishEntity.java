@@ -27,12 +27,10 @@ public class AnglerfishEntity extends BaseFishEntity implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, state -> {
+            state.getController().setAnimationSpeed(animSpeed(0.5, 1.0, 1.0, 1.35));
             if (this.isChargingPlayer()) {
-                state.getController().setAnimationSpeed(this.getChargeAnimationSpeed());
                 return state.setAndContinue(CHARGE_ANIMATION);
             }
-
-            state.getController().setAnimationSpeed(this.getSwimAnimationSpeed());
             return state.setAndContinue(SWIM_ANIMATION);
         }));
     }

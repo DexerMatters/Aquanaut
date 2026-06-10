@@ -7,6 +7,7 @@ import com.dexer.aquanaut.common.entity.CatfishEntity;
 import com.dexer.aquanaut.common.entity.CreeporpedoEntity;
 import com.dexer.aquanaut.common.entity.DonutfishEntity;
 import com.dexer.aquanaut.common.entity.ElectrofishEntity;
+import com.dexer.aquanaut.common.entity.GloomgazerEntity;
 import com.dexer.aquanaut.common.entity.LightningEntity;
 import com.dexer.aquanaut.common.entity.LightingWormEntity;
 import com.dexer.aquanaut.common.entity.HarpoonEntity;
@@ -14,12 +15,17 @@ import com.dexer.aquanaut.common.entity.HelicoprionEntity;
 import com.dexer.aquanaut.common.entity.IcerailEntity;
 import com.dexer.aquanaut.common.entity.MantaRayEntity;
 import com.dexer.aquanaut.common.entity.OctopusEntity;
+import com.dexer.aquanaut.common.entity.OxygenBreederEntity;
+import com.dexer.aquanaut.common.entity.RadioanemoneEntity;
+import com.dexer.aquanaut.common.entity.RedJellyfishEntity;
+import com.dexer.aquanaut.common.entity.RingfishEntity;
 import com.dexer.aquanaut.common.entity.GiantAbyssWormEntity;
 import com.dexer.aquanaut.common.entity.GiantOctopusTentacleEntity;
 import com.dexer.aquanaut.common.entity.SardineEntity;
 import com.dexer.aquanaut.common.entity.SpringfishEntity;
 import com.dexer.aquanaut.common.entity.SwirlEntity;
 import com.dexer.aquanaut.common.entity.SwirlMakerEntity;
+import com.dexer.aquanaut.common.entity.TripodEntity;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -197,6 +203,36 @@ public class EntityRegistry {
                             .updateInterval(1)
                             .build("swirl"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<GloomgazerEntity>> GLOOMGAZER = ENTITIES
+            .register("gloomgazer",
+                    () -> EntityType.Builder.<GloomgazerEntity>of(GloomgazerEntity::new, MobCategory.WATER_CREATURE)
+                            .sized(0.75F, 0.55F).build("gloomgazer"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<RadioanemoneEntity>> RADIOANEMONE = ENTITIES
+            .register("radioanemone",
+                    () -> EntityType.Builder.<RadioanemoneEntity>of(RadioanemoneEntity::new, MobCategory.WATER_CREATURE)
+                            .sized(1.3F, 1.3F).build("radioanemone"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<OxygenBreederEntity>> OXYGEN_BREEDER = ENTITIES
+            .register("oxygen_breeder",
+                    () -> EntityType.Builder.<OxygenBreederEntity>of(OxygenBreederEntity::new, MobCategory.WATER_CREATURE)
+                            .sized(0.5F, 0.45F).build("oxygen_breeder"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<RedJellyfishEntity>> RED_JELLYFISH = ENTITIES
+            .register("red_jellyfish",
+                    () -> EntityType.Builder.<RedJellyfishEntity>of(RedJellyfishEntity::new, MobCategory.WATER_CREATURE)
+                            .sized(0.85F, 0.7F).build("red_jellyfish"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<RingfishEntity>> RINGFISH = ENTITIES
+            .register("ringfish",
+                    () -> EntityType.Builder.<RingfishEntity>of(RingfishEntity::new, MobCategory.WATER_CREATURE)
+                            .sized(0.75F, 0.6F).build("ringfish"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<TripodEntity>> TRIPOD = ENTITIES
+            .register("tripod",
+                    () -> EntityType.Builder.<TripodEntity>of(TripodEntity::new, MobCategory.WATER_CREATURE)
+                            .sized(1.1F, 0.5F).build("tripod"));
+
     public static void register(IEventBus eventBus) {
         ENTITIES.register(eventBus);
     }
@@ -218,6 +254,12 @@ public class EntityRegistry {
         event.put(EntityRegistry.LIGHTING_WORM.get(), LightingWormEntity.createAttributes());
         event.put(EntityRegistry.CREEPORPEDO.get(), CreeporpedoEntity.createAttributes());
         event.put(EntityRegistry.SWIRL_MAKER.get(), SwirlMakerEntity.createAttributes());
+        event.put(EntityRegistry.GLOOMGAZER.get(), GloomgazerEntity.createAttributes());
+        event.put(EntityRegistry.RADIOANEMONE.get(), RadioanemoneEntity.createAttributes());
+        event.put(EntityRegistry.OXYGEN_BREEDER.get(), OxygenBreederEntity.createAttributes());
+        event.put(EntityRegistry.RED_JELLYFISH.get(), RedJellyfishEntity.createAttributes());
+        event.put(EntityRegistry.RINGFISH.get(), RingfishEntity.createAttributes());
+        event.put(EntityRegistry.TRIPOD.get(), TripodEntity.createAttributes());
     }
 
     @SubscribeEvent

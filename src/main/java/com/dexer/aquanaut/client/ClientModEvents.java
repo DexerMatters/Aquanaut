@@ -8,6 +8,7 @@ import com.dexer.aquanaut.client.renderer.CatfishRenderer;
 import com.dexer.aquanaut.client.renderer.CreeporpedoRenderer;
 import com.dexer.aquanaut.client.renderer.DonutfishRenderer;
 import com.dexer.aquanaut.client.renderer.ElectrofishRenderer;
+import com.dexer.aquanaut.client.renderer.GloomgazerRenderer;
 import com.dexer.aquanaut.client.renderer.HarpoonRenderer;
 import com.dexer.aquanaut.client.renderer.LightingWormRenderer;
 import com.dexer.aquanaut.client.renderer.LightningRenderer;
@@ -15,12 +16,17 @@ import com.dexer.aquanaut.client.renderer.HelicoprionRenderer;
 import com.dexer.aquanaut.client.renderer.IcerailRenderer;
 import com.dexer.aquanaut.client.renderer.MantaRayRenderer;
 import com.dexer.aquanaut.client.renderer.OctopusRenderer;
+import com.dexer.aquanaut.client.renderer.OxygenBreederRenderer;
+import com.dexer.aquanaut.client.renderer.RadioanemoneRenderer;
+import com.dexer.aquanaut.client.renderer.RedJellyfishRenderer;
+import com.dexer.aquanaut.client.renderer.RingfishRenderer;
 import com.dexer.aquanaut.client.renderer.GiantAbyssWormRenderer;
 import com.dexer.aquanaut.client.renderer.GiantOctopusTentacleRenderer;
 import com.dexer.aquanaut.client.renderer.SardineRenderer;
 import com.dexer.aquanaut.client.renderer.SpringfishRenderer;
 import com.dexer.aquanaut.client.renderer.SwirlMakerRenderer;
 import com.dexer.aquanaut.client.renderer.SwirlRenderer;
+import com.dexer.aquanaut.client.renderer.TripodRenderer;
 import com.dexer.aquanaut.client.renderer.item.GasFlowMeterItemRenderer;
 import com.dexer.aquanaut.client.screen.AquariumScreen;
 import com.dexer.aquanaut.core.EntityRegistry;
@@ -57,7 +63,13 @@ public final class ClientModEvents {
                 ItemRegistry.GIANT_ABYSS_WORM_SPAWN_EGG.get(),
                 ItemRegistry.LIGHTING_WORM_SPAWN_EGG.get(),
                 ItemRegistry.CREEPORPEDO_SPAWN_EGG.get(),
-                ItemRegistry.SWIRL_MAKER_SPAWN_EGG.get());
+                ItemRegistry.SWIRL_MAKER_SPAWN_EGG.get(),
+                ItemRegistry.GLOOMGAZER_SPAWN_EGG.get(),
+                ItemRegistry.RADIOANEMONE_SPAWN_EGG.get(),
+                ItemRegistry.OXYGEN_BREEDER_SPAWN_EGG.get(),
+                ItemRegistry.RED_JELLYFISH_SPAWN_EGG.get(),
+                ItemRegistry.RINGFISH_SPAWN_EGG.get(),
+                ItemRegistry.TRIPOD_SPAWN_EGG.get());
     }
 
     @SubscribeEvent
@@ -78,6 +90,12 @@ public final class ClientModEvents {
         event.registerEntityRenderer(EntityRegistry.CREEPORPEDO.get(), CreeporpedoRenderer::new);
         event.registerEntityRenderer(EntityRegistry.SWIRL_MAKER.get(), SwirlMakerRenderer::new);
         event.registerEntityRenderer(EntityRegistry.SWIRL.get(), SwirlRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.GLOOMGAZER.get(), GloomgazerRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.RADIOANEMONE.get(), RadioanemoneRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.OXYGEN_BREEDER.get(), OxygenBreederRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.RED_JELLYFISH.get(), RedJellyfishRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.RINGFISH.get(), RingfishRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.TRIPOD.get(), TripodRenderer::new);
         event.registerEntityRenderer(EntityRegistry.AIR_BUBBLE.get(), AirBubbleRenderer::new);
         event.registerEntityRenderer(EntityRegistry.HARPOON.get(), HarpoonRenderer::new);
         event.registerEntityRenderer(EntityRegistry.LIGHTNING.get(), LightningRenderer::new);

@@ -11,9 +11,6 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 public final class FishSchoolingAI {
-    private static final double SEARCH_RADIUS = 8.0D;
-    private static final double SEPARATION_RADIUS = 1.15D;
-    private static final double FOLLOW_DISTANCE = 2.15D;
     private static final int LEADER_THRESHOLD = 4;
     private static final double BARRIER_REPULSION_RANGE = 2.4D;
     private static final double BARRIER_REPULSION_STRENGTH = 0.65D;
@@ -23,7 +20,11 @@ public final class FishSchoolingAI {
             return SchoolingDecision.inactive();
         }
 
-        List<BaseFishEntity> schoolmates = this.findSchoolmates(fish);
+        double searchRadius = fish.schoolingSearchRadius();
+        double separationRadius = fish.schoolingSeparationRadius();
+        double followDistance = fish.schoolingFollowDistance();
+
+        List<BaseFishEntity> schoolmates = this.findSchoolmates(fish, searchRadius);
         if (schoolmates.isEmpty()) {
             return SchoolingDecision.inactive();
         }
@@ -45,8 +46,8 @@ public final class FishSchoolingAI {
                 schoolCenter = schoolCenter.add(mateCenter);
                 memberCount++;
 
-                if (distance < SEPARATION_RADIUS) {
-                    double separationWeight = (SEPARATION_RADIUS - distance) / SEPARATION_RADIUS;
+                if (distance < separationRadius) {
+                    double separationWeight = (separationRadius - distance) / separationRadius;
                     separationSum = separationSum
                             .add(selfCenter.subtract(mateCenter).normalize().scale(separationWeight));
                 }
@@ -76,9 +77,9 @@ public final class FishSchoolingAI {
             Vec3 leaderCenter = this.centerOf(leader);
             Vec3 leaderHeading = this.forwardVector(leader);
             Vec3 leaderRight = this.horizontalRightVector(leaderHeading);
-            double followDistance = FOLLOW_DISTANCE + Math.min(0.75D, (memberCount - 1) * 0.12D);
+            double actualFollowDist = followDistance + Math.min(0.75D, (memberCount - 1) * 0.12D);
             double sideBias = this.lateralSlotBias(fish, leader);
-            Vec3 followPoint = leaderCenter.subtract(leaderHeading.scale(followDistance))
+            Vec3 followPoint = leaderCenter.subtract(leaderHeading.scale(actualFollowDist))
                     .add(leaderRight.scale(sideBias * 0.45D))
                     .add(0.0D, (schoolCenter.y - selfCenter.y) * 0.25D, 0.0D);
 
@@ -89,7 +90,7 @@ public final class FishSchoolingAI {
                     .add(barrierRepulsion.scale(BARRIER_REPULSION_STRENGTH));
 
             double distanceToLeader = leaderCenter.distanceTo(selfCenter);
-            double distanceRatio = Mth.clamp(distanceToLeader / Math.max(1.0D, followDistance), 0.0D, 1.6D);
+            double distanceRatio = Mth.clamp(distanceToLeader / Math.max(1.0D, actualFollowDist), 0.0D, 1.6D);
             speedMultiplier = Mth.clamp(0.94D + distanceRatio * 0.05D, 0.92D, 1.03D);
         }
 
@@ -131,8 +132,8 @@ public final class FishSchoolingAI {
         return repulsion;
     }
 
-    private List<BaseFishEntity> findSchoolmates(BaseFishEntity fish) {
-        AABB searchBox = fish.getBoundingBox().inflate(SEARCH_RADIUS, SEARCH_RADIUS, SEARCH_RADIUS);
+    private List<BaseFishEntity> findSchoolmates(BaseFishEntity fish, double searchRadius) {
+        AABB searchBox = fish.getBoundingBox().inflate(searchRadius, searchRadius, searchRadius);
         return fish.level().getEntitiesOfClass(Entity.class, searchBox, entity -> entity instanceof BaseFishEntity other
                 && other != fish && other.isAlive() && other.isInWater() && other.getClass() == fish.getClass())
                 .stream()

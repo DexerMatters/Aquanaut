@@ -33,7 +33,7 @@ public class DonutfishEntity extends BaseFishEntity implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, state -> {
-            state.getController().setAnimationSpeed(this.getSwimAnimationSpeed());
+            state.getController().setAnimationSpeed(animSpeed(0.2, 0.42));
             return state.setAndContinue(SWIM_ANIMATION);
         }));
     }

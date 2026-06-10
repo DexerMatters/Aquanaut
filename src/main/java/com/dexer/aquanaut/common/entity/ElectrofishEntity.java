@@ -72,7 +72,7 @@ public class ElectrofishEntity extends BaseFishEntity implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, state -> {
-            state.getController().setAnimationSpeed(this.getFloatAnimationSpeed());
+            state.getController().setAnimationSpeed(animSpeed(0.25, 0.52));
             return state.setAndContinue(FLOAT_ANIMATION);
         }));
     }

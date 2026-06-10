@@ -6,6 +6,7 @@ import com.dexer.aquanaut.common.ai.FishResponseMode;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.WaterAnimal;
@@ -148,6 +149,13 @@ public abstract class BaseFishEntity extends WaterAnimal {
     protected boolean getSchoolingEnabled() {
         return false;
     }
+
+    public final double schoolingSearchRadius() { return this.getSchoolingSearchRadius(); }
+    protected double getSchoolingSearchRadius() { return 8.0D; }
+    public final double schoolingSeparationRadius() { return this.getSchoolingSeparationRadius(); }
+    protected double getSchoolingSeparationRadius() { return 1.15D; }
+    public final double schoolingFollowDistance() { return this.getSchoolingFollowDistance(); }
+    protected double getSchoolingFollowDistance() { return 2.15D; }
 
     public final boolean curvedCruiseMovement() {
         return this.getCurvedCruiseMovement();
@@ -638,5 +646,24 @@ public abstract class BaseFishEntity extends WaterAnimal {
 
     protected int getEscapeLaunchSteeringLockTicks() {
         return 0;
+    }
+
+    /** Animation speed scaled by current velocity. minSpeed at idle, maxSpeed at cruiseMaxSpeed. */
+    protected double animSpeed(double minSpeed, double maxSpeed) {
+        double speed = this.getDeltaMovement().length();
+        double ref = this.cruiseMaxSpeed();
+        double t = ref <= 1E-4 ? 0 : Mth.clamp(speed / ref, 0, 1);
+        return minSpeed + t * (maxSpeed - minSpeed);
+    }
+
+    /** Animation speed with separate cruise and sprint ranges. */
+    protected double animSpeed(double minCruise, double maxCruise, double minSprint, double maxSprint) {
+        boolean sprinting = this.isSprintingAway() || this.isChargingPlayer();
+        double speed = this.getDeltaMovement().length();
+        double ref = sprinting ? Math.max(this.escapeMaxSpeed(), this.chargeMaxSpeed()) : this.cruiseMaxSpeed();
+        double t = ref <= 1E-4 ? 0 : Mth.clamp(speed / ref, 0, 1);
+        double min = sprinting ? minSprint : minCruise;
+        double max = sprinting ? maxSprint : maxCruise;
+        return min + t * (max - min);
     }
 }

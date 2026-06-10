@@ -29,13 +29,7 @@ public class CatfishEntity extends BaseFishEntity implements GeoEntity {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, state -> {
-            double speed = this.getDeltaMovement().length();
-            double referenceSpeed = this.isSprintingAway() ? this.escapeMaxSpeed() : this.cruiseMaxSpeed();
-            double normalizedSpeed = referenceSpeed <= 1.0E-4D ? 0.0D : Mth.clamp(speed / referenceSpeed, 0.0D, 1.0D);
-            double minAnimSpeed = this.isSprintingAway() ? 1.5D : 0.6D;
-            double maxAnimSpeed = this.isSprintingAway() ? 3.0D : 1.2D;
-            double animationSpeed = Mth.lerp(normalizedSpeed, minAnimSpeed, maxAnimSpeed);
-            state.getController().setAnimationSpeed(animationSpeed);
+            state.getController().setAnimationSpeed(animSpeed(0.6, 1.2, 1.5, 3.0));
             return state.setAndContinue(SWIM_ANIMATION);
         }));
     }

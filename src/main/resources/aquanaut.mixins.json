@@ -1,5 +1,6 @@
 {
     "required": true,
+    "compatibilityLevel": "JAVA_21",
     "package": "com.dexer.aquanaut.mixin",
     "refmap": "aquanaut.refmap.json",
     "mixins": [

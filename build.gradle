@@ -98,7 +98,7 @@ neoForge {
 
         // applies to all the run configs above
         configureEach {
-            // Recommended logging data for a userdev environment
+            jvmArgument '-Dmixin.compatLevel=JAVA_21'            // Recommended logging data for a userdev environment
             // The markers can be added/remove as needed separated by commas.
             // "SCAN": For mods scan.
             // "REGISTRIES": For firing of registry events.
@@ -153,9 +153,9 @@ dependencies {
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    implementation "software.bernie.geckolib:geckolib-neoforge-1.21:${project.geckolib_version}"
-    implementation "com.github.glitchfiend:TerraBlender-neoforge:1.21-${project.terra_blender_version}"
-    annotationProcessor "net.fabricmc:sponge-mixin:0.15.2+mixin.0.8.7"
+    implementation "software.bernie.geckolib:geckolib-neoforge-1.21.1:${project.geckolib_version}"
+    implementation "com.github.glitchfiend:TerraBlender-neoforge:1.21.1-${project.terra_blender_version}"
+    annotationProcessor "net.fabricmc:sponge-mixin:0.17.3+mixin.0.8.7"
 }
 
 def mixinRefmapFile = layout.buildDirectory.file("resources/main/${mod_id}.refmap.json")

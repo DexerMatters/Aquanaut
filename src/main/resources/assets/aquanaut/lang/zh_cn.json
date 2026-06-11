@@ -23,6 +23,7 @@
   "entity.aquanaut.red_jellyfish": "红色水母",
   "entity.aquanaut.ringfish": "环鱼",
   "entity.aquanaut.tripod": "三脚鱼",
+  "item.aquanaut.notebook": "潜航员笔记",
   "item.aquanaut.notebook.desc": "打开笔记本，查看海洋生物的研究记录。",
   "gui.aquanaut.notebook": "潜航员笔记",
   "gui.aquanaut.notebook.title": "潜航员笔记",

@@ -23,6 +23,7 @@
   "entity.aquanaut.tripod": "Tripod",
   "entity.aquanaut.harpoon": "Harpoon",
   "entity.aquanaut.lightning": "Lightning",
+  "item.aquanaut.notebook": "Aquanaut Notebook",
   "item.aquanaut.notebook.desc": "Open the notebook to review aquatic field notes.",
   "gui.aquanaut.notebook": "Aquanaut Notebook",
   "gui.aquanaut.notebook.title": "Aquanaut Notebook",

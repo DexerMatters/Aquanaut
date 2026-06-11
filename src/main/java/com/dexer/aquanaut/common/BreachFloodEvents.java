@@ -56,6 +56,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * vanilla block-update propagation and fluid scheduling can complete first.
  */
 @EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME)
+@SuppressWarnings("removal")
 public final class BreachFloodEvents {
     private static final int MAX_VOLUME = 2000;
     private static final int MIN_FILL_PER_TICK = 1;

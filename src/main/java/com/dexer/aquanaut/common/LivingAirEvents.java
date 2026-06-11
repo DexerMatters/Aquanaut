@@ -33,6 +33,7 @@ import java.util.UUID;
  * entities.
  */
 @EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME)
+@SuppressWarnings("removal")
 public final class LivingAirEvents {
 
     // Pressure thresholds for narcosis (normalized [0, 1] hydrostatic pressure).

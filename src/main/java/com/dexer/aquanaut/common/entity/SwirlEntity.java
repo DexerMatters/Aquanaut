@@ -9,8 +9,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -198,7 +196,7 @@ public class SwirlEntity extends Entity {
     }
 
     private void spawnParticles(ServerLevel level) {
-        Vec3 ax = axis(), pA = perpA(), pB = perpB();
+        Vec3 pA = perpA(), pB = perpB();
 
         for (int ring = 0; ring < RINGS; ring++) {
             double t = (double) ring / (RINGS - 1);

@@ -7,6 +7,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 @EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.MOD)
+@SuppressWarnings("removal")
 public final class NetworkEvents {
 
     private NetworkEvents() {
@@ -27,6 +28,10 @@ public final class NetworkEvents {
                 AquariumInventorySyncPayload.TYPE,
                 AquariumInventorySyncPayload.STREAM_CODEC,
                 AquariumInventorySyncPayload::handle);
+        registrar.playToClient(
+                NotebookProgressSyncPayload.TYPE,
+                NotebookProgressSyncPayload.STREAM_CODEC,
+                NotebookProgressSyncPayload::handle);
         registrar.playToServer(
                 DivingEquipmentClickPayload.TYPE,
                 DivingEquipmentClickPayload.STREAM_CODEC,

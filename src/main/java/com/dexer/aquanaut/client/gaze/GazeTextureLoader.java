@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 @EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@SuppressWarnings("removal")
 public final class GazeTextureLoader {
 
     public static final ResourceLocation GAZE_GLINT_LOCATION = ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID,

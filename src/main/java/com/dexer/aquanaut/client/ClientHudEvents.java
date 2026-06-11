@@ -47,6 +47,7 @@ import net.minecraft.world.phys.HitResult;
  * </ol>
  */
 @EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@SuppressWarnings("removal")
 public final class ClientHudEvents {
 
     private static final ResourceLocation AIR_SPRITE = ResourceLocation.withDefaultNamespace("hud/air");

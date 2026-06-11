@@ -4,7 +4,6 @@ import com.dexer.aquanaut.common.inventory.aquarium.AquariumContainerMenu;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumFishEntry;
 import com.dexer.aquanaut.client.renderer.AquariumPreviewRenderer;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumFishSpec;
-import com.dexer.aquanaut.common.inventory.aquarium.AquariumHealthTracker;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumInventoryData;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumInventoryHelper;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumPlacementMath;
@@ -15,12 +14,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.Slot;
@@ -179,10 +178,10 @@ public class AquariumScreen extends AbstractContainerScreen<AquariumContainerMen
         int waterTop = gy - overflow;
 
         TextureAtlasSprite waterSprite = Minecraft.getInstance()
-                .getTextureAtlas(TextureAtlas.LOCATION_BLOCKS)
+                .getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
                 .apply(ResourceLocation.withDefaultNamespace("block/water_still"));
 
-        RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
+        RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
         RenderSystem.setShaderColor(0.30F, 0.54F, 0.80F, 1.0F);
 
         for (int row = 0; row <= rows; row++) {
@@ -314,23 +313,6 @@ public class AquariumScreen extends AbstractContainerScreen<AquariumContainerMen
         int x = slotLeft(anchorIndex);
         int y = slotTop(anchorIndex);
         return new FishRect(x, y, spec.gridWidth() * CELL_SIZE, spec.gridHeight() * CELL_SIZE);
-    }
-
-    private int aquariumAnchorAt(double left, double top) {
-        int relX = (int) Math.floor(left - aquariumGridLeft());
-        int relY = (int) Math.floor(top - aquariumGridTop());
-        if (relX < 0 || relY < 0) {
-            return -1;
-        }
-
-        int col = relX / CELL_SIZE;
-        int row = relY / CELL_SIZE;
-        if (col < 0 || col >= AquariumContainerMenu.AQUARIUM_COLS
-                || row < 0 || row >= AquariumContainerMenu.AQUARIUM_ROWS) {
-            return -1;
-        }
-
-        return row * AquariumContainerMenu.AQUARIUM_COLS + col;
     }
 
     private int aquariumAnchorAtSnapped(double left, double top) {

@@ -6,6 +6,7 @@ import com.dexer.aquanaut.common.inventory.aquarium.AquariumFishCatalog;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumFishEntry;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumFishSpec;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumInventoryHelper;
+import com.dexer.aquanaut.common.notebook.NotebookResearchEvents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -121,17 +122,18 @@ public class ScoopNetItem extends Item {
         float size = getFishSize(living);
         int tierSize = maxSize;
         if (size <= tierSize) {
-            doCapture(player, stack, level, living);
+            doCapture(player, stack, level, living, spec);
         } else if (size <= Math.ceil(tierSize * 1.5F) && level.random.nextFloat() < 0.40F) {
-            doCapture(player, stack, level, living);
+            doCapture(player, stack, level, living, spec);
         } else if (size <= Math.ceil(tierSize * 2.0F) && level.random.nextFloat() < 0.20F) {
-            doCapture(player, stack, level, living);
+            doCapture(player, stack, level, living, spec);
         } else if (size <= Math.ceil(tierSize * 3.0F) && level.random.nextFloat() < 0.10F) {
-            doCapture(player, stack, level, living);
+            doCapture(player, stack, level, living, spec);
         }
     }
 
-    private void doCapture(ServerPlayer player, ItemStack stack, Level level, LivingEntity target) {
+    private void doCapture(ServerPlayer player, ItemStack stack, Level level, LivingEntity target,
+            AquariumFishSpec spec) {
         Optional<AquariumFishEntry> snapshot = AquariumEntitySnapshot.snapshot(target);
         if (snapshot.isEmpty()) {
             return;
@@ -142,6 +144,7 @@ public class ScoopNetItem extends Item {
         }
 
         target.discard();
+        NotebookResearchEvents.recordCapture(player, spec);
         player.swing(player.getUsedItemHand());
         level.playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.FISHING_BOBBER_SPLASH, SoundSource.PLAYERS, 0.5F, 1.0F);

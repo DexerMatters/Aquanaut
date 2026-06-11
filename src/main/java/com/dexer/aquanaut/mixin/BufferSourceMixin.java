@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.SequencedMap;
 
-@Mixin(targets = "net/minecraft/client/renderer/MultiBufferSource$BufferSource", remap = false)
+@Mixin(value = MultiBufferSource.BufferSource.class, remap = false)
 public abstract class BufferSourceMixin {
 
     @Shadow

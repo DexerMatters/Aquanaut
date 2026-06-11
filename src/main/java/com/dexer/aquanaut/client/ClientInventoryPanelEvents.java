@@ -5,7 +5,6 @@ import com.dexer.aquanaut.common.diving.DivingEquipmentSlotType;
 import com.dexer.aquanaut.common.diving.inventory.DivingEquipmentContainer;
 import com.dexer.aquanaut.common.diving.inventory.DivingEquipmentMenuSlot;
 import com.dexer.aquanaut.common.diving.inventory.DivingInventoryLayout;
-import com.dexer.aquanaut.common.diving.inventory.DivingInventoryLayout;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -22,6 +21,7 @@ import net.neoforged.neoforge.client.event.ContainerScreenEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 
 @EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@SuppressWarnings("removal")
 public final class ClientInventoryPanelEvents {
 
     private static final ResourceLocation VANILLA_SLOT_SPRITE = ResourceLocation.withDefaultNamespace("container/slot");

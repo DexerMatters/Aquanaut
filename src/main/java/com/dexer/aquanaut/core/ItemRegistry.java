@@ -11,6 +11,7 @@ import com.dexer.aquanaut.common.item.DivingEquipmentItem;
 import com.dexer.aquanaut.common.item.FishingNetBlockItem;
 import com.dexer.aquanaut.common.item.GasFlowMeterItem;
 import com.dexer.aquanaut.common.item.HarpoonItem;
+import com.dexer.aquanaut.common.item.NotebookItem;
 import com.dexer.aquanaut.common.item.ScoopNetItem;
 
 import net.minecraft.core.registries.Registries;
@@ -72,6 +73,8 @@ public final class ItemRegistry {
         public static final DeferredItem<Item> FANG = ITEMS.registerSimpleItem("fang");
         public static final DeferredItem<Item> ICE_FIN = ITEMS.registerSimpleItem("ice_fin");
         public static final DeferredItem<Item> ICE_CORE = ITEMS.registerSimpleItem("ice_core");
+        public static final DeferredItem<NotebookItem> NOTEBOOK = ITEMS.registerItem("notebook",
+                        NotebookItem::new);
 
         public static final DeferredItem<DivingEquipmentItem> IRON_OXYGEN_TANK = tankItem("iron_oxygen_tank", 250, 5);
         public static final DeferredItem<DivingEquipmentItem> WOOD_OXYGEN_TANK = tankItem("wood_oxygen_tank", 59, 3);
@@ -438,6 +441,7 @@ public final class ItemRegistry {
                                 output.accept(SHELL_HARPOON.get());
                                 output.accept(HARD_SHELL_HARPOON.get());
                                 output.accept(MARINE_ALLOY_HARPOON.get());
+                                output.accept(NOTEBOOK.get());
                                 output.accept(SCOOP_NET.get());
                                 output.accept(MEDIUM_SCOOP_NET.get());
                                 output.accept(BIG_SCOOP_NET.get());

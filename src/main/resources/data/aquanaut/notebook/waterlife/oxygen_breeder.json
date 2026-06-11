@@ -1,0 +1,35 @@
+{
+  "species_id": "aquanaut:oxygen_breeder",
+  "entity_id": "aquanaut:oxygen_breeder",
+  "category": "friendly",
+  "diet": "energevorous",
+  "aliases": [
+    "aquanaut:oxygenbreeder"
+  ],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "stage": "encountered",
+      "text": "gui.aquanaut.notebook.waterlife.oxygen_breeder.paragraph_1"
+    },
+    {
+      "type": "component",
+      "stage": "encountered",
+      "component_kind": "sprite",
+      "resource": "aquanaut:item/oxygen_breeder_spawn_egg",
+      "caption": "gui.aquanaut.notebook.caption.identification_plate"
+    },
+    {
+      "type": "paragraph",
+      "stage": "captured",
+      "text": "gui.aquanaut.notebook.waterlife.oxygen_breeder.paragraph_2"
+    },
+    {
+      "type": "component",
+      "stage": "captured",
+      "component_kind": "model",
+      "resource": "aquanaut:oxygen_breeder",
+      "caption": "gui.aquanaut.notebook.caption.morphology_record"
+    }
+  ]
+}

@@ -11,6 +11,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
  * events.
  */
 @EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME)
+@SuppressWarnings("removal")
 public final class PlayerAirEvents {
 
     private PlayerAirEvents() {

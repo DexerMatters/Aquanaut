@@ -20,6 +20,7 @@ import net.neoforged.neoforge.client.event.CustomizeGuiOverlayEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 
 @EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@SuppressWarnings("removal")
 public final class ClientFogEvents {
     private static final float NIGHT_VISION_CAP = 0.9F;
     private static final float ABYSS_RED = 0.01F;

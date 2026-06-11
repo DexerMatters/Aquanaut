@@ -1,0 +1,35 @@
+{
+  "species_id": "aquanaut:tripod",
+  "entity_id": "aquanaut:tripod",
+  "category": "titan",
+  "diet": "energevorous",
+  "aliases": [
+    "aquanaut:threepod"
+  ],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "stage": "encountered",
+      "text": "gui.aquanaut.notebook.waterlife.tripod.paragraph_1"
+    },
+    {
+      "type": "component",
+      "stage": "encountered",
+      "component_kind": "sprite",
+      "resource": "aquanaut:item/tripod_spawn_egg",
+      "caption": "gui.aquanaut.notebook.caption.identification_plate"
+    },
+    {
+      "type": "paragraph",
+      "stage": "captured",
+      "text": "gui.aquanaut.notebook.waterlife.tripod.paragraph_2"
+    },
+    {
+      "type": "component",
+      "stage": "captured",
+      "component_kind": "model",
+      "resource": "aquanaut:tripod",
+      "caption": "gui.aquanaut.notebook.caption.morphology_record"
+    }
+  ]
+}

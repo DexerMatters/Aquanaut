@@ -1,0 +1,35 @@
+{
+  "species_id": "aquanaut:icerail",
+  "entity_id": "aquanaut:icerail",
+  "category": "friendly",
+  "diet": "energevorous",
+  "aliases": [
+    "aquanaut:ice_rail"
+  ],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "stage": "encountered",
+      "text": "gui.aquanaut.notebook.waterlife.icerail.paragraph_1"
+    },
+    {
+      "type": "component",
+      "stage": "encountered",
+      "component_kind": "sprite",
+      "resource": "aquanaut:item/icerail_spawn_egg",
+      "caption": "gui.aquanaut.notebook.caption.identification_plate"
+    },
+    {
+      "type": "paragraph",
+      "stage": "captured",
+      "text": "gui.aquanaut.notebook.waterlife.icerail.paragraph_2"
+    },
+    {
+      "type": "component",
+      "stage": "captured",
+      "component_kind": "model",
+      "resource": "aquanaut:icerail",
+      "caption": "gui.aquanaut.notebook.caption.morphology_record"
+    }
+  ]
+}

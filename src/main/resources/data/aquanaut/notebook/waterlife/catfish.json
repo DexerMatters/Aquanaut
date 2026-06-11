@@ -1,0 +1,35 @@
+{
+  "species_id": "aquanaut:catfish",
+  "entity_id": "aquanaut:catfish",
+  "category": "friendly",
+  "diet": "carnivorous",
+  "aliases": [
+    "aquanaut:cat_fish"
+  ],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "stage": "encountered",
+      "text": "gui.aquanaut.notebook.waterlife.catfish.paragraph_1"
+    },
+    {
+      "type": "component",
+      "stage": "encountered",
+      "component_kind": "sprite",
+      "resource": "aquanaut:item/catfish_spawn_egg",
+      "caption": "gui.aquanaut.notebook.caption.identification_plate"
+    },
+    {
+      "type": "paragraph",
+      "stage": "captured",
+      "text": "gui.aquanaut.notebook.waterlife.catfish.paragraph_2"
+    },
+    {
+      "type": "component",
+      "stage": "captured",
+      "component_kind": "model",
+      "resource": "aquanaut:catfish",
+      "caption": "gui.aquanaut.notebook.caption.morphology_record"
+    }
+  ]
+}

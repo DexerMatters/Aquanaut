@@ -49,7 +49,6 @@ public class SwirlMakerEntity extends BaseFishEntity implements GeoEntity {
     private int attackTargetId = -1;
     private int damageCooldown = 0;
     private int swirlRespawnTimer = 0;
-    private boolean playerHurt = false;
     private int captureTimer = 0;
     private int attackCooldown = 0;
     private float attackYaw;
@@ -190,7 +189,6 @@ public class SwirlMakerEntity extends BaseFishEntity implements GeoEntity {
         attackTargetId = target.getId();
         damageCooldown = 0;
         swirlRespawnTimer = 0;
-        playerHurt = false;
         captureTimer = 0;
 
         // Lock facing direction at attack start — don't track during inhale
@@ -207,7 +205,6 @@ public class SwirlMakerEntity extends BaseFishEntity implements GeoEntity {
         attackTargetId = -1;
         damageCooldown = 0;
         swirlRespawnTimer = 0;
-        playerHurt = false;
         captureTimer = 0;
         clearExistingSwirls();
         if (captured) {
@@ -222,19 +219,6 @@ public class SwirlMakerEntity extends BaseFishEntity implements GeoEntity {
     private Player resolveAttackTarget() {
         if (attackTargetId < 0) return null;
         return this.level().getEntity(attackTargetId) instanceof Player p ? p : null;
-    }
-
-    private void faceTarget(Player target) {
-        Vec3 toTarget = target.position().add(0, target.getBbHeight() * 0.5, 0)
-                .subtract(this.position().add(0, this.getBbHeight() * 0.4, 0));
-        float yaw = (float) (Mth.atan2(toTarget.z, toTarget.x) * Mth.RAD_TO_DEG) - 90.0F;
-        float pitch = (float) (-Mth.atan2(toTarget.y, toTarget.horizontalDistance()) * Mth.RAD_TO_DEG);
-        pitch = Mth.clamp(pitch, -this.getMaxTiltDegrees(), this.getMaxTiltDegrees());
-
-        this.setYRot(yaw);
-        this.yBodyRot = yaw;
-        this.yHeadRot = yaw;
-        this.setXRot(pitch);
     }
 
     private boolean isPlayerInSwirlCone(Player target) {

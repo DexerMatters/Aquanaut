@@ -1,0 +1,35 @@
+{
+  "species_id": "aquanaut:electrofish",
+  "entity_id": "aquanaut:electrofish",
+  "category": "threatening",
+  "diet": "energevorous",
+  "aliases": [
+    "aquanaut:electric_fish"
+  ],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "stage": "encountered",
+      "text": "gui.aquanaut.notebook.waterlife.electrofish.paragraph_1"
+    },
+    {
+      "type": "component",
+      "stage": "encountered",
+      "component_kind": "sprite",
+      "resource": "aquanaut:item/electrofish_spawn_egg",
+      "caption": "gui.aquanaut.notebook.caption.identification_plate"
+    },
+    {
+      "type": "paragraph",
+      "stage": "captured",
+      "text": "gui.aquanaut.notebook.waterlife.electrofish.paragraph_2"
+    },
+    {
+      "type": "component",
+      "stage": "captured",
+      "component_kind": "model",
+      "resource": "aquanaut:electrofish",
+      "caption": "gui.aquanaut.notebook.caption.morphology_record"
+    }
+  ]
+}

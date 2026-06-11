@@ -4,7 +4,6 @@ import com.dexer.aquanaut.common.ai.FishAttackMode;
 import com.dexer.aquanaut.common.ai.FishResponseMode;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;

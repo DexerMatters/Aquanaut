@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 @EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME)
+@SuppressWarnings("removal")
 public final class AquariumHealthTracker {
 
     private static final long GRACE_PERIOD_MS = 30_000L;

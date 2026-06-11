@@ -18,6 +18,7 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import java.util.List;
 
 @EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@SuppressWarnings("removal")
 public final class ClientGazeTooltip {
 
     private ClientGazeTooltip() {

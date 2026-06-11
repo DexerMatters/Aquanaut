@@ -3,6 +3,7 @@ package com.dexer.aquanaut.core;
 import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.diving.DivingEquipmentState;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumInventoryData;
+import com.dexer.aquanaut.common.notebook.NotebookProgress;
 import com.mojang.serialization.Codec;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
@@ -50,6 +51,12 @@ public final class AttachmentRegistry {
             ATTACHMENT_TYPES.register("aquarium_inventory",
                     () -> AttachmentType.builder(() -> AquariumInventoryData.EMPTY)
                             .serialize(AquariumInventoryData.CODEC)
+                            .build());
+
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<NotebookProgress>> NOTEBOOK_PROGRESS =
+            ATTACHMENT_TYPES.register("notebook_progress",
+                    () -> AttachmentType.builder(() -> NotebookProgress.EMPTY)
+                            .serialize(NotebookProgress.CODEC)
                             .build());
 
     private AttachmentRegistry() {

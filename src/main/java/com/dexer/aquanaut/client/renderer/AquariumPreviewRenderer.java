@@ -61,13 +61,18 @@ public final class AquariumPreviewRenderer {
         int y1 = gridY - VERTICAL_OVERFLOW;
         int y2 = gridY + spec.gridHeight() * SLOT_SIZE + VERTICAL_OVERFLOW;
 
+        renderLivingEntityPreview(graphics, x1, y1, x2, y2, scale, 0.0F, -2F, 0.0F, entity);
+    }
+
+    public static void renderLivingEntityPreview(GuiGraphics graphics, int x1, int y1, int x2, int y2, int scale,
+            float xRot, float yRot, float zRot, LivingEntity entity) {
         InventoryScreen.renderEntityInInventoryFollowsAngle(
                 graphics,
                 x1, y1, x2, y2,
                 scale,
-                0.0F,
-                -2F,
-                0.0F,
+                xRot,
+                yRot,
+                zRot,
                 entity);
     }
 

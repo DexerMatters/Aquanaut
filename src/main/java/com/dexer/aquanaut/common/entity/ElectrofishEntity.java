@@ -3,7 +3,6 @@ package com.dexer.aquanaut.common.entity;
 import com.dexer.aquanaut.common.ai.FishAttackMode;
 import com.dexer.aquanaut.common.ai.FishResponseMode;
 import com.dexer.aquanaut.core.EntityRegistry;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;

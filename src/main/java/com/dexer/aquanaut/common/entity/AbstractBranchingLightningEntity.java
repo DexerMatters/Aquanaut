@@ -22,7 +22,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.PartEntity;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -56,7 +55,6 @@ public abstract class AbstractBranchingLightningEntity extends Entity {
     private static final PartEntity<?>[] NO_PARTS = new PartEntity<?>[0];
 
     private LightningBranchSegment[] segments = new LightningBranchSegment[0];
-    private List<LightningBoltGeometry.Path> localPaths = List.of();
     private List<LightningBoltGeometry.Segment> localRenderSegments = List.of();
     private List<LightningBoltGeometry.Segment> localSegments = List.of();
     private long lastBuiltSeed;
@@ -471,7 +469,6 @@ public abstract class AbstractBranchingLightningEntity extends Entity {
         }
 
         this.segments = newSegments;
-        this.localPaths = List.copyOf(paths);
         this.localRenderSegments = renderSegments;
         this.localSegments = flatSegments;
         this.lastBuiltSeed = getLightningSeed();

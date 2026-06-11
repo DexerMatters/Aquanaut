@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
 Generate Aquanaut's Notebook — exact vanilla book shape remapped to ocean colors.
-Reads the vanilla Minecraft book texture, remaps every pixel to aquanaut palette.
+Reads a local vanilla Minecraft book texture when available, otherwise falls back to network,
+then remaps every pixel to an aquanaut palette.
 """
 from __future__ import annotations
 
@@ -14,20 +15,20 @@ SIZE = 16
 OUT_PATH = Path("src/main/resources/assets/aquanaut/textures/item/aquanaut_notebook.png")
 
 # --- Color remap table ---
-# Vanilla brown/red book colors → Aquanaut ocean teal colors
+# Vanilla brown/red book colors → deeper Aquanaut navy/ocean colors
 REMAP = {
-    # Outline — darkest brown → dark navy
-    (22, 16, 5):   (14, 26, 42, 255),
-    # Cover dark brown → dark teal
-    (49, 33, 4):   (22, 50, 78, 255),
-    # Cover medium-dark brown → medium-dark teal
-    (68, 37, 10):  (30, 65, 98, 255),
-    # Cover medium brown → medium teal
-    (82, 46, 16):  (40, 85, 120, 255),
-    # Cover medium-light brown → medium-light teal
-    (84, 62, 19):  (50, 100, 135, 255),
-    # Cover light brown (main cover face) → light teal
-    (101, 75, 23): (65, 125, 158, 255),
+    # Outline — darkest brown → deep navy
+    (22, 16, 5):   (6, 18, 34, 255),
+    # Cover dark brown → dark navy
+    (49, 33, 4):   (13, 30, 52, 255),
+    # Cover medium-dark brown → deep blue
+    (68, 37, 10):  (19, 43, 71, 255),
+    # Cover medium brown → blue-teal
+    (82, 46, 16):  (27, 58, 94, 255),
+    # Cover medium-light brown → brighter blue-teal
+    (84, 62, 19):  (37, 77, 120, 255),
+    # Cover light brown (main cover face) → bright ocean blue
+    (101, 75, 23): (51, 103, 150, 255),
     # Pages darkest gray → page edge cream
     (91, 91, 91):  (170, 155, 130, 255),
     # Pages dark gray → page shadow cream
@@ -39,23 +40,62 @@ REMAP = {
 }
 
 # Additional accent color for a subtle wave emboss on the cover
-ACCENT = (88, 165, 195, 255)  # bright aqua
+ACCENT = (94, 188, 222, 255)  # bright aqua
 
 
-def download_vanilla_book() -> bytes:
-    """Download vanilla book PNG and return pixel data."""
+def find_local_vanilla_book() -> Path | None:
+    """Return the first local vanilla book texture we can find."""
+    candidates = [
+        Path("src/main/resources/assets/minecraft/textures/item/book.png"),
+        Path("build/resources/main/assets/minecraft/textures/item/book.png"),
+        Path.home() / ".minecraft/assets/minecraft/textures/item/book.png",
+    ]
+    for base in [
+        Path.home() / ".local/share/PrismLauncher/instances",
+        Path.home() / ".var/app/org.prismlauncher.PrismLauncher/data/PrismLauncher/instances",
+    ]:
+        if base.exists():
+            candidates.extend(base.rglob("assets/minecraft/textures/item/book.png"))
+
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    return None
+
+
+def load_vanilla_book() -> bytes:
+    """Load vanilla book PNG bytes from disk first, then the network."""
+    local = find_local_vanilla_book()
+    if local is not None:
+        print(f"Using local vanilla book texture: {local}")
+        return local.read_bytes()
+
     import urllib.request
     url = "https://raw.githubusercontent.com/Faithful-Pack/Default-Java/1.21.11/assets/minecraft/textures/item/book.png"
+    print(f"Downloading vanilla book texture from {url}")
     with urllib.request.urlopen(url) as resp:
         return resp.read()
 
 
-def decode_indexed_png(data: bytes) -> list[tuple[int, int, int, int]]:
-    """Decode an indexed-color PNG into RGBA pixel list (256 entries max)."""
+def paeth_predictor(a: int, b: int, c: int) -> int:
+    p = a + b - c
+    pa = abs(p - a)
+    pb = abs(p - b)
+    pc = abs(p - c)
+    if pa <= pb and pa <= pc:
+        return a
+    if pb <= pc:
+        return b
+    return c
+
+
+def decode_png(data: bytes) -> list[tuple[int, int, int, int]]:
+    """Decode a non-interlaced 8-bit PNG into RGBA pixels."""
     pos = 8  # skip PNG signature
     palette = []
     pixels_raw = b""
     width = height = 0
+    bit_depth = color_type = None
 
     while pos < len(data):
         length = struct.unpack(">I", data[pos:pos+4])[0]
@@ -63,7 +103,11 @@ def decode_indexed_png(data: bytes) -> list[tuple[int, int, int, int]]:
         chunk_data = data[pos+8:pos+8+length]
 
         if tag == b"IHDR":
-            width, height, bit_depth, color_type = struct.unpack(">IIBB", chunk_data[:10])
+            width, height, bit_depth, color_type, compression, filter_method, interlace = struct.unpack(
+                ">IIBBBBB", chunk_data[:13]
+            )
+            if bit_depth != 8 or interlace != 0 or compression != 0 or filter_method != 0:
+                raise ValueError(f"Unsupported PNG format: bit_depth={bit_depth}, interlace={interlace}")
         elif tag == b"PLTE":
             for i in range(0, len(chunk_data), 3):
                 r, g, b = chunk_data[i], chunk_data[i+1], chunk_data[i+2]
@@ -80,14 +124,59 @@ def decode_indexed_png(data: bytes) -> list[tuple[int, int, int, int]]:
             break
         pos += 12 + length
 
-    # Convert indexed pixels to RGBA
+    if color_type is None:
+        raise ValueError("PNG missing IHDR chunk")
+
+    if color_type == 3:
+        bytes_per_pixel = 1
+    elif color_type == 2:
+        bytes_per_pixel = 3
+    elif color_type == 6:
+        bytes_per_pixel = 4
+    else:
+        raise ValueError(f"Unsupported PNG color type: {color_type}")
+
+    # Convert PNG scanlines to RGBA
     result = []
-    row_size = 1 + width  # filter byte + indices
+    row_size = 1 + width * bytes_per_pixel  # filter byte + pixels
+    previous = bytearray(width * bytes_per_pixel)
     for y in range(height):
         row_start = y * row_size
+        filter_type = pixels_raw[row_start]
+        scanline = pixels_raw[row_start + 1:row_start + row_size]
+        current = bytearray(width * bytes_per_pixel)
+        for i in range(len(scanline)):
+            raw = scanline[i]
+            left = current[i - bytes_per_pixel] if i >= bytes_per_pixel else 0
+            up = previous[i] if previous else 0
+            up_left = previous[i - bytes_per_pixel] if (previous and i >= bytes_per_pixel) else 0
+
+            if filter_type == 0:
+                value = raw
+            elif filter_type == 1:
+                value = (raw + left) & 0xFF
+            elif filter_type == 2:
+                value = (raw + up) & 0xFF
+            elif filter_type == 3:
+                value = (raw + ((left + up) // 2)) & 0xFF
+            elif filter_type == 4:
+                value = (raw + paeth_predictor(left, up, up_left)) & 0xFF
+            else:
+                raise ValueError(f"Unsupported PNG filter type: {filter_type}")
+            current[i] = value
+        previous = current
+
         for x in range(width):
-            idx = pixels_raw[row_start + 1 + x]
-            result.append(palette[idx])
+            offset = x * bytes_per_pixel
+            if color_type == 3:
+                idx = current[offset]
+                result.append(palette[idx])
+            elif color_type == 2:
+                r, g, b = current[offset:offset + 3]
+                result.append((r, g, b, 255))
+            else:
+                r, g, b, a = current[offset:offset + 4]
+                result.append((r, g, b, a))
     return result
 
 
@@ -169,11 +258,10 @@ def print_pixel_map(pixels: list) -> None:
 
 
 def main() -> None:
-    print("Downloading vanilla book texture...")
-    vanilla_data = download_vanilla_book()
+    vanilla_data = load_vanilla_book()
 
     print("Decoding indexed PNG...")
-    vanilla_pixels = decode_indexed_png(vanilla_data)
+    vanilla_pixels = decode_png(vanilla_data)
     print(f"  Got {len(vanilla_pixels)} pixels")
 
     print("Remapping to aquanaut colors...")

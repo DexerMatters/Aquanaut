@@ -1,0 +1,35 @@
+{
+  "species_id": "aquanaut:springfish",
+  "entity_id": "aquanaut:springfish",
+  "category": "friendly",
+  "diet": "energevorous",
+  "aliases": [
+    "aquanaut:spring_fish"
+  ],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "stage": "encountered",
+      "text": "gui.aquanaut.notebook.waterlife.springfish.paragraph_1"
+    },
+    {
+      "type": "component",
+      "stage": "encountered",
+      "component_kind": "sprite",
+      "resource": "aquanaut:item/springfish_spawn_egg",
+      "caption": "gui.aquanaut.notebook.caption.identification_plate"
+    },
+    {
+      "type": "paragraph",
+      "stage": "captured",
+      "text": "gui.aquanaut.notebook.waterlife.springfish.paragraph_2"
+    },
+    {
+      "type": "component",
+      "stage": "captured",
+      "component_kind": "model",
+      "resource": "aquanaut:springfish",
+      "caption": "gui.aquanaut.notebook.caption.morphology_record"
+    }
+  ]
+}

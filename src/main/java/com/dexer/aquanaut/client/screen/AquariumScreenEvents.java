@@ -22,6 +22,7 @@ import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@SuppressWarnings("removal")
 public final class AquariumScreenEvents {
 
     private static final int BUTTON_WIDTH = 20;
@@ -92,7 +93,6 @@ public final class AquariumScreenEvents {
         private static final int WATER_BG = 0xCC2A4A6A;
         private static final int LIGHT = 0xFF4A7A9A;
         private static final int DARK = 0xFF1A2A3A;
-        private static final int ACCENT = 0xCCFFFFFF;
 
         AquariumInventoryButton(int x, int y, int width, int height, OnPress onPress) {
             super(x, y, width, height, Component.empty(), onPress, DEFAULT_NARRATION);
@@ -110,7 +110,6 @@ public final class AquariumScreenEvents {
         private static final int WATER_BG = 0xCC6A2A2A;
         private static final int LIGHT = 0xFF9A4A4A;
         private static final int DARK = 0xFF3A1A1A;
-        private static final int ACCENT = 0xCCFFFFFF;
 
         AquariumCloseButton(int x, int y, int width, int height, OnPress onPress) {
             super(x, y, width, height, Component.empty(), onPress, DEFAULT_NARRATION);

@@ -1,0 +1,8 @@
+{
+    "parent": "minecraft:block/cube_bottom_top",
+    "textures": {
+        "bottom": "aquanaut:block/limestone_top",
+        "top": "aquanaut:block/limestone_top",
+        "side": "aquanaut:block/limestone"
+    }
+}

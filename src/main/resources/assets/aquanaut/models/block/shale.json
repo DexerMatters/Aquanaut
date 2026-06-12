@@ -1,0 +1,8 @@
+{
+    "parent": "minecraft:block/cube_bottom_top",
+    "textures": {
+        "bottom": "aquanaut:block/shale_top",
+        "top": "aquanaut:block/shale_top",
+        "side": "aquanaut:block/shale"
+    }
+}

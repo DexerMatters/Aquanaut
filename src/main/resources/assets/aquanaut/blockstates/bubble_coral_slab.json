@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "aquanaut:block/bubble_coral_slab"
+    },
+    "type=top": {
+      "model": "aquanaut:block/bubble_coral_slab_top"
+    },
+    "type=double": {
+      "model": "aquanaut:block/bubble_coral_slab_double"
+    }
+  }
+}

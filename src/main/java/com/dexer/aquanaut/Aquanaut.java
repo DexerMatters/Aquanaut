@@ -6,6 +6,8 @@ import com.dexer.aquanaut.core.AttachmentRegistry;
 import com.dexer.aquanaut.core.EntityRegistry;
 import com.dexer.aquanaut.core.GameRuleRegistry;
 import com.dexer.aquanaut.core.GazeRegistry;
+import com.dexer.aquanaut.core.BiomeRegistry;
+import com.dexer.aquanaut.core.FeatureRegistry;
 import com.dexer.aquanaut.core.ItemRegistry;
 import com.dexer.aquanaut.core.MenuRegistry;
 import com.dexer.aquanaut.core.MobEffectRegistry;
@@ -16,8 +18,9 @@ import com.mojang.logging.LogUtils;
 
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
 @Mod(Aquanaut.MODID)
 public class Aquanaut {
@@ -37,8 +40,14 @@ public class Aquanaut {
         MenuRegistry.register(modEventBus);
         MobEffectRegistry.register(modEventBus);
         SoundRegistry.register(modEventBus);
+        FeatureRegistry.register(modEventBus);
+        modEventBus.addListener(this::onCommonSetup);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+    }
+
+    private void onCommonSetup(FMLCommonSetupEvent event) {
+        event.enqueueWork(BiomeRegistry::register);
     }
 
 }

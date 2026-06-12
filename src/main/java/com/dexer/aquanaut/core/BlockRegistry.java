@@ -9,8 +9,11 @@ import com.dexer.aquanaut.common.block.GasPipeBlock;
 import com.dexer.aquanaut.common.block.OmnidirectionalMachineBlock;
 import com.dexer.aquanaut.common.block.PlexiglassBlock;
 import com.dexer.aquanaut.common.block.ShieldGeneratorBlock;
+import net.minecraft.util.ColorRGBA;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ColoredFallingBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -63,6 +66,42 @@ public final class BlockRegistry {
             MapColor.QUARTZ, 3.5F, 5.0F, SoundType.STONE);
     public static final DeferredBlock<Block> HARD_SHELL_FRAME = cube("hard_shell_frame",
             MapColor.QUARTZ, 3.5F, 5.0F, SoundType.STONE);
+
+    // Natural sediment / stone blocks
+    public static final DeferredBlock<ColoredFallingBlock> CORAL_SAND = BLOCKS.register("coral_sand",
+            () -> new ColoredFallingBlock(new ColorRGBA(0xFFC6C0B7), BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)
+                    .strength(0.6F, 0.8F)
+                    .sound(SoundType.SAND)));
+    public static final DeferredBlock<Block> NUTRIENT_RICH_MUD = cube("nutrient_rich_mud",
+            MapColor.TERRACOTTA_BROWN, 0.7F, 0.9F, SoundType.MUD);
+    public static final DeferredBlock<Block> SHALE = cube("shale",
+            MapColor.COLOR_GRAY, 1.5F, 3.0F, SoundType.STONE);
+    public static final DeferredBlock<Block> LIMESTONE = cube("limestone",
+            MapColor.TERRACOTTA_WHITE, 1.75F, 3.5F, SoundType.STONE);
+
+    // Vanilla coral slabs
+    public static final DeferredBlock<SlabBlock> TUBE_CORAL_SLAB = slab("tube_coral_slab",
+            MapColor.COLOR_BLUE, 1.5F, 1.5F);
+    public static final DeferredBlock<SlabBlock> BRAIN_CORAL_SLAB = slab("brain_coral_slab",
+            MapColor.COLOR_PINK, 1.5F, 1.5F);
+    public static final DeferredBlock<SlabBlock> BUBBLE_CORAL_SLAB = slab("bubble_coral_slab",
+            MapColor.COLOR_PURPLE, 1.5F, 1.5F);
+    public static final DeferredBlock<SlabBlock> FIRE_CORAL_SLAB = slab("fire_coral_slab",
+            MapColor.COLOR_RED, 1.5F, 1.5F);
+    public static final DeferredBlock<SlabBlock> HORN_CORAL_SLAB = slab("horn_coral_slab",
+            MapColor.COLOR_YELLOW, 1.5F, 1.5F);
+    public static final DeferredBlock<SlabBlock> DEAD_TUBE_CORAL_SLAB = slab("dead_tube_coral_slab",
+            MapColor.COLOR_GRAY, 1.5F, 1.5F);
+    public static final DeferredBlock<SlabBlock> DEAD_BRAIN_CORAL_SLAB = slab("dead_brain_coral_slab",
+            MapColor.COLOR_GRAY, 1.5F, 1.5F);
+    public static final DeferredBlock<SlabBlock> DEAD_BUBBLE_CORAL_SLAB = slab("dead_bubble_coral_slab",
+            MapColor.COLOR_GRAY, 1.5F, 1.5F);
+    public static final DeferredBlock<SlabBlock> DEAD_FIRE_CORAL_SLAB = slab("dead_fire_coral_slab",
+            MapColor.COLOR_GRAY, 1.5F, 1.5F);
+    public static final DeferredBlock<SlabBlock> DEAD_HORN_CORAL_SLAB = slab("dead_horn_coral_slab",
+            MapColor.COLOR_GRAY, 1.5F, 1.5F);
+
     public static final DeferredBlock<GasPipeBlock> GAS_PIPE = pipe("gas_pipe");
 
     public static final DeferredBlock<FishingNetBlock> FISHING_NET = fishingNet("fishing_net");
@@ -102,6 +141,15 @@ public final class BlockRegistry {
                 .mapColor(color)
                 .strength(hardness, resistance)
                 .sound(sound)
+                .requiresCorrectToolForDrops()));
+    }
+
+    private static DeferredBlock<SlabBlock> slab(String name, MapColor color, float hardness,
+            float resistance) {
+        return BLOCKS.register(name, () -> new SlabBlock(BlockBehaviour.Properties.of()
+                .mapColor(color)
+                .strength(hardness, resistance)
+                .sound(SoundType.CORAL_BLOCK)
                 .requiresCorrectToolForDrops()));
     }
 

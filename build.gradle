@@ -60,7 +60,7 @@ neoForge {
     }
 
     // This line is optional. Access Transformers are automatically detected
-    // accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
+    accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -165,7 +165,7 @@ dependencies {
 def mixinRefmapFile = layout.buildDirectory.file("resources/main/${mod_id}.refmap.json")
 def mixinMappingsFile = layout.buildDirectory.file("moddev/artifacts/namedToIntermediate.tsrg")
 
-// Produce a minimal named→notch TSRG for the two methods our mixins target.
+// Produce a minimal named->notch TSRG for the Minecraft methods our mixins target.
 // The Mixin AP requires this to resolve obfuscation mappings when generating the refmap.
 tasks.register("generateMixinMappings") {
     def outputFile = mixinMappingsFile
@@ -180,7 +180,9 @@ tasks.register("generateMixinMappings") {
                 "\thurt (Lnet/minecraft/world/damagesource/DamageSource;F)Z a\n" +
                 "net/minecraft/world/entity/LivingEntity btn\n" +
                 "\tgetMaxAirSupply ()I cl\n" +
-                "\tincreaseAirSupply (I)I n\n"
+                "\tincreaseAirSupply (I)I n\n" +
+                "net/minecraft/world/level/chunk/ChunkAccess duy\n" +
+                "\tfillBiomesFromNoise (Lnet/minecraft/world/level/biome/BiomeResolver;Lnet/minecraft/world/level/biome/Climate\$Sampler;)V a\n"
     }
 }
 

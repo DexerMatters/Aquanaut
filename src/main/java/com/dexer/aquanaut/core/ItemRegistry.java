@@ -259,6 +259,35 @@ public final class ItemRegistry {
                         BlockRegistry.POLISHED_HARD_SHELL_BLOCK);
         public static final DeferredItem<BlockItem> HARD_SHELL_FRAME = blockItem("hard_shell_frame",
                         BlockRegistry.HARD_SHELL_FRAME);
+        public static final DeferredItem<BlockItem> CORAL_SAND = blockItem("coral_sand",
+                        BlockRegistry.CORAL_SAND);
+        public static final DeferredItem<BlockItem> NUTRIENT_RICH_MUD = blockItem("nutrient_rich_mud",
+                        BlockRegistry.NUTRIENT_RICH_MUD);
+        public static final DeferredItem<BlockItem> SHALE = blockItem("shale",
+                        BlockRegistry.SHALE);
+        public static final DeferredItem<BlockItem> LIMESTONE = blockItem("limestone",
+                        BlockRegistry.LIMESTONE);
+        // Vanilla coral slabs
+        public static final DeferredItem<BlockItem> TUBE_CORAL_SLAB = blockItem("tube_coral_slab",
+                        BlockRegistry.TUBE_CORAL_SLAB);
+        public static final DeferredItem<BlockItem> BRAIN_CORAL_SLAB = blockItem("brain_coral_slab",
+                        BlockRegistry.BRAIN_CORAL_SLAB);
+        public static final DeferredItem<BlockItem> BUBBLE_CORAL_SLAB = blockItem("bubble_coral_slab",
+                        BlockRegistry.BUBBLE_CORAL_SLAB);
+        public static final DeferredItem<BlockItem> FIRE_CORAL_SLAB = blockItem("fire_coral_slab",
+                        BlockRegistry.FIRE_CORAL_SLAB);
+        public static final DeferredItem<BlockItem> HORN_CORAL_SLAB = blockItem("horn_coral_slab",
+                        BlockRegistry.HORN_CORAL_SLAB);
+        public static final DeferredItem<BlockItem> DEAD_TUBE_CORAL_SLAB = blockItem("dead_tube_coral_slab",
+                        BlockRegistry.DEAD_TUBE_CORAL_SLAB);
+        public static final DeferredItem<BlockItem> DEAD_BRAIN_CORAL_SLAB = blockItem("dead_brain_coral_slab",
+                        BlockRegistry.DEAD_BRAIN_CORAL_SLAB);
+        public static final DeferredItem<BlockItem> DEAD_BUBBLE_CORAL_SLAB = blockItem("dead_bubble_coral_slab",
+                        BlockRegistry.DEAD_BUBBLE_CORAL_SLAB);
+        public static final DeferredItem<BlockItem> DEAD_FIRE_CORAL_SLAB = blockItem("dead_fire_coral_slab",
+                        BlockRegistry.DEAD_FIRE_CORAL_SLAB);
+        public static final DeferredItem<BlockItem> DEAD_HORN_CORAL_SLAB = blockItem("dead_horn_coral_slab",
+                        BlockRegistry.DEAD_HORN_CORAL_SLAB);
         public static final DeferredItem<BlockItem> GAS_PIPE = blockItem("gas_pipe",
                         BlockRegistry.GAS_PIPE);
         public static final DeferredItem<FishingNetBlockItem> FISHING_NET = ITEMS.registerItem("fishing_net",
@@ -502,12 +531,26 @@ public final class ItemRegistry {
                                 output.accept(RINGED_PURPLE_CORAL_BLOCK.get());
                                 output.accept(RINGED_GREEN_CORAL_BLOCK.get());
                                 output.accept(RINGED_FLUORASCENT_BLUE_CORAL_BLOCK.get());
+                                output.accept(TUBE_CORAL_SLAB.get());
+                                output.accept(BRAIN_CORAL_SLAB.get());
+                                output.accept(BUBBLE_CORAL_SLAB.get());
+                                output.accept(FIRE_CORAL_SLAB.get());
+                                output.accept(HORN_CORAL_SLAB.get());
+                                output.accept(DEAD_TUBE_CORAL_SLAB.get());
+                                output.accept(DEAD_BRAIN_CORAL_SLAB.get());
+                                output.accept(DEAD_BUBBLE_CORAL_SLAB.get());
+                                output.accept(DEAD_FIRE_CORAL_SLAB.get());
+                                output.accept(DEAD_HORN_CORAL_SLAB.get());
                                 output.accept(SHELL_BLOCK.get());
                                 output.accept(SHELL_BRICKS.get());
                                 output.accept(HARD_SHELL_BLOCK.get());
                                 output.accept(HARD_SHELL_BRICKS.get());
                                 output.accept(POLISHED_HARD_SHELL_BLOCK.get());
                                 output.accept(HARD_SHELL_FRAME.get());
+                                output.accept(CORAL_SAND.get());
+                                output.accept(NUTRIENT_RICH_MUD.get());
+                                output.accept(SHALE.get());
+                                output.accept(LIMESTONE.get());
                                 output.accept(GAS_PIPE.get());
                                 output.accept(FISHING_NET.get());
                                 output.accept(PLEXIGLASS.get());

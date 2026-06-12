@@ -4,11 +4,14 @@
     "package": "com.dexer.aquanaut.mixin",
     "refmap": "aquanaut.refmap.json",
     "mixins": [
+        "ChunkGeneratorAccessor",
         "EntityMixin",
         "LivingEntityMixin",
         "InventoryMenuMixin",
+        "NoiseBasedChunkGeneratorMixin",
         "PlayerMixin",
         "ItemStackMixin",
+        "RandomStateMixin",
         "WaterAnimalMixin"
     ],
     "client": [

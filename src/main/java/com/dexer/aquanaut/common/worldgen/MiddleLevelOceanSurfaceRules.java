@@ -11,6 +11,7 @@ public final class MiddleLevelOceanSurfaceRules {
     public static SurfaceRules.RuleSource create() {
         return SurfaceRules.sequence(
                 CoralForestSurfaceRules.create(),
+                JellyJungleSurfaceRules.create(),
                 SurfaceRules.ifTrue(
                         SurfaceRules.isBiome(BiomeRegistry.MIDDLE_LEVEL_OCEAN),
                         SurfaceRules.sequence(

@@ -32,6 +32,24 @@ public final class BiomeFeatureLayoutTest {
     void customOceanBiomesKeepTheSameFeatureStageCount() {
         assertEquals(loadFeatureStages("middle_level_ocean").size(), loadFeatureStages("coral_forest").size(),
                 "custom ocean biomes should keep the same number of generation stages");
+        assertEquals(loadFeatureStages("middle_level_ocean").size(), loadFeatureStages("jelly_jungle").size(),
+                "custom ocean biomes should keep the same number of generation stages");
+    }
+
+    @Test
+    void jellyJungleCarriesItsOwnBulgesCracksAndVegetation() {
+        List<String> features = loadFeatureStages("jelly_jungle").stream().flatMap(List::stream).toList();
+
+        assertTrue(features.contains("aquanaut:jelly_jungle_bulge"),
+                "jelly jungle should generate large jelly bulges");
+        assertTrue(features.contains("aquanaut:jelly_jungle_crack"),
+                "jelly jungle should carve surface cracks into the middle ocean");
+        assertTrue(features.contains("aquanaut:jelly_jungle_vegetation"),
+                "jelly jungle should generate its own kelp and seaweed vegetation");
+        assertTrue(features.contains("aquanaut:jelly_jungle_stem_forest"),
+                "jelly jungle should generate dense seaweed stem forests");
+        assertFalse(features.contains("aquanaut:coral_forest_pillar"),
+                "jelly jungle should not reuse the coral forest stone pillar feature");
     }
 
     private List<List<String>> loadFeatureStages(String biomeName) {

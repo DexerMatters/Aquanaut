@@ -27,6 +27,10 @@ public final class MiddleLevelOceanRegion extends Region {
                 BiomeRegistry.CORAL_FOREST,
                 CoralForestPlacement.holderAnchorParameter(),
                 CoralForestPlacement.holderAnchorOffset());
+        addHiddenBiome(mapper,
+                BiomeRegistry.JELLY_JUNGLE,
+                JellyJunglePlacement.holderAnchorParameter(),
+                JellyJunglePlacement.holderAnchorOffset());
     }
 
     private void addHiddenBiome(Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper,

@@ -263,10 +263,36 @@ public final class ItemRegistry {
                         BlockRegistry.CORAL_SAND);
         public static final DeferredItem<BlockItem> NUTRIENT_RICH_MUD = blockItem("nutrient_rich_mud",
                         BlockRegistry.NUTRIENT_RICH_MUD);
+        public static final DeferredItem<BlockItem> DROOPING_SEAWEED = blockItem("drooping_seaweed",
+                        BlockRegistry.DROOPING_SEAWEED);
         public static final DeferredItem<BlockItem> SHALE = blockItem("shale",
                         BlockRegistry.SHALE);
         public static final DeferredItem<BlockItem> LIMESTONE = blockItem("limestone",
                         BlockRegistry.LIMESTONE);
+        public static final DeferredItem<BlockItem> SEAWEED = blockItem("seaweed",
+                        BlockRegistry.SEAWEED);
+        public static final DeferredItem<BlockItem> SEAWEED_FRUIT = blockItem("seaweed_fruit",
+                        BlockRegistry.SEAWEED_FRUIT);
+        public static final DeferredItem<BlockItem> SEAWEED_STEM = blockItem("seaweed_stem",
+                        BlockRegistry.SEAWEED_STEM);
+        // Jelly blocks
+        public static final DeferredItem<BlockItem> LIGHT_RED_JELLY_BLOCK = blockItem("light_red_jelly_block",
+                        BlockRegistry.LIGHT_RED_JELLY_BLOCK);
+        public static final DeferredItem<BlockItem> LIGHT_CYAN_JELLY_BLOCK = blockItem("light_cyan_jelly_block",
+                        BlockRegistry.LIGHT_CYAN_JELLY_BLOCK);
+        public static final DeferredItem<BlockItem> WHITE_JELLY_BLOCK = blockItem("white_jelly_block",
+                        BlockRegistry.WHITE_JELLY_BLOCK);
+        public static final DeferredItem<BlockItem> LIGHT_GOLDEN_JELLY_BLOCK = blockItem("light_golden_jelly_block",
+                        BlockRegistry.LIGHT_GOLDEN_JELLY_BLOCK);
+        // Seaweed-wrapped jelly
+        public static final DeferredItem<BlockItem> LIGHT_RED_JELLY_BLOCK_SEAWEED = blockItem("light_red_jelly_block_seaweed",
+                        BlockRegistry.LIGHT_RED_JELLY_BLOCK_SEAWEED);
+        public static final DeferredItem<BlockItem> LIGHT_CYAN_JELLY_BLOCK_SEAWEED = blockItem("light_cyan_jelly_block_seaweed",
+                        BlockRegistry.LIGHT_CYAN_JELLY_BLOCK_SEAWEED);
+        public static final DeferredItem<BlockItem> WHITE_JELLY_BLOCK_SEAWEED = blockItem("white_jelly_block_seaweed",
+                        BlockRegistry.WHITE_JELLY_BLOCK_SEAWEED);
+        public static final DeferredItem<BlockItem> LIGHT_GOLDEN_JELLY_BLOCK_SEAWEED = blockItem("light_golden_jelly_block_seaweed",
+                        BlockRegistry.LIGHT_GOLDEN_JELLY_BLOCK_SEAWEED);
         // Vanilla coral slabs
         public static final DeferredItem<BlockItem> TUBE_CORAL_SLAB = blockItem("tube_coral_slab",
                         BlockRegistry.TUBE_CORAL_SLAB);
@@ -549,8 +575,20 @@ public final class ItemRegistry {
                                 output.accept(HARD_SHELL_FRAME.get());
                                 output.accept(CORAL_SAND.get());
                                 output.accept(NUTRIENT_RICH_MUD.get());
+                                output.accept(DROOPING_SEAWEED.get());
                                 output.accept(SHALE.get());
                                 output.accept(LIMESTONE.get());
+                                output.accept(SEAWEED.get());
+                                output.accept(SEAWEED_FRUIT.get());
+                                output.accept(SEAWEED_STEM.get());
+                                output.accept(LIGHT_RED_JELLY_BLOCK.get());
+                                output.accept(LIGHT_CYAN_JELLY_BLOCK.get());
+                                output.accept(WHITE_JELLY_BLOCK.get());
+                                output.accept(LIGHT_GOLDEN_JELLY_BLOCK.get());
+                                output.accept(LIGHT_RED_JELLY_BLOCK_SEAWEED.get());
+                                output.accept(LIGHT_CYAN_JELLY_BLOCK_SEAWEED.get());
+                                output.accept(WHITE_JELLY_BLOCK_SEAWEED.get());
+                                output.accept(LIGHT_GOLDEN_JELLY_BLOCK_SEAWEED.get());
                                 output.accept(GAS_PIPE.get());
                                 output.accept(FISHING_NET.get());
                                 output.accept(PLEXIGLASS.get());

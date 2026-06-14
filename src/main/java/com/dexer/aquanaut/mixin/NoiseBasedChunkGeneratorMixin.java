@@ -1,6 +1,7 @@
 package com.dexer.aquanaut.mixin;
 
 import com.dexer.aquanaut.common.worldgen.CoralForestPlacement;
+import com.dexer.aquanaut.common.worldgen.JellyJunglePlacement;
 import com.dexer.aquanaut.common.worldgen.MiddleLevelOceanColumnRules;
 import com.dexer.aquanaut.common.worldgen.MiddleLevelOceanPlacement;
 import com.dexer.aquanaut.common.worldgen.MiddleLevelOceanTerrainShaper;
@@ -276,9 +277,11 @@ public abstract class NoiseBasedChunkGeneratorMixin {
         ChunkGeneratorAccessor generatorAccessor = (ChunkGeneratorAccessor) this;
         Holder<Biome> coralForest = aquanaut$findBiome(generatorAccessor.aquanaut$getBiomeSource(),
                 CoralForestPlacement.location());
+        Holder<Biome> jellyJungle = aquanaut$findBiome(generatorAccessor.aquanaut$getBiomeSource(),
+                JellyJunglePlacement.location());
         Holder<Biome> middleLevelOcean = aquanaut$findBiome(generatorAccessor.aquanaut$getBiomeSource(),
                 MiddleLevelOceanPlacement.location());
-        if (coralForest == null || middleLevelOcean == null) {
+        if (coralForest == null || jellyJungle == null || middleLevelOcean == null) {
             return;
         }
 
@@ -288,6 +291,8 @@ public abstract class NoiseBasedChunkGeneratorMixin {
         if (coralForestMaxQuartY < minQuartY) {
             return;
         }
+        int baseQuartX = QuartPos.fromBlock(chunk.getPos().getMinBlockX());
+        int baseQuartZ = QuartPos.fromBlock(chunk.getPos().getMinBlockZ());
 
         for (int localQuartX = 0; localQuartX < 4; localQuartX++) {
             for (int localQuartZ = 0; localQuartZ < 4; localQuartZ++) {
@@ -299,8 +304,13 @@ public abstract class NoiseBasedChunkGeneratorMixin {
 
                 for (int quartY = minQuartY; quartY <= coralForestMaxQuartY; quartY++) {
                     Holder<Biome> targetBiome = aquanaut$targetBiomeHolder(
-                            MiddleLevelOceanColumnRules.targetBiome(surfaceBiomeLocation, openWaterColumns, quartY),
+                            MiddleLevelOceanColumnRules.targetBiome(surfaceBiomeLocation,
+                                    openWaterColumns,
+                                    baseQuartX + localQuartX,
+                                    quartY,
+                                    baseQuartZ + localQuartZ),
                             coralForest,
+                            jellyJungle,
                             middleLevelOcean);
                     if (targetBiome == null) {
                         continue;
@@ -330,9 +340,11 @@ public abstract class NoiseBasedChunkGeneratorMixin {
     @Unique
     private static Holder<Biome> aquanaut$targetBiomeHolder(MiddleLevelOceanColumnRules.TargetBiome targetBiome,
                                                             Holder<Biome> coralForest,
+                                                            Holder<Biome> jellyJungle,
                                                             Holder<Biome> middleLevelOcean) {
         return switch (targetBiome) {
             case CORAL_FOREST -> coralForest;
+            case JELLY_JUNGLE -> jellyJungle;
             case MIDDLE_LEVEL_OCEAN -> middleLevelOcean;
             case NONE -> null;
         };

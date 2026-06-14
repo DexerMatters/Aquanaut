@@ -1,0 +1,35 @@
+{
+  "feature": "aquanaut:jelly_jungle_vegetation",
+  "placement": [
+    {
+      "type": "minecraft:count",
+      "count": {
+        "type": "minecraft:weighted_list",
+        "distribution": [
+          {
+            "data": 3,
+            "weight": 2
+          },
+          {
+            "data": 4,
+            "weight": 4
+          },
+          {
+            "data": 5,
+            "weight": 3
+          }
+        ]
+      }
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "minecraft:heightmap",
+      "heightmap": "OCEAN_FLOOR_WG"
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 package com.dexer.aquanaut.core;
 
 import com.dexer.aquanaut.common.worldgen.CoralForestPlacement;
+import com.dexer.aquanaut.common.worldgen.JellyJunglePlacement;
 import com.dexer.aquanaut.common.worldgen.MiddleLevelOceanPlacement;
 import com.dexer.aquanaut.common.worldgen.MiddleLevelOceanRegion;
 import net.minecraft.core.registries.Registries;
@@ -13,6 +14,8 @@ public final class BiomeRegistry {
             MiddleLevelOceanPlacement.location());
     public static final ResourceKey<Biome> CORAL_FOREST = ResourceKey.create(Registries.BIOME,
             CoralForestPlacement.location());
+    public static final ResourceKey<Biome> JELLY_JUNGLE = ResourceKey.create(Registries.BIOME,
+            JellyJunglePlacement.location());
 
     private BiomeRegistry() {
     }

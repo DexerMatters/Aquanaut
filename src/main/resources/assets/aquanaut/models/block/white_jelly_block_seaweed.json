@@ -1,0 +1,7 @@
+{
+  "render_type": "minecraft:translucent",
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "aquanaut:block/white_jelly_block_seaweed"
+  }
+}

@@ -4,16 +4,20 @@ import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.block.AirPumpBlock;
 import com.dexer.aquanaut.common.block.AirSupplyBlock;
 import com.dexer.aquanaut.common.block.BubbleMachineBlock;
+import com.dexer.aquanaut.common.block.DroopingSeaweedBlock;
 import com.dexer.aquanaut.common.block.FishingNetBlock;
 import com.dexer.aquanaut.common.block.GasPipeBlock;
 import com.dexer.aquanaut.common.block.OmnidirectionalMachineBlock;
 import com.dexer.aquanaut.common.block.PlexiglassBlock;
 import com.dexer.aquanaut.common.block.ShieldGeneratorBlock;
+import com.dexer.aquanaut.common.block.SeaweedBlock;
+import com.dexer.aquanaut.common.block.SeaweedStemBlock;
 import net.minecraft.util.ColorRGBA;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ColoredFallingBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.SlimeBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -75,10 +79,36 @@ public final class BlockRegistry {
                     .sound(SoundType.SAND)));
     public static final DeferredBlock<Block> NUTRIENT_RICH_MUD = cube("nutrient_rich_mud",
             MapColor.TERRACOTTA_BROWN, 0.7F, 0.9F, SoundType.MUD);
+    public static final DeferredBlock<DroopingSeaweedBlock> DROOPING_SEAWEED = seaweed("drooping_seaweed");
     public static final DeferredBlock<Block> SHALE = cube("shale",
             MapColor.COLOR_GRAY, 1.5F, 3.0F, SoundType.STONE);
     public static final DeferredBlock<Block> LIMESTONE = cube("limestone",
             MapColor.TERRACOTTA_WHITE, 1.75F, 3.5F, SoundType.STONE);
+
+    // Seaweed block — dense opaque foliage like leaves
+    public static final DeferredBlock<SeaweedBlock> SEAWEED = leafSeaweed("seaweed");
+    public static final DeferredBlock<SeaweedBlock> SEAWEED_FRUIT = leafSeaweed("seaweed_fruit");
+    public static final DeferredBlock<SeaweedStemBlock> SEAWEED_STEM = seaweedStem("seaweed_stem");
+
+    // Jelly blocks — translucent, bouncy like slime, easier to destroy
+    public static final DeferredBlock<SlimeBlock> LIGHT_RED_JELLY_BLOCK = jelly("light_red_jelly_block",
+            MapColor.COLOR_RED, 0.3F, 0.3F);
+    public static final DeferredBlock<SlimeBlock> LIGHT_CYAN_JELLY_BLOCK = jelly("light_cyan_jelly_block",
+            MapColor.COLOR_CYAN, 0.3F, 0.3F);
+    public static final DeferredBlock<SlimeBlock> WHITE_JELLY_BLOCK = jelly("white_jelly_block",
+            MapColor.SNOW, 0.3F, 0.3F);
+    public static final DeferredBlock<SlimeBlock> LIGHT_GOLDEN_JELLY_BLOCK = jelly("light_golden_jelly_block",
+            MapColor.COLOR_YELLOW, 0.3F, 0.3F);
+
+    // Seaweed-wrapped jelly variants
+    public static final DeferredBlock<SlimeBlock> LIGHT_RED_JELLY_BLOCK_SEAWEED = jelly("light_red_jelly_block_seaweed",
+            MapColor.COLOR_RED, 0.3F, 0.3F);
+    public static final DeferredBlock<SlimeBlock> LIGHT_CYAN_JELLY_BLOCK_SEAWEED = jelly("light_cyan_jelly_block_seaweed",
+            MapColor.COLOR_CYAN, 0.3F, 0.3F);
+    public static final DeferredBlock<SlimeBlock> WHITE_JELLY_BLOCK_SEAWEED = jelly("white_jelly_block_seaweed",
+            MapColor.SNOW, 0.3F, 0.3F);
+    public static final DeferredBlock<SlimeBlock> LIGHT_GOLDEN_JELLY_BLOCK_SEAWEED = jelly("light_golden_jelly_block_seaweed",
+            MapColor.COLOR_YELLOW, 0.3F, 0.3F);
 
     // Vanilla coral slabs
     public static final DeferredBlock<SlabBlock> TUBE_CORAL_SLAB = slab("tube_coral_slab",
@@ -151,6 +181,44 @@ public final class BlockRegistry {
                 .strength(hardness, resistance)
                 .sound(SoundType.CORAL_BLOCK)
                 .requiresCorrectToolForDrops()));
+    }
+
+    private static DeferredBlock<SeaweedBlock> leafSeaweed(String name) {
+        return BLOCKS.register(name, () -> new SeaweedBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_GREEN)
+                .strength(0.2F)
+                .sound(SoundType.GRASS)
+                .noOcclusion()
+                .dynamicShape()));
+    }
+
+    private static DeferredBlock<SeaweedStemBlock> seaweedStem(String name) {
+        return BLOCKS.register(name, () -> new SeaweedStemBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_GREEN)
+                .strength(0.3F)
+                .sound(SoundType.GRASS)
+                .noOcclusion()
+                .dynamicShape()));
+    }
+
+    private static DeferredBlock<DroopingSeaweedBlock> seaweed(String name) {
+        return BLOCKS.register(name, () -> new DroopingSeaweedBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_GREEN)
+                .strength(0.2F)
+                .sound(SoundType.GRASS)
+                .noOcclusion()
+                .dynamicShape()));
+    }
+
+    private static DeferredBlock<SlimeBlock> jelly(String name, MapColor color, float hardness,
+            float resistance) {
+        return BLOCKS.register(name, () -> new SlimeBlock(BlockBehaviour.Properties.of()
+                .mapColor(color)
+                .strength(hardness, resistance)
+                .sound(SoundType.SLIME_BLOCK)
+                .friction(0.8F)
+                .noOcclusion()
+                .isViewBlocking((state, level, pos) -> false)));
     }
 
     private static DeferredBlock<OmnidirectionalMachineBlock> machine(String name) {

@@ -3,10 +3,13 @@ package com.dexer.aquanaut.core;
 import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.entity.AirBubbleEntity;
 import com.dexer.aquanaut.common.entity.AnglerfishEntity;
+import com.dexer.aquanaut.common.entity.BlueJellyfishEntity;
+import com.dexer.aquanaut.common.entity.BlueRingedWormfishEntity;
 import com.dexer.aquanaut.common.entity.CatfishEntity;
 import com.dexer.aquanaut.common.entity.CreeporpedoEntity;
 import com.dexer.aquanaut.common.entity.DonutfishEntity;
 import com.dexer.aquanaut.common.entity.ElectrofishEntity;
+import com.dexer.aquanaut.common.entity.FlatfishEntity;
 import com.dexer.aquanaut.common.entity.GloomgazerEntity;
 import com.dexer.aquanaut.common.entity.LightningEntity;
 import com.dexer.aquanaut.common.entity.LightingWormEntity;
@@ -233,6 +236,21 @@ public class EntityRegistry {
                     () -> EntityType.Builder.<TripodEntity>of(TripodEntity::new, MobCategory.WATER_CREATURE)
                             .sized(1.1F, 0.5F).build("tripod"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<BlueRingedWormfishEntity>> BLUE_RINGED_WORMFISH = ENTITIES
+            .register("blue_ringed_wormfish",
+                    () -> EntityType.Builder.<BlueRingedWormfishEntity>of(BlueRingedWormfishEntity::new, MobCategory.WATER_CREATURE)
+                            .sized(1.0F, 0.35F).build("blue_ringed_wormfish"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<BlueJellyfishEntity>> BLUE_JELLYFISH = ENTITIES
+            .register("blue_jellyfish",
+                    () -> EntityType.Builder.<BlueJellyfishEntity>of(BlueJellyfishEntity::new, MobCategory.WATER_CREATURE)
+                            .sized(1.5F, 1.0F).build("blue_jellyfish"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<FlatfishEntity>> FLATFISH = ENTITIES
+            .register("flatfish",
+                    () -> EntityType.Builder.<FlatfishEntity>of(FlatfishEntity::new, MobCategory.WATER_CREATURE)
+                            .sized(1.3F, 0.65F).build("flatfish"));
+
     public static void register(IEventBus eventBus) {
         ENTITIES.register(eventBus);
     }
@@ -260,6 +278,9 @@ public class EntityRegistry {
         event.put(EntityRegistry.RED_JELLYFISH.get(), RedJellyfishEntity.createAttributes());
         event.put(EntityRegistry.RINGFISH.get(), RingfishEntity.createAttributes());
         event.put(EntityRegistry.TRIPOD.get(), TripodEntity.createAttributes());
+        event.put(EntityRegistry.BLUE_RINGED_WORMFISH.get(), BlueRingedWormfishEntity.createAttributes());
+        event.put(EntityRegistry.BLUE_JELLYFISH.get(), BlueJellyfishEntity.createAttributes());
+        event.put(EntityRegistry.FLATFISH.get(), FlatfishEntity.createAttributes());
     }
 
     @SubscribeEvent

@@ -1,7 +1,7 @@
 package com.dexer.aquanaut.client.renderer;
 
-import com.dexer.aquanaut.client.model.AnglerfishModel;
-import com.dexer.aquanaut.common.entity.AnglerfishEntity;
+import com.dexer.aquanaut.client.model.BlueJellyfishModel;
+import com.dexer.aquanaut.common.entity.BlueJellyfishEntity;
 import javax.annotation.Nullable;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -9,11 +9,11 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
-public class AnglerfishRenderer extends BaseFishRenderer<AnglerfishEntity> {
-    public AnglerfishRenderer(EntityRendererProvider.Context c) {
-        super(c, new AnglerfishModel());
+public class BlueJellyfishRenderer extends BaseFishRenderer<BlueJellyfishEntity> {
+    public BlueJellyfishRenderer(EntityRendererProvider.Context c) {
+        super(c, new BlueJellyfishModel());
         addRenderLayer(new AutoGlowingGeoLayer<>(this));
     }
-    @Override public @Nullable RenderType getRenderType(AnglerfishEntity a, ResourceLocation t,
+    @Override public @Nullable RenderType getRenderType(BlueJellyfishEntity a, ResourceLocation t,
             @Nullable MultiBufferSource b, float p) { return RenderType.entityTranslucent(getTextureLocation(a)); }
 }

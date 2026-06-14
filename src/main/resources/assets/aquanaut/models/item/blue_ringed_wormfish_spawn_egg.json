@@ -1,0 +1,6 @@
+{
+    "parent": "minecraft:item/generated",
+    "textures": {
+        "layer0": "aquanaut:item/blue_ringed_wormfish_spawn_egg"
+    }
+}

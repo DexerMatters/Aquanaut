@@ -403,6 +403,18 @@ public final class ItemRegistry {
                         "tripod_spawn_egg",
                         EntityRegistry.TRIPOD, 0x805650, 0xD2B4A5);
 
+        public static final DeferredItem<DeferredSpawnEggItem> BLUE_RINGED_WORMFISH_SPAWN_EGG = spawnEgg(
+                        "blue_ringed_wormfish_spawn_egg",
+                        EntityRegistry.BLUE_RINGED_WORMFISH, 0x193260, 0x78C8FF);
+
+        public static final DeferredItem<DeferredSpawnEggItem> BLUE_JELLYFISH_SPAWN_EGG = spawnEgg(
+                        "blue_jellyfish_spawn_egg",
+                        EntityRegistry.BLUE_JELLYFISH, 0x1E64C8, 0xB4DCFF);
+
+        public static final DeferredItem<DeferredSpawnEggItem> FLATFISH_SPAWN_EGG = spawnEgg(
+                        "flatfish_spawn_egg",
+                        EntityRegistry.FLATFISH, 0x6E6C4B, 0xC3B9A0);
+
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FOOD_TAB = tab("food",
                         COOKED_SARDINE, output -> {
                                 output.accept(COOKED_OCTOPUS_SHREDS.get());
@@ -438,6 +450,9 @@ public final class ItemRegistry {
                                 output.accept(RED_JELLYFISH_SPAWN_EGG.get());
                                 output.accept(RINGFISH_SPAWN_EGG.get());
                                 output.accept(TRIPOD_SPAWN_EGG.get());
+                                output.accept(BLUE_RINGED_WORMFISH_SPAWN_EGG.get());
+                                output.accept(BLUE_JELLYFISH_SPAWN_EGG.get());
+                                output.accept(FLATFISH_SPAWN_EGG.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MATERIALS_TAB = tab("materials",

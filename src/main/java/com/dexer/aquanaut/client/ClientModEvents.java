@@ -3,11 +3,14 @@ package com.dexer.aquanaut.client;
 import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.client.renderer.AirBubbleRenderer;
 import com.dexer.aquanaut.client.renderer.AnglerfishRenderer;
+import com.dexer.aquanaut.client.renderer.BlueJellyfishRenderer;
+import com.dexer.aquanaut.client.renderer.BlueRingedWormfishRenderer;
 import com.dexer.aquanaut.client.renderer.GasPipeBlockEntityRenderer;
 import com.dexer.aquanaut.client.renderer.CatfishRenderer;
 import com.dexer.aquanaut.client.renderer.CreeporpedoRenderer;
 import com.dexer.aquanaut.client.renderer.DonutfishRenderer;
 import com.dexer.aquanaut.client.renderer.ElectrofishRenderer;
+import com.dexer.aquanaut.client.renderer.FlatfishRenderer;
 import com.dexer.aquanaut.client.renderer.GloomgazerRenderer;
 import com.dexer.aquanaut.client.renderer.HarpoonRenderer;
 import com.dexer.aquanaut.client.renderer.LightingWormRenderer;
@@ -70,7 +73,10 @@ public final class ClientModEvents {
                 ItemRegistry.OXYGEN_BREEDER_SPAWN_EGG.get(),
                 ItemRegistry.RED_JELLYFISH_SPAWN_EGG.get(),
                 ItemRegistry.RINGFISH_SPAWN_EGG.get(),
-                ItemRegistry.TRIPOD_SPAWN_EGG.get());
+                ItemRegistry.TRIPOD_SPAWN_EGG.get(),
+                ItemRegistry.BLUE_RINGED_WORMFISH_SPAWN_EGG.get(),
+                ItemRegistry.BLUE_JELLYFISH_SPAWN_EGG.get(),
+                ItemRegistry.FLATFISH_SPAWN_EGG.get());
     }
 
     @SubscribeEvent
@@ -97,6 +103,9 @@ public final class ClientModEvents {
         event.registerEntityRenderer(EntityRegistry.RED_JELLYFISH.get(), RedJellyfishRenderer::new);
         event.registerEntityRenderer(EntityRegistry.RINGFISH.get(), RingfishRenderer::new);
         event.registerEntityRenderer(EntityRegistry.TRIPOD.get(), TripodRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.BLUE_RINGED_WORMFISH.get(), BlueRingedWormfishRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.BLUE_JELLYFISH.get(), BlueJellyfishRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.FLATFISH.get(), FlatfishRenderer::new);
         event.registerEntityRenderer(EntityRegistry.AIR_BUBBLE.get(), AirBubbleRenderer::new);
         event.registerEntityRenderer(EntityRegistry.HARPOON.get(), HarpoonRenderer::new);
         event.registerEntityRenderer(EntityRegistry.LIGHTNING.get(), LightningRenderer::new);

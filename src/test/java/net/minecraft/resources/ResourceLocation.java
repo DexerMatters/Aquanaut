@@ -21,6 +21,10 @@ public final class ResourceLocation implements Comparable<ResourceLocation> {
         return new ResourceLocation(namespace, path);
     }
 
+    public static ResourceLocation withDefaultNamespace(String path) {
+        return new ResourceLocation("minecraft", path);
+    }
+
     public static ResourceLocation parse(String value) {
         int separator = value.indexOf(':');
         if (separator < 0) {

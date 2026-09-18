@@ -17,6 +17,11 @@ public final class Config {
                         .comment("Underwater movement multiplier while diving flippers are equipped.")
                         .defineInRange("divingFlipperSpeedMultiplier", 1.25D, 1.0D, 5.0D);
 
+        public static final ModConfigSpec.BooleanValue ORESUCKER_GRAZING = BUILDER
+                        .comment("Allow oresuckers to grind exposed ore blocks into stone and store the metal.",
+                                        "Disable to keep the world untouched; the fish still gathers what it already holds.")
+                        .define("oresuckerGrazing", true);
+
         static final ModConfigSpec SPEC = BUILDER.build();
 
         private Config() {

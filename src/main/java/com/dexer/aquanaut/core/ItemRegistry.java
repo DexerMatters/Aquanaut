@@ -320,21 +320,8 @@ public final class ItemRegistry {
                 props -> new FishingNetBlockItem(BlockRegistry.FISHING_NET.get(), props));
         public static final DeferredItem<BlockItem> PLEXIGLASS = ITEMS.registerItem("plexiglass",
                 props -> new BlockItem(BlockRegistry.PLEXIGLASS.get(), props));
-        public static final DeferredItem<BlockItem> LIGHTNING_GENERATOR = blockItem("lightning_generator",
-                        BlockRegistry.LIGHTNING_GENERATOR);
-        public static final DeferredItem<BlockItem> BUBBLE_MACHINE = blockItem("bubble_machine",
-                        BlockRegistry.BUBBLE_MACHINE);
-        public static final DeferredItem<BlockItem> SWIRL_GENERATOR = blockItem("swirl_generator",
-                        BlockRegistry.SWIRL_GENERATOR);
-        public static final DeferredItem<BlockItem> TORPEDO_LAUNCHER = blockItem("torpedo_launcher",
-                        BlockRegistry.TORPEDO_LAUNCHER);
-        public static final DeferredItem<BlockItem> AIR_PUMP = blockItem("air_pump",
-                        BlockRegistry.AIR_PUMP);
-        public static final DeferredItem<BlockItem> SHIELD_GENERATOR = blockItem("shield_generator",
-                        BlockRegistry.SHIELD_GENERATOR);
-        public static final DeferredItem<BlockItem> AIR_SUPPLY_BLOCK = blockItem("air_supply",
-                        BlockRegistry.AIR_SUPPLY);
-
+        public static final DeferredItem<BlockItem> DISSECTION_TABLE = blockItem("dissection_table",
+                        BlockRegistry.DISSECTION_TABLE);
         public static final DeferredItem<GasFlowMeterItem> GAS_FLOW_METER = ITEMS.registerItem("gas_flow_meter",
                         properties -> new GasFlowMeterItem(properties.stacksTo(1)));
         public static final DeferredItem<Item> BUBBLE_GUN = ITEMS.registerItem("bubble_gun",
@@ -415,6 +402,62 @@ public final class ItemRegistry {
                         "flatfish_spawn_egg",
                         EntityRegistry.FLATFISH, 0x6E6C4B, 0xC3B9A0);
 
+        public static final DeferredItem<DeferredSpawnEggItem> VAMPREY_SPAWN_EGG = spawnEgg(
+                        "vamprey_spawn_egg",
+                        EntityRegistry.VAMPREY, 0xD9D4C8, 0x827F77);
+
+        public static final DeferredItem<DeferredSpawnEggItem> ORESUCKER_SPAWN_EGG = spawnEgg(
+                        "oresucker_spawn_egg",
+                        EntityRegistry.ORESUCKER, 0xC1F4EB, 0x708781);
+
+        public static final DeferredItem<DeferredSpawnEggItem> FLAGELLONAUTILUS_SPAWN_EGG = spawnEgg(
+                        "flagellonautilus_spawn_egg",
+                        EntityRegistry.FLAGELLONAUTILUS, 0x685247, 0x3F2E27);
+
+        public static final DeferredItem<DeferredSpawnEggItem> SKELETON_CARP_SPAWN_EGG = spawnEgg(
+                        "skeleton_carp_spawn_egg",
+                        EntityRegistry.SKELETON_CARP, 0xCECEC8, 0x807F7B);
+
+        public static final DeferredItem<DeferredSpawnEggItem> GOLDEN_CARP_SPAWN_EGG = spawnEgg(
+                        "golden_carp_spawn_egg",
+                        EntityRegistry.GOLDEN_CARP, 0xF8CA31, 0x987416);
+
+        public static final DeferredItem<DeferredSpawnEggItem> SILVER_CARP_SPAWN_EGG = spawnEgg(
+                        "silver_carp_spawn_egg",
+                        EntityRegistry.SILVER_CARP, 0xD8D5CA, 0x887E64);
+
+        public static final DeferredItem<DeferredSpawnEggItem> GENTLEFISH_SPAWN_EGG = spawnEgg(
+                        "gentlefish_spawn_egg",
+                        EntityRegistry.GENTLEFISH, 0x9F6936, 0x5D3E1E);
+
+        public static final DeferredItem<DeferredSpawnEggItem> SLIMMY_SPAWN_EGG = spawnEgg(
+                        "slimmy_spawn_egg",
+                        EntityRegistry.SLIMMY, 0x96FB74, 0x51963F);
+
+        public static final DeferredItem<DeferredSpawnEggItem> IONFIN_SPAWN_EGG = spawnEgg(
+                        "ionfin_spawn_egg",
+                        EntityRegistry.IONFIN, 0xDAE1E5, 0x7F8486);
+
+        public static final DeferredItem<DeferredSpawnEggItem> OPTICICHTHUS_SPAWN_EGG = spawnEgg(
+                        "opticichthus_spawn_egg",
+                        EntityRegistry.OPTICICHTHUS, 0x92999B, 0x4F5456);
+
+        public static final DeferredItem<DeferredSpawnEggItem> GEMINI_JELLYFISH_SPAWN_EGG = spawnEgg(
+                        "gemini_jellyfish_spawn_egg",
+                        EntityRegistry.GEMINI_JELLYFISH, 0xEBEBEA, 0x89847F);
+
+        public static final DeferredItem<DeferredSpawnEggItem> ECOFISH_SPAWN_EGG = spawnEgg(
+                        "ecofish_spawn_egg",
+                        EntityRegistry.ECOFISH, 0x217C36, 0x0F3D1C);
+
+        public static final DeferredItem<DeferredSpawnEggItem> PALE_ABYSS_HYDRA_SPAWN_EGG = spawnEgg(
+                        "pale_abyss_hydra_spawn_egg",
+                        EntityRegistry.PALE_ABYSS_HYDRA, 0xF0DD8F, 0x8C8154);
+
+        public static final DeferredItem<DeferredSpawnEggItem> THREE_HEADED_SHARK_SPAWN_EGG = spawnEgg(
+                        "three_headed_shark_spawn_egg",
+                        EntityRegistry.THREE_HEADED_SHARK, 0x6A7582, 0x3E444D);
+
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FOOD_TAB = tab("food",
                         COOKED_SARDINE, output -> {
                                 output.accept(COOKED_OCTOPUS_SHREDS.get());
@@ -453,6 +496,20 @@ public final class ItemRegistry {
                                 output.accept(BLUE_RINGED_WORMFISH_SPAWN_EGG.get());
                                 output.accept(BLUE_JELLYFISH_SPAWN_EGG.get());
                                 output.accept(FLATFISH_SPAWN_EGG.get());
+                                output.accept(VAMPREY_SPAWN_EGG.get());
+                                output.accept(ORESUCKER_SPAWN_EGG.get());
+                                output.accept(FLAGELLONAUTILUS_SPAWN_EGG.get());
+                                output.accept(SKELETON_CARP_SPAWN_EGG.get());
+                                output.accept(GOLDEN_CARP_SPAWN_EGG.get());
+                                output.accept(SILVER_CARP_SPAWN_EGG.get());
+                                output.accept(GENTLEFISH_SPAWN_EGG.get());
+                                output.accept(SLIMMY_SPAWN_EGG.get());
+                                output.accept(IONFIN_SPAWN_EGG.get());
+                                output.accept(OPTICICHTHUS_SPAWN_EGG.get());
+                                output.accept(GEMINI_JELLYFISH_SPAWN_EGG.get());
+                                output.accept(ECOFISH_SPAWN_EGG.get());
+                                output.accept(PALE_ABYSS_HYDRA_SPAWN_EGG.get());
+                                output.accept(THREE_HEADED_SHARK_SPAWN_EGG.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MATERIALS_TAB = tab("materials",
@@ -607,13 +664,7 @@ public final class ItemRegistry {
                                 output.accept(GAS_PIPE.get());
                                 output.accept(FISHING_NET.get());
                                 output.accept(PLEXIGLASS.get());
-                                output.accept(LIGHTNING_GENERATOR.get());
-                                output.accept(BUBBLE_MACHINE.get());
-                                output.accept(SWIRL_GENERATOR.get());
-                                output.accept(TORPEDO_LAUNCHER.get());
-                                output.accept(AIR_PUMP.get());
-                                output.accept(SHIELD_GENERATOR.get());
-                                output.accept(AIR_SUPPLY_BLOCK.get());
+                                output.accept(DISSECTION_TABLE.get());
                         });
 
         private ItemRegistry() {

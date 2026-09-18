@@ -1,6 +1,20 @@
 package com.dexer.aquanaut.core;
 
 import com.dexer.aquanaut.Aquanaut;
+import com.dexer.aquanaut.common.entity.VampreyEntity;
+import com.dexer.aquanaut.common.entity.OresuckerEntity;
+import com.dexer.aquanaut.common.entity.FlagellonautilusEntity;
+import com.dexer.aquanaut.common.entity.SkeletonCarpEntity;
+import com.dexer.aquanaut.common.entity.GoldenCarpEntity;
+import com.dexer.aquanaut.common.entity.SilverCarpEntity;
+import com.dexer.aquanaut.common.entity.GentlefishEntity;
+import com.dexer.aquanaut.common.entity.SlimyEntity;
+import com.dexer.aquanaut.common.entity.IonfinEntity;
+import com.dexer.aquanaut.common.entity.OpticichthusEntity;
+import com.dexer.aquanaut.common.entity.GeminiJellyfishEntity;
+import com.dexer.aquanaut.common.entity.EcofishEntity;
+import com.dexer.aquanaut.common.entity.PaleAbyssHydraEntity;
+import com.dexer.aquanaut.common.entity.ThreeHeadedSharkEntity;
 import com.dexer.aquanaut.common.entity.AirBubbleEntity;
 import com.dexer.aquanaut.common.entity.AnglerfishEntity;
 import com.dexer.aquanaut.common.entity.BlueJellyfishEntity;
@@ -251,6 +265,115 @@ public class EntityRegistry {
                     () -> EntityType.Builder.<FlatfishEntity>of(FlatfishEntity::new, MobCategory.WATER_CREATURE)
                             .sized(1.3F, 0.65F).build("flatfish"));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<VampreyEntity>> VAMPREY = ENTITIES.register(
+            "vamprey",
+            () -> EntityType.Builder
+                    .<VampreyEntity>of(VampreyEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(0.6F, 0.5F)
+                    .build("vamprey"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<OresuckerEntity>> ORESUCKER = ENTITIES.register(
+            "oresucker",
+            () -> EntityType.Builder
+                    .<OresuckerEntity>of(OresuckerEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(0.5F, 0.4F)
+                    .build("oresucker"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<FlagellonautilusEntity>> FLAGELLONAUTILUS = ENTITIES.register(
+            "flagellonautilus",
+            () -> EntityType.Builder
+                    .<FlagellonautilusEntity>of(FlagellonautilusEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(0.9F, 1.2F)
+                            .clientTrackingRange(10)
+                    .build("flagellonautilus"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SkeletonCarpEntity>> SKELETON_CARP = ENTITIES.register(
+            "skeleton_carp",
+            () -> EntityType.Builder
+                    .<SkeletonCarpEntity>of(SkeletonCarpEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(0.6F, 0.85F)
+                    .build("skeleton_carp"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<GoldenCarpEntity>> GOLDEN_CARP = ENTITIES.register(
+            "golden_carp",
+            () -> EntityType.Builder
+                    .<GoldenCarpEntity>of(GoldenCarpEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(0.6F, 0.85F)
+                    .build("golden_carp"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SilverCarpEntity>> SILVER_CARP = ENTITIES.register(
+            "silver_carp",
+            () -> EntityType.Builder
+                    .<SilverCarpEntity>of(SilverCarpEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(0.6F, 0.85F)
+                    .build("silver_carp"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<GentlefishEntity>> GENTLEFISH = ENTITIES.register(
+            "gentlefish",
+            () -> EntityType.Builder
+                    .<GentlefishEntity>of(GentlefishEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(0.5F, 0.75F)
+                    .build("gentlefish"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SlimyEntity>> SLIMMY = ENTITIES.register(
+            "slimmy",
+            () -> EntityType.Builder
+                    .<SlimyEntity>of(SlimyEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(0.8F, 0.75F)
+                    .build("slimmy"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<IonfinEntity>> IONFIN = ENTITIES.register(
+            "ionfin",
+            () -> EntityType.Builder
+                    .<IonfinEntity>of(IonfinEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(1.5F, 1.5F)
+                            .clientTrackingRange(10)
+                    .build("ionfin"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<OpticichthusEntity>> OPTICICHTHUS = ENTITIES.register(
+            "opticichthus",
+            () -> EntityType.Builder
+                    .<OpticichthusEntity>of(OpticichthusEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(1.3F, 1.0F)
+                            .clientTrackingRange(10)
+                    .build("opticichthus"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<GeminiJellyfishEntity>> GEMINI_JELLYFISH = ENTITIES.register(
+            "gemini_jellyfish",
+            () -> EntityType.Builder
+                    .<GeminiJellyfishEntity>of(GeminiJellyfishEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(4.5F, 9.0F)
+                            .clientTrackingRange(16)
+                            .updateInterval(2)
+                    .build("gemini_jellyfish"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<EcofishEntity>> ECOFISH = ENTITIES.register(
+            "ecofish",
+            () -> EntityType.Builder
+                    .<EcofishEntity>of(EcofishEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(8.0F, 12.0F)
+                            .clientTrackingRange(16)
+                            .updateInterval(2)
+                    .build("ecofish"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<PaleAbyssHydraEntity>> PALE_ABYSS_HYDRA = ENTITIES.register(
+            "pale_abyss_hydra",
+            () -> EntityType.Builder
+                    .<PaleAbyssHydraEntity>of(PaleAbyssHydraEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(6.0F, 6.0F)
+                            .clientTrackingRange(16)
+                            .updateInterval(2)
+                    .build("pale_abyss_hydra"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ThreeHeadedSharkEntity>> THREE_HEADED_SHARK = ENTITIES.register(
+            "three_headed_shark",
+            () -> EntityType.Builder
+                    .<ThreeHeadedSharkEntity>of(ThreeHeadedSharkEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(2.4F, 1.5F)
+                            .clientTrackingRange(12)
+                            .updateInterval(2)
+                    .build("three_headed_shark"));
+
     public static void register(IEventBus eventBus) {
         ENTITIES.register(eventBus);
     }
@@ -281,6 +404,20 @@ public class EntityRegistry {
         event.put(EntityRegistry.BLUE_RINGED_WORMFISH.get(), BlueRingedWormfishEntity.createAttributes());
         event.put(EntityRegistry.BLUE_JELLYFISH.get(), BlueJellyfishEntity.createAttributes());
         event.put(EntityRegistry.FLATFISH.get(), FlatfishEntity.createAttributes());
+        event.put(EntityRegistry.VAMPREY.get(), VampreyEntity.createAttributes());
+        event.put(EntityRegistry.ORESUCKER.get(), OresuckerEntity.createAttributes());
+        event.put(EntityRegistry.FLAGELLONAUTILUS.get(), FlagellonautilusEntity.createAttributes());
+        event.put(EntityRegistry.SKELETON_CARP.get(), SkeletonCarpEntity.createAttributes());
+        event.put(EntityRegistry.GOLDEN_CARP.get(), GoldenCarpEntity.createAttributes());
+        event.put(EntityRegistry.SILVER_CARP.get(), SilverCarpEntity.createAttributes());
+        event.put(EntityRegistry.GENTLEFISH.get(), GentlefishEntity.createAttributes());
+        event.put(EntityRegistry.SLIMMY.get(), SlimyEntity.createAttributes());
+        event.put(EntityRegistry.IONFIN.get(), IonfinEntity.createAttributes());
+        event.put(EntityRegistry.OPTICICHTHUS.get(), OpticichthusEntity.createAttributes());
+        event.put(EntityRegistry.GEMINI_JELLYFISH.get(), GeminiJellyfishEntity.createAttributes());
+        event.put(EntityRegistry.ECOFISH.get(), EcofishEntity.createAttributes());
+        event.put(EntityRegistry.PALE_ABYSS_HYDRA.get(), PaleAbyssHydraEntity.createAttributes());
+        event.put(EntityRegistry.THREE_HEADED_SHARK.get(), ThreeHeadedSharkEntity.createAttributes());
     }
 
     @SubscribeEvent

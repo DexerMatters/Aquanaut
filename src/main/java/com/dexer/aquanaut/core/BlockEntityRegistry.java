@@ -1,6 +1,7 @@
 package com.dexer.aquanaut.core;
 
 import com.dexer.aquanaut.Aquanaut;
+import com.dexer.aquanaut.common.block.entity.DissectionTableBlockEntity;
 import com.dexer.aquanaut.common.block.entity.GasPipeBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -15,6 +16,12 @@ public final class BlockEntityRegistry {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<GasPipeBlockEntity>> GAS_PIPE = BLOCK_ENTITY_TYPES
             .register("gas_pipe",
                     () -> BlockEntityType.Builder.of(GasPipeBlockEntity::new, BlockRegistry.GAS_PIPE.get())
+                            .build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DissectionTableBlockEntity>> DISSECTION_TABLE = BLOCK_ENTITY_TYPES
+            .register("dissection_table",
+                    () -> BlockEntityType.Builder
+                            .of(DissectionTableBlockEntity::new, BlockRegistry.DISSECTION_TABLE.get())
                             .build(null));
 
     private BlockEntityRegistry() {

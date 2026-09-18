@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "HSH",
+    "I I"
+  ],
+  "key": {
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "H": {
+      "item": "aquanaut:polished_hard_shell_block"
+    },
+    "S": {
+      "item": "aquanaut:shell"
+    }
+  },
+  "result": {
+    "id": "aquanaut:dissection_table",
+    "count": 1
+  }
+}

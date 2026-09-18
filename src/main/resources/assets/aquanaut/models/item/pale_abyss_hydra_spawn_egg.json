@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "aquanaut:item/pale_abyss_hydra_spawn_egg"
+  }
+}

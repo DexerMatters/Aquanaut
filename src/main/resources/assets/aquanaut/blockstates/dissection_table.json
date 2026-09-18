@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "waterlogged=false": {
+      "model": "aquanaut:block/dissection_table"
+    },
+    "waterlogged=true": {
+      "model": "aquanaut:block/dissection_table"
+    }
+  }
+}

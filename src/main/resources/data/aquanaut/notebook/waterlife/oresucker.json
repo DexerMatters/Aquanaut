@@ -1,0 +1,35 @@
+{
+  "species_id": "aquanaut:oresucker",
+  "entity_id": "aquanaut:oresucker",
+  "category": "friendly",
+  "diet": "herbivorous",
+  "aliases": [
+    "aquanaut:ore_sucker"
+  ],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "stage": "encountered",
+      "text": "gui.aquanaut.notebook.waterlife.oresucker.paragraph_1"
+    },
+    {
+      "type": "component",
+      "stage": "encountered",
+      "component_kind": "sprite",
+      "resource": "aquanaut:item/oresucker_spawn_egg",
+      "caption": "gui.aquanaut.notebook.caption.identification_plate"
+    },
+    {
+      "type": "paragraph",
+      "stage": "captured",
+      "text": "gui.aquanaut.notebook.waterlife.oresucker.paragraph_2"
+    },
+    {
+      "type": "component",
+      "stage": "captured",
+      "component_kind": "model",
+      "resource": "aquanaut:oresucker",
+      "caption": "gui.aquanaut.notebook.caption.morphology_record"
+    }
+  ]
+}

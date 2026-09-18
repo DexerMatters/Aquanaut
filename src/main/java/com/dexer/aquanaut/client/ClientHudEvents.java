@@ -3,7 +3,6 @@ package com.dexer.aquanaut.client;
 import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.client.model.GasFlowMeterReadoutHelper;
 import com.dexer.aquanaut.common.AirSupplyHelper;
-import com.dexer.aquanaut.common.block.AirPumpBlock;
 import com.dexer.aquanaut.common.block.AbstractPipeBlock;
 import com.dexer.aquanaut.common.block.entity.AbstractPipeBlockEntity;
 import com.dexer.aquanaut.core.ItemRegistry;
@@ -186,14 +185,6 @@ public final class ClientHudEvents {
         }
 
         BlockState state = player.level().getBlockState(pos);
-        if (state.getBlock() instanceof AirPumpBlock airPump) {
-            GasFlowMeterReadoutHelper.Readout readout = GasFlowMeterReadoutHelper.airPump(
-                    state.getValue(AirPumpBlock.ACTIVE),
-                    airPump.getFlowStrength(state));
-            drawTargetReadout(event.getGuiGraphics(), mc.font, readout);
-            return;
-        }
-
         if (!(state.getBlock() instanceof AbstractPipeBlock)
                 || !(player.level().getBlockEntity(pos) instanceof AbstractPipeBlockEntity pipeEntity)) {
             return;

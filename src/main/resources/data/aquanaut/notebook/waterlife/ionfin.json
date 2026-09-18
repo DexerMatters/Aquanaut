@@ -1,0 +1,35 @@
+{
+  "species_id": "aquanaut:ionfin",
+  "entity_id": "aquanaut:ionfin",
+  "category": "threatening",
+  "diet": "energevorous",
+  "aliases": [
+    "aquanaut:ion_fin"
+  ],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "stage": "encountered",
+      "text": "gui.aquanaut.notebook.waterlife.ionfin.paragraph_1"
+    },
+    {
+      "type": "component",
+      "stage": "encountered",
+      "component_kind": "sprite",
+      "resource": "aquanaut:item/ionfin_spawn_egg",
+      "caption": "gui.aquanaut.notebook.caption.identification_plate"
+    },
+    {
+      "type": "paragraph",
+      "stage": "captured",
+      "text": "gui.aquanaut.notebook.waterlife.ionfin.paragraph_2"
+    },
+    {
+      "type": "component",
+      "stage": "captured",
+      "component_kind": "model",
+      "resource": "aquanaut:ionfin",
+      "caption": "gui.aquanaut.notebook.caption.morphology_record"
+    }
+  ]
+}

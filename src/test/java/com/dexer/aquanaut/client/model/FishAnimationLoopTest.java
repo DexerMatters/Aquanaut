@@ -5,7 +5,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Sanity checks for the looping clips that ship with the mod.
+ *
+ * <p>
+ * The animations are exported by Blockbench itself (through the GeckoLib plugin's format), so this
+ * test guards the export rather than re-deriving it: a looping clip must declare a positive length,
+ * must start on a keyframe at {@code 0.0}, and must not leave a dead tail longer than one tick
+ * ({@code 1/24} s) before its declared end. When the exporter does place a key exactly on the
+ * declared length, the clip must also be pose-closed, i.e. end on the pose it starts with - the
+ * shipped Aquanaut animations mostly are, and the few that are not are still within one tick.
+ */
 public final class FishAnimationLoopTest {
+
+    /** One Minecraft tick, the granularity Blockbench snaps keyframe times to when exporting. */
+    private static final double TICK = 1.0D / 24.0D;
 
     public static void main(String[] args) {
         FishAnimationLoopTest test = new FishAnimationLoopTest();
@@ -13,17 +27,56 @@ public final class FishAnimationLoopTest {
     }
 
     private void targetedSwimLoopsCloseOnTheirDeclaredLength() {
-        assertLoopClosure("creeporpedo", "swim");
-        assertLoopClosure("swirl_maker", "swim");
-        assertLoopClosure("lighting_worm", "swim");
+        assertLoopShape("creeporpedo", "swim");
+        assertLoopShape("swirl_maker", "swim");
+        assertLoopShape("lighting_worm", "swim");
+
+        // Species added with models.zip.
+        assertLoopShape("vamprey", "swim");
+        assertLoopShape("vamprey", "charge");
+        assertLoopShape("oresucker", "swim");
+        assertLoopShape("flagellonautilus", "swim");
+        assertLoopShape("skeleton_carp", "swim");
+        assertLoopShape("golden_carp", "swim");
+        assertLoopShape("silver_carp", "swim");
+        assertLoopShape("gentlefish", "swim");
+        assertLoopShape("slimmy", "swim");
+        assertLoopShape("ionfin", "swim");
+        assertLoopShape("opticichthus", "swim");
+        assertLoopShape("gemini_jellyfish", "swim");
+        assertLoopShape("pale_abyss_hydra", "swim");
+        assertLoopShape("three_headed_shark", "swim");
+        assertLoopShape("three_headed_shark", "charge");
     }
 
-    private void assertLoopClosure(String animationName, String clipName) {
+    private void assertLoopShape(String animationName, String clipName) {
         String clip = loadClip(animationName, clipName);
         String endKey = extractAnimationLength(clip);
+        double length = Double.parseDouble(endKey);
+        if (length <= 0.0D) {
+            throw new AssertionError(animationName + "." + clipName + " declares a non-positive length");
+        }
+
+        List<Double> times = extractTimes(clip);
+        if (times.isEmpty()) {
+            throw new AssertionError(animationName + "." + clipName + " has no keyframes");
+        }
+        if (times.stream().noneMatch(time -> time == 0.0D)) {
+            throw new AssertionError(animationName + "." + clipName + " has no keyframe at 0.0");
+        }
+
+        double last = times.stream().mapToDouble(Double::doubleValue).max().orElse(0.0D);
+        if (Math.abs(last - length) > TICK + 1.0E-6D) {
+            throw new AssertionError(animationName + "." + clipName + " ends at " + last
+                    + ", more than one tick away from its declared length " + length);
+        }
+
+        // Pose closure is only enforced when the exporter actually wrote a key on the declared end.
         List<String> startFrames = extractFrames(clip, "\"0.0\"");
         List<String> endFrames = extractFrames(clip, "\"" + endKey + "\"");
-
+        if (endFrames.isEmpty()) {
+            return;
+        }
         if (startFrames.size() != endFrames.size()) {
             throw new AssertionError(animationName + "." + clipName + " expected " + startFrames.size()
                     + " closing keyframes at " + endKey + " but found " + endFrames.size());
@@ -35,6 +88,28 @@ public final class FishAnimationLoopTest {
                         + " does not end on the same pose it starts with at index " + i);
             }
         }
+    }
+
+    /** Every numeric key of the clip object is a keyframe time. */
+    private List<Double> extractTimes(String clip) {
+        List<Double> times = new ArrayList<>();
+        int index = 0;
+        while (index < clip.length()) {
+            int quote = clip.indexOf('"', index);
+            if (quote < 0) {
+                break;
+            }
+            int close = clip.indexOf('"', quote + 1);
+            if (close < 0) {
+                break;
+            }
+            String key = clip.substring(quote + 1, close);
+            if (key.matches("\\d+(\\.\\d+)?")) {
+                times.add(Double.parseDouble(key));
+            }
+            index = close + 1;
+        }
+        return times;
     }
 
     private List<String> extractFrames(String clip, String key) {

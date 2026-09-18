@@ -6,17 +6,6 @@ public final class GasFlowMeterReadoutHelper {
     private GasFlowMeterReadoutHelper() {
     }
 
-    public static Readout airPump(boolean active, int flowStrength) {
-        if (!active) {
-            return new Readout(
-                    Component.translatable("hud.aquanaut.gas_flow_meter.air_pump"),
-                    Component.translatable("hud.aquanaut.gas_flow_meter.inactive"));
-        }
-        return new Readout(
-                Component.translatable("hud.aquanaut.gas_flow_meter.air_pump"),
-                Component.translatable("hud.aquanaut.gas_flow_meter.active", signed(Math.max(0, flowStrength))));
-    }
-
     public static Readout airPipe(int flowStrength) {
         if (flowStrength == 0) {
             return new Readout(

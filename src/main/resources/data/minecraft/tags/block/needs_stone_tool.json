@@ -19,13 +19,6 @@
     "aquanaut:hard_shell_bricks",
     "aquanaut:polished_hard_shell_block",
     "aquanaut:hard_shell_frame",
-    "aquanaut:gas_pipe",
-    "aquanaut:lightning_generator",
-    "aquanaut:bubble_machine",
-    "aquanaut:swirl_generator",
-    "aquanaut:torpedo_launcher",
-    "aquanaut:air_pump",
-    "aquanaut:shield_generator",
-    "aquanaut:air_supply"
+    "aquanaut:gas_pipe"
   ]
 }

@@ -1,0 +1,36 @@
+{
+  "species_id": "aquanaut:pale_abyss_hydra",
+  "entity_id": "aquanaut:pale_abyss_hydra",
+  "category": "titan",
+  "diet": "carnivorous",
+  "aliases": [
+    "aquanaut:hydra",
+    "aquanaut:abyss_hydra"
+  ],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "stage": "encountered",
+      "text": "gui.aquanaut.notebook.waterlife.pale_abyss_hydra.paragraph_1"
+    },
+    {
+      "type": "component",
+      "stage": "encountered",
+      "component_kind": "sprite",
+      "resource": "aquanaut:item/pale_abyss_hydra_spawn_egg",
+      "caption": "gui.aquanaut.notebook.caption.identification_plate"
+    },
+    {
+      "type": "paragraph",
+      "stage": "captured",
+      "text": "gui.aquanaut.notebook.waterlife.pale_abyss_hydra.paragraph_2"
+    },
+    {
+      "type": "component",
+      "stage": "captured",
+      "component_kind": "model",
+      "resource": "aquanaut:pale_abyss_hydra",
+      "caption": "gui.aquanaut.notebook.caption.morphology_record"
+    }
+  ]
+}

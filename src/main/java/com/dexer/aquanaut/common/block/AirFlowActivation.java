@@ -55,27 +55,12 @@ public final class AirFlowActivation {
     }
 
     public static BlockState setActive(BlockState state, boolean active) {
-        Block block = state.getBlock();
-        if (block instanceof OmnidirectionalMachineBlock) {
-            return state.setValue(OmnidirectionalMachineBlock.ACTIVE, active);
-        }
-        if (block instanceof BubbleMachineBlock) {
-            return state.setValue(BubbleMachineBlock.ACTIVE, active);
-        }
-        if (block instanceof AirPumpBlock) {
-            return state.setValue(AirPumpBlock.ACTIVE, active);
-        }
-        if (block instanceof AbstractBottomAirConsumerBlock) {
-            return state.setValue(AbstractBottomAirConsumerBlock.ACTIVE, active);
-        }
-        return state;
+        return state.getBlock() instanceof AirConnector connector ? connector.withActive(state, active) : state;
     }
 
+    /** Only connectors that advertise an {@link AirConnector#ACTIVE} state need re-evaluating. */
     private static boolean isReactive(Block block) {
-        return block instanceof OmnidirectionalMachineBlock
-                || block instanceof BubbleMachineBlock
-                || block instanceof AirPumpBlock
-                || block instanceof AbstractBottomAirConsumerBlock;
+        return block instanceof AirConnector connector && connector.isActiveIndicator();
     }
 
     private static boolean pipeHasPositiveFlow(Level level, BlockPos pipePos, Direction face) {
@@ -101,19 +86,6 @@ public final class AirFlowActivation {
     }
 
     private static boolean isActiveState(BlockState state) {
-        Block block = state.getBlock();
-        if (block instanceof OmnidirectionalMachineBlock) {
-            return state.getValue(OmnidirectionalMachineBlock.ACTIVE);
-        }
-        if (block instanceof BubbleMachineBlock) {
-            return state.getValue(BubbleMachineBlock.ACTIVE);
-        }
-        if (block instanceof AirPumpBlock) {
-            return state.getValue(AirPumpBlock.ACTIVE);
-        }
-        if (block instanceof AbstractBottomAirConsumerBlock) {
-            return state.getValue(AbstractBottomAirConsumerBlock.ACTIVE);
-        }
-        return false;
+        return state.getBlock() instanceof AirConnector connector && connector.isActive(state);
     }
 }

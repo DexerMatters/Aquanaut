@@ -38,3 +38,9 @@ run/
 **/src/generated/**/.cache/
 repo/
 !**/src/**/repo/
+
+### Aquanaut asset pipeline scratch ###
+scripts/blockbench/src/
+
+### Logs ###
+/logs

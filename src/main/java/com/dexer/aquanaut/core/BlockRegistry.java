@@ -1,15 +1,11 @@
 package com.dexer.aquanaut.core;
 
 import com.dexer.aquanaut.Aquanaut;
-import com.dexer.aquanaut.common.block.AirPumpBlock;
-import com.dexer.aquanaut.common.block.AirSupplyBlock;
-import com.dexer.aquanaut.common.block.BubbleMachineBlock;
+import com.dexer.aquanaut.common.block.DissectionTableBlock;
 import com.dexer.aquanaut.common.block.DroopingSeaweedBlock;
 import com.dexer.aquanaut.common.block.FishingNetBlock;
 import com.dexer.aquanaut.common.block.GasPipeBlock;
-import com.dexer.aquanaut.common.block.OmnidirectionalMachineBlock;
 import com.dexer.aquanaut.common.block.PlexiglassBlock;
-import com.dexer.aquanaut.common.block.ShieldGeneratorBlock;
 import com.dexer.aquanaut.common.block.SeaweedBlock;
 import com.dexer.aquanaut.common.block.SeaweedStemBlock;
 import net.minecraft.util.ColorRGBA;
@@ -137,14 +133,14 @@ public final class BlockRegistry {
     public static final DeferredBlock<FishingNetBlock> FISHING_NET = fishingNet("fishing_net");
     public static final DeferredBlock<PlexiglassBlock> PLEXIGLASS = plexiglass("plexiglass");
 
-    public static final DeferredBlock<OmnidirectionalMachineBlock> LIGHTNING_GENERATOR = machine(
-            "lightning_generator");
-    public static final DeferredBlock<BubbleMachineBlock> BUBBLE_MACHINE = bubbleMachine("bubble_machine");
-    public static final DeferredBlock<OmnidirectionalMachineBlock> SWIRL_GENERATOR = machine("swirl_generator");
-    public static final DeferredBlock<OmnidirectionalMachineBlock> TORPEDO_LAUNCHER = machine("torpedo_launcher");
-    public static final DeferredBlock<AirPumpBlock> AIR_PUMP = airPump("air_pump");
-    public static final DeferredBlock<ShieldGeneratorBlock> SHIELD_GENERATOR = shieldGenerator("shield_generator");
-    public static final DeferredBlock<AirSupplyBlock> AIR_SUPPLY = airSupply("air_supply");
+    /** Dissection table: a 1x1 bench on its own, merged into 2x1 / 2x2 benches by placement. */
+    public static final DeferredBlock<DissectionTableBlock> DISSECTION_TABLE = BLOCKS.register("dissection_table",
+            () -> new DissectionTableBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(2.5F, 4.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .requiresCorrectToolForDrops()));
 
     private BlockRegistry() {
     }
@@ -219,46 +215,6 @@ public final class BlockRegistry {
                 .friction(0.8F)
                 .noOcclusion()
                 .isViewBlocking((state, level, pos) -> false)));
-    }
-
-    private static DeferredBlock<OmnidirectionalMachineBlock> machine(String name) {
-        return BLOCKS.register(name, () -> new OmnidirectionalMachineBlock(BlockBehaviour.Properties.of()
-                .mapColor(MapColor.QUARTZ)
-                .strength(3.5F, 5.0F)
-                .sound(SoundType.STONE)
-                .requiresCorrectToolForDrops()));
-    }
-
-    private static DeferredBlock<BubbleMachineBlock> bubbleMachine(String name) {
-        return BLOCKS.register(name, () -> new BubbleMachineBlock(BlockBehaviour.Properties.of()
-                .mapColor(MapColor.QUARTZ)
-                .strength(3.5F, 5.0F)
-                .sound(SoundType.STONE)
-                .requiresCorrectToolForDrops()));
-    }
-
-    private static DeferredBlock<AirPumpBlock> airPump(String name) {
-        return BLOCKS.register(name, () -> new AirPumpBlock(BlockBehaviour.Properties.of()
-                .mapColor(MapColor.QUARTZ)
-                .strength(3.5F, 5.0F)
-                .sound(SoundType.STONE)
-                .requiresCorrectToolForDrops()));
-    }
-
-    private static DeferredBlock<AirSupplyBlock> airSupply(String name) {
-        return BLOCKS.register(name, () -> new AirSupplyBlock(BlockBehaviour.Properties.of()
-                .mapColor(MapColor.QUARTZ)
-                .strength(3.5F, 5.0F)
-                .sound(SoundType.STONE)
-                .requiresCorrectToolForDrops()));
-    }
-
-    private static DeferredBlock<ShieldGeneratorBlock> shieldGenerator(String name) {
-        return BLOCKS.register(name, () -> new ShieldGeneratorBlock(BlockBehaviour.Properties.of()
-                .mapColor(MapColor.QUARTZ)
-                .strength(3.5F, 5.0F)
-                .sound(SoundType.STONE)
-                .requiresCorrectToolForDrops()));
     }
 
     private static DeferredBlock<GasPipeBlock> pipe(String name) {

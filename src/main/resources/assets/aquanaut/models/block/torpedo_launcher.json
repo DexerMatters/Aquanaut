@@ -1,8 +1,0 @@
-{
-  "parent": "aquanaut:block/template_machine",
-  "textures": {
-    "side": "aquanaut:block/torpedo_launcher",
-    "front": "aquanaut:block/torpedo_launcher_front",
-    "back": "aquanaut:block/hard_shell_frame"
-  }
-}

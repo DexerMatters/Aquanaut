@@ -1,0 +1,1176 @@
+{
+	"format_version": "1.12.0",
+	"minecraft:geometry": [
+		{
+			"description": {
+				"identifier": "geometry.unknown",
+				"texture_width": 256,
+				"texture_height": 1024,
+				"visible_bounds_width": 9,
+				"visible_bounds_height": 9,
+				"visible_bounds_offset": [0, 0.5, 0]
+			},
+			"bones": [
+				{
+					"name": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [0, 0, 0],
+					"cubes": [
+						{"origin": [-8, -8, -8], "size": [16, 16, 16], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_east",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [-16, 0, 0],
+					"cubes": [
+						{"origin": [-24, -7, -7], "size": [16, 14, 14], "uv": [65, 0]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_0_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_east",
+					"pivot": [-24, 0, 0],
+					"cubes": [
+						{"origin": [-28, -4, 0], "size": [8, 8, 18], "pivot": [-24, 0, 0], "rotation": [8.48905, -84.28941, 0], "uv": [159, 120]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_0_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_0_segment_1",
+					"pivot": [-41.5, 2.5, 2],
+					"cubes": [
+						{"origin": [-44.5, -0.5, 2], "size": [6, 6, 13], "pivot": [-41.5, 2.5, 2], "rotation": [-12.7532, -53.36589, 0], "uv": [212, 120]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_0_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_0_segment_2",
+					"pivot": [-51.5, -0.5, 9.5],
+					"cubes": [
+						{"origin": [-53.5, -2.5, 9.5], "size": [4, 4, 9], "pivot": [-51.5, -0.5, 9.5], "rotation": [9.32174, -24.22775, 0], "uv": [0, 149]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_0_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_0_segment_3",
+					"pivot": [-53, 0, 13.5],
+					"cubes": [
+						{"origin": [-54, -1, 13.5], "size": [2, 2, 8], "pivot": [-53, 0, 13.5], "rotation": [-67.87955, -13.35957, 0], "uv": [75, 149]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_0_subbranch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_0_branch_2",
+					"pivot": [-53.5, -7.5, 16.5],
+					"cubes": [
+						{"origin": [-54.5, -8.5, 16.5], "size": [2, 2, 6], "pivot": [-53.5, -7.5, 16.5], "rotation": [84.84794, -150.64121, 0], "uv": [96, 149]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_0_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_0_segment_2",
+					"pivot": [-47.5, 0.5, 6.5],
+					"cubes": [
+						{"origin": [-49.5, -1.5, 6.5], "size": [4, 4, 10], "pivot": [-47.5, 0.5, 6.5], "rotation": [5.41096, 21.35952, 0], "uv": [27, 149]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_0_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_0_branch_1",
+					"pivot": [-44, 1.5, 16],
+					"cubes": [
+						{"origin": [-45, 0.5, 16], "size": [2, 2, 7], "pivot": [-44, 1.5, 16], "rotation": [1.83039, -48.92301, 0], "uv": [56, 149]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_0_branch_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_0_segment_1",
+					"pivot": [-34, 1.5, 1],
+					"cubes": [
+						{"origin": [-35, 0.5, 1], "size": [2, 2, 7], "pivot": [-34, 1.5, 1], "rotation": [-71.28803, -86.88476, 0], "uv": [113, 149]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_0_subbranch_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_0_branch_3",
+					"pivot": [-36, -5, 1],
+					"cubes": [
+						{"origin": [-37, -6, 1], "size": [2, 2, 6], "pivot": [-36, -5, 1], "rotation": [-16.84524, -174.48106, 0], "uv": [132, 149]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_west",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [16, 0, 0],
+					"cubes": [
+						{"origin": [8, -7, -7], "size": [16, 14, 14], "uv": [126, 0]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_1_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_west",
+					"pivot": [24, 2, 0],
+					"cubes": [
+						{"origin": [20, -2, 0], "size": [8, 8, 19], "pivot": [24, 2, 0], "rotation": [6.68442, 77.59258, 0], "uv": [149, 149]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_1_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_1_segment_1",
+					"pivot": [42.5, 4, 4],
+					"cubes": [
+						{"origin": [39.5, 1, 4], "size": [6, 6, 15], "pivot": [42.5, 4, 4], "rotation": [30.01987, 123.69007, 0], "uv": [204, 149]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_1_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_1_segment_2",
+					"pivot": [53.5, 11.5, -3],
+					"cubes": [
+						{"origin": [51.5, 9.5, -3], "size": [4, 4, 10], "pivot": [53.5, 11.5, -3], "rotation": [-13.15372, 159.19321, 0], "uv": [0, 177]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_1_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_1_segment_3",
+					"pivot": [55, 10.5, -7.5],
+					"cubes": [
+						{"origin": [54, 9.5, -7.5], "size": [2, 2, 9], "pivot": [55, 10.5, -7.5], "rotation": [-85.1228, 60.94395, 0], "uv": [81, 177]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_1_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_1_segment_2",
+					"pivot": [49.5, 8.5, -0.5],
+					"cubes": [
+						{"origin": [47.5, 6.5, -0.5], "size": [4, 4, 11], "pivot": [49.5, 8.5, -0.5], "rotation": [16.25857, 47.31784, 0], "uv": [29, 177]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_1_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_1_branch_1",
+					"pivot": [57.5, 11.5, 6.5],
+					"cubes": [
+						{"origin": [56.5, 10.5, 6.5], "size": [2, 2, 8], "pivot": [57.5, 11.5, 6.5], "rotation": [75.79204, -26.08341, 0], "uv": [60, 177]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_top",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [0, 16, 0],
+					"cubes": [
+						{"origin": [-7, 8, -7], "size": [14, 16, 14], "uv": [187, 0]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_2_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_top",
+					"pivot": [0, 24, 2],
+					"cubes": [
+						{"origin": [-4, 20, 2], "size": [8, 8, 20], "pivot": [0, 24, 2], "rotation": [77.79313, -56.30993, 0], "uv": [104, 177]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_2_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_2_segment_1",
+					"pivot": [-3.5, 43.5, 4.5],
+					"cubes": [
+						{"origin": [-6.5, 40.5, 4.5], "size": [6, 6, 13], "pivot": [-3.5, 43.5, 4.5], "rotation": [49.33078, 40.03026, 0], "uv": [161, 177]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_2_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_2_segment_2",
+					"pivot": [2, 53.5, 11],
+					"cubes": [
+						{"origin": [0, 51.5, 11], "size": [4, 4, 11], "pivot": [2, 53.5, 11], "rotation": [28.23843, -40.46223, 0], "uv": [200, 177]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_2_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_2_segment_3",
+					"pivot": [-1, 56, 14.5],
+					"cubes": [
+						{"origin": [-2, 55, 14.5], "size": [2, 2, 8], "pivot": [-1, 56, 14.5], "rotation": [-44.12508, -9.8534, 0], "uv": [52, 206]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_2_subbranch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_2_branch_2",
+					"pivot": [-2, 50.5, 20],
+					"cubes": [
+						{"origin": [-3, 49.5, 20], "size": [2, 2, 8], "pivot": [-2, 50.5, 20], "rotation": [59.71936, -172.91906, 0], "uv": [73, 206]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_2_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_2_segment_2",
+					"pivot": [0, 49.5, 8.5],
+					"cubes": [
+						{"origin": [-2, 47.5, 8.5], "size": [4, 4, 12], "pivot": [0, 49.5, 8.5], "rotation": [20.11914, 119.68907, 0], "uv": [0, 206]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_2_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_2_branch_1",
+					"pivot": [10, 53.5, 3],
+					"cubes": [
+						{"origin": [9, 52.5, 3], "size": [2, 2, 7], "pivot": [10, 53.5, 3], "rotation": [-48.62929, 103.78882, 0], "uv": [33, 206]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_bottom",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [0, -16, 0],
+					"cubes": [
+						{"origin": [-7, -24, -7], "size": [14, 16, 14], "uv": [0, 33]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_3_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_bottom",
+					"pivot": [-3, -24, 0],
+					"cubes": [
+						{"origin": [-7, -28, 0], "size": [8, 8, 18], "pivot": [-3, -24, 0], "rotation": [-73.44166, -19.65382, 0], "uv": [94, 206]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_3_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_3_segment_1",
+					"pivot": [-4.5, -41.5, 5],
+					"cubes": [
+						{"origin": [-7.5, -44.5, 5], "size": [6, 6, 15], "pivot": [-4.5, -41.5, 5], "rotation": [-42.75888, -135, 0], "uv": [147, 206]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_3_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_3_segment_2",
+					"pivot": [-12.5, -51.5, -3],
+					"cubes": [
+						{"origin": [-14.5, -53.5, -3], "size": [4, 4, 12], "pivot": [-12.5, -51.5, -3], "rotation": [-24.21681, 136.7357, 0], "uv": [190, 206]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_3_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_3_segment_3",
+					"pivot": [-9, -54, -7],
+					"cubes": [
+						{"origin": [-10, -55, -7], "size": [2, 2, 9], "pivot": [-9, -54, -7], "rotation": [-66.78926, 19.92342, 0], "uv": [21, 233]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_3_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_3_segment_2",
+					"pivot": [-9.5, -47.5, 0],
+					"cubes": [
+						{"origin": [-11.5, -49.5, 0], "size": [4, 4, 10], "pivot": [-9.5, -47.5, 0], "rotation": [-1.68857, 146.61706, 0], "uv": [223, 206]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_3_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_3_branch_1",
+					"pivot": [-4, -48, -8.5],
+					"cubes": [
+						{"origin": [-5, -49, -8.5], "size": [2, 2, 8], "pivot": [-4, -48, -8.5], "rotation": [-0.57188, -143.17389, 0], "uv": [0, 233]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_3_branch_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_3_segment_1",
+					"pivot": [-4, -34, 3],
+					"cubes": [
+						{"origin": [-5, -35, 3], "size": [2, 2, 8], "pivot": [-4, -34, 3], "rotation": [-4.12178, -87.26773, 0], "uv": [44, 233]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_front",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [0, 0, 16],
+					"cubes": [
+						{"origin": [-7, -7, 8], "size": [14, 14, 16], "uv": [57, 33]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_4_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_front",
+					"pivot": [0, 2, 24],
+					"cubes": [
+						{"origin": [-4, -2, 24], "size": [8, 8, 19], "pivot": [0, 2, 24], "rotation": [10.15439, -5.71059, 0], "uv": [65, 233]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_4_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_4_segment_1",
+					"pivot": [-2, 5.5, 42.5],
+					"cubes": [
+						{"origin": [-5, 2.5, 42.5], "size": [6, 6, 13], "pivot": [-2, 5.5, 42.5], "rotation": [6.86731, 38.4802, 0], "uv": [120, 233]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_4_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_4_segment_2",
+					"pivot": [6, 7, 52.5],
+					"cubes": [
+						{"origin": [4, 5, 52.5], "size": [4, 4, 9], "pivot": [6, 7, 52.5], "rotation": [-24.49183, -24.34109, 0], "uv": [159, 233]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_4_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_4_segment_3",
+					"pivot": [4.5, 5.5, 56],
+					"cubes": [
+						{"origin": [3.5, 4.5, 56], "size": [2, 2, 8], "pivot": [4.5, 5.5, 56], "rotation": [-74.28295, -162.6921, 0], "uv": [236, 233]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_4_subbranch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_4_branch_2",
+					"pivot": [4, -2, 54],
+					"cubes": [
+						{"origin": [3, -3, 54], "size": [2, 2, 7], "pivot": [4, -2, 54], "rotation": [57.57061, -4.36124, 0], "uv": [0, 261]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_4_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_4_segment_2",
+					"pivot": [3, 6.5, 48.5],
+					"cubes": [
+						{"origin": [1, 4.5, 48.5], "size": [4, 4, 11], "pivot": [3, 6.5, 48.5], "rotation": [10.55936, 112.94474, 0], "uv": [186, 233]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_4_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_4_branch_1",
+					"pivot": [13, 8.5, 44.5],
+					"cubes": [
+						{"origin": [12, 7.5, 44.5], "size": [2, 2, 7], "pivot": [13, 8.5, 44.5], "rotation": [-59.3291, 104.74271, 0], "uv": [217, 233]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_back",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [0, 0, -16],
+					"cubes": [
+						{"origin": [-7, -7, -24], "size": [14, 14, 16], "uv": [118, 33]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_5_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_back",
+					"pivot": [2, 0, -24],
+					"cubes": [
+						{"origin": [-2, -4, -24], "size": [8, 8, 20], "pivot": [2, 0, -24], "rotation": [10.00987, 168.69007, 0], "uv": [19, 261]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_5_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_5_segment_1",
+					"pivot": [6, 3.5, -43.5],
+					"cubes": [
+						{"origin": [3, 0.5, -43.5], "size": [6, 6, 15], "pivot": [6, 3.5, -43.5], "rotation": [-4.61828, -136.63658, 0], "uv": [76, 261]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_5_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_5_segment_2",
+					"pivot": [-4.5, 2.5, -54.5],
+					"cubes": [
+						{"origin": [-6.5, 0.5, -54.5], "size": [4, 4, 10], "pivot": [-4.5, 2.5, -54.5], "rotation": [28.60424, 158.68209, 0], "uv": [119, 261]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_5_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_5_segment_3",
+					"pivot": [-3, 5, -58.5],
+					"cubes": [
+						{"origin": [-4, 4, -58.5], "size": [2, 2, 9], "pivot": [-3, 5, -58.5], "rotation": [-47.73071, 174.14814, 0], "uv": [202, 261]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_5_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_5_segment_2",
+					"pivot": [-0.5, 3, -50.5],
+					"cubes": [
+						{"origin": [-2.5, 1, -50.5], "size": [4, 4, 12], "pivot": [-0.5, 3, -50.5], "rotation": [7.54185, 148.95736, 0], "uv": [148, 261]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_5_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_5_branch_1",
+					"pivot": [5.5, 4.5, -60.5],
+					"cubes": [
+						{"origin": [4.5, 3.5, -60.5], "size": [2, 2, 8], "pivot": [5.5, 4.5, -60.5], "rotation": [2.54804, -140.6834, 0], "uv": [181, 261]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_east_top",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [-15, 15, 0],
+					"cubes": [
+						{"origin": [-22, 8, -6], "size": [14, 14, 12], "uv": [179, 33]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_6_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_east_top",
+					"pivot": [-22, 22, 0],
+					"cubes": [
+						{"origin": [-26, 18, 0], "size": [8, 8, 18], "pivot": [-22, 22, 0], "rotation": [42.97177, -80.53768, 0], "uv": [0, 290]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_6_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_6_segment_1",
+					"pivot": [-35, 34.5, 2],
+					"cubes": [
+						{"origin": [-38, 31.5, 2], "size": [6, 6, 13], "pivot": [-35, 34.5, 2], "rotation": [22.61674, -37.87498, 0], "uv": [53, 290]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_6_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_6_segment_2",
+					"pivot": [-42.5, 39.5, 11.5],
+					"cubes": [
+						{"origin": [-44.5, 37.5, 11.5], "size": [4, 4, 11], "pivot": [-42.5, 39.5, 11.5], "rotation": [45.39214, -9.72758, 0], "uv": [92, 290]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_6_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_6_segment_3",
+					"pivot": [-43, 43.5, 15],
+					"cubes": [
+						{"origin": [-44, 42.5, 15], "size": [2, 2, 8], "pivot": [-43, 43.5, 15], "rotation": [-31.85904, -1.72007, 0], "uv": [171, 290]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_6_subbranch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_6_branch_2",
+					"pivot": [-43, 39.5, 22],
+					"cubes": [
+						{"origin": [-44, 38.5, 22], "size": [2, 2, 6], "pivot": [-43, 39.5, 22], "rotation": [50.38522, -178.84071, 0], "uv": [192, 290]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_6_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_6_segment_2",
+					"pivot": [-39.5, 37.5, 8],
+					"cubes": [
+						{"origin": [-41.5, 35.5, 8], "size": [4, 4, 10], "pivot": [-39.5, 37.5, 8], "rotation": [14.5292, 37.63308, 0], "uv": [123, 290]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_6_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_6_branch_1",
+					"pivot": [-33.5, 40, 15.5],
+					"cubes": [
+						{"origin": [-34.5, 39, 15.5], "size": [2, 2, 7], "pivot": [-33.5, 40, 15.5], "rotation": [-51.36396, 65.42499, 0], "uv": [152, 290]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_6_branch_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_6_segment_1",
+					"pivot": [-29.5, 29.5, 1],
+					"cubes": [
+						{"origin": [-30.5, 28.5, 1], "size": [2, 2, 7], "pivot": [-29.5, 29.5, 1], "rotation": [-36.49553, -88.48105, 0], "uv": [209, 290]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_6_subbranch_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_6_branch_3",
+					"pivot": [-35, 25.5, 1],
+					"cubes": [
+						{"origin": [-36, 24.5, 1], "size": [2, 2, 6], "pivot": [-35, 25.5, 1], "rotation": [-11.84114, -166.35299, 0], "uv": [228, 290]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_west_top",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [15, 15, 0],
+					"cubes": [
+						{"origin": [8, 8, -6], "size": [14, 14, 12], "uv": [0, 64]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_7_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_west_top",
+					"pivot": [22, 22, 2],
+					"cubes": [
+						{"origin": [18, 18, 2], "size": [8, 8, 19], "pivot": [22, 22, 2], "rotation": [45.62111, 83.4802, 0], "uv": [0, 317]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_7_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_7_segment_1",
+					"pivot": [35, 35.5, 3.5],
+					"cubes": [
+						{"origin": [32, 32.5, 3.5], "size": [6, 6, 15], "pivot": [35, 35.5, 3.5], "rotation": [24.78172, 146.65929, 0], "uv": [55, 317]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_7_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_7_segment_2",
+					"pivot": [42.5, 42, -8],
+					"cubes": [
+						{"origin": [40.5, 40, -8], "size": [4, 4, 12], "pivot": [42.5, 42, -8], "rotation": [50.38568, 163.81079, 0], "uv": [98, 317]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_7_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_7_segment_3",
+					"pivot": [43.5, 46.5, -11.5],
+					"cubes": [
+						{"origin": [42.5, 45.5, -11.5], "size": [2, 2, 9], "pivot": [43.5, 46.5, -11.5], "rotation": [-26.2438, 177.55923, 0], "uv": [183, 317]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_7_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_7_segment_2",
+					"pivot": [39.5, 39.5, -3.5],
+					"cubes": [
+						{"origin": [37.5, 37.5, -3.5], "size": [4, 4, 11], "pivot": [39.5, 39.5, -3.5], "rotation": [15.04629, 70.92261, 0], "uv": [131, 317]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_7_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_7_branch_1",
+					"pivot": [49.5, 42.5, 0],
+					"cubes": [
+						{"origin": [48.5, 41.5, 0], "size": [2, 2, 8], "pivot": [49.5, 42.5, 0], "rotation": [83.17888, 25.81943, 0], "uv": [162, 317]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_east_bottom",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [-15, -15, 0],
+					"cubes": [
+						{"origin": [-22, -22, -6], "size": [14, 14, 12], "uv": [53, 64]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_8_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_east_bottom",
+					"pivot": [-22, -22, -2],
+					"cubes": [
+						{"origin": [-26, -26, -2], "size": [8, 8, 20], "pivot": [-22, -22, -2], "rotation": [-46.0426, -101.63363, 0], "uv": [0, 345]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_8_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_8_segment_1",
+					"pivot": [-35.5, -36.5, -5],
+					"cubes": [
+						{"origin": [-38.5, -39.5, -5], "size": [6, 6, 13], "pivot": [-35.5, -36.5, -5], "rotation": [-19.98126, -41.53177, 0], "uv": [57, 345]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_8_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_8_segment_2",
+					"pivot": [-43.5, -41, 4],
+					"cubes": [
+						{"origin": [-45.5, -43, 4], "size": [4, 4, 9], "pivot": [-43.5, -41, 4], "rotation": [-51.81293, -19.02561, 0], "uv": [96, 345]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_8_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_8_segment_3",
+					"pivot": [-44.5, -44.5, 6.5],
+					"cubes": [
+						{"origin": [-45.5, -45.5, 6.5], "size": [2, 2, 8], "pivot": [-44.5, -44.5, 6.5], "rotation": [-48.73325, -176.23563, 0], "uv": [175, 345]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_8_subbranch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_8_branch_2",
+					"pivot": [-45, -50.5, 1],
+					"cubes": [
+						{"origin": [-46, -51.5, 1], "size": [2, 2, 8], "pivot": [-45, -50.5, 1], "rotation": [30.51144, -1.45738, 0], "uv": [196, 345]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_8_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_8_segment_2",
+					"pivot": [-40.5, -39.5, 0.5],
+					"cubes": [
+						{"origin": [-42.5, -41.5, 0.5], "size": [4, 4, 12], "pivot": [-40.5, -39.5, 0.5], "rotation": [3.55937, 33.72534, 0], "uv": [123, 345]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_8_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_8_branch_1",
+					"pivot": [-34, -39, 10.5],
+					"cubes": [
+						{"origin": [-35, -40, 10.5], "size": [2, 2, 7], "pivot": [-34, -39, 10.5], "rotation": [1.20494, -36.51101, 0], "uv": [156, 345]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_west_bottom",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [15, -15, 0],
+					"cubes": [
+						{"origin": [8, -22, -6], "size": [14, 14, 12], "uv": [106, 64]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_9_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_west_bottom",
+					"pivot": [22, -22, 0],
+					"cubes": [
+						{"origin": [18, -26, 0], "size": [8, 8, 18], "pivot": [22, -22, 0], "rotation": [-42.67465, 77.47119, 0], "uv": [0, 374]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_9_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_9_segment_1",
+					"pivot": [35, -34, 3],
+					"cubes": [
+						{"origin": [32, -37, 3], "size": [6, 6, 15], "pivot": [35, -34, 3], "rotation": [-25.94257, 35.09582, 0], "uv": [53, 374]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_9_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_9_segment_2",
+					"pivot": [43, -40.5, 14],
+					"cubes": [
+						{"origin": [41, -42.5, 14], "size": [4, 4, 10], "pivot": [43, -40.5, 14], "rotation": [-51.99504, 7.35238, 0], "uv": [96, 374]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_9_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_9_segment_3",
+					"pivot": [43.5, -44.5, 17],
+					"cubes": [
+						{"origin": [42.5, -45.5, 17], "size": [2, 2, 9], "pivot": [43.5, -44.5, 17], "rotation": [25.40175, 1.07391, 0], "uv": [175, 374]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_9_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_9_segment_2",
+					"pivot": [40, -38, 10],
+					"cubes": [
+						{"origin": [38, -40, 10], "size": [4, 4, 10], "pivot": [40, -38, 10], "rotation": [2.08311, -40.77171, 0], "uv": [125, 374]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_9_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_9_branch_1",
+					"pivot": [33.5, -37.5, 17.5],
+					"cubes": [
+						{"origin": [32.5, -38.5, 17.5], "size": [2, 2, 8], "pivot": [33.5, -37.5, 17.5], "rotation": [-67.99012, -46.84123, 0], "uv": [154, 374]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_9_branch_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_9_segment_1",
+					"pivot": [29.5, -29, 1.5],
+					"cubes": [
+						{"origin": [28.5, -30, 1.5], "size": [2, 2, 8], "pivot": [29.5, -29, 1.5], "rotation": [-56.6778, -87.05184, 0], "uv": [198, 374]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_east_front",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [-15, 0, 15],
+					"cubes": [
+						{"origin": [-22, -6, 8], "size": [14, 12, 14], "uv": [159, 64]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_10_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_east_front",
+					"pivot": [-22, 0, 22],
+					"cubes": [
+						{"origin": [-26, -4, 22], "size": [8, 8, 19], "pivot": [-22, 0, 22], "rotation": [5.68692, -44.19307, 0], "uv": [0, 401]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_10_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_10_segment_1",
+					"pivot": [-35, 2, 35.5],
+					"cubes": [
+						{"origin": [-38, -1, 35.5], "size": [6, 6, 13], "pivot": [-35, 2, 35.5], "rotation": [-42.73778, -42.7974, 0], "uv": [55, 401]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_10_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_10_segment_2",
+					"pivot": [-41.5, -7, 42.5],
+					"cubes": [
+						{"origin": [-43.5, -9, 42.5], "size": [4, 4, 11], "pivot": [-41.5, -7, 42.5], "rotation": [15.03011, -51.70984, 0], "uv": [94, 401]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_10_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_10_segment_3",
+					"pivot": [-45.5, -5.5, 45.5],
+					"cubes": [
+						{"origin": [-46.5, -6.5, 45.5], "size": [2, 2, 8], "pivot": [-45.5, -5.5, 45.5], "rotation": [-57.18304, -17.48919, 0], "uv": [175, 401]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_10_subbranch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_10_branch_2",
+					"pivot": [-47, -12, 49.5],
+					"cubes": [
+						{"origin": [-48, -13, 49.5], "size": [2, 2, 7], "pivot": [-47, -12, 49.5], "rotation": [70.10386, -165.98527, 0], "uv": [196, 401]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_10_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_10_segment_2",
+					"pivot": [-39, -3.5, 40],
+					"cubes": [
+						{"origin": [-41, -5.5, 40], "size": [4, 4, 11], "pivot": [-39, -3.5, 40], "rotation": [-1.6843, 35.58169, 0], "uv": [125, 401]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_10_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_10_branch_1",
+					"pivot": [-32.5, -4, 49],
+					"cubes": [
+						{"origin": [-33.5, -5, 49], "size": [2, 2, 7], "pivot": [-32.5, -4, 49], "rotation": [-0.57043, -34.62732, 0], "uv": [156, 401]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_west_front",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [15, 0, 15],
+					"cubes": [
+						{"origin": [8, -6, 8], "size": [14, 12, 14], "uv": [0, 91]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_12_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_west_front",
+					"pivot": [22, 0, 22],
+					"cubes": [
+						{"origin": [18, -4, 22], "size": [8, 8, 18], "pivot": [22, 0, 22], "rotation": [10.16227, 45.80693, 0], "uv": [0, 458]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_12_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_12_segment_1",
+					"pivot": [34.5, 3, 34.5],
+					"cubes": [
+						{"origin": [31.5, 0, 34.5], "size": [6, 6, 13], "pivot": [34.5, 3, 34.5], "rotation": [-40.6548, 46.606, 0], "uv": [53, 458]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_12_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_12_segment_2",
+					"pivot": [41.5, -5.5, 41.5],
+					"cubes": [
+						{"origin": [39.5, -7.5, 41.5], "size": [4, 4, 9], "pivot": [41.5, -5.5, 41.5], "rotation": [11.57457, 55.00798, 0], "uv": [92, 458]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_12_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_12_segment_3",
+					"pivot": [45, -4.5, 44],
+					"cubes": [
+						{"origin": [44, -5.5, 44], "size": [2, 2, 8], "pivot": [45, -4.5, 44], "rotation": [2.47082, -22.82933, 0], "uv": [167, 458]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_12_subbranch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_12_branch_2",
+					"pivot": [42, -4, 51.5],
+					"cubes": [
+						{"origin": [41, -5, 51.5], "size": [2, 2, 6], "pivot": [42, -4, 51.5], "rotation": [1.24997, 138.89228, 0], "uv": [188, 458]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_12_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_12_segment_2",
+					"pivot": [39, -2.5, 39],
+					"cubes": [
+						{"origin": [37, -4.5, 39], "size": [4, 4, 10], "pivot": [39, -2.5, 39], "rotation": [-1.25634, 124.6134, 0], "uv": [119, 458]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_12_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_12_branch_1",
+					"pivot": [47, -2.5, 33.5],
+					"cubes": [
+						{"origin": [46, -3.5, 33.5], "size": [2, 2, 7], "pivot": [47, -2.5, 33.5], "rotation": [-71.43807, 127.17671, 0], "uv": [148, 458]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_12_branch_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_12_segment_1",
+					"pivot": [29, 1.5, 29.5],
+					"cubes": [
+						{"origin": [28, 0.5, 29.5], "size": [2, 2, 7], "pivot": [29, 1.5, 29.5], "rotation": [80.42006, -43.08185, 0], "uv": [205, 458]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_12_subbranch_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_12_branch_3",
+					"pivot": [28, 8.5, 30.5],
+					"cubes": [
+						{"origin": [27, 7.5, 30.5], "size": [2, 2, 6], "pivot": [28, 8.5, 30.5], "rotation": [16.45969, -130.22362, 0], "uv": [224, 458]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_east_back",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [-15, 0, -15],
+					"cubes": [
+						{"origin": [-22, -6, -22], "size": [14, 12, 14], "uv": [57, 91]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_13_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_east_back",
+					"pivot": [-22, 0, -22],
+					"cubes": [
+						{"origin": [-26, -4, -22], "size": [8, 8, 19], "pivot": [-22, 0, -22], "rotation": [-6.81448, -135.80693, 0], "uv": [0, 485]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_13_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_13_segment_1",
+					"pivot": [-35, -2.5, -35.5],
+					"cubes": [
+						{"origin": [-38, -5.5, -35.5], "size": [6, 6, 15], "pivot": [-35, -2.5, -35.5], "rotation": [45.80693, -143.1301, 0], "uv": [55, 485]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_13_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_13_segment_2",
+					"pivot": [-41.5, 8.5, -44],
+					"cubes": [
+						{"origin": [-43.5, 6.5, -44], "size": [4, 4, 10], "pivot": [-41.5, 8.5, -44], "rotation": [-17.5484, -124.69515, 0], "uv": [98, 485]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_13_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_13_segment_3",
+					"pivot": [-45.5, 7, -46.5],
+					"cubes": [
+						{"origin": [-46.5, 6, -46.5], "size": [2, 2, 9], "pivot": [-45.5, 7, -46.5], "rotation": [-66.71126, -25.21574, 0], "uv": [179, 485]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_13_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_13_segment_2",
+					"pivot": [-39, 4.5, -41],
+					"cubes": [
+						{"origin": [-41, 2.5, -41], "size": [4, 4, 11], "pivot": [-39, 4.5, -41], "rotation": [19.49789, 137.91415, 0], "uv": [127, 485]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_13_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_13_branch_1",
+					"pivot": [-32, 8, -48.5],
+					"cubes": [
+						{"origin": [-33, 7, -48.5], "size": [2, 2, 8], "pivot": [-32, 8, -48.5], "rotation": [70.90694, -136.42112, 0], "uv": [158, 485]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_west_back",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [15, 0, -15],
+					"cubes": [
+						{"origin": [8, -6, -22], "size": [14, 12, 14], "uv": [114, 91]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_11_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_west_back",
+					"pivot": [22, 0, -22],
+					"cubes": [
+						{"origin": [18, -4, -22], "size": [8, 8, 20], "pivot": [22, 0, -22], "rotation": [-4.55491, 135.80693, 0], "uv": [0, 429]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_11_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_11_segment_1",
+					"pivot": [36, -1.5, -36.5],
+					"cubes": [
+						{"origin": [33, -4.5, -36.5], "size": [6, 6, 15], "pivot": [36, -1.5, -36.5], "rotation": [44.3486, 144.09028, 0], "uv": [57, 429]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_11_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_11_segment_2",
+					"pivot": [42.5, 9, -45],
+					"cubes": [
+						{"origin": [40.5, 7, -45], "size": [4, 4, 12], "pivot": [42.5, 9, -45], "rotation": [-11.62689, 126.63411, 0], "uv": [100, 429]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_11_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_11_segment_3",
+					"pivot": [47, 8, -48.5],
+					"cubes": [
+						{"origin": [46, 7, -48.5], "size": [2, 2, 9], "pivot": [47, 8, -48.5], "rotation": [-75.14908, 41.21644, 0], "uv": [187, 429]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_11_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_11_segment_2",
+					"pivot": [40, 5, -42],
+					"cubes": [
+						{"origin": [38, 3, -42], "size": [4, 4, 12], "pivot": [40, 5, -42], "rotation": [19.22892, 65.41277, 0], "uv": [133, 429]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_11_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_11_branch_1",
+					"pivot": [50.5, 9, -37.5],
+					"cubes": [
+						{"origin": [49.5, 8, -37.5], "size": [2, 2, 8], "pivot": [50.5, 9, -37.5], "rotation": [81.90327, -19.12491, 0], "uv": [166, 429]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_top_front",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [0, 15, 15],
+					"cubes": [
+						{"origin": [-6, 8, 8], "size": [12, 14, 14], "uv": [171, 91]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_14_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_top_front",
+					"pivot": [0, 22, 22],
+					"cubes": [
+						{"origin": [-4, 18, 22], "size": [8, 8, 20], "pivot": [0, 22, 22], "rotation": [45.39214, -9.72758, 0], "uv": [0, 513]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_14_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_14_segment_1",
+					"pivot": [-2.5, 36, 36],
+					"cubes": [
+						{"origin": [-5.5, 33, 36], "size": [6, 6, 13], "pivot": [-2.5, 36, 36], "rotation": [33.84904, -52.43141, 0], "uv": [57, 513]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_14_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_14_segment_2",
+					"pivot": [-11, 43, 42.5],
+					"cubes": [
+						{"origin": [-13, 41, 42.5], "size": [4, 4, 11], "pivot": [-11, 43, 42.5], "rotation": [51.32655, 38.65981, 0], "uv": [96, 513]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_14_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_14_segment_3",
+					"pivot": [-9, 47, 45],
+					"cubes": [
+						{"origin": [-10, 46, 45], "size": [2, 2, 8], "pivot": [-9, 47, 45], "rotation": [-20.47959, 5.13669, 0], "uv": [179, 513]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_14_subbranch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_14_branch_2",
+					"pivot": [-8.5, 44, 52.5],
+					"cubes": [
+						{"origin": [-9.5, 43, 52.5], "size": [2, 2, 8], "pivot": [-8.5, 44, 52.5], "rotation": [37.71533, 176.92457, 0], "uv": [200, 513]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_14_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_14_segment_2",
+					"pivot": [-8, 40.5, 40],
+					"cubes": [
+						{"origin": [-10, 38.5, 40], "size": [4, 4, 12], "pivot": [-8, 40.5, 40], "rotation": [17.10577, 24.47756, 0], "uv": [127, 513]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_14_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_14_branch_1",
+					"pivot": [-3, 44, 50.5],
+					"cubes": [
+						{"origin": [-4, 43, 50.5], "size": [2, 2, 7], "pivot": [-3, 44, 50.5], "rotation": [5.71785, -46.53539, 0], "uv": [160, 513]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_top_back",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [0, 15, -15],
+					"cubes": [
+						{"origin": [-6, 8, -22], "size": [12, 14, 14], "uv": [0, 120]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_15_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_top_back",
+					"pivot": [0, 22, -22],
+					"cubes": [
+						{"origin": [-4, 18, -22], "size": [8, 8, 18], "pivot": [0, 22, -22], "rotation": [45.51763, 171.8699, 0], "uv": [0, 542]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_15_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_15_segment_1",
+					"pivot": [2, 35, -34.5],
+					"cubes": [
+						{"origin": [-1, 32, -34.5], "size": [6, 6, 15], "pivot": [2, 35, -34.5], "rotation": [28.48532, 132.70939, 0], "uv": [53, 542]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_15_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_15_segment_2",
+					"pivot": [11.5, 42, -43.5],
+					"cubes": [
+						{"origin": [9.5, 40, -43.5], "size": [4, 4, 12], "pivot": [11.5, 42, -43.5], "rotation": [51.16091, -142.76517, 0], "uv": [96, 542]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_15_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_15_segment_3",
+					"pivot": [9.5, 46.5, -46.5],
+					"cubes": [
+						{"origin": [8.5, 45.5, -46.5], "size": [2, 2, 9], "pivot": [9.5, 46.5, -46.5], "rotation": [-21.08201, -174.98697, 0], "uv": [179, 542]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_15_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_15_segment_2",
+					"pivot": [8, 39.5, -40],
+					"cubes": [
+						{"origin": [6, 37.5, -40], "size": [4, 4, 10], "pivot": [8, 39.5, -40], "rotation": [15.90948, 56.53529, 0], "uv": [129, 542]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_15_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_15_branch_1",
+					"pivot": [16, 42, -34.5],
+					"cubes": [
+						{"origin": [15, 41, -34.5], "size": [2, 2, 8], "pivot": [16, 42, -34.5], "rotation": [79.48259, -10.24593, 0], "uv": [158, 542]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_15_branch_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_15_segment_1",
+					"pivot": [1, 29.5, -29],
+					"cubes": [
+						{"origin": [0, 28.5, -29], "size": [2, 2, 8], "pivot": [1, 29.5, -29], "rotation": [-0.51566, 97.05873, 0], "uv": [202, 542]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_bottom_front",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [0, -15, 15],
+					"cubes": [
+						{"origin": [-6, -22, 8], "size": [12, 14, 14], "uv": [53, 120]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_16_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_bottom_front",
+					"pivot": [0, -22, 22],
+					"cubes": [
+						{"origin": [-4, -26, 22], "size": [8, 8, 19], "pivot": [0, -22, 22], "rotation": [-45.07758, 12.875, 0], "uv": [0, 569]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_16_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_16_segment_1",
+					"pivot": [3, -35.5, 35],
+					"cubes": [
+						{"origin": [0, -38.5, 35], "size": [6, 6, 13], "pivot": [3, -35.5, 35], "rotation": [-35.63143, -50.01311, 0], "uv": [55, 569]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_16_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_16_segment_2",
+					"pivot": [-5, -43, 42],
+					"cubes": [
+						{"origin": [-7, -45, 42], "size": [4, 4, 9], "pivot": [-5, -43, 42], "rotation": [-49.7448, 44.3704, 0], "uv": [94, 569]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_16_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_16_segment_3",
+					"pivot": [-3, -46.5, 44],
+					"cubes": [
+						{"origin": [-4, -47.5, 44], "size": [2, 2, 8], "pivot": [-3, -46.5, 44], "rotation": [-42.04283, 172.48778, 0], "uv": [171, 569]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_16_subbranch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_16_branch_2",
+					"pivot": [-2, -52, 38],
+					"cubes": [
+						{"origin": [-3, -53, 38], "size": [2, 2, 7], "pivot": [-2, -52, 38], "rotation": [25.57927, 3.12232, 0], "uv": [192, 569]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_16_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_16_segment_2",
+					"pivot": [-2, -40, 39.5],
+					"cubes": [
+						{"origin": [-4, -42, 39.5], "size": [4, 4, 11], "pivot": [-2, -40, 39.5], "rotation": [-0.17427, 27.16595, 0], "uv": [121, 569]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_16_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_16_branch_1",
+					"pivot": [3, -40, 49.5],
+					"cubes": [
+						{"origin": [2, -41, 49.5], "size": [2, 2, 7], "pivot": [3, -40, 49.5], "rotation": [-0.05903, -43.03526, 0], "uv": [152, 569]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:bulge_bottom_back",
+					"parent": "bbpi:pale_abyss_hydra:group:body_root",
+					"pivot": [0, -15, -15],
+					"cubes": [
+						{"origin": [-6, -22, -22], "size": [12, 14, 14], "uv": [106, 120]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_17_segment_1",
+					"parent": "bbpi:pale_abyss_hydra:group:bulge_bottom_back",
+					"pivot": [0, -22, -22],
+					"cubes": [
+						{"origin": [-4, -26, -22], "size": [8, 8, 20], "pivot": [0, -22, -22], "rotation": [-45.39214, -170.27242, 0], "uv": [0, 597]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_17_segment_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_17_segment_1",
+					"pivot": [-2.5, -36, -36],
+					"cubes": [
+						{"origin": [-5.5, -39, -36], "size": [6, 6, 15], "pivot": [-2.5, -36, -36], "rotation": [-30.50896, 135, 0], "uv": [57, 597]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_17_segment_3",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_17_segment_2",
+					"pivot": [6.5, -43.5, -45],
+					"cubes": [
+						{"origin": [4.5, -45.5, -45], "size": [4, 4, 10], "pivot": [6.5, -43.5, -45], "rotation": [-49.41069, -137.48955, 0], "uv": [100, 597]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_17_branch_2",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_17_segment_3",
+					"pivot": [4.5, -47, -47.5],
+					"cubes": [
+						{"origin": [3.5, -48, -47.5], "size": [2, 2, 9], "pivot": [4.5, -47, -47.5], "rotation": [-43.2109, -7.44697, 0], "uv": [183, 597]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_17_branch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_17_segment_2",
+					"pivot": [3, -40.5, -41.5],
+					"cubes": [
+						{"origin": [1, -42.5, -41.5], "size": [4, 4, 12], "pivot": [3, -40.5, -41.5], "rotation": [0.9942, 58.56256, 0], "uv": [129, 597]}
+					]
+				},
+				{
+					"name": "bbpi:pale_abyss_hydra:group:tentacle_17_subbranch_1",
+					"parent": "bbpi:pale_abyss_hydra:group:tentacle_17_branch_1",
+					"pivot": [13, -40.5, -35],
+					"cubes": [
+						{"origin": [12, -41.5, -35], "size": [2, 2, 8], "pivot": [13, -40.5, -35], "rotation": [71.18592, 56.78936, 0], "uv": [162, 597]}
+					]
+				}
+			]
+		}
+	]
+}

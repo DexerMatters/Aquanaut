@@ -1,0 +1,35 @@
+{
+  "species_id": "aquanaut:gentlefish",
+  "entity_id": "aquanaut:gentlefish",
+  "category": "friendly",
+  "diet": "herbivorous",
+  "aliases": [
+    "aquanaut:gentle_fish"
+  ],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "stage": "encountered",
+      "text": "gui.aquanaut.notebook.waterlife.gentlefish.paragraph_1"
+    },
+    {
+      "type": "component",
+      "stage": "encountered",
+      "component_kind": "sprite",
+      "resource": "aquanaut:item/gentlefish_spawn_egg",
+      "caption": "gui.aquanaut.notebook.caption.identification_plate"
+    },
+    {
+      "type": "paragraph",
+      "stage": "captured",
+      "text": "gui.aquanaut.notebook.waterlife.gentlefish.paragraph_2"
+    },
+    {
+      "type": "component",
+      "stage": "captured",
+      "component_kind": "model",
+      "resource": "aquanaut:gentlefish",
+      "caption": "gui.aquanaut.notebook.caption.morphology_record"
+    }
+  ]
+}

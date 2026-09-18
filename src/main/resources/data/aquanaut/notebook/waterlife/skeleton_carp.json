@@ -1,0 +1,35 @@
+{
+  "species_id": "aquanaut:skeleton_carp",
+  "entity_id": "aquanaut:skeleton_carp",
+  "category": "threatening",
+  "diet": "carnivorous",
+  "aliases": [
+    "aquanaut:bone_carp"
+  ],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "stage": "encountered",
+      "text": "gui.aquanaut.notebook.waterlife.skeleton_carp.paragraph_1"
+    },
+    {
+      "type": "component",
+      "stage": "encountered",
+      "component_kind": "sprite",
+      "resource": "aquanaut:item/skeleton_carp_spawn_egg",
+      "caption": "gui.aquanaut.notebook.caption.identification_plate"
+    },
+    {
+      "type": "paragraph",
+      "stage": "captured",
+      "text": "gui.aquanaut.notebook.waterlife.skeleton_carp.paragraph_2"
+    },
+    {
+      "type": "component",
+      "stage": "captured",
+      "component_kind": "model",
+      "resource": "aquanaut:skeleton_carp",
+      "caption": "gui.aquanaut.notebook.caption.morphology_record"
+    }
+  ]
+}

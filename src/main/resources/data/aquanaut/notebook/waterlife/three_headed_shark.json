@@ -1,0 +1,35 @@
+{
+  "species_id": "aquanaut:three_headed_shark",
+  "entity_id": "aquanaut:three_headed_shark",
+  "category": "titan",
+  "diet": "carnivorous",
+  "aliases": [
+    "aquanaut:triple_head_shark"
+  ],
+  "blocks": [
+    {
+      "type": "paragraph",
+      "stage": "encountered",
+      "text": "gui.aquanaut.notebook.waterlife.three_headed_shark.paragraph_1"
+    },
+    {
+      "type": "component",
+      "stage": "encountered",
+      "component_kind": "sprite",
+      "resource": "aquanaut:item/three_headed_shark_spawn_egg",
+      "caption": "gui.aquanaut.notebook.caption.identification_plate"
+    },
+    {
+      "type": "paragraph",
+      "stage": "captured",
+      "text": "gui.aquanaut.notebook.waterlife.three_headed_shark.paragraph_2"
+    },
+    {
+      "type": "component",
+      "stage": "captured",
+      "component_kind": "model",
+      "resource": "aquanaut:three_headed_shark",
+      "caption": "gui.aquanaut.notebook.caption.morphology_record"
+    }
+  ]
+}

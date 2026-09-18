@@ -165,6 +165,40 @@ public abstract class BaseFishEntity extends WaterAnimal {
         return false;
     }
 
+    /**
+     * True for creatures that travel shell-first (or tail-first) instead of snout-first.
+     *
+     * <p>
+     * The models are all authored snout-first along {@code -Z}, so a jet-propelled swimmer like the
+     * flagellonautilus renders with its model turned half a turn and travels with its shell leading
+     * for as long as it is moving.
+     */
+    public final boolean swimsTailFirst() {
+        return this.getSwimsTailFirst();
+    }
+
+    protected boolean getSwimsTailFirst() {
+        return false;
+    }
+
+    /**
+     * True while the creature has turned around so that its shell faces a victim.
+     *
+     * <p>
+     * This is the one time a tail-first swimmer must <em>not</em> be drawn shell-leading: the attack
+     * animation turns the whole creature another half turn to bring the shell — which is where the
+     * flagellonautilus's whip lives — around onto the victim. Leaving the renderer's half turn on as
+     * well would cancel the animation's and land the strike facing away, so the renderer drops its
+     * own turn for exactly the duration of this state.
+     */
+    public final boolean isFacingThreat() {
+        return this.getIsFacingThreat();
+    }
+
+    protected boolean getIsFacingThreat() {
+        return false;
+    }
+
     public final float cruiseCurveTorqueDegrees() {
         return this.getCruiseCurveTorqueDegrees();
     }

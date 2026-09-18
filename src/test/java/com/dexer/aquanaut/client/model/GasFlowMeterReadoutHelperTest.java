@@ -3,23 +3,7 @@ package com.dexer.aquanaut.client.model;
 public final class GasFlowMeterReadoutHelperTest {
     public static void main(String[] args) {
         GasFlowMeterReadoutHelperTest test = new GasFlowMeterReadoutHelperTest();
-        test.activePumpShowsAirFlowTitleAndStrength();
-        test.inactivePumpShowsInactiveState();
         test.pipeShowsSignedFlowAndNoFlowState();
-    }
-
-    private void activePumpShowsAirFlowTitleAndStrength() {
-        GasFlowMeterReadoutHelper.Readout readout = GasFlowMeterReadoutHelper.airPump(true, 16);
-
-        assertEquals("AIR PUMP", readout.titleText(), "active title");
-        assertEquals("ACTIVE +16", readout.valueText(), "active value");
-    }
-
-    private void inactivePumpShowsInactiveState() {
-        GasFlowMeterReadoutHelper.Readout readout = GasFlowMeterReadoutHelper.airPump(false, 16);
-
-        assertEquals("AIR PUMP", readout.titleText(), "inactive title");
-        assertEquals("INACTIVE", readout.valueText(), "inactive value");
     }
 
     private void pipeShowsSignedFlowAndNoFlowState() {

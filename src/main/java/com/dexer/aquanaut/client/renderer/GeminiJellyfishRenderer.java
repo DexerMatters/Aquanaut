@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
-public class GeminiJellyfishRenderer extends BaseFishRenderer<GeminiJellyfishEntity> {
+public final class GeminiJellyfishRenderer extends BaseFishRenderer<GeminiJellyfishEntity> {
     public GeminiJellyfishRenderer(EntityRendererProvider.Context context) {
         super(context, new GeminiJellyfishModel());
         addRenderLayer(new AutoGlowingGeoLayer<>(this));

@@ -2,9 +2,9 @@ package com.dexer.aquanaut.client.model;
 
 import com.dexer.aquanaut.common.entity.GiantAbyssWormEntity;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
-public class GiantAbyssWormPartModel extends GeoModel<GiantAbyssWormEntity> {
+public class GiantAbyssWormPartModel extends AquanautGeoModel<GiantAbyssWormEntity> {
 
     private static final ResourceLocation ANIMATION = ResourceLocation.fromNamespaceAndPath("aquanaut",
             "animations/giant_abyss_worm.animation.json");
@@ -18,12 +18,12 @@ public class GiantAbyssWormPartModel extends GeoModel<GiantAbyssWormEntity> {
     }
 
     @Override
-    public ResourceLocation getModelResource(GiantAbyssWormEntity animatable) {
+    public ResourceLocation getModelResource(GiantAbyssWormEntity entity, GeoRenderer<GiantAbyssWormEntity> renderer) {
         return model;
     }
 
     @Override
-    public ResourceLocation getTextureResource(GiantAbyssWormEntity animatable) {
+    public ResourceLocation getTextureResource(GiantAbyssWormEntity entity, GeoRenderer<GiantAbyssWormEntity> renderer) {
         return texture;
     }
 

@@ -1,0 +1,9 @@
+{
+  "render_type": "minecraft:translucent",
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "aquanaut:block/brine_mirror",
+    "top": "aquanaut:block/brine_mirror_top",
+    "side": "aquanaut:block/brine_mirror"
+  }
+}

@@ -9,7 +9,7 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.PartEntity;
 
-public class LightningBranchSegment extends PartEntity<AbstractBranchingLightningEntity> {
+public final class LightningBranchSegment extends PartEntity<AbstractBranchingLightningEntity> {
     private final SegmentDefinition definition;
     private final int index;
     private final EntityDimensions dimensions;

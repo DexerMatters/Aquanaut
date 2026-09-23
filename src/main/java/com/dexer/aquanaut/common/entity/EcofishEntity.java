@@ -45,7 +45,9 @@ public class EcofishEntity extends BaseFishEntity implements GeoEntity {
     private static final int PLANT_INTERVAL = 400;
     private static final int PLANT_RADIUS = 4;
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    /** Built on first use: passing {@code this} at field-init time would leak a
+     * half-constructed entity to GeckoLib before the subclass constructor has run. */
+    private AnimatableInstanceCache cache;
 
     public EcofishEntity(EntityType<? extends WaterAnimal> type, Level level) {
         super(type, level);
@@ -61,7 +63,11 @@ public class EcofishEntity extends BaseFishEntity implements GeoEntity {
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
+        AnimatableInstanceCache c = this.cache;
+        if (c == null) {
+            c = this.cache = GeckoLibUtil.createInstanceCache(this);
+        }
+        return c;
     }
 
     public static AttributeSupplier createAttributes() {

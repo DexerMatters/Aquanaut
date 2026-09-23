@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "aquanaut:coral_sand",
+    "aquanaut:volcanic_ash",
+    "aquanaut:ash_layer",
+    "aquanaut:nutrient_rich_mud"
+  ]
+}

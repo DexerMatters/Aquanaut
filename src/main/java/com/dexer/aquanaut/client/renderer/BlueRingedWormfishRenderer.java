@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
-public class BlueRingedWormfishRenderer extends BaseFishRenderer<BlueRingedWormfishEntity> {
+public final class BlueRingedWormfishRenderer extends BaseFishRenderer<BlueRingedWormfishEntity> {
     public BlueRingedWormfishRenderer(EntityRendererProvider.Context c) {
         super(c, new BlueRingedWormfishModel());
         addRenderLayer(new AutoGlowingGeoLayer<>(this));

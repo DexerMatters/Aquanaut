@@ -15,8 +15,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 import java.util.List;
 
-@EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME)
-@SuppressWarnings("removal")
+@EventBusSubscriber(modid = Aquanaut.MODID)
 public final class NotebookResearchEvents {
 
     private static int tickCounter;

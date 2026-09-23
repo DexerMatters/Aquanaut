@@ -12,8 +12,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
-@EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME)
-@SuppressWarnings("removal")
+@EventBusSubscriber(modid = Aquanaut.MODID)
 public final class AquariumCommandEvents {
 
     private AquariumCommandEvents() {

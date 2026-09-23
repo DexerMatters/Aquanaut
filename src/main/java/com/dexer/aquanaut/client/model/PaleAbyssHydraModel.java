@@ -2,16 +2,16 @@ package com.dexer.aquanaut.client.model;
 
 import com.dexer.aquanaut.common.entity.PaleAbyssHydraEntity;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
-public class PaleAbyssHydraModel extends GeoModel<PaleAbyssHydraEntity> {
+public class PaleAbyssHydraModel extends AquanautGeoModel<PaleAbyssHydraEntity> {
     @Override
-    public ResourceLocation getModelResource(PaleAbyssHydraEntity animatable) {
+    public ResourceLocation getModelResource(PaleAbyssHydraEntity entity, GeoRenderer<PaleAbyssHydraEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "geo/pale_abyss_hydra.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(PaleAbyssHydraEntity animatable) {
+    public ResourceLocation getTextureResource(PaleAbyssHydraEntity entity, GeoRenderer<PaleAbyssHydraEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/pale_abyss_hydra.png");
     }
 

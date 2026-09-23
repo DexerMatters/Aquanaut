@@ -45,9 +45,14 @@ public class DissectionTableBlock extends BaseEntityBlock implements SimpleWater
 
     private static final VoxelShape SHAPE = Shapes.block();
 
+    /**
+     * No {@code registerDefaultState} call here: {@code Block}'s own constructor registers
+     * {@code stateDefinition.any()} after {@link #createBlockStateDefinition} adds the properties,
+     * and {@code WATERLOGGED} is a {@link BooleanProperty}, so the default state already has it
+     * false.
+     */
     public DissectionTableBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        registerDefaultState(this.stateDefinition.any().setValue(WATERLOGGED, Boolean.FALSE));
     }
 
     @Override
@@ -55,8 +60,13 @@ public class DissectionTableBlock extends BaseEntityBlock implements SimpleWater
         return CODEC;
     }
 
+    /**
+     * Final because {@code Block}'s constructor calls this while the block is still being built;
+     * an overridable override would let a subclass run against a half-initialised block. This class
+     * is a leaf, so nothing loses the ability to add properties.
+     */
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    protected final void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(WATERLOGGED);
     }
 

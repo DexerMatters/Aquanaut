@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
-public class AnglerfishRenderer extends BaseFishRenderer<AnglerfishEntity> {
+public final class AnglerfishRenderer extends BaseFishRenderer<AnglerfishEntity> {
     public AnglerfishRenderer(EntityRendererProvider.Context c) {
         super(c, new AnglerfishModel());
         addRenderLayer(new AutoGlowingGeoLayer<>(this));

@@ -17,6 +17,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.neoforge.fluids.FluidType;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -55,7 +56,9 @@ public class GiantOctopusTentacleEntity extends AbstractSerpentineEntity impleme
     private static final double BASE_SWAY_X = 3.6D;
     private static final double BASE_SWAY_Z = 2.8D;
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    /** Built on first use: passing {@code this} at field-init time would leak a
+     * half-constructed entity to GeckoLib before the subclass constructor has run. */
+    private AnimatableInstanceCache cache;
     private int whipTicksRemaining;
     private int whipCooldownTicks;
     private int whipRecoveryTicksRemaining;
@@ -66,9 +69,20 @@ public class GiantOctopusTentacleEntity extends AbstractSerpentineEntity impleme
     private double[] segmentStrikeWeights = new double[0];
     private Vec3 lastStrikeMotion = new Vec3(0.0D, 0.0D, 1.0D);
 
+    // The constructor below deliberately calls inherited mutators before any subclass constructor
+    // runs. That is safe here: every such call -- setNoGravity, applyDefaultProfile -- only touches
+    // Entity state that the superclass constructor has already established, and none of them reads
+    // a subclass field. The warning is noted rather than restructured, because the alternative
+    // (deferring the calls to a later lifecycle hook) would let a gravity-enabled tick run first.
+    @SuppressWarnings("this-escape")
     public GiantOctopusTentacleEntity(EntityType<? extends GiantOctopusTentacleEntity> type, Level level) {
         super(type, level);
         this.setNoGravity(true);
+    }
+
+    @Override
+    protected SegmentChainAlgorithm createChainAlgorithm() {
+        return new Chain();
     }
 
     @Override
@@ -86,10 +100,6 @@ public class GiantOctopusTentacleEntity extends AbstractSerpentineEntity impleme
         return defs;
     }
 
-    @Override
-    protected SegmentChainAlgorithm createChainAlgorithm() {
-        return new Chain();
-    }
 
     @Override
     protected void driveHead(ServerLevel level) {
@@ -236,8 +246,9 @@ public class GiantOctopusTentacleEntity extends AbstractSerpentineEntity impleme
         return currentAir;
     }
 
+    /** Anchored to the parent octopus, so no current may drag the arm off it. */
     @Override
-    public boolean isPushedByFluid() {
+    public boolean isPushedByFluid(FluidType fluidType) {
         return false;
     }
 
@@ -265,7 +276,11 @@ public class GiantOctopusTentacleEntity extends AbstractSerpentineEntity impleme
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
+        AnimatableInstanceCache c = this.cache;
+        if (c == null) {
+            c = this.cache = GeckoLibUtil.createInstanceCache(this);
+        }
+        return c;
     }
 
     public static AttributeSupplier createAttributes() {
@@ -783,4 +798,5 @@ public class GiantOctopusTentacleEntity extends AbstractSerpentineEntity impleme
                     .isEmpty();
         }
     }
+
 }

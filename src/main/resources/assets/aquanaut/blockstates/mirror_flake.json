@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "waterlogged=false": {
+      "model": "aquanaut:block/mirror_flake"
+    },
+    "waterlogged=true": {
+      "model": "aquanaut:block/mirror_flake"
+    }
+  }
+}

@@ -46,6 +46,8 @@ Aquanaut uses two test styles:
 
 Keep tests deterministic. Favor temporary directories, in-memory data, and explicit assertions over game runtime dependence where possible.
 
+The test source set runs without Minecraft on its classpath and links against the shims under `src/test/java/net/minecraft`. Code that a test touches therefore has to stay on the members those shims provide; when it needs another one, extend the shim.
+
 When you fix a bug, add or update a regression test before considering the change done.
 
 ## Content conventions
@@ -53,6 +55,7 @@ When you fix a bug, add or update a regression test before considering the chang
 - Register new game objects through the relevant registry class in `src/main/java/com/dexer/aquanaut/core`.
 - Keep shared gameplay logic in `common`; do not pull client-only classes into shared code.
 - Keep renderers, screens, HUD code, and other visual behavior in `client`.
+- The world's block light cannot follow a moving player smoothly: it is an integer per block, baked into a chunk mesh, so every step means a chunk rebuild. Beams and lamps are therefore drawn, not lit. The searchlight's shape stays in `common/item/SearchlightGeometry` (pure and tested) and is emitted as additive geometry by `client/searchlight/SearchlightBeamRenderer` at `RenderLevelStageEvent.Stage.AFTER_BLOCK_ENTITIES`. Keep new beam maths in the geometry class and the renderer emitting.
 - Keep packet encoding/decoding and handler logic together in `network`.
 - Keep mixins narrow and document why the injection point is needed.
 - If you add or rename a mixin, update `src/main/resources/aquanaut.mixins.json`.

@@ -1,0 +1,14 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "aquanaut:item/submarine_drone_controller"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "aquanaut:linked": 0.5
+      },
+      "model": "aquanaut:item/submarine_drone_controller_active"
+    }
+  ]
+}

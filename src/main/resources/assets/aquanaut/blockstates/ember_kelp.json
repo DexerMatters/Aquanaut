@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "part=top": {
+      "model": "aquanaut:block/ember_kelp_top"
+    },
+    "part=body": {
+      "model": "aquanaut:block/ember_kelp_body"
+    },
+    "part=tail": {
+      "model": "aquanaut:block/ember_kelp_tail"
+    }
+  }
+}

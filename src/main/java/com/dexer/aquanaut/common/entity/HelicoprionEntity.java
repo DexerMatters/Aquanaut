@@ -23,7 +23,9 @@ public class HelicoprionEntity extends BaseFishEntity implements GeoEntity {
             .thenPlay("mouth_open_to_close")
             .thenLoop("swim");
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    /** Built on first use: passing {@code this} at field-init time would leak a
+     * half-constructed entity to GeckoLib before the subclass constructor has run. */
+    private AnimatableInstanceCache cache;
     private boolean mouthOpenedVisual;
 
     public HelicoprionEntity(EntityType<? extends WaterAnimal> type, Level level) {
@@ -57,7 +59,11 @@ public class HelicoprionEntity extends BaseFishEntity implements GeoEntity {
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
+        AnimatableInstanceCache c = this.cache;
+        if (c == null) {
+            c = this.cache = GeckoLibUtil.createInstanceCache(this);
+        }
+        return c;
     }
 
     public static AttributeSupplier createAttributes() {

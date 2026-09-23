@@ -3,16 +3,16 @@ package com.dexer.aquanaut.client.model;
 import com.dexer.aquanaut.common.entity.DonutfishEntity;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
-public class DonutfishModel extends GeoModel<DonutfishEntity> {
+public class DonutfishModel extends AquanautGeoModel<DonutfishEntity> {
     @Override
-    public ResourceLocation getModelResource(DonutfishEntity animatable) {
+    public ResourceLocation getModelResource(DonutfishEntity entity, GeoRenderer<DonutfishEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "geo/donutfish.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(DonutfishEntity animatable) {
+    public ResourceLocation getTextureResource(DonutfishEntity entity, GeoRenderer<DonutfishEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/donutfish.png");
     }
 

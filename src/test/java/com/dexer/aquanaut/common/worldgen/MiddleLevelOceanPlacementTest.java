@@ -47,13 +47,13 @@ public final class MiddleLevelOceanPlacementTest {
 
     @Test
     void deepOceanColumnsQualifyForTheVerticalRewrite() {
-        assertTrue(MiddleLevelOceanLayering.shouldReplaceBiome(minecraft("deep_ocean"), 7));
-        assertTrue(MiddleLevelOceanLayering.shouldReplaceBiome(minecraft("deep_cold_ocean"), 2));
-        assertTrue(MiddleLevelOceanLayering.shouldReplaceBiome(minecraft("deep_lukewarm_ocean"), 2));
-        assertTrue(MiddleLevelOceanLayering.shouldReplaceBiome(minecraft("deep_frozen_ocean"), -12));
-        assertFalse(MiddleLevelOceanLayering.shouldReplaceBiome(minecraft("ocean"), 7));
-        assertFalse(MiddleLevelOceanLayering.shouldReplaceBiome(minecraft("deep_ocean"), 8));
-        assertFalse(MiddleLevelOceanLayering.shouldReplaceBiome(minecraft("plains"), 7));
+        assertTrue(MiddleLevelOceanColumnRules.supportsQuartCell(minecraft("deep_ocean"), 16));
+        assertTrue(MiddleLevelOceanColumnRules.supportsQuartCell(minecraft("deep_cold_ocean"), 16));
+        assertTrue(MiddleLevelOceanColumnRules.supportsQuartCell(minecraft("deep_lukewarm_ocean"), 16));
+        assertTrue(MiddleLevelOceanColumnRules.supportsQuartCell(minecraft("deep_frozen_ocean"), 16));
+        assertFalse(MiddleLevelOceanColumnRules.supportsQuartCell(minecraft("ocean"), 16));
+        assertFalse(MiddleLevelOceanColumnRules.supportsQuartCell(minecraft("deep_ocean"), 15));
+        assertFalse(MiddleLevelOceanColumnRules.supportsQuartCell(minecraft("plains"), 16));
     }
 
     private static ResourceLocation minecraft(String path) {

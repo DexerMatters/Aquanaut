@@ -1,0 +1,206 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "aquanaut:item/compass/frame_00"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "aquanaut:angle": 0.0
+      },
+      "model": "aquanaut:item/submarine_compass"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.015625
+      },
+      "model": "aquanaut:item/submarine_compass_01"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.046875
+      },
+      "model": "aquanaut:item/submarine_compass_02"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.078125
+      },
+      "model": "aquanaut:item/submarine_compass_03"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.109375
+      },
+      "model": "aquanaut:item/submarine_compass_04"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.140625
+      },
+      "model": "aquanaut:item/submarine_compass_05"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.171875
+      },
+      "model": "aquanaut:item/submarine_compass_06"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.203125
+      },
+      "model": "aquanaut:item/submarine_compass_07"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.234375
+      },
+      "model": "aquanaut:item/submarine_compass_08"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.265625
+      },
+      "model": "aquanaut:item/submarine_compass_09"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.296875
+      },
+      "model": "aquanaut:item/submarine_compass_10"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.328125
+      },
+      "model": "aquanaut:item/submarine_compass_11"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.359375
+      },
+      "model": "aquanaut:item/submarine_compass_12"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.390625
+      },
+      "model": "aquanaut:item/submarine_compass_13"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.421875
+      },
+      "model": "aquanaut:item/submarine_compass_14"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.453125
+      },
+      "model": "aquanaut:item/submarine_compass_15"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.484375
+      },
+      "model": "aquanaut:item/submarine_compass_16"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.515625
+      },
+      "model": "aquanaut:item/submarine_compass_17"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.546875
+      },
+      "model": "aquanaut:item/submarine_compass_18"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.578125
+      },
+      "model": "aquanaut:item/submarine_compass_19"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.609375
+      },
+      "model": "aquanaut:item/submarine_compass_20"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.640625
+      },
+      "model": "aquanaut:item/submarine_compass_21"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.671875
+      },
+      "model": "aquanaut:item/submarine_compass_22"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.703125
+      },
+      "model": "aquanaut:item/submarine_compass_23"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.734375
+      },
+      "model": "aquanaut:item/submarine_compass_24"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.765625
+      },
+      "model": "aquanaut:item/submarine_compass_25"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.796875
+      },
+      "model": "aquanaut:item/submarine_compass_26"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.828125
+      },
+      "model": "aquanaut:item/submarine_compass_27"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.859375
+      },
+      "model": "aquanaut:item/submarine_compass_28"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.890625
+      },
+      "model": "aquanaut:item/submarine_compass_29"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.921875
+      },
+      "model": "aquanaut:item/submarine_compass_30"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.953125
+      },
+      "model": "aquanaut:item/submarine_compass_31"
+    },
+    {
+      "predicate": {
+        "aquanaut:angle": 0.984375
+      },
+      "model": "aquanaut:item/submarine_compass"
+    }
+  ]
+}

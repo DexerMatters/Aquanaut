@@ -2,16 +2,16 @@ package com.dexer.aquanaut.client.model;
 
 import com.dexer.aquanaut.common.entity.CatfishEntity;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
-public class CatfishModel extends GeoModel<CatfishEntity> {
+public class CatfishModel extends AquanautGeoModel<CatfishEntity> {
     @Override
-    public ResourceLocation getModelResource(CatfishEntity animatable) {
+    public ResourceLocation getModelResource(CatfishEntity entity, GeoRenderer<CatfishEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "geo/catfish.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(CatfishEntity animatable) {
+    public ResourceLocation getTextureResource(CatfishEntity entity, GeoRenderer<CatfishEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/catfish.png");
     }
 

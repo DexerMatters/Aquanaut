@@ -64,6 +64,12 @@ public abstract class AbstractBranchingLightningEntity extends Entity {
     private int lastBuiltThicknessBits;
     private int lastBuiltBranchScaleBits;
 
+    // The constructor below deliberately calls inherited mutators before any subclass constructor
+    // runs. That is safe here: every such call -- setNoGravity, applyDefaultProfile -- only touches
+    // Entity state that the superclass constructor has already established, and none of them reads
+    // a subclass field. The warning is noted rather than restructured, because the alternative
+    // (deferring the calls to a later lifecycle hook) would let a gravity-enabled tick run first.
+    @SuppressWarnings("this-escape")
     protected AbstractBranchingLightningEntity(EntityType<? extends AbstractBranchingLightningEntity> type,
             Level level) {
         super(type, level);
@@ -579,4 +585,5 @@ public abstract class AbstractBranchingLightningEntity extends Entity {
                     1, 0.0D, 0.0D, 0.0D, 0.02D);
         }
     }
+
 }

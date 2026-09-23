@@ -18,8 +18,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import java.util.List;
 import java.util.Optional;
 
-@EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME)
-@SuppressWarnings("removal")
+@EventBusSubscriber(modid = Aquanaut.MODID)
 public final class AquariumHealthTracker {
 
     private static final long GRACE_PERIOD_MS = 30_000L;
@@ -54,7 +53,6 @@ public final class AquariumHealthTracker {
             if (entry.isEmpty()) {
                 continue;
             }
-
             long now = System.currentTimeMillis();
             long enteredAt = getEnteredAt(entry);
             if (enteredAt <= 0) {

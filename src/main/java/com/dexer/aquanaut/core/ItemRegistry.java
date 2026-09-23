@@ -6,13 +6,21 @@ import java.util.function.Supplier;
 import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.diving.DivingEquipmentSlotType;
 import com.dexer.aquanaut.common.item.AirSupplyItem;
+import com.dexer.aquanaut.common.item.BiologicalDetectorItem;
 import com.dexer.aquanaut.common.item.BubbleGunItem;
+import com.dexer.aquanaut.common.item.CursorItem;
 import com.dexer.aquanaut.common.item.DivingEquipmentItem;
 import com.dexer.aquanaut.common.item.FishingNetBlockItem;
 import com.dexer.aquanaut.common.item.GasFlowMeterItem;
+import com.dexer.aquanaut.common.item.HandheldAirBladderItem;
+import com.dexer.aquanaut.common.item.HandheldSearchlightItem;
+import com.dexer.aquanaut.common.item.LargeHandheldAirBladderItem;
 import com.dexer.aquanaut.common.item.HarpoonItem;
 import com.dexer.aquanaut.common.item.NotebookItem;
 import com.dexer.aquanaut.common.item.ScoopNetItem;
+import com.dexer.aquanaut.common.item.SubmarineCompassItem;
+import com.dexer.aquanaut.common.item.SubmarineDroneControllerItem;
+import com.dexer.aquanaut.common.item.SubmarineDroneItem;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -21,6 +29,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
@@ -70,11 +79,63 @@ public final class ItemRegistry {
                         props -> new AirSupplyItem(props.food(new FoodProperties.Builder()
                                         .nutrition(0).saturationModifier(0.0F).build()),
                                         2));
+        /**
+         * A translucent air membrane in a wrought iron bail handle, under a brass
+         * cap. It is an air supply, and while it is held it keeps its owner
+         * floating (see FlotationHelper). Unlike the other air supplies it is a
+         * modelled object: the held geometry lives in
+         * {@code models/item/handheld_air_bladder_held.json} and the inventory
+         * sprite is a render of that same model, so the client extension
+         * registered in {@code ClientModEvents} draws it.
+         */
+        public static final DeferredItem<HandheldAirBladderItem> HANDHELD_AIR_BLADDER = ITEMS.registerItem(
+                        "handheld_air_bladder",
+                        props -> new HandheldAirBladderItem(props.food(new FoodProperties.Builder()
+                                        .nutrition(0).saturationModifier(0.0F).build()),
+                                        5));
+        /**
+         * The same bladder, oversized: a full breath of air, and enough lift to
+         * climb to the surface hard while it is held.
+         */
+        public static final DeferredItem<LargeHandheldAirBladderItem> LARGE_HANDHELD_AIR_BLADDER = ITEMS.registerItem(
+                        "large_handheld_air_bladder",
+                        props -> new LargeHandheldAirBladderItem(props.food(new FoodProperties.Builder()
+                                        .nutrition(0).saturationModifier(0.0F).build()),
+                                        10));
         public static final DeferredItem<Item> FANG = ITEMS.registerSimpleItem("fang");
         public static final DeferredItem<Item> ICE_FIN = ITEMS.registerSimpleItem("ice_fin");
         public static final DeferredItem<Item> ICE_CORE = ITEMS.registerSimpleItem("ice_core");
         public static final DeferredItem<NotebookItem> NOTEBOOK = ITEMS.registerItem("notebook",
                         NotebookItem::new);
+
+        /** Places a {@code CursorEntity}: the under-sea location pin. */
+        public static final DeferredItem<CursorItem> CURSOR = ITEMS.registerItem("cursor",
+                        CursorItem::new);
+
+        /**
+         * Deploys a {@code SubmarineDroneEntity}, and takes one back: hitting a deployed drone
+         * returns this item.
+         */
+        public static final DeferredItem<SubmarineDroneItem> SUBMARINE_DRONE = ITEMS.registerItem(
+                        "submarine_drone", SubmarineDroneItem::new);
+
+        /**
+         * Deploys a {@code BiologicalDetectorEntity}, and takes one back: hitting a deployed
+         * detector returns this item.
+         */
+        public static final DeferredItem<BiologicalDetectorItem> BIOLOGICAL_DETECTOR = ITEMS.registerItem(
+                        "biological_detector", BiologicalDetectorItem::new);
+
+        /** Points at a tagged marker, and lets the player choose which one. */
+        public static final DeferredItem<SubmarineCompassItem> SUBMARINE_COMPASS = ITEMS.registerItem(
+                        "submarine_compass", SubmarineCompassItem::new);
+
+        /**
+         * Takes over a submarine drone: press it against a free drone to bind, against a bound one
+         * to let it go.
+         */
+        public static final DeferredItem<SubmarineDroneControllerItem> SUBMARINE_DRONE_CONTROLLER = ITEMS
+                        .registerItem("submarine_drone_controller", SubmarineDroneControllerItem::new);
 
         public static final DeferredItem<DivingEquipmentItem> IRON_OXYGEN_TANK = tankItem("iron_oxygen_tank", 250, 5);
         public static final DeferredItem<DivingEquipmentItem> WOOD_OXYGEN_TANK = tankItem("wood_oxygen_tank", 59, 3);
@@ -269,6 +330,83 @@ public final class ItemRegistry {
                         BlockRegistry.SHALE);
         public static final DeferredItem<BlockItem> LIMESTONE = blockItem("limestone",
                         BlockRegistry.LIMESTONE);
+
+        public static final DeferredItem<BlockItem> HALITE_CRUST = blockItem("halite_crust",
+                        BlockRegistry.HALITE_CRUST);
+        public static final DeferredItem<BlockItem> HALITE_PIPE = blockItem("halite_pipe",
+                        BlockRegistry.HALITE_PIPE);
+        public static final DeferredItem<BlockItem> VARVE_SHALE = blockItem("varve_shale",
+                        BlockRegistry.VARVE_SHALE);
+        public static final DeferredItem<BlockItem> BRINE_MIRROR = blockItem("brine_mirror",
+                        BlockRegistry.BRINE_MIRROR);
+        public static final DeferredItem<BlockItem> CALCITE_QUILL = blockItem("calcite_quill",
+                        BlockRegistry.CALCITE_QUILL);
+        public static final DeferredItem<BlockItem> HALITE_ROSETTE = blockItem("halite_rosette",
+                        BlockRegistry.HALITE_ROSETTE);
+        public static final DeferredItem<BlockItem> SALT_FRINGE = blockItem("salt_fringe",
+                        BlockRegistry.SALT_FRINGE);
+        // Brine Mirror Gorge enrichment block items
+        public static final DeferredItem<BlockItem> HOPPER_HALITE = blockItem("hopper_halite",
+                        BlockRegistry.HOPPER_HALITE);
+        public static final DeferredItem<BlockItem> HALITE_DRUSE = blockItem("halite_druse",
+                        BlockRegistry.HALITE_DRUSE);
+        public static final DeferredItem<BlockItem> GYPSUM_BLADE = blockItem("gypsum_blade",
+                        BlockRegistry.GYPSUM_BLADE);
+        public static final DeferredItem<BlockItem> SYLVITE_CRUST = blockItem("sylvite_crust",
+                        BlockRegistry.SYLVITE_CRUST);
+        public static final DeferredItem<BlockItem> MIRROR_FLAKE = blockItem("mirror_flake",
+                        BlockRegistry.MIRROR_FLAKE);
+        public static final DeferredItem<BlockItem> GYPSUM_ROSE = blockItem("gypsum_rose",
+                        BlockRegistry.GYPSUM_ROSE);
+        // Brimstone Caldera block items
+        public static final DeferredItem<BlockItem> VOLCANIC_BASALT = blockItem("volcanic_basalt",
+                        BlockRegistry.VOLCANIC_BASALT);
+        public static final DeferredItem<BlockItem> SCORIA = blockItem("scoria",
+                        BlockRegistry.SCORIA);
+        public static final DeferredItem<BlockItem> PILLOW_BASALT = blockItem("pillow_basalt",
+                        BlockRegistry.PILLOW_BASALT);
+        public static final DeferredItem<BlockItem> VOLCANIC_AGGLOMERATE = blockItem("volcanic_agglomerate",
+                        BlockRegistry.VOLCANIC_AGGLOMERATE);
+        public static final DeferredItem<BlockItem> PUMICE = blockItem("pumice",
+                        BlockRegistry.PUMICE);
+        public static final DeferredItem<BlockItem> OBSIDIAN_GLASS = blockItem("obsidian_glass",
+                        BlockRegistry.OBSIDIAN_GLASS);
+        public static final DeferredItem<BlockItem> ACID_ETCHED_BASALT = blockItem("acid_etched_basalt",
+                        BlockRegistry.ACID_ETCHED_BASALT);
+        public static final DeferredItem<BlockItem> SULFUR_CRUST = blockItem("sulfur_crust",
+                        BlockRegistry.SULFUR_CRUST);
+        public static final DeferredItem<BlockItem> SINTER = blockItem("sinter",
+                        BlockRegistry.SINTER);
+        public static final DeferredItem<BlockItem> VENT_CHIMNEY = blockItem("vent_chimney",
+                        BlockRegistry.VENT_CHIMNEY);
+        public static final DeferredItem<BlockItem> VOLCANIC_ASH = blockItem("volcanic_ash",
+                        BlockRegistry.VOLCANIC_ASH);
+        public static final DeferredItem<BlockItem> ASH_LAYER = blockItem("ash_layer",
+                        BlockRegistry.ASH_LAYER);
+        public static final DeferredItem<BlockItem> SULFUR_MOSS = blockItem("sulfur_moss",
+                        BlockRegistry.SULFUR_MOSS);
+        public static final DeferredItem<BlockItem> SULFUR_CRYSTAL = blockItem("sulfur_crystal",
+                        BlockRegistry.SULFUR_CRYSTAL);
+        public static final DeferredItem<BlockItem> FIREBLOOM = blockItem("firebloom",
+                        BlockRegistry.FIREBLOOM);
+        public static final DeferredItem<BlockItem> SULFUR_STALACTITE = blockItem("sulfur_stalactite",
+                        BlockRegistry.SULFUR_STALACTITE);
+        public static final DeferredItem<BlockItem> EMBER_KELP = blockItem("ember_kelp",
+                        BlockRegistry.EMBER_KELP);
+        public static final DeferredItem<BlockItem> FUMAROLE = blockItem("fumarole",
+                        BlockRegistry.FUMAROLE);
+        public static final DeferredItem<BlockItem> THERMOPHILIC_MAT_GOLD = blockItem("thermophilic_mat_gold",
+                        BlockRegistry.THERMOPHILIC_MAT_GOLD);
+        public static final DeferredItem<BlockItem> THERMOPHILIC_MAT_RUST = blockItem("thermophilic_mat_rust",
+                        BlockRegistry.THERMOPHILIC_MAT_RUST);
+        public static final DeferredItem<BlockItem> THERMOPHILIC_MAT_OLIVE = blockItem("thermophilic_mat_olive",
+                        BlockRegistry.THERMOPHILIC_MAT_OLIVE);
+        // Brimstone Caldera goods
+        public static final DeferredItem<Item> SULFUR_LUMP = ITEMS.registerSimpleItem("sulfur_lump");
+        public static final DeferredItem<BucketItem> SULFURIC_ACID_BUCKET = ITEMS.registerItem(
+                        "sulfuric_acid_bucket",
+                        props -> new BucketItem(FluidRegistry.SULFURIC_ACID.get(),
+                                        props.craftRemainder(Items.BUCKET).stacksTo(1)));
         public static final DeferredItem<BlockItem> SEAWEED = blockItem("seaweed",
                         BlockRegistry.SEAWEED);
         public static final DeferredItem<BlockItem> SEAWEED_FRUIT = blockItem("seaweed_fruit",
@@ -324,6 +462,8 @@ public final class ItemRegistry {
                         BlockRegistry.DISSECTION_TABLE);
         public static final DeferredItem<GasFlowMeterItem> GAS_FLOW_METER = ITEMS.registerItem("gas_flow_meter",
                         properties -> new GasFlowMeterItem(properties.stacksTo(1)));
+        public static final DeferredItem<HandheldSearchlightItem> HANDHELD_SEARCHLIGHT = ITEMS.registerItem(
+                        "handheld_searchlight", properties -> new HandheldSearchlightItem(properties));
         public static final DeferredItem<Item> BUBBLE_GUN = ITEMS.registerItem("bubble_gun",
                         properties -> new BubbleGunItem(properties.durability(60).stacksTo(1)));
 
@@ -551,11 +691,18 @@ public final class ItemRegistry {
                                 output.accept(RING_RIB.get());
                                 output.accept(ROTTEN_TISSUE.get());
                                 output.accept(SPRING.get());
+                                output.accept(SULFUR_LUMP.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TOOLS_TAB = tab("tools",
                         BUBBLE_GUN, output -> {
                                 output.accept(GAS_FLOW_METER.get());
+                                output.accept(HANDHELD_SEARCHLIGHT.get());
+                                output.accept(CURSOR.get());
+                                output.accept(SUBMARINE_COMPASS.get());
+                                output.accept(SUBMARINE_DRONE.get());
+                                output.accept(SUBMARINE_DRONE_CONTROLLER.get());
+                                output.accept(BIOLOGICAL_DETECTOR.get());
                                 output.accept(BUBBLE_GUN.get());
                                 output.accept(WOOD_HARPOON.get());
                                 output.accept(STONE_HARPOON.get());
@@ -609,6 +756,8 @@ public final class ItemRegistry {
                                 output.accept(SHELL_MASK.get());
                                 output.accept(HARD_SHELL_MASK.get());
                                 output.accept(MARINE_ALLOY_MASK.get());
+                                output.accept(HANDHELD_AIR_BLADDER.get());
+                                output.accept(LARGE_HANDHELD_AIR_BLADDER.get());
                                 output.accept(ANGLERFISH_MASK.get());
                                 output.accept(ENDER_MASK.get());
                                 output.accept(SLIME_MASK.get());
@@ -650,6 +799,43 @@ public final class ItemRegistry {
                                 output.accept(DROOPING_SEAWEED.get());
                                 output.accept(SHALE.get());
                                 output.accept(LIMESTONE.get());
+                                // Brine Mirror Gorge
+                                output.accept(HALITE_CRUST.get());
+                                output.accept(HALITE_PIPE.get());
+                                output.accept(VARVE_SHALE.get());
+                                output.accept(BRINE_MIRROR.get());
+                                output.accept(CALCITE_QUILL.get());
+                                output.accept(HALITE_ROSETTE.get());
+                                output.accept(SALT_FRINGE.get());
+                                output.accept(HOPPER_HALITE.get());
+                                output.accept(HALITE_DRUSE.get());
+                                output.accept(GYPSUM_BLADE.get());
+                                output.accept(SYLVITE_CRUST.get());
+                                output.accept(MIRROR_FLAKE.get());
+                                output.accept(GYPSUM_ROSE.get());
+                                // Brimstone Caldera
+                                output.accept(VOLCANIC_BASALT.get());
+                                output.accept(SCORIA.get());
+                                output.accept(PILLOW_BASALT.get());
+                                output.accept(VOLCANIC_AGGLOMERATE.get());
+                                output.accept(PUMICE.get());
+                                output.accept(OBSIDIAN_GLASS.get());
+                                output.accept(ACID_ETCHED_BASALT.get());
+                                output.accept(SULFUR_CRUST.get());
+                                output.accept(SINTER.get());
+                                output.accept(VENT_CHIMNEY.get());
+                                output.accept(VOLCANIC_ASH.get());
+                                output.accept(ASH_LAYER.get());
+                                output.accept(SULFUR_MOSS.get());
+                                output.accept(SULFUR_CRYSTAL.get());
+                                output.accept(FIREBLOOM.get());
+                                output.accept(SULFUR_STALACTITE.get());
+                                output.accept(EMBER_KELP.get());
+                                output.accept(FUMAROLE.get());
+                                output.accept(THERMOPHILIC_MAT_GOLD.get());
+                                output.accept(THERMOPHILIC_MAT_RUST.get());
+                                output.accept(THERMOPHILIC_MAT_OLIVE.get());
+                                output.accept(SULFURIC_ACID_BUCKET.get());
                                 output.accept(SEAWEED.get());
                                 output.accept(SEAWEED_FRUIT.get());
                                 output.accept(SEAWEED_STEM.get());

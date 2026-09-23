@@ -3,16 +3,16 @@ package com.dexer.aquanaut.client.model;
 import com.dexer.aquanaut.common.entity.CreeporpedoEntity;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
-public class CreeporpedoModel extends GeoModel<CreeporpedoEntity> {
+public class CreeporpedoModel extends AquanautGeoModel<CreeporpedoEntity> {
     @Override
-    public ResourceLocation getModelResource(CreeporpedoEntity animatable) {
+    public ResourceLocation getModelResource(CreeporpedoEntity entity, GeoRenderer<CreeporpedoEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "geo/creeporpedo.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(CreeporpedoEntity animatable) {
+    public ResourceLocation getTextureResource(CreeporpedoEntity entity, GeoRenderer<CreeporpedoEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/creeporpedo.png");
     }
 

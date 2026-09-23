@@ -1,0 +1,53 @@
+{
+  "__comment": [
+    "Aquanaut fog authority. How far the eye reaches inside each ocean, and the look of any",
+    "medium the world has no colour for. Colours are NOT set here for water: while the camera",
+    "is submerged the authoritative colour is the biome's own water_fog_color (which the abyss",
+    "ramp then darkens), so the same colour reaches a shader pack through the vanilla fog state",
+    "and the fallback veil drawn on top of it.",
+    "near/far are block distances; cast is 0..1 how strongly the medium tints the screen."
+  ],
+  "default": {
+    "near": -4.0,
+    "far": 96.0,
+    "cast": 0.45
+  },
+  "biomes": {
+    "aquanaut:middle_level_ocean": {
+      "near": -4.0,
+      "far": 128.0,
+      "cast": 0.30
+    },
+    "aquanaut:coral_forest": {
+      "near": -4.0,
+      "far": 120.0,
+      "cast": 0.26
+    },
+    "aquanaut:jelly_jungle": {
+      "near": -2.0,
+      "far": 64.0,
+      "cast": 0.48
+    },
+    "aquanaut:brine_mirror_gorge": {
+      "__comment": "The gorge is the one place in the middle sea where the water stays clear.",
+      "near": -6.0,
+      "far": 160.0,
+      "cast": 0.20
+    },
+    "aquanaut:brimstone_caldera": {
+      "__comment": "Suspended sulfur and ash close the eye in; the air itself looks sour.",
+      "near": -3.0,
+      "far": 80.0,
+      "cast": 0.55
+    }
+  },
+  "mediums": {
+    "acid": {
+      "__comment": "Sulfuric acid has no vanilla FogType and no biome colour of its own.",
+      "color": "#6e7a2a",
+      "near": 1.0,
+      "far": 22.0,
+      "cast": 0.85
+    }
+  }
+}

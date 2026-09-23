@@ -30,17 +30,19 @@ public final class CoralForestPlacementTest {
     }
 
     @Test
-    void deepOceanColumnsQualifyForTheCoralForestRewrite() {
-        assertTrue(CoralForestLayering.shouldReplaceBiome(minecraft("deep_ocean"), 9));
-        assertTrue(CoralForestLayering.shouldReplaceBiome(minecraft("deep_ocean"), 8));
-        assertTrue(CoralForestLayering.shouldReplaceBiome(minecraft("deep_cold_ocean"), 9));
-        assertTrue(CoralForestLayering.shouldReplaceBiome(minecraft("deep_lukewarm_ocean"), 9));
-        assertTrue(CoralForestLayering.shouldReplaceBiome(minecraft("deep_frozen_ocean"), 9));
-        assertFalse(CoralForestLayering.shouldReplaceBiome(minecraft("ocean"), 9));
-        assertFalse(CoralForestLayering.shouldReplaceBiome(minecraft("warm_ocean"), 9));
-        assertFalse(CoralForestLayering.shouldReplaceBiome(minecraft("deep_ocean"), 7));
-        assertFalse(CoralForestLayering.shouldReplaceBiome(minecraft("deep_ocean"), 10));
-        assertFalse(CoralForestLayering.shouldReplaceBiome(minecraft("plains"), 9));
+    void reefBandRoutesToEitherCoralForestOrJellyJungle() {
+        MiddleLevelOceanColumnRules.TargetBiome band =
+                MiddleLevelOceanColumnRules.targetBiome(minecraft("deep_ocean"), 16, 0, 9, 0);
+        assertTrue(band == MiddleLevelOceanColumnRules.TargetBiome.CORAL_FOREST
+                        || band == MiddleLevelOceanColumnRules.TargetBiome.JELLY_JUNGLE,
+                "reef band should route to a custom reef biome");
+        MiddleLevelOceanColumnRules.TargetBiome deep =
+                MiddleLevelOceanColumnRules.targetBiome(minecraft("deep_ocean"), 16, 0, 7, 0);
+        assertTrue(deep == MiddleLevelOceanColumnRules.TargetBiome.MIDDLE_LEVEL_OCEAN
+                        || deep == MiddleLevelOceanColumnRules.TargetBiome.BRINE_MIRROR_GORGE,
+                "middle-sea layer is MLO or brine mirror gorge");
+        assertEquals(MiddleLevelOceanColumnRules.TargetBiome.NONE,
+                MiddleLevelOceanColumnRules.targetBiome(minecraft("deep_ocean"), 16, 0, 10, 0));
     }
 
     private static ResourceLocation minecraft(String path) {

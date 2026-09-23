@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "aquanaut:block/vent_chimney_horizontal",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "aquanaut:block/vent_chimney"
+    },
+    "axis=z": {
+      "model": "aquanaut:block/vent_chimney_horizontal",
+      "x": 90
+    }
+  }
+}

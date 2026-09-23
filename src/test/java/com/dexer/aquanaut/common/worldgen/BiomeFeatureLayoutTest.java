@@ -52,6 +52,17 @@ public final class BiomeFeatureLayoutTest {
                 "jelly jungle should not reuse the coral forest stone pillar feature");
     }
 
+    @Test
+    void brineMirrorGorgeCarriesTerracesMirrorsOrgansAndMineralFlora() {
+        List<String> brine = loadFeatureStages("brine_mirror_gorge").stream().flatMap(List::stream).toList();
+        assertTrue(brine.contains("aquanaut:brine_terraces"), "gorge terraces");
+        assertTrue(brine.contains("aquanaut:brine_mirrors"), "gorge mirrors");
+        assertTrue(brine.contains("aquanaut:halite_organ"), "organ pipes");
+        assertTrue(brine.contains("aquanaut:calcite_quill_field"), "quill colonies");
+        assertTrue(brine.contains("aquanaut:salt_fringe_curtain"), "salt fringe");
+        assertFalse(brine.contains("aquanaut:jelly_jungle_bulge"), "no jelly in the gorge");
+    }
+
     private List<List<String>> loadFeatureStages(String biomeName) {
         String path = "data/aquanaut/worldgen/biome/" + biomeName + ".json";
         try (InputStream stream = BiomeFeatureLayoutTest.class.getClassLoader().getResourceAsStream(path)) {

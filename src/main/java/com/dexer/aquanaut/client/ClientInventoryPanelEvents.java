@@ -20,8 +20,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ContainerScreenEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 
-@EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
-@SuppressWarnings("removal")
+@EventBusSubscriber(modid = Aquanaut.MODID, value = Dist.CLIENT)
 public final class ClientInventoryPanelEvents {
 
     private static final ResourceLocation VANILLA_SLOT_SPRITE = ResourceLocation.withDefaultNamespace("container/slot");

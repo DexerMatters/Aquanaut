@@ -9,8 +9,7 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import net.minecraft.client.Minecraft;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-@EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
-@SuppressWarnings("removal")
+@EventBusSubscriber(modid = Aquanaut.MODID, value = Dist.CLIENT)
 public final class ClientGazeEvents {
     private ClientGazeEvents() {
     }

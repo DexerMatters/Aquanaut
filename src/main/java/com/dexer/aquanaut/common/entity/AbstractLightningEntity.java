@@ -46,6 +46,12 @@ public abstract class AbstractLightningEntity extends Entity {
 
     private final Set<Integer> damagedEntityIds = new HashSet<>();
 
+    // The constructor below deliberately calls inherited mutators before any subclass constructor
+    // runs. That is safe here: every such call -- setNoGravity, applyDefaultProfile -- only touches
+    // Entity state that the superclass constructor has already established, and none of them reads
+    // a subclass field. The warning is noted rather than restructured, because the alternative
+    // (deferring the calls to a later lifecycle hook) would let a gravity-enabled tick run first.
+    @SuppressWarnings("this-escape")
     protected AbstractLightningEntity(EntityType<? extends AbstractLightningEntity> type, Level level) {
         super(type, level);
         this.noPhysics = true;
@@ -360,4 +366,5 @@ public abstract class AbstractLightningEntity extends Entity {
             }
         }
     }
+
 }

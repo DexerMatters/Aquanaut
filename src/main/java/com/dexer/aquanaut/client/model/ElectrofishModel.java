@@ -3,16 +3,16 @@ package com.dexer.aquanaut.client.model;
 import com.dexer.aquanaut.common.entity.ElectrofishEntity;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
-public class ElectrofishModel extends GeoModel<ElectrofishEntity> {
+public class ElectrofishModel extends AquanautGeoModel<ElectrofishEntity> {
     @Override
-    public ResourceLocation getModelResource(ElectrofishEntity animatable) {
+    public ResourceLocation getModelResource(ElectrofishEntity entity, GeoRenderer<ElectrofishEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "geo/electrofish.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(ElectrofishEntity animatable) {
+    public ResourceLocation getTextureResource(ElectrofishEntity entity, GeoRenderer<ElectrofishEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/electrofish.png");
     }
 

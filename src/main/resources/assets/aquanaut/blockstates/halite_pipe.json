@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "axis=x": { "model": "aquanaut:block/halite_pipe_horizontal", "x": 90, "y": 90 },
+    "axis=y": { "model": "aquanaut:block/halite_pipe" },
+    "axis=z": { "model": "aquanaut:block/halite_pipe_horizontal", "x": 90 }
+  }
+}

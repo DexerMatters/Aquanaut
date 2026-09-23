@@ -15,6 +15,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.SequencedMap;
 
+/**
+ * Gives Aquanaut's own render types a vertex buffer each.
+ *
+ * <p>
+ * A render type that is not registered here shares the buffer source's one shared buffer, and asking
+ * for the buffer of an unregistered type flushes whatever was being built in it. The gaze glint is
+ * drawn at its own point in the frame and would rather not disturb, or be disturbed by, anyone
+ * else's half-built geometry.
+ */
 @Mixin(value = MultiBufferSource.BufferSource.class, remap = false)
 public abstract class BufferSourceMixin {
 
@@ -26,7 +35,7 @@ public abstract class BufferSourceMixin {
     private boolean aquanaut$gazeTypeRegistered;
 
     @Inject(method = "getBuffer", at = @At("HEAD"), remap = false)
-    private void aquanaut$registerGazeType(RenderType type, CallbackInfoReturnable<VertexConsumer> cir) {
+    private void aquanaut$registerRenderTypes(RenderType type, CallbackInfoReturnable<VertexConsumer> cir) {
         if (!aquanaut$gazeTypeRegistered && type == GazeRenderTypes.getGazeGlint()) {
             aquanaut$gazeTypeRegistered = true;
             fixedBuffers.put(type, new ByteBufferBuilder(256));

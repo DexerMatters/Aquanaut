@@ -3,7 +3,7 @@ package com.dexer.aquanaut.client.model;
 import com.dexer.aquanaut.common.block.DissectionTableMultiblock;
 import com.dexer.aquanaut.common.block.entity.DissectionTableBlockEntity;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
 /**
  * Picks the merged dissection bench model for a table cell.
@@ -13,7 +13,7 @@ import software.bernie.geckolib.model.GeoModel;
  * model is asked for its resources, so the suffix here always matches the bench actually being
  * drawn. Textures live with the other block atlases under {@code textures/block}.
  */
-public class DissectionTableGeoModel extends GeoModel<DissectionTableBlockEntity> {
+public class DissectionTableGeoModel extends AquanautGeoModel<DissectionTableBlockEntity> {
     private String suffix = "";
 
     public void useSuffix(String suffix) {
@@ -25,12 +25,12 @@ public class DissectionTableGeoModel extends GeoModel<DissectionTableBlockEntity
     }
 
     @Override
-    public ResourceLocation getModelResource(DissectionTableBlockEntity animatable) {
+    public ResourceLocation getModelResource(DissectionTableBlockEntity entity, GeoRenderer<DissectionTableBlockEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "geo/dissection_table" + this.suffix + ".geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(DissectionTableBlockEntity animatable) {
+    public ResourceLocation getTextureResource(DissectionTableBlockEntity entity, GeoRenderer<DissectionTableBlockEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut",
                 "textures/block/dissection_table" + this.suffix + ".png");
     }

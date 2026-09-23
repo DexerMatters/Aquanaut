@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "part=top": {
+      "model": "aquanaut:block/sulfur_stalactite_top"
+    },
+    "part=body": {
+      "model": "aquanaut:block/sulfur_stalactite_body"
+    },
+    "part=tail": {
+      "model": "aquanaut:block/sulfur_stalactite_tail"
+    }
+  }
+}

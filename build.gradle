@@ -29,14 +29,14 @@ sourceSets.main.resources {
 repositories {
     maven {
         name = 'GeckoLib'
-        url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
+        url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/'
         content {
             includeGroup("software.bernie.geckolib")
         }
     }
     maven {
         name = 'TerraBlender'
-        url 'https://maven.minecraftforge.net/releases/'
+        url = 'https://maven.minecraftforge.net/releases/'
         content {
             includeGroup("com.github.glitchfiend")
         }
@@ -130,7 +130,6 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
-
 dependencies {
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
@@ -167,6 +166,8 @@ def mixinMappingsFile = layout.buildDirectory.file("moddev/artifacts/namedToInte
 
 // Produce a minimal named->notch TSRG for the Minecraft methods our mixins target.
 // The Mixin AP requires this to resolve obfuscation mappings when generating the refmap.
+// Every @Shadow/@Accessor/@Inject target of a remapped mixin must appear here, or the AP
+// reports "Unable to locate obfuscation mapping" and silently omits the entry from the refmap.
 tasks.register("generateMixinMappings") {
     def outputFile = mixinMappingsFile
     outputs.file(outputFile)
@@ -181,8 +182,20 @@ tasks.register("generateMixinMappings") {
                 "net/minecraft/world/entity/LivingEntity btn\n" +
                 "\tgetMaxAirSupply ()I cl\n" +
                 "\tincreaseAirSupply (I)I n\n" +
+                "net/minecraft/client/Camera ffy\n" +
+                "\teyeHeight r\n" +
+                "\teyeHeightOld s\n" +
                 "net/minecraft/world/level/chunk/ChunkAccess duy\n" +
-                "\tfillBiomesFromNoise (Lnet/minecraft/world/level/biome/BiomeResolver;Lnet/minecraft/world/level/biome/Climate\$Sampler;)V a\n"
+                "\tfillBiomesFromNoise (Lnet/minecraft/world/level/biome/BiomeResolver;Lnet/minecraft/world/level/biome/Climate\$Sampler;)V a\n" +
+                "net/minecraft/world/level/levelgen/RandomState dzm\n" +
+                "\trouter c\n" +
+                "\tsampler d\n" +
+                "\t<init> (Lnet/minecraft/world/level/levelgen/NoiseGeneratorSettings;Lnet/minecraft/core/HolderGetter;J)V <init>\n" +
+                "net/minecraft/world/level/levelgen/NoiseBasedChunkGenerator dzb\n" +
+                "\tsettings e\n" +
+                "\tcreateNoiseChunk (Lnet/minecraft/world/level/chunk/ChunkAccess;Lnet/minecraft/world/level/StructureManager;Lnet/minecraft/world/level/levelgen/blending/Blender;Lnet/minecraft/world/level/levelgen/RandomState;)Lnet/minecraft/world/level/levelgen/NoiseChunk; a\n" +
+                "net/minecraft/world/level/chunk/ChunkGenerator duz\n" +
+                "\tbiomeSource b\n"
     }
 }
 
@@ -234,13 +247,14 @@ publishing {
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/repo"
+            url = "file://${project.projectDir}/repo"
         }
     }
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+    options.compilerArgs.add('-Xlint:all,-processing')
 }
 
 tasks.test {

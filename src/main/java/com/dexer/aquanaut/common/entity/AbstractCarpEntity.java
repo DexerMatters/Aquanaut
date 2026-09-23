@@ -23,7 +23,9 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 public abstract class AbstractCarpEntity extends BaseFishEntity implements GeoEntity {
     protected static final RawAnimation SWIM_ANIMATION = RawAnimation.begin().thenLoop("swim");
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    /** Built on first use: passing {@code this} at field-init time would leak a
+     * half-constructed entity to GeckoLib before the subclass constructor has run. */
+    private AnimatableInstanceCache cache;
 
     protected AbstractCarpEntity(EntityType<? extends WaterAnimal> type, Level level) {
         super(type, level);
@@ -39,7 +41,11 @@ public abstract class AbstractCarpEntity extends BaseFishEntity implements GeoEn
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
+        AnimatableInstanceCache c = this.cache;
+        if (c == null) {
+            c = this.cache = GeckoLibUtil.createInstanceCache(this);
+        }
+        return c;
     }
 
     @Override

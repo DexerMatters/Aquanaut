@@ -45,8 +45,7 @@ import net.minecraft.world.phys.HitResult;
  * <li>The draining layer (depth 0, partially filled).</li>
  * </ol>
  */
-@EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
-@SuppressWarnings("removal")
+@EventBusSubscriber(modid = Aquanaut.MODID, value = Dist.CLIENT)
 public final class ClientHudEvents {
 
     private static final ResourceLocation AIR_SPRITE = ResourceLocation.withDefaultNamespace("hud/air");

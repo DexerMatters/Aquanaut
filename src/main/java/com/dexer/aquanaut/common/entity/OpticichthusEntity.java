@@ -101,7 +101,9 @@ public class OpticichthusEntity extends BaseFishEntity implements GeoEntity {
     private static final EntityDataAccessor<Boolean> BEAM_CONTACT = SynchedEntityData.defineId(
             OpticichthusEntity.class, EntityDataSerializers.BOOLEAN);
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    /** Built on first use: passing {@code this} at field-init time would leak a
+     * half-constructed entity to GeckoLib before the subclass constructor has run. */
+    private AnimatableInstanceCache cache;
 
     /** Server-side only: the diver currently lined up in the lens. */
     private Player beamTarget;
@@ -140,7 +142,11 @@ public class OpticichthusEntity extends BaseFishEntity implements GeoEntity {
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
+        AnimatableInstanceCache c = this.cache;
+        if (c == null) {
+            c = this.cache = GeckoLibUtil.createInstanceCache(this);
+        }
+        return c;
     }
 
     public static AttributeSupplier createAttributes() {

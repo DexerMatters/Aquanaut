@@ -58,5 +58,90 @@
                 "pitch": 1.0
             }
         ]
+    },
+    "submarine_drone_activate": {
+        "subtitle": "subtitles.aquanaut.submarine_drone_activate",
+        "sounds": [
+            {
+                "name": "minecraft:block/copper_bulb/turn_on",
+                "volume": 0.9,
+                "pitch": 1.35
+            },
+            {
+                "name": "minecraft:block/beacon/activate",
+                "volume": 0.45,
+                "pitch": 1.6
+            },
+            {
+                "name": "minecraft:block/note_block/pling",
+                "volume": 0.35,
+                "pitch": 1.8
+            }
+        ]
+    },
+    "submarine_drone_deactivate": {
+        "subtitle": "subtitles.aquanaut.submarine_drone_deactivate",
+        "sounds": [
+            {
+                "name": "minecraft:block/copper_bulb/turn_off",
+                "volume": 0.9,
+                "pitch": 1.25
+            },
+            {
+                "name": "minecraft:block/beacon/deactivate",
+                "volume": 0.5,
+                "pitch": 1.5
+            }
+        ]
+    },
+    "submarine_drone_retrieve": {
+        "subtitle": "subtitles.aquanaut.submarine_drone_retrieve",
+        "sounds": [
+            {
+                "name": "minecraft:block/iron_trapdoor/close",
+                "volume": 0.55,
+                "pitch": 1.55
+            },
+            {
+                "name": "minecraft:entity/iron_golem/hurt",
+                "volume": 0.5,
+                "pitch": 0.62
+            },
+            {
+                "name": "minecraft:block/copper_bulb/turn_off",
+                "volume": 0.4,
+                "pitch": 1.8
+            }
+        ]
+    },
+    "submarine_drone_thruster": {
+        "subtitle": "subtitles.aquanaut.submarine_drone_thruster",
+        "sounds": [
+            {
+                "name": "minecraft:block/bubble_column/bubble_column_whirlpool_ambient",
+                "volume": 0.5,
+                "pitch": 1.15
+            },
+            {
+                "name": "minecraft:block/bubble_column/bubble_column_upwards_ambient",
+                "volume": 0.35,
+                "pitch": 1.4
+            }
+        ]
+    },
+    "submarine_drone_reject": {
+        "subtitle": "subtitles.aquanaut.submarine_drone_reject",
+        "sounds": [
+            {
+                "name": "minecraft:block/note_block/bass",
+                "volume": 0.7,
+                "pitch": 0.65
+            },
+            {
+                "name": "minecraft:block/copper_bulb/turn_off",
+                "volume": 0.6,
+                "pitch": 0.7
+            }
+        ]
     }
 }

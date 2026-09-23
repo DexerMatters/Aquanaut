@@ -7,8 +7,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 
-@EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-@SuppressWarnings("removal")
+@EventBusSubscriber(modid = Aquanaut.MODID, value = Dist.CLIENT)
 public final class ClientNotebookEvents {
 
     private ClientNotebookEvents() {

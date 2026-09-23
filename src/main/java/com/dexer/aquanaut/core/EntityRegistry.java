@@ -16,6 +16,11 @@ import com.dexer.aquanaut.common.entity.EcofishEntity;
 import com.dexer.aquanaut.common.entity.PaleAbyssHydraEntity;
 import com.dexer.aquanaut.common.entity.ThreeHeadedSharkEntity;
 import com.dexer.aquanaut.common.entity.AirBubbleEntity;
+import com.dexer.aquanaut.common.entity.BiologicalDetectorEntity;
+import com.dexer.aquanaut.common.entity.CursorEntity;
+import com.dexer.aquanaut.common.entity.CursorGeometry;
+import com.dexer.aquanaut.common.entity.DetectorGeometry;
+import com.dexer.aquanaut.common.entity.DroneGeometry;
 import com.dexer.aquanaut.common.entity.AnglerfishEntity;
 import com.dexer.aquanaut.common.entity.BlueJellyfishEntity;
 import com.dexer.aquanaut.common.entity.BlueRingedWormfishEntity;
@@ -40,6 +45,7 @@ import com.dexer.aquanaut.common.entity.GiantAbyssWormEntity;
 import com.dexer.aquanaut.common.entity.GiantOctopusTentacleEntity;
 import com.dexer.aquanaut.common.entity.SardineEntity;
 import com.dexer.aquanaut.common.entity.SpringfishEntity;
+import com.dexer.aquanaut.common.entity.SubmarineDroneEntity;
 import com.dexer.aquanaut.common.entity.SwirlEntity;
 import com.dexer.aquanaut.common.entity.SwirlMakerEntity;
 import com.dexer.aquanaut.common.entity.TripodEntity;
@@ -56,8 +62,7 @@ import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-@EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.MOD)
-@SuppressWarnings("removal")
+@EventBusSubscriber(modid = Aquanaut.MODID)
 public class EntityRegistry {
     public static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister
             .create(BuiltInRegistries.ENTITY_TYPE, Aquanaut.MODID);
@@ -142,6 +147,19 @@ public class EntityRegistry {
                     .<AirBubbleEntity>of(AirBubbleEntity::new, MobCategory.MISC)
                     .sized(0.9375F, 0.9375F)
                     .build("air_bubble"));
+
+    /**
+     * The hitbox comes from {@link CursorGeometry}, which derives it from the shipped model, so it
+     * cannot drift away from the geometry when cursor.geo.json is re-exported.
+     */
+    public static final DeferredHolder<EntityType<?>, EntityType<CursorEntity>> CURSOR = ENTITIES.register(
+            "cursor",
+            () -> EntityType.Builder
+                    .<CursorEntity>of(CursorEntity::new, MobCategory.MISC)
+                    .sized(CursorGeometry.HITBOX_WIDTH, CursorGeometry.HITBOX_HEIGHT)
+                    .clientTrackingRange(10)
+                    .updateInterval(3)
+                    .build("cursor"));
 
     public static final DeferredHolder<EntityType<?>, EntityType<HarpoonEntity>> HARPOON = ENTITIES.register(
             "harpoon",
@@ -373,6 +391,54 @@ public class EntityRegistry {
                             .clientTrackingRange(12)
                             .updateInterval(2)
                     .build("three_headed_shark"));
+
+    /**
+     * The submarine drone. Registered as a plain machine in {@link MobCategory#MISC} on purpose:
+     * that is what keeps it out of the fishing pipelines — the scoop net reaches for
+     * {@code WaterAnimal}s and the aquarium catalogue is built from the aquatic mob categories — so
+     * a drone can be neither caught nor filed away, without either system having to know the drone
+     * exists.
+     *
+     * <p>
+     * It has no spawn egg and no attributes: a machine is deployed from its own item rather than
+     * hatched, and it has no health to give it.
+     *
+     * <p>
+     * Its eye height is the middle of its nose sensor, derived from the shipped model by
+     * {@link DroneGeometry}, because the pilot's camera rides there and the feed has to look out of
+     * the pod rather than over the top of the hull.
+     */
+    public static final DeferredHolder<EntityType<?>, EntityType<SubmarineDroneEntity>> SUBMARINE_DRONE = ENTITIES.register(
+            "submarine_drone",
+            () -> EntityType.Builder
+                    .<SubmarineDroneEntity>of(SubmarineDroneEntity::new, MobCategory.MISC)
+                    .sized(0.6F, 0.6F)
+                    .eyeHeight(DroneGeometry.EYE_HEIGHT)
+                            .clientTrackingRange(10)
+                    .build("submarine_drone"));
+
+    /**
+     * The biological detector. A second machine in {@link MobCategory#MISC} for the same reason the
+     * drone is one: the fishing and aquarium pipelines work in terms of aquatic mobs, and a buoy
+     * that can be neither scooped up nor filed away needs no exception in either of them.
+     *
+     * <p>
+     * It has no spawn egg and no attributes: a detector is deployed from its own item rather than
+     * hatched, and it has no health to take — a hit is read as "pick that up" by its entity class.
+     *
+     * <p>
+     * Half a block across and half a block tall, which is exactly the ball in its folded state; the
+     * opened shell adds a hair over a tenth of a block above the hitbox, which is not worth a
+     * taller box on something a diver swims past.
+     */
+    public static final DeferredHolder<EntityType<?>, EntityType<BiologicalDetectorEntity>> BIOLOGICAL_DETECTOR = ENTITIES.register(
+            "biological_detector",
+            () -> EntityType.Builder
+                    .<BiologicalDetectorEntity>of(BiologicalDetectorEntity::new, MobCategory.MISC)
+                    .sized(DetectorGeometry.FOLDED_HEIGHT, DetectorGeometry.FOLDED_HEIGHT)
+                            .clientTrackingRange(10)
+                            .updateInterval(2)
+                    .build("biological_detector"));
 
     public static void register(IEventBus eventBus) {
         ENTITIES.register(eventBus);

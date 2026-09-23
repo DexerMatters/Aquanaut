@@ -57,7 +57,9 @@ public class PaleAbyssHydraEntity extends BaseFishEntity implements GeoEntity {
     private static final int NARCOSIS_TICKS = 60;
     private static final double PULL_STRENGTH = 0.28D;
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    /** Built on first use: passing {@code this} at field-init time would leak a
+     * half-constructed entity to GeckoLib before the subclass constructor has run. */
+    private AnimatableInstanceCache cache;
 
     private int stateTimer;
     private int dormantCooldown;
@@ -95,7 +97,11 @@ public class PaleAbyssHydraEntity extends BaseFishEntity implements GeoEntity {
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
+        AnimatableInstanceCache c = this.cache;
+        if (c == null) {
+            c = this.cache = GeckoLibUtil.createInstanceCache(this);
+        }
+        return c;
     }
 
     public static AttributeSupplier createAttributes() {

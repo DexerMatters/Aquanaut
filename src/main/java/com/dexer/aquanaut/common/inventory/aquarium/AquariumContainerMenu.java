@@ -8,7 +8,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-public class AquariumContainerMenu extends AbstractContainerMenu {
+/**
+ * Final because the constructor calls {@code addSlot}, which is overridable: a subclass could
+ * otherwise observe a half-built menu. There are no subclasses.
+ */
+public final class AquariumContainerMenu extends AbstractContainerMenu {
 
     public static final int AQUARIUM_COLS = 9;
     public static final int AQUARIUM_ROWS = 2;

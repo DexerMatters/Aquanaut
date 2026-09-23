@@ -44,3 +44,9 @@ scripts/blockbench/src/
 
 ### Logs ###
 /logs
+
+### Agents ###
+/.mimocode
+
+## Python $$
+**/__pycache__/*

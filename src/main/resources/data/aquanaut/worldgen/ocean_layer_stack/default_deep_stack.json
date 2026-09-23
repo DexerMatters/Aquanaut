@@ -1,0 +1,107 @@
+{
+  "id": "aquanaut:default_deep_stack",
+  "vertical_blend_quarts": 1.0,
+  "region_edge_fade_blocks": 16.0,
+  "min_open_water_columns": 16,
+  "parent_biomes": [
+    "minecraft:deep_ocean",
+    "minecraft:deep_cold_ocean",
+    "minecraft:deep_lukewarm_ocean",
+    "minecraft:deep_frozen_ocean"
+  ],
+  "layers": [
+    {
+      "id": "aquanaut:surface_ocean",
+      "band": {
+        "min_y": 40,
+        "max_y": 320,
+        "blend_down": 0.0,
+        "blend_up": 0.0
+      },
+      "biomes": {
+        "horizontal_blend_quarts": 0.0,
+        "entries": [
+          {
+            "biome": "minecraft:deep_ocean",
+            "weight": 1.0,
+            "inherit_surface": true
+          }
+        ]
+      },
+      "terrain": "minecraft:none",
+      "carve": false
+    },
+    {
+      "id": "aquanaut:reef_ceiling",
+      "band": {
+        "min_y": 35,
+        "max_y": 39,
+        "blend_down": 2.0,
+        "blend_up": 2.0
+      },
+      "biomes": {
+        "horizontal_blend_quarts": 3.0,
+        "entries": [
+          {
+            "biome": "aquanaut:coral_forest",
+            "weight": 0.5,
+            "noise_scale": 32,
+            "noise_offset_x": 11,
+            "noise_offset_z": -7,
+            "noise_salt": 2
+          },
+          {
+            "biome": "aquanaut:jelly_jungle",
+            "weight": 0.5,
+            "noise_scale": 32,
+            "noise_offset_x": 11,
+            "noise_offset_z": -7,
+            "noise_salt": 2
+          }
+        ]
+      },
+      "terrain": "aquanaut:reef_cap",
+      "carve": true
+    },
+    {
+      "id": "aquanaut:middle_sea",
+      "band": {
+        "min_y": -64,
+        "max_y": 34,
+        "blend_down": 0.0,
+        "blend_up": 2.0
+      },
+      "biomes": {
+        "horizontal_blend_quarts": 4.0,
+        "entries": [
+          {
+            "biome": "aquanaut:middle_level_ocean",
+            "weight": 0.3,
+            "noise_scale": 80,
+            "noise_offset_x": 19,
+            "noise_offset_z": -13,
+            "noise_salt": 7
+          },
+          {
+            "biome": "aquanaut:brine_mirror_gorge",
+            "weight": 0.55,
+            "noise_scale": 80,
+            "noise_offset_x": 19,
+            "noise_offset_z": -13,
+            "noise_salt": 7
+          },
+          {
+            "biome": "aquanaut:brimstone_caldera",
+            "weight": 0.35,
+            "noise_scale": 80,
+            "noise_offset_x": 19,
+            "noise_offset_z": -13,
+            "noise_salt": 23
+          }
+        ]
+      },
+      "terrain": "aquanaut:middle_cavity",
+      "carve": true
+    }
+  ]
+}

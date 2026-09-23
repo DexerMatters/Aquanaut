@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "aquanaut:item/submarine_drone_controller_active"
+  }
+}

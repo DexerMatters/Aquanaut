@@ -40,7 +40,9 @@ public class SlimyEntity extends BaseFishEntity implements GeoEntity {
     private static final int SLOWNESS_TICKS = 80;
     private static final float SLIME_SHED_CHANCE = 0.25F;
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    /** Built on first use: passing {@code this} at field-init time would leak a
+     * half-constructed entity to GeckoLib before the subclass constructor has run. */
+    private AnimatableInstanceCache cache;
 
     private int stickCooldown;
 
@@ -58,7 +60,11 @@ public class SlimyEntity extends BaseFishEntity implements GeoEntity {
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
+        AnimatableInstanceCache c = this.cache;
+        if (c == null) {
+            c = this.cache = GeckoLibUtil.createInstanceCache(this);
+        }
+        return c;
     }
 
     public static AttributeSupplier createAttributes() {

@@ -8,10 +8,15 @@ import com.dexer.aquanaut.core.GameRuleRegistry;
 import com.dexer.aquanaut.core.GazeRegistry;
 import com.dexer.aquanaut.core.BiomeRegistry;
 import com.dexer.aquanaut.core.FeatureRegistry;
+import com.dexer.aquanaut.core.FluidRegistry;
 import com.dexer.aquanaut.core.ItemRegistry;
 import com.dexer.aquanaut.core.MenuRegistry;
 import com.dexer.aquanaut.core.MobEffectRegistry;
+import com.dexer.aquanaut.core.ParticleRegistry;
 import com.dexer.aquanaut.core.SoundRegistry;
+import com.dexer.aquanaut.common.light.ServerDynamicLightManager;
+import com.dexer.aquanaut.common.searchlight.SearchlightServerProvider;
+import com.dexer.aquanaut.common.drone.DroneHeadlightServerProvider;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -34,16 +39,30 @@ public class Aquanaut {
         BlockEntityRegistry.register(modEventBus);
         AttachmentRegistry.register(modEventBus);
         EntityRegistry.register(modEventBus);
+        FluidRegistry.register(modEventBus);
         GameRuleRegistry.register(modEventBus);
         GazeRegistry.register(modEventBus);
         ItemRegistry.register(modEventBus);
         MenuRegistry.register(modEventBus);
         MobEffectRegistry.register(modEventBus);
+        ParticleRegistry.register(modEventBus);
         SoundRegistry.register(modEventBus);
         FeatureRegistry.register(modEventBus);
+        ServerDynamicLightManager.registerProvider(SearchlightServerProvider.ID, new SearchlightServerProvider());
+        ServerDynamicLightManager.registerProvider(DroneHeadlightServerProvider.ID,
+                new DroneHeadlightServerProvider());
         modEventBus.addListener(this::onCommonSetup);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        // Client-side fog controls live in a client config: whether a shader pack's atmosphere
+        // should be supplemented by the mod's own veil is a property of the player's install,
+        // not of the world. Touched only behind the dist check, so a dedicated server never
+        // loads the class.
+        if (net.neoforged.fml.loading.FMLEnvironment.dist
+                == net.neoforged.api.distmarker.Dist.CLIENT) {
+            modContainer.registerConfig(ModConfig.Type.CLIENT,
+                    com.dexer.aquanaut.client.fog.FogClientConfig.SPEC);
+        }
     }
 
     private void onCommonSetup(FMLCommonSetupEvent event) {

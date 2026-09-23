@@ -43,7 +43,9 @@ public class SwirlMakerEntity extends BaseFishEntity implements GeoEntity {
     private static final float DAMAGE_PER_HALF_SEC = 3.0F;
     private static final int DAMAGE_INTERVAL = 10;
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    /** Built on first use: passing {@code this} at field-init time would leak a
+     * half-constructed entity to GeckoLib before the subclass constructor has run. */
+    private AnimatableInstanceCache cache;
 
     private int attackTimer = 0;
     private int attackTargetId = -1;
@@ -83,7 +85,11 @@ public class SwirlMakerEntity extends BaseFishEntity implements GeoEntity {
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
+        AnimatableInstanceCache c = this.cache;
+        if (c == null) {
+            c = this.cache = GeckoLibUtil.createInstanceCache(this);
+        }
+        return c;
     }
 
     public static AttributeSupplier createAttributes() {

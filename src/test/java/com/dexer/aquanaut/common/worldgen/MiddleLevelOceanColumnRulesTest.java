@@ -44,8 +44,12 @@ public final class MiddleLevelOceanColumnRulesTest {
         assertTrue(seen.contains(MiddleLevelOceanColumnRules.TargetBiome.JELLY_JUNGLE),
                 "large-scale sampling should still produce jelly jungle patches");
 
-        assertEquals(MiddleLevelOceanColumnRules.TargetBiome.MIDDLE_LEVEL_OCEAN,
-                MiddleLevelOceanColumnRules.targetBiome(minecraft("deep_ocean"), 16, 0, 7, 0));
+        MiddleLevelOceanColumnRules.TargetBiome deep =
+                MiddleLevelOceanColumnRules.targetBiome(minecraft("deep_ocean"), 16, 0, 7, 0);
+        assertTrue(deep == MiddleLevelOceanColumnRules.TargetBiome.MIDDLE_LEVEL_OCEAN
+                        || deep == MiddleLevelOceanColumnRules.TargetBiome.BRINE_MIRROR_GORGE
+                        || deep == MiddleLevelOceanColumnRules.TargetBiome.BRIMSTONE_CALDERA,
+                "middle-sea layer mixes MLO, brine mirror gorge and brimstone caldera");
         assertEquals(MiddleLevelOceanColumnRules.TargetBiome.NONE,
                 MiddleLevelOceanColumnRules.targetBiome(minecraft("deep_ocean"), 16, 0, 10, 0));
         assertEquals(MiddleLevelOceanColumnRules.TargetBiome.NONE,

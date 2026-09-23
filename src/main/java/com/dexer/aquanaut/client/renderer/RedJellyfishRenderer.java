@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
-public class RedJellyfishRenderer extends BaseFishRenderer<RedJellyfishEntity> {
+public final class RedJellyfishRenderer extends BaseFishRenderer<RedJellyfishEntity> {
     public RedJellyfishRenderer(EntityRendererProvider.Context c) {
         super(c, new RedJellyfishModel());
         addRenderLayer(new AutoGlowingGeoLayer<>(this));

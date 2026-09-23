@@ -2,16 +2,16 @@ package com.dexer.aquanaut.client.model;
 
 import com.dexer.aquanaut.common.entity.MantaRayEntity;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
-public class MantaRayModel extends GeoModel<MantaRayEntity> {
+public class MantaRayModel extends AquanautGeoModel<MantaRayEntity> {
     @Override
-    public ResourceLocation getModelResource(MantaRayEntity animatable) {
+    public ResourceLocation getModelResource(MantaRayEntity entity, GeoRenderer<MantaRayEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "geo/manta_ray.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(MantaRayEntity animatable) {
+    public ResourceLocation getTextureResource(MantaRayEntity entity, GeoRenderer<MantaRayEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/manta_ray.png");
     }
 

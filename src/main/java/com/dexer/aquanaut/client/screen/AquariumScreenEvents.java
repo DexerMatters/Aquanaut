@@ -21,8 +21,7 @@ import net.neoforged.neoforge.client.event.ContainerScreenEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-@EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
-@SuppressWarnings("removal")
+@EventBusSubscriber(modid = Aquanaut.MODID, value = Dist.CLIENT)
 public final class AquariumScreenEvents {
 
     private static final int BUTTON_WIDTH = 20;

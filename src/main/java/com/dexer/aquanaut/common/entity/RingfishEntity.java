@@ -16,7 +16,9 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 public class RingfishEntity extends BaseFishEntity implements GeoEntity {
     private static final RawAnimation SWIM = RawAnimation.begin().thenLoop("animation.ring_fish.swim");
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    /** Built on first use: passing {@code this} at field-init time would leak a
+     * half-constructed entity to GeckoLib before the subclass constructor has run. */
+    private AnimatableInstanceCache cache;
 
     public RingfishEntity(EntityType<? extends WaterAnimal> type, Level level) { super(type, level); }
 
@@ -27,7 +29,12 @@ public class RingfishEntity extends BaseFishEntity implements GeoEntity {
             return s.setAndContinue(SWIM);
         }));
     }
-    @Override public AnimatableInstanceCache getAnimatableInstanceCache() { return cache; }
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() { AnimatableInstanceCache c = this.cache;
+        if (c == null) {
+            c = this.cache = GeckoLibUtil.createInstanceCache(this);
+        }
+        return c; }
 
     public static AttributeSupplier createAttributes() {
         return WaterAnimal.createMobAttributes()

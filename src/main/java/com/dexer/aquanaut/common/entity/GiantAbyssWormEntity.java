@@ -81,7 +81,9 @@ public class GiantAbyssWormEntity extends AbstractSerpentineEntity implements Ge
     private static final int COIL_DURATION_MIN = 40;
     private static final int COIL_DURATION_MAX = 100;
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    /** Built on first use: passing {@code this} at field-init time would leak a
+     * half-constructed entity to GeckoLib before the subclass constructor has run. */
+    private AnimatableInstanceCache cache;
 
     // movement state
     private Vec3 steerDir = new Vec3(1.0D, 0.0D, 0.0D);
@@ -110,6 +112,12 @@ public class GiantAbyssWormEntity extends AbstractSerpentineEntity implements Ge
     private float headRoll = 0.0F;
     private float headRollPrev = 0.0F;
 
+    // The constructor below deliberately calls inherited mutators before any subclass constructor
+    // runs. That is safe here: every such call -- setNoGravity, applyDefaultProfile -- only touches
+    // Entity state that the superclass constructor has already established, and none of them reads
+    // a subclass field. The warning is noted rather than restructured, because the alternative
+    // (deferring the calls to a later lifecycle hook) would let a gravity-enabled tick run first.
+    @SuppressWarnings("this-escape")
     public GiantAbyssWormEntity(EntityType<? extends GiantAbyssWormEntity> type, Level level) {
         super(type, level);
         this.noPhysics = true;
@@ -139,7 +147,16 @@ public class GiantAbyssWormEntity extends AbstractSerpentineEntity implements Ge
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
+        AnimatableInstanceCache c = this.cache;
+        if (c == null) {
+            c = this.cache = GeckoLibUtil.createInstanceCache(this);
+        }
+        return c;
+    }
+
+    @Override
+    protected SegmentChainAlgorithm createChainAlgorithm() {
+        return new Chain();
     }
 
     @Override
@@ -153,10 +170,6 @@ public class GiantAbyssWormEntity extends AbstractSerpentineEntity implements Ge
         return defs;
     }
 
-    @Override
-    protected SegmentChainAlgorithm createChainAlgorithm() {
-        return new Chain();
-    }
 
     @Override
     protected void driveHead(ServerLevel level) {
@@ -561,4 +574,5 @@ public class GiantAbyssWormEntity extends AbstractSerpentineEntity implements Ge
             }
         }
     }
+
 }

@@ -18,7 +18,9 @@ public class AnglerfishEntity extends BaseFishEntity implements GeoEntity {
     private static final RawAnimation SWIM_ANIMATION = RawAnimation.begin().thenLoop("swim");
     private static final RawAnimation CHARGE_ANIMATION = RawAnimation.begin().thenLoop("charge");
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    /** Built on first use: passing {@code this} at field-init time would leak a
+     * half-constructed entity to GeckoLib before the subclass constructor has run. */
+    private AnimatableInstanceCache cache;
 
     public AnglerfishEntity(EntityType<? extends WaterAnimal> type, Level level) {
         super(type, level);
@@ -37,7 +39,11 @@ public class AnglerfishEntity extends BaseFishEntity implements GeoEntity {
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
+        AnimatableInstanceCache c = this.cache;
+        if (c == null) {
+            c = this.cache = GeckoLibUtil.createInstanceCache(this);
+        }
+        return c;
     }
 
     public static AttributeSupplier createAttributes() {

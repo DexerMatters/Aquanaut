@@ -1,5 +1,7 @@
 package com.dexer.aquanaut.client;
 
+import java.util.function.Supplier;
+
 import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.client.renderer.AirBubbleRenderer;
 import com.dexer.aquanaut.client.renderer.AnglerfishRenderer;
@@ -22,6 +24,14 @@ import com.dexer.aquanaut.client.renderer.BlueRingedWormfishRenderer;
 import com.dexer.aquanaut.client.renderer.DissectionTableBlockEntityRenderer;
 import com.dexer.aquanaut.client.renderer.GasPipeBlockEntityRenderer;
 import com.dexer.aquanaut.client.renderer.CatfishRenderer;
+import com.dexer.aquanaut.client.renderer.CursorRenderer;
+import com.dexer.aquanaut.client.renderer.BiologicalDetectorRenderer;
+import com.dexer.aquanaut.client.renderer.SubmarineDroneRenderer;
+import com.dexer.aquanaut.client.drone.ClientDroneEvents;
+import com.dexer.aquanaut.client.drone.DroneHeadlightClientProvider;
+import com.dexer.aquanaut.client.renderer.item.SubmarineCompassItemPropertyFunction;
+import com.dexer.aquanaut.client.screen.TagScreen;
+import com.dexer.aquanaut.common.fog.FogProfiles;
 import com.dexer.aquanaut.client.renderer.CreeporpedoRenderer;
 import com.dexer.aquanaut.client.renderer.DonutfishRenderer;
 import com.dexer.aquanaut.client.renderer.ElectrofishRenderer;
@@ -46,23 +56,74 @@ import com.dexer.aquanaut.client.renderer.SwirlMakerRenderer;
 import com.dexer.aquanaut.client.renderer.SwirlRenderer;
 import com.dexer.aquanaut.client.renderer.TripodRenderer;
 import com.dexer.aquanaut.client.renderer.item.GasFlowMeterItemRenderer;
+import com.dexer.aquanaut.client.renderer.item.HandheldAirBladderItemRenderer;
+import com.dexer.aquanaut.client.renderer.item.HandheldSearchlightItemRenderer;
+import com.dexer.aquanaut.client.light.ClientDynamicLightManager;
+import com.dexer.aquanaut.client.particle.SoftWispParticle;
+import com.dexer.aquanaut.client.searchlight.SearchlightClientProvider;
 import com.dexer.aquanaut.client.screen.AquariumScreen;
+import com.dexer.aquanaut.common.item.GasFlowMeterItem;
+import com.dexer.aquanaut.common.item.SubmarineDroneControllerItem;
 import com.dexer.aquanaut.core.EntityRegistry;
 import com.dexer.aquanaut.core.BlockEntityRegistry;
+import com.dexer.aquanaut.core.FluidRegistry;
 import com.dexer.aquanaut.core.ItemRegistry;
 import com.dexer.aquanaut.core.MenuRegistry;
+import com.dexer.aquanaut.core.ParticleRegistry;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 
-@EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-@SuppressWarnings("removal")
+@EventBusSubscriber(modid = Aquanaut.MODID, value = Dist.CLIENT)
 public final class ClientModEvents {
     private ClientModEvents() {
+    }
+
+    /** Registers the tag editor, which a taggable entity opens through a common-side hook. */
+    @SubscribeEvent
+    public static void onClientSetup(FMLClientSetupEvent event) {
+        TagScreen.install();        ClientDynamicLightManager.registerProvider(SearchlightClientProvider.ID, new SearchlightClientProvider());
+        ClientDynamicLightManager.registerProvider(DroneHeadlightClientProvider.ID,
+                new DroneHeadlightClientProvider());
+
+        // The compass needle is an item-model property, exactly like vanilla's compass: the
+        // generated submarine_compass.json picks one of its 32 frames from this value.
+        ItemProperties.register(
+                ItemRegistry.SUBMARINE_COMPASS.get(),
+                ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, "angle"),
+                new SubmarineCompassItemPropertyFunction());
+
+        // The controller has two sprites, not two items: the powered one is chosen from the link in
+        // the stack's NBT, so a controller that points at a drone looks live in the hand.
+        ItemProperties.register(
+                ItemRegistry.SUBMARINE_DRONE_CONTROLLER.get(),
+                ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, "linked"),
+                (stack, level, entity, seed) -> SubmarineDroneControllerItem.isLinked(stack) ? 1.0F : 0.0F);
+    }
+
+    @SubscribeEvent
+    public static void registerKeyMappings(RegisterKeyMappingsEvent event) {
+        event.register(ClientDroneEvents.HEADLIGHT_KEY);
+    }
+
+    /** Loads the fog table (visibility per ocean, and the look of acid). */
+    @SubscribeEvent
+    public static void onRegisterClientReloadListeners(RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener(FogProfiles.reloadListener());
     }
 
     @SubscribeEvent
@@ -150,6 +211,9 @@ public final class ClientModEvents {
         event.registerEntityRenderer(EntityRegistry.PALE_ABYSS_HYDRA.get(), PaleAbyssHydraRenderer::new);
         event.registerEntityRenderer(EntityRegistry.THREE_HEADED_SHARK.get(), ThreeHeadedSharkRenderer::new);
         event.registerEntityRenderer(EntityRegistry.AIR_BUBBLE.get(), AirBubbleRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.CURSOR.get(), CursorRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.SUBMARINE_DRONE.get(), SubmarineDroneRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.BIOLOGICAL_DETECTOR.get(), BiologicalDetectorRenderer::new);
         event.registerEntityRenderer(EntityRegistry.HARPOON.get(), HarpoonRenderer::new);
         event.registerEntityRenderer(EntityRegistry.LIGHTNING.get(), LightningRenderer::new);
         event.registerBlockEntityRenderer(BlockEntityRegistry.GAS_PIPE.get(), GasPipeBlockEntityRenderer::new);
@@ -160,6 +224,72 @@ public final class ClientModEvents {
     @SubscribeEvent
     public static void registerAdditionalModels(ModelEvent.RegisterAdditional event) {
         GasFlowMeterItemRenderer.registerAdditionalModels(event);
+        HandheldAirBladderItemRenderer.registerAdditionalModels(event);
+        HandheldSearchlightItemRenderer.registerAdditionalModels(event);
+    }
+
+    /**
+     * The bladder swaps between the inventory sprite and the element model, and
+     * the searchlight additionally swaps between its dark and burning states, so
+     * both need the custom renderer. The flow meter brings its own extension,
+     * which carries its targeting hand transform alongside the renderer.
+     * Registered here rather than through the removed {@code Item#initializeClient}
+     * hook, and resolved lazily so the renderers are built after the client exists.
+     */
+    @SubscribeEvent
+    public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
+        event.registerItem(customRenderer(HandheldAirBladderItemRenderer::small),
+                ItemRegistry.HANDHELD_AIR_BLADDER.get());
+        event.registerItem(customRenderer(HandheldAirBladderItemRenderer::large),
+                ItemRegistry.LARGE_HANDHELD_AIR_BLADDER.get());
+        event.registerItem(customRenderer(HandheldSearchlightItemRenderer::getInstance),
+                ItemRegistry.HANDHELD_SEARCHLIGHT.get());
+        event.registerItem(GasFlowMeterItem.CLIENT_EXTENSIONS, ItemRegistry.GAS_FLOW_METER.get());
+        event.registerFluidType(SULFURIC_ACID_CLIENT, FluidRegistry.SULFURIC_ACID_TYPE.get());
+    }
+
+    /** Sulfuric acid renders with its own still/flowing textures and a sour green fog tint. */
+    private static final IClientFluidTypeExtensions SULFURIC_ACID_CLIENT = new IClientFluidTypeExtensions() {
+        @Override
+        public int getTintColor() {
+            return 0xFFD8D466;
+        }
+
+        @Override
+        public ResourceLocation getStillTexture() {
+            return ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, "block/sulfuric_acid_still");
+        }
+
+        @Override
+        public ResourceLocation getFlowingTexture() {
+            return ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, "block/sulfuric_acid_flow");
+        }
+    };
+
+    /** Vapor, steam and drifting ash of the Brimstone Caldera. */
+    @SubscribeEvent
+    public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(ParticleRegistry.SULFURIC_ACID_MIST.get(),
+                sprites -> new SoftWispParticle.Provider(sprites, 0.80F, 0.82F, 0.48F,
+                        0.42F, 30, 0.002F, 0.55F));
+        event.registerSpriteSet(ParticleRegistry.VENT_STEAM.get(),
+                sprites -> new SoftWispParticle.Provider(sprites, 0.93F, 0.94F, 0.95F,
+                        0.36F, 24, 0.003F, 0.50F));
+        event.registerSpriteSet(ParticleRegistry.SULFUR_GAS.get(),
+                sprites -> new SoftWispParticle.Provider(sprites, 0.88F, 0.88F, 0.45F,
+                        0.28F, 20, 0.002F, 0.45F));
+        event.registerSpriteSet(ParticleRegistry.ASH_MOTE.get(),
+                sprites -> new SoftWispParticle.Provider(sprites, 0.30F, 0.30F, 0.33F,
+                        0.16F, 45, 0.004F, 0.75F));
+    }
+
+    private static IClientItemExtensions customRenderer(Supplier<BlockEntityWithoutLevelRenderer> renderer) {
+        return new IClientItemExtensions() {
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                return renderer.get();
+            }
+        };
     }
 
     @SubscribeEvent

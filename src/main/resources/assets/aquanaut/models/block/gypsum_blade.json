@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "aquanaut:block/gypsum_blade_top",
+    "side": "aquanaut:block/gypsum_blade"
+  }
+}

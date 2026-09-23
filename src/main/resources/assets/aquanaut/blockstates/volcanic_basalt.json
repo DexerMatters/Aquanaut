@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "aquanaut:block/volcanic_basalt_horizontal",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "aquanaut:block/volcanic_basalt"
+    },
+    "axis=z": {
+      "model": "aquanaut:block/volcanic_basalt_horizontal",
+      "x": 90
+    }
+  }
+}

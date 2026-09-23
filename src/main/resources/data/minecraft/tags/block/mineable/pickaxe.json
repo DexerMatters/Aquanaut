@@ -8,6 +8,26 @@
     "aquanaut:polished_hard_shell_block",
     "aquanaut:hard_shell_frame",
     "aquanaut:gas_pipe",
-    "aquanaut:dissection_table"
+    "aquanaut:dissection_table",
+    "aquanaut:volcanic_basalt",
+    "aquanaut:scoria",
+    "aquanaut:pillow_basalt",
+    "aquanaut:volcanic_agglomerate",
+    "aquanaut:pumice",
+    "aquanaut:obsidian_glass",
+    "aquanaut:acid_etched_basalt",
+    "aquanaut:sulfur_crust",
+    "aquanaut:sinter",
+    "aquanaut:vent_chimney",
+    "aquanaut:fumarole",
+    "aquanaut:sulfur_crystal",
+    "aquanaut:halite_crust",
+    "aquanaut:halite_pipe",
+    "aquanaut:varve_shale",
+    "aquanaut:brine_mirror",
+    "aquanaut:hopper_halite",
+    "aquanaut:halite_druse",
+    "aquanaut:gypsum_blade",
+    "aquanaut:sylvite_crust"
   ]
 }

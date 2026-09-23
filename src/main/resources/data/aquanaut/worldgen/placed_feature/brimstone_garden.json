@@ -1,0 +1,21 @@
+{
+  "feature": "aquanaut:brimstone_garden",
+  "placement": [
+    {
+      "type": "minecraft:count",
+      "count": {
+        "type": "minecraft:weighted_list",
+        "distribution": [
+          { "data": 0, "weight": 3 },
+          { "data": 1, "weight": 4 }
+        ]
+      }
+    },
+    { "type": "minecraft:in_square" },
+    {
+      "type": "minecraft:heightmap",
+      "heightmap": "OCEAN_FLOOR_WG"
+    },
+    { "type": "minecraft:biome" }
+  ]
+}

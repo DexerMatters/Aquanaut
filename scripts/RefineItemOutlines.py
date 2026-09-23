@@ -1,7 +1,19 @@
 #!/usr/bin/env python3
+"""Apply the per-texture outline profiles to the item sprites.
+
+Run from the repository root:
+
+    python3 scripts/RefineItemOutlines.py                       # every sprite
+    python3 scripts/RefineItemOutlines.py --only a.png,b.png    # a subset
+
+The subset form exists because the profile table is allowed to lag behind the
+texture set (some sprites shipped without an entry); refining only the sprites
+you just generated keeps that gap from blocking the pass.
+"""
 from __future__ import annotations
 
 import math
+import sys
 from pathlib import Path
 
 from PIL import Image
@@ -151,13 +163,26 @@ def process_texture(path: Path, profile: OutlineProfile) -> bool:
 
 
 def main() -> None:
+    argv = sys.argv[1:]
+    only: set[str] | None = None
+    if argv:
+        if argv[0] != "--only" or len(argv) != 2:
+            raise SystemExit("usage: RefineItemOutlines.py [--only name.png[,name.png]]")
+        only = {name.strip() for name in argv[1].split(",") if name.strip()}
+
     actual_files = sorted(path.name for path in ROOT.glob("*.png"))
-    missing = [name for name in actual_files if name not in TEXTURE_PROFILES]
     extra = [name for name in TEXTURE_PROFILES if not (ROOT / name).exists()]
-    if missing:
-        raise SystemExit(f"Missing explicit outline profiles for: {', '.join(missing)}")
     if extra:
         raise SystemExit(f"Profiles point to missing textures: {', '.join(extra)}")
+    if only is not None:
+        unknown = sorted(only - set(actual_files))
+        if unknown:
+            raise SystemExit(f"Unknown textures: {', '.join(unknown)}")
+        actual_files = [name for name in actual_files if name in only]
+
+    missing = [name for name in actual_files if name not in TEXTURE_PROFILES]
+    if missing:
+        raise SystemExit(f"Missing explicit outline profiles for: {', '.join(missing)}")
 
     changed_count = 0
     for name in actual_files:

@@ -1,17 +1,19 @@
 package com.dexer.aquanaut.common.worldgen;
 
+import com.dexer.aquanaut.common.worldgen.layers.OceanLayerStack;
+import com.dexer.aquanaut.common.worldgen.layers.OceanLayerStacks;
+import com.dexer.aquanaut.common.worldgen.layers.SoftMixNoise;
 import net.minecraft.resources.ResourceLocation;
 
+/**
+ * Thin facade over the active {@link OceanLayerStack}. Prefer the layers package for new code.
+ */
 public final class MiddleLevelOceanColumnRules {
-    private static final int FULL_QUART_CELL_COLUMN_COUNT = 16;
-    private static final int TRANSITION_PATCH_SIZE_QUARTS = 32;
-
     private MiddleLevelOceanColumnRules() {
     }
 
     public static boolean supportsQuartCell(ResourceLocation surfaceBiomeLocation, int openWaterColumns) {
-        return MiddleLevelOceanPlacement.isVanillaDeepOcean(surfaceBiomeLocation)
-                && openWaterColumns >= FULL_QUART_CELL_COLUMN_COUNT;
+        return OceanLayerStacks.active().supportsQuartCell(surfaceBiomeLocation, openWaterColumns);
     }
 
     public static TargetBiome targetBiome(ResourceLocation surfaceBiomeLocation,
@@ -19,74 +21,57 @@ public final class MiddleLevelOceanColumnRules {
                                           int quartX,
                                           int quartY,
                                           int quartZ) {
-        if (!supportsQuartCell(surfaceBiomeLocation, openWaterColumns)) {
+        OceanLayerStack stack = OceanLayerStacks.active();
+        if (!stack.supportsQuartCell(surfaceBiomeLocation, openWaterColumns)) {
             return TargetBiome.NONE;
         }
 
-        if (CoralForestPlacement.isCoralForestQuartY(quartY)) {
-            return transitionBandBiome(quartX, quartZ);
+        int blockY = (quartY << 2) + 2;
+        ResourceLocation biome = stack.dominantLayerAtBlockY(blockY).mix().dominantBiomeAt(quartX, quartZ);
+        if (biome == null) {
+            return TargetBiome.NONE;
         }
-
-        if (MiddleLevelOceanPlacement.isMiddleLayerQuartY(quartY)) {
+        if (biome.equals(CoralForestPlacement.location())) {
+            return TargetBiome.CORAL_FOREST;
+        }
+        if (biome.equals(JellyJunglePlacement.location())) {
+            return TargetBiome.JELLY_JUNGLE;
+        }
+        if (biome.equals(MiddleLevelOceanPlacement.location())) {
             return TargetBiome.MIDDLE_LEVEL_OCEAN;
         }
-
+        if (biome.equals(BrineMirrorGorgePlacement.location())) {
+            return TargetBiome.BRINE_MIRROR_GORGE;
+        }
+        if (biome.equals(BrimstoneCalderaPlacement.location())) {
+            return TargetBiome.BRIMSTONE_CALDERA;
+        }
         return TargetBiome.NONE;
     }
 
-    private static TargetBiome transitionBandBiome(int quartX, int quartZ) {
-        double noise = transitionNoise(quartX + 11, quartZ - 7);
-        return noise >= 0.0D ? TargetBiome.JELLY_JUNGLE : TargetBiome.CORAL_FOREST;
-    }
-
-    private static double transitionNoise(int quartX, int quartZ) {
-        int cellX = Math.floorDiv(quartX, TRANSITION_PATCH_SIZE_QUARTS);
-        int cellZ = Math.floorDiv(quartZ, TRANSITION_PATCH_SIZE_QUARTS);
-        double fracX = Math.floorMod(quartX, TRANSITION_PATCH_SIZE_QUARTS)
-                / (double) TRANSITION_PATCH_SIZE_QUARTS;
-        double fracZ = Math.floorMod(quartZ, TRANSITION_PATCH_SIZE_QUARTS)
-                / (double) TRANSITION_PATCH_SIZE_QUARTS;
-        double sx = smoothstep(fracX);
-        double sz = smoothstep(fracZ);
-
-        double n00 = cornerNoise(cellX, cellZ);
-        double n10 = cornerNoise(cellX + 1, cellZ);
-        double n01 = cornerNoise(cellX, cellZ + 1);
-        double n11 = cornerNoise(cellX + 1, cellZ + 1);
-        double nx0 = lerp(sx, n00, n10);
-        double nx1 = lerp(sx, n01, n11);
-        return lerp(sz, nx0, nx1);
-    }
-
-    private static double cornerNoise(int cellX, int cellZ) {
-        long hash = mix(cellX, cellZ, 2);
-        return (Math.floorMod(hash, 2001L) / 1000.0D) - 1.0D;
-    }
-
-    private static double smoothstep(double value) {
-        return value * value * (3.0D - 2.0D * value);
-    }
-
-    private static double lerp(double delta, double start, double end) {
-        return start + delta * (end - start);
-    }
-
-    private static long mix(int cellX, int cellZ, int salt) {
-        long value = 0x9E3779B97F4A7C15L;
-        value ^= (long) cellX * 341873128712L;
-        value ^= (long) cellZ * 132897987541L;
-        value ^= (long) salt * 0x94D049BB133111EBL;
-        value ^= value >>> 30;
-        value *= 0xBF58476D1CE4E5B9L;
-        value ^= value >>> 27;
-        value *= 0x94D049BB133111EBL;
-        return value ^ (value >>> 31);
+    /**
+     * Soft horizontal mix weight for jelly jungle on the reef band (1 = full jelly).
+     */
+    public static double jellyWeight(int quartX, int quartZ) {
+        OceanLayerStack stack = OceanLayerStacks.active();
+        for (var layer : stack.layers()) {
+            if (layer.mix().entries().size() >= 2
+                    && layer.mix().entries().get(0).biome().equals(CoralForestPlacement.location())) {
+                double[] weights = layer.mix().weightsAt(quartX + 11, quartZ - 7);
+                return weights[1];
+            }
+        }
+        return SoftMixNoise.softThreshold(
+                SoftMixNoise.valueNoise(quartX + 11, quartZ - 7, 32, 2L),
+                0.05D);
     }
 
     public enum TargetBiome {
         NONE,
         CORAL_FOREST,
         JELLY_JUNGLE,
-        MIDDLE_LEVEL_OCEAN
+        MIDDLE_LEVEL_OCEAN,
+        BRINE_MIRROR_GORGE,
+        BRIMSTONE_CALDERA
     }
 }

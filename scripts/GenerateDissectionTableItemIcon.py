@@ -65,7 +65,7 @@ def load_palette() -> dict[str, tuple[int, int, int, int]]:
     if not TABLE_TEXTURE.exists():
         raise SystemExit(f"missing table texture: {TABLE_TEXTURE} (export the models first: scripts/export_blockbench_models.py)")
     image = Image.open(TABLE_TEXTURE).convert("RGBA")
-    pixels = [pixel for pixel in image.getdata() if pixel[3] > 128]
+    pixels = [pixel for pixel in image.get_flattened_data() if pixel[3] > 128]
     if not pixels:
         raise SystemExit("table texture has no opaque pixels")
 
@@ -152,7 +152,7 @@ def main(argv: list[str] | None = None) -> int:
     ICON_PATH.parent.mkdir(parents=True, exist_ok=True)
     icon.save(ICON_PATH)
 
-    opaque = sum(1 for pixel in icon.getdata() if pixel[3] > 0)
+    opaque = sum(1 for pixel in icon.get_flattened_data() if pixel[3] > 0)
     print(f"wrote {ICON_PATH.relative_to(REPO_ROOT)} ({opaque} opaque pixels)")
     if args.preview:
         print(ascii_preview(icon))

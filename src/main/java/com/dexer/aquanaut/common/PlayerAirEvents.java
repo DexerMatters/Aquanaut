@@ -10,8 +10,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
  * Player-only air lifecycle hooks that cannot be derived from generic entity
  * events.
  */
-@EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME)
-@SuppressWarnings("removal")
+@EventBusSubscriber(modid = Aquanaut.MODID)
 public final class PlayerAirEvents {
 
     private PlayerAirEvents() {

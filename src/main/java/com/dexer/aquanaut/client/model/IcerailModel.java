@@ -3,16 +3,16 @@ package com.dexer.aquanaut.client.model;
 import com.dexer.aquanaut.common.entity.IcerailEntity;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
-public class IcerailModel extends GeoModel<IcerailEntity> {
+public class IcerailModel extends AquanautGeoModel<IcerailEntity> {
     @Override
-    public ResourceLocation getModelResource(IcerailEntity animatable) {
+    public ResourceLocation getModelResource(IcerailEntity entity, GeoRenderer<IcerailEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "geo/icerail.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(IcerailEntity animatable) {
+    public ResourceLocation getTextureResource(IcerailEntity entity, GeoRenderer<IcerailEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/icerail.png");
     }
 

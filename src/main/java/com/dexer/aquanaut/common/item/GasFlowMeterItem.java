@@ -1,7 +1,5 @@
 package com.dexer.aquanaut.common.item;
 
-import java.util.function.Consumer;
-
 import com.dexer.aquanaut.client.model.GasFlowMeterTargetingHelper;
 import com.dexer.aquanaut.client.renderer.item.GasFlowMeterItemRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -54,32 +52,34 @@ public class GasFlowMeterItem extends Item {
                 SoundEvents.SPYGLASS_STOP_USING, SoundSource.PLAYERS, 0.8F, 1.0F);
     }
 
-    @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            @Override
-            public boolean applyForgeHandTransform(PoseStack poseStack, LocalPlayer player, HumanoidArm arm,
-                    ItemStack itemInHand, float partialTick, float equipProcess, float swingProcess) {
-                if (!isUsingInArm(player, arm, itemInHand)) {
-                    return false;
-                }
-
-                GasFlowMeterTargetingHelper.Transform transform =
-                        GasFlowMeterTargetingHelper.targeting(arm == HumanoidArm.RIGHT);
-                poseStack.translate(transform.translateX(), transform.translateY(), transform.translateZ());
-                poseStack.mulPose(Axis.YP.rotationDegrees(transform.yawDegrees()));
-                poseStack.mulPose(Axis.XP.rotationDegrees(transform.pitchDegrees()));
-                poseStack.mulPose(Axis.ZP.rotationDegrees(transform.rollDegrees()));
-                poseStack.scale(transform.scale(), transform.scale(), transform.scale());
-                return true;
+    /**
+     * Targeting transform and inventory model, handed to
+     * {@code ClientModEvents#registerClientExtensions} rather than through the removed
+     * {@code Item#initializeClient} hook. Shared, because the extension holds no state of its own.
+     */
+    public static final IClientItemExtensions CLIENT_EXTENSIONS = new IClientItemExtensions() {
+        @Override
+        public boolean applyForgeHandTransform(PoseStack poseStack, LocalPlayer player, HumanoidArm arm,
+                ItemStack itemInHand, float partialTick, float equipProcess, float swingProcess) {
+            if (!isUsingInArm(player, arm, itemInHand)) {
+                return false;
             }
 
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return GasFlowMeterItemRenderer.getInstance();
-            }
-        });
-    }
+            GasFlowMeterTargetingHelper.Transform transform =
+                    GasFlowMeterTargetingHelper.targeting(arm == HumanoidArm.RIGHT);
+            poseStack.translate(transform.translateX(), transform.translateY(), transform.translateZ());
+            poseStack.mulPose(Axis.YP.rotationDegrees(transform.yawDegrees()));
+            poseStack.mulPose(Axis.XP.rotationDegrees(transform.pitchDegrees()));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(transform.rollDegrees()));
+            poseStack.scale(transform.scale(), transform.scale(), transform.scale());
+            return true;
+        }
+
+        @Override
+        public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+            return GasFlowMeterItemRenderer.getInstance();
+        }
+    };
 
     private static boolean isUsingInArm(LocalPlayer player, HumanoidArm arm, ItemStack itemStack) {
         if (!player.isUsingItem() || !ItemStack.isSameItemSameComponents(player.getUseItem(), itemStack)) {

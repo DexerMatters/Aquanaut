@@ -2,16 +2,16 @@ package com.dexer.aquanaut.client.model;
 
 import com.dexer.aquanaut.common.entity.SpringfishEntity;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
-public class SpringfishModel extends GeoModel<SpringfishEntity> {
+public class SpringfishModel extends AquanautGeoModel<SpringfishEntity> {
     @Override
-    public ResourceLocation getModelResource(SpringfishEntity animatable) {
+    public ResourceLocation getModelResource(SpringfishEntity entity, GeoRenderer<SpringfishEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "geo/springfish.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(SpringfishEntity animatable) {
+    public ResourceLocation getTextureResource(SpringfishEntity entity, GeoRenderer<SpringfishEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/springfish.png");
     }
 

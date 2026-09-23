@@ -1,0 +1,52 @@
+{
+  "variants": {
+    "layers=1,waterlogged=false": {
+      "model": "aquanaut:block/ash_layer_1"
+    },
+    "layers=1,waterlogged=true": {
+      "model": "aquanaut:block/ash_layer_1"
+    },
+    "layers=2,waterlogged=false": {
+      "model": "aquanaut:block/ash_layer_2"
+    },
+    "layers=2,waterlogged=true": {
+      "model": "aquanaut:block/ash_layer_2"
+    },
+    "layers=3,waterlogged=false": {
+      "model": "aquanaut:block/ash_layer_2"
+    },
+    "layers=3,waterlogged=true": {
+      "model": "aquanaut:block/ash_layer_2"
+    },
+    "layers=4,waterlogged=false": {
+      "model": "aquanaut:block/ash_layer_2"
+    },
+    "layers=4,waterlogged=true": {
+      "model": "aquanaut:block/ash_layer_2"
+    },
+    "layers=5,waterlogged=false": {
+      "model": "aquanaut:block/ash_layer_3"
+    },
+    "layers=5,waterlogged=true": {
+      "model": "aquanaut:block/ash_layer_3"
+    },
+    "layers=6,waterlogged=false": {
+      "model": "aquanaut:block/ash_layer_3"
+    },
+    "layers=6,waterlogged=true": {
+      "model": "aquanaut:block/ash_layer_3"
+    },
+    "layers=7,waterlogged=false": {
+      "model": "aquanaut:block/ash_layer_3"
+    },
+    "layers=7,waterlogged=true": {
+      "model": "aquanaut:block/ash_layer_3"
+    },
+    "layers=8,waterlogged=false": {
+      "model": "aquanaut:block/ash_layer_3"
+    },
+    "layers=8,waterlogged=true": {
+      "model": "aquanaut:block/ash_layer_3"
+    }
+  }
+}

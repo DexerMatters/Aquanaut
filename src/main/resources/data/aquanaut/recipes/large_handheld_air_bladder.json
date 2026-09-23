@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " T ",
+    "TBT",
+    " T "
+  ],
+  "key": {
+    "B": {
+      "item": "aquanaut:handheld_air_bladder"
+    },
+    "T": {
+      "item": "aquanaut:transparent_tissue"
+    }
+  },
+  "result": {
+    "id": "aquanaut:large_handheld_air_bladder",
+    "count": 1
+  }
+}

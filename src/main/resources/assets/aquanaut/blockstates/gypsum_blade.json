@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "aquanaut:block/gypsum_blade_horizontal",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y": {
+      "model": "aquanaut:block/gypsum_blade"
+    },
+    "axis=z": {
+      "model": "aquanaut:block/gypsum_blade_horizontal",
+      "x": 90
+    }
+  }
+}

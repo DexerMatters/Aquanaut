@@ -1,85 +1,127 @@
 package com.dexer.aquanaut.common.worldgen;
 
+import com.dexer.aquanaut.common.worldgen.layers.SoftMixNoise;
+import com.dexer.aquanaut.common.worldgen.layers.TerrainModule;
+
 public final class MiddleLevelOceanTerrainProfile {
-    private static final int CAP_TOP_MIN_Y = CoralForestPlacement.layerStartBlockY() - 1;
-    private static final int CAP_TOP_MAX_Y = CoralForestPlacement.layerStartBlockY() + 3;
-    private static final int MIN_CAP_THICKNESS = 4;
-    private static final int CAP_THICKNESS_VARIANTS = 5;
-    private static final double PILLAR_CHANCE = 0.05D;
-    private static final double PILLAR_CONNECTED_CHANCE = 0.20D;
-    private static final double PILLAR_HEIGHT_MIN_RATIO = 0.20D;
-    private static final double PILLAR_HEIGHT_MAX_RATIO = 0.40D;
-    private static final int PILLAR_BASE_EXTRA = 4;
-    private static final int MIN_CAVITY_DEPTH = 40;
-    private static final int CAVITY_DEPTH_VARIANTS = 9;
-    private static final int MIN_FLOOR_MARGIN = 12;
-    private static final double CRACK_THRESHOLD = 0.50D;
-    private static final double CRACK_DETAIL_THRESHOLD = 0.40D;
     private static final long WALL_SEED = 0xDEADBEEFL;
-    private static final int WALL_CELL_SIZE = 64;
-    private static final double WALL_INTRUSION_STRENGTH = 0.15D;
+    private static final long PILLAR_PATCH_SEED = 0xA1B2C3D4L;
+    private static final long PILLAR_CORE_SEED = 0xC0FFEE11L;
+    // Crack openings: two rotated octaves of the same value-noise family. The rotation is what
+    // keeps the outlines irregular — a single axis-aligned grid reads as a field of squares.
+    private static final long CRACK_OUTLINE_SEED = 0x9E3779B9L;
+    private static final long CRACK_DETAIL_SEED = 0x7F4A7C15L;
+    private static final double CRACK_ROTATION = 0.62D;
+    private static final double CRACK_DETAIL_ROTATION = 1.67D;
+    private static final double CRACK_DETAIL_RATIO = 1.0D / Math.sqrt(2.0D);
+    private static final double CRACK_DETAIL_WEIGHT = 0.38D;
+    // Second (finer) outline field, as a fraction of the coarse crack cell size.
+    private static final double CRACK_DETAIL_CELL_SCALE = 0.30D;
 
     private MiddleLevelOceanTerrainProfile() {
     }
 
     public static double chamberWallFade(int blockX, int blockZ) {
-        double wallNoise = sample(blockX, blockZ, WALL_CELL_SIZE, WALL_SEED);
-        double wallDetail = sample(blockX, blockZ, 16, WALL_SEED ^ 0x12345678L);
-        double combined = wallNoise * 0.7D + wallDetail * 0.3D;
-        double fade = (combined - WALL_INTRUSION_STRENGTH) / (1.0D - WALL_INTRUSION_STRENGTH);
-        return smoothClamp(fade);
+        return chamberWallFade(blockX, blockZ, TerrainModule.reefCap());
     }
 
-    private static double smoothClamp(double value) {
-        if (value <= 0.0D) return 0.0D;
-        if (value >= 1.0D) return 1.0D;
-        return value * value * (3.0D - 2.0D * value);
+    /**
+     * Broad chamber outline only (large cells). Must stay smooth so floor height
+     * does not inherit high-frequency wall detail.
+     */
+    public static double chamberWallFade(int blockX, int blockZ, TerrainModule terrain) {
+        double wallNoise = sample(blockX, blockZ, terrain.wallCellSize(), WALL_SEED);
+        double wallMid = sample(blockX, blockZ, 48, WALL_SEED ^ 0x12345678L);
+        double combined = wallNoise * 0.75D + wallMid * 0.25D;
+        double fade = (combined - terrain.wallIntrusion()) / (1.0D - terrain.wallIntrusion());
+        return SoftMixNoise.smoothstep(fade);
     }
 
     public static ColumnProfile profileFor(int blockX, int blockZ, int minBuildHeight) {
-        double capTopNoise = sample(blockX, blockZ, 28, 0x5F3759DFL);
-        double capTopDetail = sample(blockX, blockZ, 10, 0x5F3759DFL ^ 0xABCDEF01L);
-        double capTopBlend = capTopNoise * 0.7D + capTopDetail * 0.3D;
-        int capTopY = CAP_TOP_MIN_Y + floor(capTopBlend * ((CAP_TOP_MAX_Y - CAP_TOP_MIN_Y) + 1));
+        return profileFor(blockX, blockZ, minBuildHeight, TerrainModule.reefCap());
+    }
 
-        double capThicknessNoise = sample(blockX, blockZ, 20, 0x6A09E667L);
-        int capThickness = MIN_CAP_THICKNESS + floor(capThicknessNoise * CAP_THICKNESS_VARIANTS);
-        int capBottomY = Math.max(MiddleLevelOceanPlacement.layerStartBlockY() + 1,
-                capTopY - capThickness + 1);
+    public static ColumnProfile profileFor(int blockX, int blockZ, int minBuildHeight, TerrainModule terrain) {
+        // Cap top: broad undulation only (no 10-block detail).
+        double capTopNoise = sample(blockX, blockZ, 36, 0x5F3759DFL);
+        double capTopMid = sample(blockX, blockZ, 18, 0x5F3759DFL ^ 0xABCDEF01L);
+        double capTopBlend = capTopNoise * 0.8D + capTopMid * 0.2D;
+        int capRange = (terrain.capTopMaxY() - terrain.capTopMinY()) + 1;
+        int capTopY = terrain.capTopMinY() + floor(capTopBlend * capRange);
 
-        double basinNoise = sample(blockX, blockZ, 52, 0x243F6A88L);
-        double basinDetail = sample(blockX, blockZ, 24, 0xB7E15162L);
-        double cavityBlend = basinNoise * 0.72D + basinDetail * 0.28D;
-        int cavityDepth = MIN_CAVITY_DEPTH + floor(cavityBlend * CAVITY_DEPTH_VARIANTS);
-        int cavityFloorY = Math.max(minBuildHeight + MIN_FLOOR_MARGIN, capBottomY - cavityDepth);
+        double capThicknessNoise = sample(blockX, blockZ, 28, 0x6A09E667L);
+        int capThickness = terrain.minCapThickness() + floor(capThicknessNoise * terrain.capThicknessVariants());
+        int layerFloor = terrain.capTopMinY() - 7;
+        int capBottomY = Math.max(layerFloor + 1, capTopY - capThickness + 1);
 
-        double crackField = sample(blockX, blockZ, 44, 0x9E3779B9L);
-        double crackDetail = sample(blockX, blockZ, 12, 0x7F4A7C15L);
-        boolean crack = crackField > CRACK_THRESHOLD && crackDetail > CRACK_DETAIL_THRESHOLD;
+        // Basin depth: large-scale only so the lower sea floor stays broad and gentle.
+        double basinNoise = sample(blockX, blockZ, 80, 0x243F6A88L);
+        double basinMid = sample(blockX, blockZ, 40, 0xB7E15162L);
+        double cavityBlend = basinNoise * 0.8D + basinMid * 0.2D;
+        int cavityDepth = terrain.minCavityDepth() + floor(cavityBlend * terrain.cavityDepthVariants());
+        int cavityFloorY = Math.max(minBuildHeight + terrain.minFloorMargin(), capBottomY - cavityDepth);
+
+        // Broad outline plus a finer irregularity field, both rotated off the block grid.
+        boolean crack = crackField(blockX, blockZ, terrain.crackCellSize(), CRACK_OUTLINE_SEED,
+                terrain.crackThreshold())
+                && crackField(blockX, blockZ,
+                        Math.max(2.0D, terrain.crackCellSize() * CRACK_DETAIL_CELL_SCALE),
+                        CRACK_DETAIL_SEED, terrain.crackDetailThreshold());
 
         int pillarTopY = 0;
-        if (!crack) {
-            double pillarNoise = unitHash(blockX, blockZ, 0xA1B2C3D4L);
-            if (pillarNoise < PILLAR_CHANCE) {
-                double connectNoise = unitHash(blockX ^ 0x55, blockZ ^ 0xAA, 0xD4C3B2A1L);
-                if (connectNoise < PILLAR_CONNECTED_CHANCE) {
-                    pillarTopY = capBottomY;
-                } else {
-                    double heightNoise = unitHash(blockX ^ 0x7F, blockZ ^ 0x3A, 0x1A2B3C4DL);
-                    double ratio = PILLAR_HEIGHT_MIN_RATIO
-                            + heightNoise * (PILLAR_HEIGHT_MAX_RATIO - PILLAR_HEIGHT_MIN_RATIO);
-                    int cavHeight = capBottomY - cavityFloorY;
-                    pillarTopY = cavityFloorY + (int) Math.round(ratio * cavHeight);
-                }
+        if (!crack && isPillarAt(blockX, blockZ, terrain)) {
+            double connectNoise = unitHash(blockX / 3, blockZ / 3, 0xD4C3B2A1L);
+            if (connectNoise < terrain.pillarConnectedChance()) {
+                pillarTopY = capBottomY;
+            } else {
+                double heightNoise = unitHash(blockX / 3, blockZ / 3, 0x1A2B3C4DL);
+                double ratio = terrain.pillarHeightMinRatio()
+                        + heightNoise * (terrain.pillarHeightMaxRatio() - terrain.pillarHeightMinRatio());
+                int cavHeight = capBottomY - cavityFloorY;
+                pillarTopY = cavityFloorY + (int) Math.round(ratio * cavHeight);
             }
         }
 
         return new ColumnProfile(capTopY, capBottomY, cavityFloorY, crack, pillarTopY);
     }
 
-    public static boolean isPillarAt(int blockX, int blockZ) {
-        double pillarNoise = unitHash(blockX, blockZ, 0xA1B2C3D4L);
-        return pillarNoise < PILLAR_CHANCE;
+    /**
+     * Pillars form blobby outcrops in patch regions, not per-block white noise.
+     */
+    public static boolean isPillarAt(int blockX, int blockZ, TerrainModule terrain) {
+        double patch = sample(blockX, blockZ, 20, PILLAR_PATCH_SEED);
+        double mid = sample(blockX, blockZ, 8, PILLAR_PATCH_SEED ^ 0x55AA33L);
+        double field = patch * 0.7D + mid * 0.3D;
+        // Outcrop regions occupy roughly pillarChance of the map in coherent blobs.
+        double regionThreshold = 1.0D - Math.min(0.35D, Math.max(0.02D, terrain.pillarChance() * 3.5D));
+        if (field < regionThreshold) {
+            return false;
+        }
+        // Solid-ish cores inside the outcrop (not salt-and-pepper).
+        double core = sample(blockX, blockZ, 4, PILLAR_CORE_SEED);
+        return core > 0.42D;
+    }
+
+    /**
+     * True where a rotated two-octave field exceeds {@code threshold}. Rotating each octave and
+     * shifting the detail octave by {@link #CRACK_DETAIL_WEIGHT} breaks up the straight,
+     * axis-aligned borders a single grid-aligned sample produces.
+     */
+    private static boolean crackField(int blockX, int blockZ, double cellSize, long seed,
+                                      double threshold) {
+        double cos = Math.cos(CRACK_ROTATION);
+        double sin = Math.sin(CRACK_ROTATION);
+        double broad = sample(
+                blockX * cos - blockZ * sin,
+                blockX * sin + blockZ * cos,
+                cellSize, seed);
+        double detailCos = Math.cos(CRACK_DETAIL_ROTATION);
+        double detailSin = Math.sin(CRACK_DETAIL_ROTATION);
+        double detail = sample(
+                blockX * detailCos - blockZ * detailSin,
+                blockX * detailSin + blockZ * detailCos,
+                cellSize * CRACK_DETAIL_RATIO, seed ^ 0x51L);
+        return broad * (1.0D - CRACK_DETAIL_WEIGHT) + detail * CRACK_DETAIL_WEIGHT > threshold;
     }
 
     private static double sample(int blockX, int blockZ, int cellSize, long seed) {
@@ -87,28 +129,41 @@ public final class MiddleLevelOceanTerrainProfile {
         int cellZ = Math.floorDiv(blockZ, cellSize);
         double localX = (double) Math.floorMod(blockX, cellSize) / cellSize;
         double localZ = (double) Math.floorMod(blockZ, cellSize) / cellSize;
-        double smoothX = smooth(localX);
-        double smoothZ = smooth(localZ);
+        double smoothX = SoftMixNoise.smoothstep(localX);
+        double smoothZ = SoftMixNoise.smoothstep(localZ);
 
         double sample00 = unitHash(cellX, cellZ, seed);
         double sample10 = unitHash(cellX + 1, cellZ, seed);
         double sample01 = unitHash(cellX, cellZ + 1, seed);
         double sample11 = unitHash(cellX + 1, cellZ + 1, seed);
-        double lerpX0 = lerp(smoothX, sample00, sample10);
-        double lerpX1 = lerp(smoothX, sample01, sample11);
-        return lerp(smoothZ, lerpX0, lerpX1);
+        double lerpX0 = SoftMixNoise.lerp(smoothX, sample00, sample10);
+        double lerpX1 = SoftMixNoise.lerp(smoothX, sample01, sample11);
+        return SoftMixNoise.lerp(smoothZ, lerpX0, lerpX1);
+    }
+
+    /**
+     * Continuous (non-integer-cell) sample of the same value-noise family, used where the crack
+     * field is rotated and therefore lands between grid cells.
+     */
+    private static double sample(double blockX, double blockZ, double cellSize, long seed) {
+        double cellX = blockX / cellSize;
+        double cellZ = blockZ / cellSize;
+        int baseX = (int) Math.floor(cellX);
+        int baseZ = (int) Math.floor(cellZ);
+        double smoothX = SoftMixNoise.smoothstep(cellX - baseX);
+        double smoothZ = SoftMixNoise.smoothstep(cellZ - baseZ);
+
+        double sample00 = unitHash(baseX, baseZ, seed);
+        double sample10 = unitHash(baseX + 1, baseZ, seed);
+        double sample01 = unitHash(baseX, baseZ + 1, seed);
+        double sample11 = unitHash(baseX + 1, baseZ + 1, seed);
+        double lerpX0 = SoftMixNoise.lerp(smoothX, sample00, sample10);
+        double lerpX1 = SoftMixNoise.lerp(smoothX, sample01, sample11);
+        return SoftMixNoise.lerp(smoothZ, lerpX0, lerpX1);
     }
 
     private static int floor(double value) {
         return (int) Math.floor(value);
-    }
-
-    private static double lerp(double delta, double start, double end) {
-        return start + delta * (end - start);
-    }
-
-    private static double smooth(double value) {
-        return value * value * (3.0D - 2.0D * value);
     }
 
     private static double unitHash(int x, int z, long seed) {
@@ -125,8 +180,7 @@ public final class MiddleLevelOceanTerrainProfile {
         value *= 0xBF58476D1CE4E5B9L;
         value ^= value >>> 27;
         value *= 0x94D049BB133111EBL;
-        value ^= value >>> 31;
-        return value;
+        return value ^ (value >>> 31);
     }
 
     public record ColumnProfile(int capTopY, int capBottomY, int cavityFloorY, boolean crack,

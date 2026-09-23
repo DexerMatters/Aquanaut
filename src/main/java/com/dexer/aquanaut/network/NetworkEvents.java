@@ -6,8 +6,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-@EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.MOD)
-@SuppressWarnings("removal")
+@EventBusSubscriber(modid = Aquanaut.MODID)
 public final class NetworkEvents {
 
     private NetworkEvents() {
@@ -52,5 +51,25 @@ public final class NetworkEvents {
                 AquariumFishTransferPayload.TYPE,
                 AquariumFishTransferPayload.STREAM_CODEC,
                 AquariumFishTransferPayload::handle);
+        registrar.playToServer(
+                TagPayload.TYPE,
+                TagPayload.STREAM_CODEC,
+                TagPayload::handle);
+        registrar.playToServer(
+                CompassTargetPayload.TYPE,
+                CompassTargetPayload.STREAM_CODEC,
+                CompassTargetPayload::handle);
+        registrar.playToServer(
+                SubmarineDroneLinkPayload.TYPE,
+                SubmarineDroneLinkPayload.STREAM_CODEC,
+                SubmarineDroneLinkPayload::handle);
+        registrar.playToServer(
+                SubmarineDroneControlPayload.TYPE,
+                SubmarineDroneControlPayload.STREAM_CODEC,
+                SubmarineDroneControlPayload::handle);
+        registrar.playToServer(
+                SubmarineDroneHeadlightPayload.TYPE,
+                SubmarineDroneHeadlightPayload.STREAM_CODEC,
+                SubmarineDroneHeadlightPayload::handle);
     }
 }

@@ -43,7 +43,6 @@ from __future__ import annotations
 
 import argparse
 import math
-import warnings
 import random
 import statistics
 import sys
@@ -120,6 +119,8 @@ SPECIES: tuple[Species, ...] = (
             note="toothed maw ringed by arms"),
     Species("three_headed_shark", "three_jaws", "gills", canvas="d", accent_shift=0.9,
             note="three heads, three rows of teeth"),
+    # The submarine drone deliberately has no spawn egg: it is a machine, so it ships without one
+    # rather than being hatched. See scripts/GenerateSubmarineDroneTextures.py for its own art.
 )
 
 # -- reference analysis ---------------------------------------------------
@@ -929,12 +930,10 @@ def closest_pair(sprites: dict[str, Image.Image]) -> tuple[float, str, str]:
 def pixel_data(image: Image.Image) -> list[tuple[int, ...]]:
     """Pixel list for the statistics below.
 
-    ``Image.getdata`` is deprecated in current Pillow releases but is still the cheapest way to read
-    a sprite; the warning is noise here because every sprite is 16x16 RGBA.
+    ``get_flattened_data`` returns the ordinary tuple needed by the statistics
+    code without relying on Pillow's deprecated ``Image.getdata`` API.
     """
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", DeprecationWarning)
-        return list(image.getdata())
+    return list(image.get_flattened_data())
 
 
 def stats(image: Image.Image) -> tuple[int, int, float, float]:

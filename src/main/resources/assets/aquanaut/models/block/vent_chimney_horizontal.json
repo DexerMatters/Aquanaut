@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column_horizontal",
+  "textures": {
+    "end": "aquanaut:block/vent_chimney_top",
+    "side": "aquanaut:block/vent_chimney"
+  }
+}

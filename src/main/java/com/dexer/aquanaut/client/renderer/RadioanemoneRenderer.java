@@ -11,7 +11,7 @@ import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
-public class RadioanemoneRenderer extends GeoEntityRenderer<RadioanemoneEntity> {
+public final class RadioanemoneRenderer extends GeoEntityRenderer<RadioanemoneEntity> {
     private static final double VISUAL_Y_OFFSET = -0.5D;
 
     public RadioanemoneRenderer(EntityRendererProvider.Context ctx) {

@@ -115,7 +115,7 @@ public final class FishSchoolingAI {
                             (int) Math.floor(selfCenter.z + dz));
 
                     if (!fish.level().getFluidState(pos).is(FluidTags.WATER)
-                            && fish.level().getBlockState(pos).isSolid()) {
+                            && SwimObstruction.blocks(fish.level(), pos)) {
                         Vec3 blockCenter = new Vec3(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D);
                         Vec3 awayFromBlock = selfCenter.subtract(blockCenter);
                         double dist = awayFromBlock.length();

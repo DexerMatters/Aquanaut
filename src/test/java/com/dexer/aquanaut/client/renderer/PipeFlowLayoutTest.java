@@ -163,7 +163,8 @@ public final class PipeFlowLayoutTest {
         }
     }
 
-    @SafeVarargs
+    // No @SafeVarargs here: Endpoint is an enum, so the varargs array is reifiable and the
+    // annotation would be redundant. faceFlows below does need it — Map.Entry is generic.
     private final EnumSet<PipeFlowLayout.Endpoint> endpoints(PipeFlowLayout.Endpoint... endpoints) {
         EnumSet<PipeFlowLayout.Endpoint> set = EnumSet.noneOf(PipeFlowLayout.Endpoint.class);
         for (PipeFlowLayout.Endpoint endpoint : endpoints) {

@@ -32,8 +32,7 @@ import java.util.UUID;
  * Shared server-side air and diving-equipment behavior for all non-water-living
  * entities.
  */
-@EventBusSubscriber(modid = Aquanaut.MODID, bus = EventBusSubscriber.Bus.GAME)
-@SuppressWarnings("removal")
+@EventBusSubscriber(modid = Aquanaut.MODID)
 public final class LivingAirEvents {
 
     // Pressure thresholds for narcosis (normalized [0, 1] hydrostatic pressure).

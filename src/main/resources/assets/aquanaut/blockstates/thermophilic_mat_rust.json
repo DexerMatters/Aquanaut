@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "waterlogged=false": {
+      "model": "aquanaut:block/thermophilic_mat_rust"
+    },
+    "waterlogged=true": {
+      "model": "aquanaut:block/thermophilic_mat_rust"
+    }
+  }
+}

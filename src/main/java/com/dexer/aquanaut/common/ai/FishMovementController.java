@@ -10,7 +10,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public class FishMovementController {
@@ -726,8 +725,7 @@ public class FishMovementController {
             double targetY = this.state.cruiseTargetY();
             BlockPos targetPos = new BlockPos(
                     (int) Math.floor(fish.getX()), (int) Math.floor(targetY), (int) Math.floor(fish.getZ()));
-            BlockState blockAtTarget = fish.level().getBlockState(targetPos);
-            if (blockAtTarget.isSolid()) {
+            if (SwimObstruction.blocks(fish.level(), targetPos)) {
                 double alt = targetY > fish.getY() ? fish.getY() + fish.cruiseDepthEmergencyOffset()
                         : fish.getY() - fish.cruiseDepthEmergencyOffset();
                 this.state.setCruiseTargetY(Mth.lerp(0.35D, targetY, alt));
@@ -990,7 +988,7 @@ public class FishMovementController {
     }
 
     private boolean isBarrierAt(BaseFishEntity fish, BlockPos pos) {
-        return !fish.level().getFluidState(pos).is(FluidTags.WATER) && fish.level().getBlockState(pos).isSolid();
+        return !fish.level().getFluidState(pos).is(FluidTags.WATER) && SwimObstruction.blocks(fish.level(), pos);
     }
 
     private boolean isProbePointBlocked(BaseFishEntity fish, Vec3 point, double horizontalRadius, double verticalRadius) {

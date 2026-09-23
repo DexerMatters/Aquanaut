@@ -13,7 +13,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 
 /**
@@ -87,15 +86,19 @@ public final class PressureHelper {
     // ── Public API ────────────────────────────────────────────────────────
 
     /**
-     * Normalised [0, 1] hydrostatic pressure for a living entity.
-     * Returns 0 if not submerged, or if the surrounding water is not connected
+     * Normalised [0, 1] hydrostatic pressure at an entity's own position.
+     * Returns 0 if the entity is not submerged, or if the surrounding water is not connected
      * to the open ocean surface.
+     *
+     * <p>
+     * Any entity will do, not only a living one: what the reading depends on is where the caller is,
+     * and a machine's sensor head is as good a place to take it as a diver's.
      *
      * <p>
      * Uses a per-entity cache — safe to call every rendered frame (fog, HUD).
      */
     public static float getPressure(Entity entity) {
-        if (!(entity instanceof LivingEntity living) || !living.isInWater())
+        if (!entity.isInWater())
             return 0f;
         Level level = entity.level();
         long now = level.getGameTime();

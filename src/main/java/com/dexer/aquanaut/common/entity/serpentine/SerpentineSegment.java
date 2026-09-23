@@ -8,7 +8,7 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.PartEntity;
 
-public class SerpentineSegment extends PartEntity<AbstractSerpentineEntity> {
+public final class SerpentineSegment extends PartEntity<AbstractSerpentineEntity> {
 
     private final SegmentDefinition definition;
     private final int index;

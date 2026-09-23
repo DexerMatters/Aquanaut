@@ -15,11 +15,15 @@
         "WaterAnimalMixin"
     ],
     "client": [
+        "CameraAccessor",
         "CreativeModeInventoryScreenMixin",
         "ItemRendererMixin",
         "BufferSourceMixin",
         "HarpoonRendererMixin",
-        "HumanoidModelMixin"
+        "HumanoidModelMixin",
+        "LevelRendererMixin",
+        "EntityRendererMixin",
+        "LightTextureMixin"
     ],
     "injectors": {
         "defaultRequire": 1

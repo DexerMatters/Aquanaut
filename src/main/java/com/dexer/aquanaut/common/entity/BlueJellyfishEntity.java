@@ -14,7 +14,9 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 public class BlueJellyfishEntity extends BaseFishEntity implements GeoEntity {
     private static final RawAnimation SWIM = RawAnimation.begin().thenLoop("animation.blue_jellyfish.swim");
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    /** Built on first use: passing {@code this} at field-init time would leak a
+     * half-constructed entity to GeckoLib before the subclass constructor has run. */
+    private AnimatableInstanceCache cache;
     public BlueJellyfishEntity(EntityType<? extends WaterAnimal> t, Level l) { super(t, l); }
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar c) {
         c.add(new AnimationController<>(this, "c", 0, s -> {
@@ -22,7 +24,12 @@ public class BlueJellyfishEntity extends BaseFishEntity implements GeoEntity {
             return s.setAndContinue(SWIM);
         }));
     }
-    @Override public AnimatableInstanceCache getAnimatableInstanceCache() { return cache; }
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() { AnimatableInstanceCache c = this.cache;
+        if (c == null) {
+            c = this.cache = GeckoLibUtil.createInstanceCache(this);
+        }
+        return c; }
     public static AttributeSupplier createAttributes() {
         return WaterAnimal.createMobAttributes().add(Attributes.MAX_HEALTH, 6.0D).add(Attributes.MOVEMENT_SPEED, 0.05D).build();
     }

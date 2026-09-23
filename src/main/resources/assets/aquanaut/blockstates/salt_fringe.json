@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "part=top": { "model": "aquanaut:block/salt_fringe_top" },
+    "part=body": { "model": "aquanaut:block/salt_fringe_body" },
+    "part=tail": { "model": "aquanaut:block/salt_fringe_tail" }
+  }
+}

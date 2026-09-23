@@ -36,7 +36,7 @@ import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
  * The textures carry the profile and the palette; the per-vertex colour carries the heat envelope, so
  * the lance blows out white at the muzzle and cools toward its far end.
  */
-public class OpticichthusRenderer extends BaseFishRenderer<OpticichthusEntity> {
+public final class OpticichthusRenderer extends BaseFishRenderer<OpticichthusEntity> {
     private static final int RIBBON_SEGMENTS = 12;
     private static final int BEAM_TEXELS_ACROSS = 16;
     private static final int BEAM_TEXELS_ALONG = 64;

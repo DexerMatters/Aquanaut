@@ -33,7 +33,9 @@ public class CreeporpedoEntity extends BaseFishEntity implements GeoEntity {
     private static final EntityDataAccessor<Integer> IGNITE_TIMER_SYNC = SynchedEntityData.defineId(
             CreeporpedoEntity.class, EntityDataSerializers.INT);
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    /** Built on first use: passing {@code this} at field-init time would leak a
+     * half-constructed entity to GeckoLib before the subclass constructor has run. */
+    private AnimatableInstanceCache cache;
 
     private static final double IGNITE_DISTANCE = 3.0D;
     private static final int EXPLODE_DELAY_TICKS = 30;
@@ -66,7 +68,11 @@ public class CreeporpedoEntity extends BaseFishEntity implements GeoEntity {
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
+        AnimatableInstanceCache c = this.cache;
+        if (c == null) {
+            c = this.cache = GeckoLibUtil.createInstanceCache(this);
+        }
+        return c;
     }
 
     public static AttributeSupplier createAttributes() {

@@ -2,9 +2,9 @@ package com.dexer.aquanaut.client.model;
 
 import com.dexer.aquanaut.common.entity.GiantOctopusTentacleEntity;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
-public class GiantOctopusTentacleModel extends GeoModel<GiantOctopusTentacleEntity> {
+public class GiantOctopusTentacleModel extends AquanautGeoModel<GiantOctopusTentacleEntity> {
 
     private static final ResourceLocation MODEL = ResourceLocation.fromNamespaceAndPath("aquanaut",
             "geo/giant_octopus_tentacle_anchor.geo.json");
@@ -14,12 +14,12 @@ public class GiantOctopusTentacleModel extends GeoModel<GiantOctopusTentacleEnti
             "animations/giant_octopus_tentacle.animation.json");
 
     @Override
-    public ResourceLocation getModelResource(GiantOctopusTentacleEntity animatable) {
+    public ResourceLocation getModelResource(GiantOctopusTentacleEntity entity, GeoRenderer<GiantOctopusTentacleEntity> renderer) {
         return MODEL;
     }
 
     @Override
-    public ResourceLocation getTextureResource(GiantOctopusTentacleEntity animatable) {
+    public ResourceLocation getTextureResource(GiantOctopusTentacleEntity entity, GeoRenderer<GiantOctopusTentacleEntity> renderer) {
         return TEXTURE;
     }
 

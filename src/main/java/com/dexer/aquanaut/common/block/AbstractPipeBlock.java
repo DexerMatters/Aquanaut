@@ -76,16 +76,15 @@ public abstract class AbstractPipeBlock extends Block implements SimpleWaterlogg
         }
     }
 
+    /**
+     * No {@code registerDefaultState} call here: {@code Block}'s own constructor registers
+     * {@code stateDefinition.any()} once {@link #createBlockStateDefinition} has added the
+     * properties, and every property is a {@link BooleanProperty}, so that default state already
+     * has all seven connections and waterlogged set to false. Calling it again from this constructor
+     * would only repeat the work — and would trip the compiler's this-escape lint.
+     */
     protected AbstractPipeBlock(Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any()
-                .setValue(NORTH, false)
-                .setValue(EAST, false)
-                .setValue(SOUTH, false)
-                .setValue(WEST, false)
-                .setValue(UP, false)
-                .setValue(DOWN, false)
-                .setValue(WATERLOGGED, false));
     }
 
     @Override
@@ -105,8 +104,14 @@ public abstract class AbstractPipeBlock extends Block implements SimpleWaterlogg
         return state.setValue(property(direction), canConnectTo(state, neighborState, direction));
     }
 
+    /**
+     * Final because {@code Block}'s constructor calls this while the block is still being built.
+     * Leaving it overridable would let a subclass run arbitrary code against a half-initialised
+     * block, which is exactly the escape the compiler warns about; no subclass here needs to add
+     * pipe properties.
+     */
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    protected final void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN, WATERLOGGED);
     }
 

@@ -20,22 +20,50 @@ public abstract class AbstractSerpentineEntity extends Mob {
     private static final EntityDataAccessor<CompoundTag> SEGMENT_TRANSFORMS = net.minecraft.network.syncher.SynchedEntityData
             .defineId(AbstractSerpentineEntity.class, EntityDataSerializers.COMPOUND_TAG);
 
-    private final SerpentineSegment[] segments;
-    private final SegmentChainAlgorithm chainAlgorithm;
+    /**
+     * The segments are built on first use rather than in the constructor. Building them here would
+     * mean passing {@code this} to each {@link SerpentineSegment} and calling the subclass's
+     * {@link #createSegmentDefinitions()} before that subclass's fields exist — the escape the
+     * compiler warns about. Deferring keeps construction free of both.
+     */
+    private SerpentineSegment[] segments;
+    /** Built on first tick, never in the constructor: the solver is a subclass inner class. */
+    private SegmentChainAlgorithm chainAlgorithm;
 
     protected AbstractSerpentineEntity(EntityType<? extends AbstractSerpentineEntity> type, Level level) {
         super(type, level);
-        List<SegmentDefinition> defs = createSegmentDefinitions();
-        this.segments = new SerpentineSegment[defs.size()];
-        for (int i = 0; i < defs.size(); i++) {
-            this.segments[i] = new SerpentineSegment(this, defs.get(i), i);
-        }
-        this.chainAlgorithm = createChainAlgorithm();
     }
 
+    /** The segment layout, supplied by the subclass. */
     protected abstract List<SegmentDefinition> createSegmentDefinitions();
 
+    private SerpentineSegment[] segments() {
+        SerpentineSegment[] built = this.segments;
+        if (built == null) {
+            List<SegmentDefinition> defs = createSegmentDefinitions();
+            built = new SerpentineSegment[defs.size()];
+            for (int i = 0; i < defs.size(); i++) {
+                built[i] = new SerpentineSegment(this, defs.get(i), i);
+            }
+            this.segments = built;
+        }
+        return built;
+    }
+
+    /**
+     * The chain solver. Built on first tick rather than in the constructor: both implementations
+     * are inner classes of their entity, so instantiating one reads the subclass's fields, which
+     * are not yet assigned while this constructor runs.
+     */
     protected abstract SegmentChainAlgorithm createChainAlgorithm();
+
+    private SegmentChainAlgorithm chainAlgorithm() {
+        SegmentChainAlgorithm solver = this.chainAlgorithm;
+        if (solver == null) {
+            solver = this.chainAlgorithm = createChainAlgorithm();
+        }
+        return solver;
+    }
 
     protected void driveHead(ServerLevel level) {
     }
@@ -50,13 +78,13 @@ public abstract class AbstractSerpentineEntity extends Mob {
 
     @Override
     public PartEntity<?>[] getParts() {
-        return segments;
+        return segments();
     }
 
     @Override
     public AABB getBoundingBoxForCulling() {
         AABB bounds = this.getBoundingBox();
-        for (SerpentineSegment segment : segments) {
+        for (SerpentineSegment segment : segments()) {
             bounds = bounds.minmax(segment.getBoundingBox());
         }
         return bounds;
@@ -69,7 +97,7 @@ public abstract class AbstractSerpentineEntity extends Mob {
         this.yBodyRotO = this.yBodyRot;
         this.yHeadRotO = this.yHeadRot;
 
-        for (SerpentineSegment seg : segments) {
+        for (SerpentineSegment seg : segments()) {
             seg.setOldPosAndRot();
             seg.rollO = seg.getRoll();
             seg.tickCount++;
@@ -79,7 +107,7 @@ public abstract class AbstractSerpentineEntity extends Mob {
             driveHead(serverLevel);
             this.yBodyRot = this.getYRot();
             this.yHeadRot = this.getYRot();
-            chainAlgorithm.updateSegments(this, segments);
+            chainAlgorithm().updateSegments(this, segments());
             afterSegmentsUpdated(serverLevel);
             this.getEntityData().set(SEGMENT_TRANSFORMS, packSegmentTransforms());
         } else {
@@ -91,13 +119,13 @@ public abstract class AbstractSerpentineEntity extends Mob {
     public void recreateFromPacket(ClientboundAddEntityPacket packet) {
         super.recreateFromPacket(packet);
         double centerY = this.getY() + this.getBbHeight() * 0.5D;
-        for (int i = 0; i < segments.length; i++) {
-            segments[i].setId(packet.getId() + i + 1);
-            segments[i].setCenterPos(this.getX(), centerY, this.getZ());
-            segments[i].setYRot(this.getYRot());
-            segments[i].setXRot(this.getXRot());
-            segments[i].setOldPosAndRot();
-            segments[i].rollO = 0.0F;
+        for (int i = 0; i < segments().length; i++) {
+            segments()[i].setId(packet.getId() + i + 1);
+            segments()[i].setCenterPos(this.getX(), centerY, this.getZ());
+            segments()[i].setYRot(this.getYRot());
+            segments()[i].setXRot(this.getXRot());
+            segments()[i].setOldPosAndRot();
+            segments()[i].rollO = 0.0F;
         }
     }
 
@@ -108,14 +136,14 @@ public abstract class AbstractSerpentineEntity extends Mob {
     }
 
     public SerpentineSegment[] getSegments() {
-        return segments;
+        return segments();
     }
 
     private CompoundTag packSegmentTransforms() {
         CompoundTag root = new CompoundTag();
         ListTag list = new ListTag();
 
-        for (SerpentineSegment segment : segments) {
+        for (SerpentineSegment segment : segments()) {
             CompoundTag tag = new CompoundTag();
             tag.putDouble("x", segment.getCenterX());
             tag.putDouble("y", segment.getCenterY());
@@ -136,11 +164,11 @@ public abstract class AbstractSerpentineEntity extends Mob {
         }
 
         ListTag list = root.getList("segments", Tag.TAG_COMPOUND);
-        int count = Math.min(list.size(), segments.length);
+        int count = Math.min(list.size(), segments().length);
 
         for (int i = 0; i < count; i++) {
             CompoundTag tag = list.getCompound(i);
-            SerpentineSegment segment = segments[i];
+            SerpentineSegment segment = segments()[i];
             segment.setCenterPos(tag.getDouble("x"), tag.getDouble("y"), tag.getDouble("z"));
             segment.setYRot(tag.getFloat("yaw"));
             segment.setXRot(tag.getFloat("pitch"));

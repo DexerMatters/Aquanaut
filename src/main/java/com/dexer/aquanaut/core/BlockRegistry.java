@@ -1,11 +1,17 @@
 package com.dexer.aquanaut.core;
 
 import com.dexer.aquanaut.Aquanaut;
+import com.dexer.aquanaut.common.block.AshLayerBlock;
 import com.dexer.aquanaut.common.block.DissectionTableBlock;
 import com.dexer.aquanaut.common.block.DroopingSeaweedBlock;
 import com.dexer.aquanaut.common.block.FishingNetBlock;
 import com.dexer.aquanaut.common.block.GasPipeBlock;
+import com.dexer.aquanaut.common.block.FumaroleBlock;
+import com.dexer.aquanaut.common.block.MatCarpetBlock;
 import com.dexer.aquanaut.common.block.PlexiglassBlock;
+import com.dexer.aquanaut.common.block.DynamicLightBlock;
+import com.dexer.aquanaut.common.block.CrystalPlantBlock;
+import com.dexer.aquanaut.common.block.SulfuricAcidBlock;
 import com.dexer.aquanaut.common.block.SeaweedBlock;
 import com.dexer.aquanaut.common.block.SeaweedStemBlock;
 import net.minecraft.util.ColorRGBA;
@@ -15,6 +21,7 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SlimeBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
@@ -86,6 +93,106 @@ public final class BlockRegistry {
     public static final DeferredBlock<SeaweedBlock> SEAWEED_FRUIT = leafSeaweed("seaweed_fruit");
     public static final DeferredBlock<SeaweedStemBlock> SEAWEED_STEM = seaweedStem("seaweed_stem");
 
+    // Brine Mirror Gorge - evaporite minerals and crystal flora
+    public static final DeferredBlock<Block> HALITE_CRUST = cube("halite_crust",
+            MapColor.TERRACOTTA_WHITE, 0.8F, 1.2F, SoundType.CALCITE);
+    public static final DeferredBlock<RotatedPillarBlock> HALITE_PIPE = pillar("halite_pipe",
+            MapColor.TERRACOTTA_PINK, 1.4F, 2.2F, SoundType.CALCITE, true);
+    public static final DeferredBlock<Block> VARVE_SHALE = cube("varve_shale",
+            MapColor.COLOR_GRAY, 1.5F, 3.0F, SoundType.STONE);
+    public static final DeferredBlock<Block> BRINE_MIRROR = BLOCKS.register("brine_mirror",
+            () -> new Block(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_BLACK)
+                    .strength(0.4F, 0.8F)
+                    .sound(SoundType.GLASS)
+                    .noOcclusion()
+                    .isViewBlocking((state, level, pos) -> false)));
+    public static final DeferredBlock<CrystalPlantBlock> CALCITE_QUILL = crystalPlant("calcite_quill", 2);
+    public static final DeferredBlock<CrystalPlantBlock> HALITE_ROSETTE = crystalPlant("halite_rosette", 0);
+    public static final DeferredBlock<DroopingSeaweedBlock> SALT_FRINGE = saltFringe("salt_fringe");
+
+    // Brine Mirror Gorge - evaporite enrichment: hopper halite, druse, gypsum and potash
+    public static final DeferredBlock<Block> HOPPER_HALITE = cube("hopper_halite",
+            MapColor.TERRACOTTA_PINK, 1.2F, 2.2F, SoundType.CALCITE);
+    public static final DeferredBlock<Block> HALITE_DRUSE = cube("halite_druse",
+            MapColor.TERRACOTTA_WHITE, 1.0F, 1.8F, SoundType.CALCITE);
+    public static final DeferredBlock<RotatedPillarBlock> GYPSUM_BLADE = pillar("gypsum_blade",
+            MapColor.TERRACOTTA_WHITE, 1.3F, 2.2F, SoundType.CALCITE, true);
+    public static final DeferredBlock<Block> SYLVITE_CRUST = cube("sylvite_crust",
+            MapColor.TERRACOTTA_PINK, 0.8F, 1.2F, SoundType.CALCITE);
+    public static final DeferredBlock<MatCarpetBlock> MIRROR_FLAKE = mat("mirror_flake",
+            MapColor.COLOR_BLACK, SoundType.GLASS);
+    public static final DeferredBlock<CrystalPlantBlock> GYPSUM_ROSE = crystalPlant("gypsum_rose", 1,
+            MapColor.TERRACOTTA_WHITE);
+
+    // Brimstone Caldera - volcanic rocks, sulfur minerals and hot spring deposits
+    public static final DeferredBlock<RotatedPillarBlock> VOLCANIC_BASALT = pillar("volcanic_basalt",
+            MapColor.COLOR_GRAY, 2.5F, 5.0F, SoundType.BASALT, true);
+    public static final DeferredBlock<Block> SCORIA = cube("scoria",
+            MapColor.TERRACOTTA_BLACK, 1.8F, 3.5F, SoundType.BASALT);
+    public static final DeferredBlock<Block> PILLOW_BASALT = cube("pillow_basalt",
+            MapColor.COLOR_GRAY, 2.2F, 4.5F, SoundType.BASALT);
+    public static final DeferredBlock<Block> VOLCANIC_AGGLOMERATE = cube("volcanic_agglomerate",
+            MapColor.TERRACOTTA_GRAY, 1.6F, 3.5F, SoundType.STONE);
+    public static final DeferredBlock<Block> PUMICE = cube("pumice",
+            MapColor.TERRACOTTA_WHITE, 0.9F, 1.4F, SoundType.CALCITE);
+    public static final DeferredBlock<Block> OBSIDIAN_GLASS = cube("obsidian_glass",
+            MapColor.COLOR_BLACK, 2.8F, 6.0F, SoundType.GLASS);
+    public static final DeferredBlock<Block> ACID_ETCHED_BASALT = cube("acid_etched_basalt",
+            MapColor.TERRACOTTA_LIGHT_GRAY, 1.4F, 3.0F, SoundType.STONE);
+    public static final DeferredBlock<Block> SULFUR_CRUST = cube("sulfur_crust",
+            MapColor.COLOR_YELLOW, 0.7F, 1.1F, SoundType.CALCITE);
+    public static final DeferredBlock<Block> SINTER = cube("sinter",
+            MapColor.QUARTZ, 1.1F, 2.0F, SoundType.CALCITE);
+    public static final DeferredBlock<RotatedPillarBlock> VENT_CHIMNEY = pillar("vent_chimney",
+            MapColor.COLOR_BLACK, 1.6F, 3.5F, SoundType.BASALT, true);
+    public static final DeferredBlock<ColoredFallingBlock> VOLCANIC_ASH = BLOCKS.register("volcanic_ash",
+            () -> new ColoredFallingBlock(new ColorRGBA(0xFF636468), BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_GRAY)
+                    .strength(0.5F, 0.7F)
+                    .sound(SoundType.SAND)));
+    public static final DeferredBlock<AshLayerBlock> ASH_LAYER = BLOCKS.register("ash_layer",
+            () -> new AshLayerBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_GRAY)
+                    .strength(0.3F, 0.5F)
+                    .sound(SoundType.SAND)
+                    .noOcclusion()
+                    .isViewBlocking((state, level, pos) -> false)));
+    public static final DeferredBlock<SeaweedBlock> SULFUR_MOSS = leafSeaweed("sulfur_moss");
+
+    // Brimstone Caldera - hydrothermal flora, vents and acid pools
+    public static final DeferredBlock<CrystalPlantBlock> SULFUR_CRYSTAL = crystalPlant("sulfur_crystal", 2,
+            MapColor.COLOR_YELLOW);
+    public static final DeferredBlock<CrystalPlantBlock> FIREBLOOM = crystalPlant("firebloom", 5,
+            MapColor.COLOR_ORANGE);
+    public static final DeferredBlock<DroopingSeaweedBlock> SULFUR_STALACTITE = drooping("sulfur_stalactite",
+            MapColor.COLOR_YELLOW, SoundType.CALCITE);
+    public static final DeferredBlock<DroopingSeaweedBlock> EMBER_KELP = drooping("ember_kelp",
+            MapColor.COLOR_ORANGE, SoundType.WET_GRASS);
+    public static final DeferredBlock<FumaroleBlock> FUMAROLE = BLOCKS.register("fumarole",
+            () -> new FumaroleBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_GRAY)
+                    .strength(1.2F, 2.5F)
+                    .sound(SoundType.BASALT)
+                    .noOcclusion()
+                    .lightLevel(state -> 1)
+                    .dynamicShape()));
+    public static final DeferredBlock<MatCarpetBlock> THERMOPHILIC_MAT_GOLD = mat("thermophilic_mat_gold",
+            MapColor.COLOR_YELLOW);
+    public static final DeferredBlock<MatCarpetBlock> THERMOPHILIC_MAT_RUST = mat("thermophilic_mat_rust",
+            MapColor.COLOR_ORANGE);
+    public static final DeferredBlock<MatCarpetBlock> THERMOPHILIC_MAT_OLIVE = mat("thermophilic_mat_olive",
+            MapColor.PLANT);
+    public static final DeferredBlock<SulfuricAcidBlock> SULFURIC_ACID = BLOCKS.register("sulfuric_acid",
+            () -> new SulfuricAcidBlock(FluidRegistry.SULFURIC_ACID.get(), BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_LIGHT_GREEN)
+                    .replaceable()
+                    .noCollission()
+                    .strength(100.0F)
+                    .pushReaction(PushReaction.DESTROY)
+                    .noLootTable()
+                    .liquid()));
+
     // Jelly blocks — translucent, bouncy like slime, easier to destroy
     public static final DeferredBlock<SlimeBlock> LIGHT_RED_JELLY_BLOCK = jelly("light_red_jelly_block",
             MapColor.COLOR_RED, 0.3F, 0.3F);
@@ -132,6 +239,20 @@ public final class BlockRegistry {
 
     public static final DeferredBlock<FishingNetBlock> FISHING_NET = fishingNet("fishing_net");
     public static final DeferredBlock<PlexiglassBlock> PLEXIGLASS = plexiglass("plexiglass");
+
+    /** Server-owned, inaccessible light source shared by Aquanaut dynamic-light providers. */
+    public static final DeferredBlock<DynamicLightBlock> DYNAMIC_LIGHT = BLOCKS.register("dynamic_light",
+            () -> new DynamicLightBlock(BlockBehaviour.Properties.of()
+                    .replaceable()
+                    .noCollission()
+                    .noOcclusion()
+                    .noLootTable()
+                    .randomTicks()
+                    .strength(-1.0F, 3600000.8F)
+                    .mapColor(MapColor.NONE)
+                    .lightLevel(state -> state.getValue(DynamicLightBlock.LIGHT_LEVEL))
+                    .isViewBlocking((state, level, pos) -> false)
+                    .pushReaction(PushReaction.DESTROY)));
 
     /** Dissection table: a 1x1 bench on its own, merged into 2x1 / 2x2 benches by placement. */
     public static final DeferredBlock<DissectionTableBlock> DISSECTION_TABLE = BLOCKS.register("dissection_table",
@@ -202,6 +323,50 @@ public final class BlockRegistry {
                 .mapColor(MapColor.COLOR_GREEN)
                 .strength(0.2F)
                 .sound(SoundType.GRASS)
+                .noOcclusion()
+                .dynamicShape()));
+    }
+
+    private static DeferredBlock<CrystalPlantBlock> crystalPlant(String name, int light) {
+        return crystalPlant(name, light, MapColor.ICE);
+    }
+
+    private static DeferredBlock<CrystalPlantBlock> crystalPlant(String name, int light, MapColor color) {
+        return BLOCKS.register(name, () -> new CrystalPlantBlock(BlockBehaviour.Properties.of()
+                .mapColor(color)
+                .strength(0.2F)
+                .sound(SoundType.CALCITE)
+                .noOcclusion()
+                .dynamicShape()
+                .lightLevel(state -> light)));
+    }
+
+    private static DeferredBlock<DroopingSeaweedBlock> drooping(String name, MapColor color, SoundType sound) {
+        return BLOCKS.register(name, () -> new DroopingSeaweedBlock(BlockBehaviour.Properties.of()
+                .mapColor(color)
+                .strength(0.3F)
+                .sound(sound)
+                .noOcclusion()
+                .dynamicShape()));
+    }
+
+    private static DeferredBlock<MatCarpetBlock> mat(String name, MapColor color) {
+        return mat(name, color, SoundType.WET_GRASS);
+    }
+
+    private static DeferredBlock<MatCarpetBlock> mat(String name, MapColor color, SoundType sound) {
+        return BLOCKS.register(name, () -> new MatCarpetBlock(BlockBehaviour.Properties.of()
+                .mapColor(color)
+                .strength(0.2F)
+                .sound(sound)
+                .noOcclusion()));
+    }
+
+    private static DeferredBlock<DroopingSeaweedBlock> saltFringe(String name) {
+        return BLOCKS.register(name, () -> new DroopingSeaweedBlock(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.TERRACOTTA_WHITE)
+                .strength(0.3F)
+                .sound(SoundType.CALCITE)
                 .noOcclusion()
                 .dynamicShape()));
     }

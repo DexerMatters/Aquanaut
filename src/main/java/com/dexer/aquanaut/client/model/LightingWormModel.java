@@ -3,16 +3,16 @@ package com.dexer.aquanaut.client.model;
 import com.dexer.aquanaut.common.entity.LightingWormEntity;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
-public class LightingWormModel extends GeoModel<LightingWormEntity> {
+public class LightingWormModel extends AquanautGeoModel<LightingWormEntity> {
     @Override
-    public ResourceLocation getModelResource(LightingWormEntity animatable) {
+    public ResourceLocation getModelResource(LightingWormEntity entity, GeoRenderer<LightingWormEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "geo/lighting_worm.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(LightingWormEntity animatable) {
+    public ResourceLocation getTextureResource(LightingWormEntity entity, GeoRenderer<LightingWormEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/lighting_worm.png");
     }
 

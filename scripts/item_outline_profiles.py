@@ -73,6 +73,9 @@ TEXTURE_PROFILES: dict[str, OutlineProfile] = {
     "coral_shovel.png": _t(TOOL_ORGANIC, shadow_depth=12, retain_original=0.40),
     "coral_stick.png": _t(BIO_DENSE, shadow_depth=10, retain_original=0.38),
     "creeporpedo_spawn_egg.png": _t(SPAWN_EGG, shadow_depth=12, edge_mix=0.67),
+    # field instruments: a deliberately heavier ("stressed") silhouette outline
+    "cursor.png": _t(METAL, shadow_depth=19, edge_mix=0.68, retain_original=0.46,
+                     max_channel_delta=60),
     "diamond_harpoon.png": _t(METAL, shadow_depth=15, max_channel_delta=50),
     "donutfish_spawn_egg.png": _t(SPAWN_EGG, shadow_depth=9, edge_mix=0.72),
     "elastic_biomass.png": _t(BIO_SOFT, shadow_depth=8, edge_mix=0.75),
@@ -94,6 +97,13 @@ TEXTURE_PROFILES: dict[str, OutlineProfile] = {
     "golden_jelly.png": _t(BIO_SOFT, shadow_depth=8, edge_mix=0.76),
     "hard_rib.png": _t(BONE, shadow_depth=13, retain_original=0.44),
     "hard_shell.png": _t(BONE, shadow_depth=13, retain_original=0.42),
+    # The bladder is rendered, not drawn: the sprite already carries the model's
+    # own silhouette shading and the atlas is a lit material sheet, so the edge
+    # pass is a no-op for both.  They are listed here because the refiner
+    # requires an explicit profile for every sprite in the item folder.
+    "handheld_air_bladder.png": _t(UTILITY, enabled=False),
+    "handheld_air_bladder_model.png": _t(UTILITY, enabled=False),
+
     "hard_shell_axe.png": _t(BONE, shadow_depth=14, retain_original=0.42),
     "hard_shell_flippers.png": _t(SOFT_FABRIC, shadow_depth=12, retain_original=0.38),
     "hard_shell_harpoon.png": _t(BONE, shadow_depth=14, retain_original=0.42),
@@ -160,6 +170,12 @@ TEXTURE_PROFILES: dict[str, OutlineProfile] = {
     "springfish_spawn_egg.png": _t(SPAWN_EGG, shadow_depth=10, edge_mix=0.70),
     "stone_harpoon.png": _t(BONE, shadow_depth=14, retain_original=0.42),
     "strange_fragments.png": _t(GLOW, shadow_depth=8, edge_mix=0.72),
+    "submarine_compass.png": _t(METAL, shadow_depth=19, edge_mix=0.68, retain_original=0.46,
+                                max_channel_delta=60),
+    # Brushed stainless hull like the compass and the cursor: the same heavy
+    # metal rim keeps the drone's dark steel from washing out on the hotbar.
+    "submarine_drone.png": _t(METAL, shadow_depth=19, edge_mix=0.68, retain_original=0.46,
+                              max_channel_delta=60),
     "suspicious_fang.png": _t(BONE, shadow_depth=15, retain_original=0.44),
     "swirl_maker_spawn_egg.png": _t(SPAWN_EGG, shadow_depth=11, edge_mix=0.67),
     "transparent_tissue.png": _t(BIO_SOFT, shadow_depth=7, edge_mix=0.78, alpha_mix=0.40),

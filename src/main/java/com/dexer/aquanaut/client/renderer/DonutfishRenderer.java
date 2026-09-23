@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
-public class DonutfishRenderer extends BaseFishRenderer<DonutfishEntity> {
+public final class DonutfishRenderer extends BaseFishRenderer<DonutfishEntity> {
     public DonutfishRenderer(EntityRendererProvider.Context c) {
         super(c, new DonutfishModel());
         addRenderLayer(new AutoGlowingGeoLayer<>(this));

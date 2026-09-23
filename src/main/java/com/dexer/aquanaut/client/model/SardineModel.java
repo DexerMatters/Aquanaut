@@ -2,16 +2,16 @@ package com.dexer.aquanaut.client.model;
 
 import com.dexer.aquanaut.common.entity.SardineEntity;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.renderer.GeoRenderer;
 
-public class SardineModel extends GeoModel<SardineEntity> {
+public class SardineModel extends AquanautGeoModel<SardineEntity> {
     @Override
-    public ResourceLocation getModelResource(SardineEntity animatable) {
+    public ResourceLocation getModelResource(SardineEntity entity, GeoRenderer<SardineEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "geo/sardine.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(SardineEntity animatable) {
+    public ResourceLocation getTextureResource(SardineEntity entity, GeoRenderer<SardineEntity> renderer) {
         return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/sardine.png");
     }
 

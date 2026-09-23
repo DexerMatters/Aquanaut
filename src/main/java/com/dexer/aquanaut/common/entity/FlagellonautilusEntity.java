@@ -56,7 +56,9 @@ public class FlagellonautilusEntity extends BaseFishEntity implements GeoEntity 
     private static final float SWEEP_DAMAGE = 6.0F;
     private static final double RETREAT_SPEED = 0.42D;
 
-    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    /** Built on first use: passing {@code this} at field-init time would leak a
+     * half-constructed entity to GeckoLib before the subclass constructor has run. */
+    private AnimatableInstanceCache cache;
 
     private int stateTimer;
     private int idleCooldown;
@@ -95,7 +97,11 @@ public class FlagellonautilusEntity extends BaseFishEntity implements GeoEntity 
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return this.cache;
+        AnimatableInstanceCache c = this.cache;
+        if (c == null) {
+            c = this.cache = GeckoLibUtil.createInstanceCache(this);
+        }
+        return c;
     }
 
     public static AttributeSupplier createAttributes() {

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "aquanaut:block/sylvite_crust_top",
+    "side": "aquanaut:block/sylvite_crust",
+    "bottom": "aquanaut:block/sylvite_crust_top"
+  }
+}

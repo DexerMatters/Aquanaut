@@ -20,7 +20,7 @@ import software.bernie.geckolib.renderer.GeoRenderer;
 public abstract class AquanautGeoModel<T extends GeoAnimatable> extends GeoModel<T> {
 
     @Override
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public ResourceLocation getModelResource(T animatable) {
         return getModelResource(animatable, null);
     }
@@ -28,7 +28,7 @@ public abstract class AquanautGeoModel<T extends GeoAnimatable> extends GeoModel
     public abstract ResourceLocation getModelResource(T entity, GeoRenderer<T> renderer);
 
     @Override
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public ResourceLocation getTextureResource(T animatable) {
         return getTextureResource(animatable, null);
     }

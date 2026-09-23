@@ -24,7 +24,6 @@ import net.minecraft.world.level.Level;
  */
 public class SkeletonCarpEntity extends AbstractCarpEntity {
     private static final float REASSEMBLY_HEALTH_FRACTION = 0.40F;
-    private static final int REASSEMBLY_INVULNERABILITY_TICKS = 20;
     private static final int REASSEMBLY_COOLDOWN_TICKS = 1200;
 
     private boolean reassembled;

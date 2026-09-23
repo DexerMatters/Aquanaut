@@ -4,7 +4,6 @@ import com.dexer.aquanaut.common.block.DroopingSeaweedBlock;
 import com.dexer.aquanaut.core.BiomeRegistry;
 import com.dexer.aquanaut.core.BlockRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.tags.FluidTags;

@@ -7,6 +7,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+/**
+ * Air regen for living entities wearing diving equipment.
+ *
+ * <p>
+ * See {@link AirSupplyHelper} for the policy; this mixin is only where it is hooked in.
+ */
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin {
 

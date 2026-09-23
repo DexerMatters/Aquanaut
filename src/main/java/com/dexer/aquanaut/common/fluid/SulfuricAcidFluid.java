@@ -81,7 +81,7 @@ public abstract class SulfuricAcidFluid extends FlowingFluid {
      * instead. Kept in agreement with it.
      */
     @Override
-    @SuppressWarnings("deprecation")
+    @Deprecated
     protected boolean canConvertToSource(Level level) {
         return false;
     }

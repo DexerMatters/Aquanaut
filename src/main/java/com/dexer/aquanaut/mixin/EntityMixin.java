@@ -10,6 +10,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+/**
+ * The mod's air-supply policy on the entity level.
+ *
+ * <p>
+ * {@code Entity#getMaxAirSupply} decides how much air any entity may carry — overridden per entity
+ * type by the diving rules in {@link AirSupplyHelper} — and {@code Entity#baseTick} is rewound to
+ * let those rules drain and refill air on ordinary entities too.
+ */
 @Mixin(Entity.class)
 public abstract class EntityMixin {
     @Inject(method = "getMaxAirSupply", at = @At("HEAD"), cancellable = true)

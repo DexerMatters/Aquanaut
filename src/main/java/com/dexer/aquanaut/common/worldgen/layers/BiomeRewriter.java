@@ -63,7 +63,6 @@ public final class BiomeRewriter {
 
                     LevelChunkSection section = chunk.getSection(chunk.getSectionIndex(
                             net.minecraft.core.QuartPos.toBlock(quartY)));
-                    @SuppressWarnings("unchecked")
                     PalettedContainer<Holder<Biome>> biomes =
                             (PalettedContainer<Holder<Biome>>) section.getBiomes();
                     biomes.set(localQuartX, Math.floorMod(quartY, 4), localQuartZ, holder);

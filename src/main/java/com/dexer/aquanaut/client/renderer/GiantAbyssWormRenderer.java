@@ -72,8 +72,8 @@ public class GiantAbyssWormRenderer extends BaseSerpentineRenderer<GiantAbyssWor
         // 2. Render body segments
         this.animatable = entity;
         try {
-            BakedGeoModel sectionBaked = sectionModel.getBakedModel(sectionModel.getModelResource(entity));
-            BakedGeoModel tailBaked = tailModel.getBakedModel(tailModel.getModelResource(entity));
+            BakedGeoModel sectionBaked = sectionModel.getBakedModel(sectionModel.getModelResource(entity, this));
+            BakedGeoModel tailBaked = tailModel.getBakedModel(tailModel.getModelResource(entity, this));
             int packedOverlay = getPackedOverlay(entity, 0.0F, partialTick);
             int colour = getRenderColor(entity, partialTick, packedLight).argbInt();
             SerpentineSegment[] segments = entity.getSegments();

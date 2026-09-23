@@ -11,7 +11,6 @@ import com.dexer.aquanaut.common.worldgen.layers.TerrainModule;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.block.Blocks;
@@ -28,7 +27,6 @@ import net.minecraft.world.level.levelgen.blending.Blender;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -42,19 +40,17 @@ public abstract class NoiseBasedChunkGeneratorMixin {
     private Holder<NoiseGeneratorSettings> settings;
 
     @Shadow
-    protected abstract NoiseChunk createNoiseChunk(ChunkAccess chunk, StructureManager structureManager, Blender blender, RandomState randomState);
+    protected abstract NoiseChunk createNoiseChunk(ChunkAccess chunk, StructureManager structureManager,
+            Blender blender, RandomState randomState);
 
-    @Inject(method = "doFill",
-            at = @At("HEAD"),
-            cancellable = true,
-            remap = false)
+    @Inject(method = "doFill", at = @At("HEAD"), cancellable = true, remap = false)
     private void aquanaut$integratedFill(Blender blender,
-                                         StructureManager structureManager,
-                                         RandomState randomState,
-                                         ChunkAccess chunk,
-                                         int minCellY,
-                                         int cellCountY,
-                                         CallbackInfoReturnable<ChunkAccess> cir) {
+            StructureManager structureManager,
+            RandomState randomState,
+            ChunkAccess chunk,
+            int minCellY,
+            int cellCountY,
+            CallbackInfoReturnable<ChunkAccess> cir) {
         NoiseChunk noiseChunk = chunk.getOrCreateNoiseChunk(
                 c -> this.createNoiseChunk(c, structureManager, blender, randomState));
         Heightmap oceanFloor = chunk.getOrCreateHeightmapUnprimed(Heightmap.Types.OCEAN_FLOOR_WG);

@@ -144,7 +144,9 @@ final class ShaderStanddown {
 
     private static boolean install() {
         try {
-            Object manager = pipelineManager.invoke(null);
+            // The reflective probe is kept even though its result is not: reaching the
+            // accessor is what forces the pipeline class to initialise.
+            pipelineManager.invoke(null);
             displacedKey = currentDimension.invoke(null);
             Map<Object, Object> map = perDimensionOf();
             hadEntry = map.containsKey(displacedKey);

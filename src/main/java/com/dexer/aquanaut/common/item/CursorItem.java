@@ -1,6 +1,5 @@
 package com.dexer.aquanaut.common.item;
 
-import com.dexer.aquanaut.common.entity.CursorEntity;
 import com.dexer.aquanaut.core.EntityRegistry;
 
 import net.minecraft.world.entity.Entity;

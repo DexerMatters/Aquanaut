@@ -38,7 +38,6 @@ public class AquariumScreen extends AbstractContainerScreen<AquariumContainerMen
     private static final int PANEL_INNER = 0xFFB8D0D0;
     private static final int PANEL_LIGHT = 0xFFF2FFFF;
     private static final int PANEL_DARK = 0xFF5D7A7A;
-    private static final int DIVIDER_COLOR = 0x55000000;
     private static final float SLOT_TINT_R = 0.78F;
     private static final float SLOT_TINT_G = 0.90F;
     private static final float SLOT_TINT_B = 0.90F;
@@ -390,7 +389,6 @@ public class AquariumScreen extends AbstractContainerScreen<AquariumContainerMen
     }
 
     private Component healthTooltip(float health, float maxHealth) {
-        float clampedHealth = Mth.clamp(health, 0.0F, maxHealth);
         int totalHearts = Math.max(1, Mth.ceil(maxHealth * 0.5F));
         int filledHalfHearts = Mth.clamp(Mth.floor((health * 2.0F) + 1.0E-4F), 0, totalHearts * 2);
         int fullHearts = filledHalfHearts / 2;

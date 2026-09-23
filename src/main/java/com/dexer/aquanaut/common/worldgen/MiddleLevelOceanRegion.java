@@ -1,7 +1,6 @@
 package com.dexer.aquanaut.common.worldgen;
 
 import com.dexer.aquanaut.core.BiomeRegistry;
-import com.dexer.aquanaut.common.worldgen.BrineMirrorGorgePlacement;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;

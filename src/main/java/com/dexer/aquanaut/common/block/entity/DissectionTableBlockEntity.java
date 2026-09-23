@@ -55,7 +55,8 @@ public class DissectionTableBlockEntity extends BlockEntity implements GeoBlockE
      * Places a specimen on the bench.
      *
      * <p>
-     * TODO(dissection): only the origin of a merge group may hold a specimen, the specimen must fit
+     * Not yet enforced (dissection): only the origin of a merge group may hold a specimen, the
+     * specimen must fit
      * the bench footprint (1x1 friendly, 2x1 medium, 2x2 titan — derived from the aquarium
      * footprint), and inserting a specimen should start {@link #progress}.
      */

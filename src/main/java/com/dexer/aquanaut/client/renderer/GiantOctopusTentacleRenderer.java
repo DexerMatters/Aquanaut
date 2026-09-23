@@ -58,8 +58,8 @@ public class GiantOctopusTentacleRenderer extends BaseSerpentineRenderer<GiantOc
         this.animatable = entity;
 
         try {
-            BakedGeoModel sectionBaked = this.sectionModel.getBakedModel(this.sectionModel.getModelResource(entity));
-            BakedGeoModel tipBaked = this.tipModel.getBakedModel(this.tipModel.getModelResource(entity));
+            BakedGeoModel sectionBaked = this.sectionModel.getBakedModel(this.sectionModel.getModelResource(entity, this));
+            BakedGeoModel tipBaked = this.tipModel.getBakedModel(this.tipModel.getModelResource(entity, this));
             int packedOverlay = getPackedOverlay(entity, 0.0F, partialTick);
             int colour = getRenderColor(entity, partialTick, packedLight).argbInt();
             SerpentineSegment[] segments = entity.getSegments();

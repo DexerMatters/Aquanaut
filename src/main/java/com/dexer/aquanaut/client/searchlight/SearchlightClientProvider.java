@@ -15,7 +15,6 @@ import com.dexer.aquanaut.common.searchlight.SearchlightTargeting;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;

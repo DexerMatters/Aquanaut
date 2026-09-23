@@ -1,18 +1,13 @@
 package com.dexer.aquanaut.common.worldgen.layers;
 
-import com.dexer.aquanaut.common.worldgen.MiddleLevelOceanColumnRules;
 import com.dexer.aquanaut.common.worldgen.MiddleLevelOceanPlacement;
 import net.minecraft.core.QuartPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseChunk;
-import net.minecraft.world.level.levelgen.RandomState;
-import net.minecraft.world.level.levelgen.blending.Blender;
 
 /**
  * Coarse per-chunk sampling: 16 quart-center open-water probes (not a full second 16×16 noise pass).

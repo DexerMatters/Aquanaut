@@ -73,7 +73,6 @@ public final class LaserGeometryTest {
 
     @Test
     void theStrandsActuallyRotate() {
-        Vec3 direction = new Vec3(0.0D, 0.0D, 1.0D);
         Vec3 side = new Vec3(1.0D, 0.0D, 0.0D);
         Vec3 side2 = new Vec3(0.0D, 1.0D, 0.0D);
 

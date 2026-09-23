@@ -13,6 +13,16 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * Scales the deep oceans by scaling the router and sampler it grows from.
+ *
+ * <p>
+ * {@code RandomState} is where vanilla turns the noise router into the {@link Climate.Sampler} that
+ * biomes are actually sampled with. Both are private finals assigned in the constructor, so both
+ * are replaced at its tail: continents — and with them the sampler's {@code continentalness} — are
+ * multiplied by {@link #OCEAN_SCALE}, which pushes the coastline outward and deepens the ocean
+ * half of every climate curve the mod's biomes key on.
+ */
 @Mixin(RandomState.class)
 public abstract class RandomStateMixin {
     private static final double OCEAN_SCALE = 3.0D;

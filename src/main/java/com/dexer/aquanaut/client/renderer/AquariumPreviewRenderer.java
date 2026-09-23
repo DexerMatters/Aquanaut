@@ -8,7 +8,6 @@ import com.dexer.aquanaut.common.inventory.aquarium.AquariumHealthTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.util.HashMap;

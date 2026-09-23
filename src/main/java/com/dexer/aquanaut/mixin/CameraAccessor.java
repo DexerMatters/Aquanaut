@@ -18,15 +18,19 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(Camera.class)
 public interface CameraAccessor {
 
+    /** The height the camera has currently settled at. */
     @Accessor("eyeHeight")
     float aquanaut$getEyeHeight();
 
+    /** Sets the settled height, so a second setup into the same camera starts from it. */
     @Accessor("eyeHeight")
     void aquanaut$setEyeHeight(float eyeHeight);
 
+    /** The previous tick's height, the low half of the running average. */
     @Accessor("eyeHeightOld")
     float aquanaut$getEyeHeightOld();
 
+    /** Sets the previous tick's height alongside {@link #aquanaut$setEyeHeight(float)}. */
     @Accessor("eyeHeightOld")
     void aquanaut$setEyeHeightOld(float eyeHeightOld);
 }

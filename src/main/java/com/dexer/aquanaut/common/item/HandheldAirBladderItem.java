@@ -2,7 +2,6 @@ package com.dexer.aquanaut.common.item;
 
 import java.util.List;
 
-import com.dexer.aquanaut.common.FlotationHelper;
 import com.dexer.aquanaut.common.FlotationHelper.FlotationDevice;
 
 import net.minecraft.ChatFormatting;

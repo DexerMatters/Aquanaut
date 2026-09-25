@@ -3,6 +3,7 @@ package com.dexer.aquanaut.common.block;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
@@ -20,17 +21,31 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import javax.annotation.Nullable;
+
 /**
  * Thin waterlogged mineral flora (calcite quills, halite rosettes).
+ *
+ * <p>When a {@code supportBelow} tag is given the plant may only root on that rock — this
+ * is how 晶芽 obeys the "crystals grow only on 晶巢岩" rule while the other mineral flora
+ * keep their own substrates. Without a tag the plant is plain waterlogged vegetation.</p>
  */
 public final class CrystalPlantBlock extends Block implements SimpleWaterloggedBlock {
-    public static final MapCodec<CrystalPlantBlock> CODEC = simpleCodec(CrystalPlantBlock::new);
+    public static final MapCodec<CrystalPlantBlock> CODEC = simpleCodec(props -> new CrystalPlantBlock(props));
     private static final VoxelShape SHAPE = Shapes.or(
             Block.box(6.0D, 0.0D, 6.0D, 10.0D, 16.0D, 10.0D),
             Block.box(4.0D, 2.0D, 4.0D, 12.0D, 14.0D, 12.0D));
 
+    @Nullable
+    private final TagKey<Block> supportBelow;
+
     public CrystalPlantBlock(BlockBehaviour.Properties properties) {
+        this(properties, null);
+    }
+
+    public CrystalPlantBlock(BlockBehaviour.Properties properties, @Nullable TagKey<Block> supportBelow) {
         super(properties);
+        this.supportBelow = supportBelow;
         registerDefaultState(defaultBlockState().setValue(BlockStateProperties.WATERLOGGED, false));
     }
 
@@ -45,7 +60,8 @@ public final class CrystalPlantBlock extends Block implements SimpleWaterloggedB
         if (!fluidState.is(Fluids.WATER)) {
             return null;
         }
-        return defaultBlockState().setValue(BlockStateProperties.WATERLOGGED, true);
+        BlockState state = defaultBlockState().setValue(BlockStateProperties.WATERLOGGED, true);
+        return state.canSurvive(context.getLevel(), context.getClickedPos()) ? state : null;
     }
 
     @Override
@@ -53,14 +69,16 @@ public final class CrystalPlantBlock extends Block implements SimpleWaterloggedB
             LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         if (state.getValue(BlockStateProperties.WATERLOGGED)) {
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
-            return state;
         }
-        return Blocks.AIR.defaultBlockState();
+        return state.canSurvive(level, pos) ? state : Blocks.AIR.defaultBlockState();
     }
 
     @Override
     protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
-        return state.getValue(BlockStateProperties.WATERLOGGED);
+        if (!state.getValue(BlockStateProperties.WATERLOGGED)) {
+            return false;
+        }
+        return supportBelow == null || level.getBlockState(pos.below()).is(supportBelow);
     }
 
     @Override

@@ -117,6 +117,7 @@ public final class FogTable {
         biomes.put(id("jelly_jungle"), new FogVisibility(-2.0F, 64.0F, 0.48F));
         biomes.put(id("brine_mirror_gorge"), new FogVisibility(-6.0F, 160.0F, 0.20F));
         biomes.put(id("brimstone_caldera"), new FogVisibility(-3.0F, 80.0F, 0.55F));
+        biomes.put(id("crystal_nest"), new FogVisibility(-5.0F, 144.0F, 0.28F));
 
         Map<String, FogMediumProfile> mediums = new LinkedHashMap<>();
         // The acid's surface tint (0xFFD8D466) is chosen for a thin film of liquid; a screen

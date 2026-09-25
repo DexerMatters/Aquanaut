@@ -18,7 +18,7 @@ public final class VolcanoGeometryTest {
     private static final int FLOOR_Y = -15;
 
     @Test
-    void breachPlugsAlwaysReachTheUpperFloor() {
+    void breachNecksStandProudOfTheCone() {
         int breaches = 0;
         for (int cellX = -12; cellX <= 12; cellX++) {
             for (int cellZ = -12; cellZ <= 12; cellZ++) {
@@ -28,16 +28,17 @@ public final class VolcanoGeometryTest {
                 }
                 breaches++;
                 double plugTop = VolcanoGeometry.plugTopY(volcano, FLOOR_Y, 1.0D);
-                assertTrue(plugTop >= VolcanoGeometry.BREACH_TOP_MIN_Y,
-                        "breach plug must pierce the reef cap (Y " + plugTop + " >= "
-                                + VolcanoGeometry.BREACH_TOP_MIN_Y + ")");
+                assertTrue(plugTop > FLOOR_Y + volcano.height() * 0.8D,
+                        "the breach neck stands proud of the crater rim (Y " + plugTop + ")");
+                assertTrue(plugTop <= FLOOR_Y + volcano.height() + 1e-6D,
+                        "the neck never overtops its own cone (Y " + plugTop + ")");
             }
         }
         assertTrue(breaches > 0, "the sample region should contain breach volcanoes");
     }
 
     @Test
-    void volcanoesAreGiantMassifs() {
+    void volcanoesAreCompactMassifs() {
         int checked = 0;
         for (int cellX = -12; cellX <= 12; cellX++) {
             for (int cellZ = -12; cellZ <= 12; cellZ++) {
@@ -46,8 +47,8 @@ public final class VolcanoGeometryTest {
                     continue;
                 }
                 checked++;
-                assertTrue(volcano.baseRadius() >= 24, "massifs are giant (" + volcano.baseRadius() + ")");
-                assertTrue(volcano.height() >= 32, "summits are majestic (" + volcano.height() + ")");
+                assertTrue(volcano.baseRadius() >= 16, "massifs keep a compact footprint (" + volcano.baseRadius() + ")");
+                assertTrue(volcano.height() >= 22, "summits stay modest hills (" + volcano.height() + ")");
                 assertTrue(volcano.craterRadius() >= 6, "calderas are wide");
                 assertTrue(volcano.plugRadius() >= 3, "the vent is never a one-block spike");
                 assertTrue(volcano.breachAzimuthDeg() >= 0 && volcano.breachAzimuthDeg() < 360,
@@ -98,7 +99,7 @@ public final class VolcanoGeometryTest {
         VolcanoGeometry.ColumnShape flank = VolcanoGeometry.edificeShape(
                 volcano, null, volcano.centerX() + (int) Math.round(domeRadius * 0.5D),
                 volcano.centerZ(), FLOOR_Y, 1.0D);
-        assertTrue(VolcanoGeometry.plugTopY(volcano, FLOOR_Y, 1.0D) >= VolcanoGeometry.BREACH_TOP_MIN_Y);
+        assertTrue(VolcanoGeometry.plugTopY(volcano, FLOOR_Y, 1.0D) > FLOOR_Y + volcano.height() * 0.8D);
         assertTrue(centre.surfaceY() - flank.surfaceY() < volcano.height() * 0.25D,
                 "the neck climbs as a thick buttress, not a needle");
     }

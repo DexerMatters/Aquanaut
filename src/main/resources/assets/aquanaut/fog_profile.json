@@ -39,6 +39,18 @@
       "near": -3.0,
       "far": 80.0,
       "cast": 0.55
+    },
+    "aquanaut:crystal_nest": {
+      "__comment": "Clear water hung with faintly glowing crystal: the eye reaches far, the glow tints it.",
+      "near": -5.0,
+      "far": 144.0,
+      "cast": 0.28
+    },
+    "aquanaut:deep_sea": {
+      "__comment": "The abyss below the reef: light gives up early and the dark has weight.",
+      "near": -1.0,
+      "far": 40.0,
+      "cast": 0.72
     }
   },
   "mediums": {

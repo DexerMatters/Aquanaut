@@ -48,8 +48,9 @@ public final class MiddleLevelOceanColumnRulesTest {
                 MiddleLevelOceanColumnRules.targetBiome(minecraft("deep_ocean"), 16, 0, 7, 0);
         assertTrue(deep == MiddleLevelOceanColumnRules.TargetBiome.MIDDLE_LEVEL_OCEAN
                         || deep == MiddleLevelOceanColumnRules.TargetBiome.BRINE_MIRROR_GORGE
-                        || deep == MiddleLevelOceanColumnRules.TargetBiome.BRIMSTONE_CALDERA,
-                "middle-sea layer mixes MLO, brine mirror gorge and brimstone caldera");
+                        || deep == MiddleLevelOceanColumnRules.TargetBiome.BRIMSTONE_CALDERA
+                        || deep == MiddleLevelOceanColumnRules.TargetBiome.CRYSTAL_NEST,
+                "middle-sea layer mixes MLO, brine mirror gorge, brimstone caldera and the crystal nest");
         assertEquals(MiddleLevelOceanColumnRules.TargetBiome.NONE,
                 MiddleLevelOceanColumnRules.targetBiome(minecraft("deep_ocean"), 16, 0, 10, 0));
         assertEquals(MiddleLevelOceanColumnRules.TargetBiome.NONE,

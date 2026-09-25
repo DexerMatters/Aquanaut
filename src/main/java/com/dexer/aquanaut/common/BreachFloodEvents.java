@@ -197,12 +197,21 @@ public final class BreachFloodEvents {
             return;
         }
 
-        Iterator<Map.Entry<DeferredScanKey, DeferredScan>> iterator = DEFERRED_SCANS.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<DeferredScanKey, DeferredScan> entry = iterator.next();
+        // Work on a snapshot and clear the live map before scanning. Scanning can
+        // re-enter queueDeferredScan(): the world reads in findEntryPoints/
+        // startFloodTask may synchronously load chunks and run fluid interactions
+        // (LiquidBlock#onPlace -> FluidInteractionRegistry), which fire
+        // FluidPlaceBlockEvent / NeighborNotifyEvent and queue new scans. A
+        // structural modification of DEFERRED_SCANS while a fail-fast iterator
+        // walks it threw ConcurrentModificationException and crashed the server.
+        // Scans queued re-entrantly during this pass simply stay in the fresh map
+        // and are processed on the next tick.
+        List<Map.Entry<DeferredScanKey, DeferredScan>> pending = new ArrayList<>(DEFERRED_SCANS.entrySet());
+        DEFERRED_SCANS.clear();
+
+        for (Map.Entry<DeferredScanKey, DeferredScan> entry : pending) {
             ServerLevel level = server.getLevel(entry.getKey().dimension());
             if (level == null) {
-                iterator.remove();
                 continue;
             }
 
@@ -210,13 +219,19 @@ public final class BreachFloodEvents {
             List<BlockPos> entryPoints = findEntryPoints(level, entry.getKey().pos(), scan.radius);
             if (!entryPoints.isEmpty()) {
                 startFloodTask(level, entry.getKey().pos(), entryPoints);
-                iterator.remove();
                 continue;
             }
 
             scan.attempts++;
-            if (scan.attempts >= MAX_SCAN_ATTEMPTS) {
-                iterator.remove();
+            if (scan.attempts < MAX_SCAN_ATTEMPTS) {
+                // Re-queue, merging with anything queued re-entrantly for the same key.
+                DeferredScan queued = DEFERRED_SCANS.get(entry.getKey());
+                if (queued == null) {
+                    DEFERRED_SCANS.put(entry.getKey(), scan);
+                } else {
+                    queued.radius = Math.max(queued.radius, scan.radius);
+                    queued.attempts = Math.min(queued.attempts, scan.attempts);
+                }
             }
         }
     }

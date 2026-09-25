@@ -2,6 +2,8 @@ package com.dexer.aquanaut.core;
 
 import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.block.AshLayerBlock;
+import com.dexer.aquanaut.common.block.CrystalClusterBlock;
+import com.dexer.aquanaut.common.block.CrystalColumnBlock;
 import com.dexer.aquanaut.common.block.DissectionTableBlock;
 import com.dexer.aquanaut.common.block.DroopingSeaweedBlock;
 import com.dexer.aquanaut.common.block.FishingNetBlock;
@@ -14,6 +16,7 @@ import com.dexer.aquanaut.common.block.CrystalPlantBlock;
 import com.dexer.aquanaut.common.block.SulfuricAcidBlock;
 import com.dexer.aquanaut.common.block.SeaweedBlock;
 import com.dexer.aquanaut.common.block.SeaweedStemBlock;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.ColorRGBA;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ColoredFallingBlock;
@@ -27,6 +30,9 @@ import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import javax.annotation.Nullable;
+import java.util.function.Function;
 
 public final class BlockRegistry {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Aquanaut.MODID);
@@ -193,6 +199,46 @@ public final class BlockRegistry {
                     .noLootTable()
                     .liquid()));
 
+    // Crystal Nest (水晶巢) — the geode lattice of the middle sea: nest rock, chamber
+    // linings, wall crystals in six orientations, and the algae that carpets every surface
+    public static final DeferredBlock<Block> CRYSTAL_NEST_STONE = cube("crystal_nest_stone",
+            MapColor.COLOR_CYAN, 2.5F, 4.5F, SoundType.AMETHYST);
+    public static final DeferredBlock<Block> CRYSTAL_DRUSE = cube("crystal_druse",
+            MapColor.COLOR_LIGHT_BLUE, 1.2F, 2.2F, SoundType.AMETHYST_CLUSTER);
+    public static final DeferredBlock<RotatedPillarBlock> CRYSTAL_COLUMN = crystalPillar("crystal_column",
+            MapColor.COLOR_LIGHT_GRAY, 1.8F, 3.5F, SoundType.AMETHYST, true);
+
+    // Wall crystals — every kind may bloom inside the core chambers (the glowing pair
+    // rarely); the open surface grows only the quiet trio: white, smoky and amethyst.
+    // All of them root on 晶巢岩 and nothing else (see TagRegistry.CRYSTAL_GROWTH_SUPPORT).
+    public static final DeferredBlock<CrystalClusterBlock> WHITE_CRYSTAL_CLUSTER = cluster(
+            "white_crystal_cluster", 0, MapColor.SNOW);
+    public static final DeferredBlock<CrystalClusterBlock> ROSE_CRYSTAL_CLUSTER = cluster(
+            "rose_crystal_cluster", 0, MapColor.COLOR_PINK);
+    public static final DeferredBlock<CrystalClusterBlock> AMETHYST_CRYSTAL_CLUSTER = cluster(
+            "amethyst_crystal_cluster", 0, MapColor.COLOR_PURPLE);
+    public static final DeferredBlock<CrystalClusterBlock> AQUA_CRYSTAL_CLUSTER = cluster(
+            "aqua_crystal_cluster", 0, MapColor.COLOR_LIGHT_BLUE);
+    public static final DeferredBlock<CrystalClusterBlock> SMOKY_CRYSTAL_CLUSTER = cluster(
+            "smoky_crystal_cluster", 0, MapColor.TERRACOTTA_GRAY);
+    public static final DeferredBlock<CrystalClusterBlock> RESONANT_CRYSTAL_CLUSTER = cluster(
+            "resonant_crystal_cluster", 4, MapColor.COLOR_CYAN);
+    public static final DeferredBlock<CrystalClusterBlock> LIFE_GEM_CLUSTER = cluster(
+            "life_gem_cluster", 5, MapColor.COLOR_LIGHT_GREEN);
+
+    /** One whole solid block of algae turf: the green carpet over every top surface. */
+    public static final DeferredBlock<Block> ALGAE_MAT = BLOCKS.register("algae_mat",
+            () -> new Block(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.PLANT)
+                    .strength(0.6F, 0.8F)
+                    .sound(SoundType.WET_GRASS)));
+    public static final DeferredBlock<CrystalPlantBlock> ALGAE_TUFT = crystalPlant("algae_tuft", 0,
+            MapColor.COLOR_GREEN);
+    public static final DeferredBlock<CrystalPlantBlock> CRYSTAL_SPROUT = crystalPlant("crystal_sprout", 0,
+            MapColor.ICE, TagRegistry.CRYSTAL_GROWTH_SUPPORT);
+    public static final DeferredBlock<DroopingSeaweedBlock> CRYSTAL_FRINGE = drooping("crystal_fringe",
+            MapColor.ICE, SoundType.AMETHYST_CLUSTER, TagRegistry.CRYSTAL_GROWTH_SUPPORT);
+
     // Jelly blocks — translucent, bouncy like slime, easier to destroy
     public static final DeferredBlock<SlimeBlock> LIGHT_RED_JELLY_BLOCK = jelly("light_red_jelly_block",
             MapColor.COLOR_RED, 0.3F, 0.3F);
@@ -273,13 +319,24 @@ public final class BlockRegistry {
 
     private static DeferredBlock<RotatedPillarBlock> pillar(String name, MapColor color, float hardness,
             float resistance, SoundType sound, boolean requiresTool) {
+        return pillarLike(name, color, hardness, resistance, sound, requiresTool, RotatedPillarBlock::new);
+    }
+
+    private static DeferredBlock<RotatedPillarBlock> crystalPillar(String name, MapColor color, float hardness,
+            float resistance, SoundType sound, boolean requiresTool) {
+        return pillarLike(name, color, hardness, resistance, sound, requiresTool, CrystalColumnBlock::new);
+    }
+
+    private static DeferredBlock<RotatedPillarBlock> pillarLike(String name, MapColor color, float hardness,
+            float resistance, SoundType sound, boolean requiresTool,
+            Function<BlockBehaviour.Properties, RotatedPillarBlock> factory) {
         var base = BlockBehaviour.Properties.of()
                 .mapColor(color)
                 .strength(hardness, resistance)
                 .sound(sound);
         if (requiresTool) base = base.requiresCorrectToolForDrops();
         BlockBehaviour.Properties props = base;
-        return BLOCKS.register(name, () -> new RotatedPillarBlock(props));
+        return BLOCKS.register(name, () -> factory.apply(props));
     }
 
     private static DeferredBlock<Block> cube(String name, MapColor color, float hardness, float resistance,
@@ -331,23 +388,43 @@ public final class BlockRegistry {
         return crystalPlant(name, light, MapColor.ICE);
     }
 
+    private static DeferredBlock<CrystalClusterBlock> cluster(String name, int light, MapColor color) {
+        return BLOCKS.register(name, () -> new CrystalClusterBlock(BlockBehaviour.Properties.of()
+                .mapColor(color)
+                .strength(0.4F)
+                .sound(SoundType.AMETHYST_CLUSTER)
+                .noOcclusion()
+                .dynamicShape()
+                .lightLevel(state -> light)));
+    }
+
     private static DeferredBlock<CrystalPlantBlock> crystalPlant(String name, int light, MapColor color) {
+        return crystalPlant(name, light, color, null);
+    }
+
+    private static DeferredBlock<CrystalPlantBlock> crystalPlant(String name, int light, MapColor color,
+            @Nullable TagKey<Block> supportBelow) {
         return BLOCKS.register(name, () -> new CrystalPlantBlock(BlockBehaviour.Properties.of()
                 .mapColor(color)
                 .strength(0.2F)
                 .sound(SoundType.CALCITE)
                 .noOcclusion()
                 .dynamicShape()
-                .lightLevel(state -> light)));
+                .lightLevel(state -> light), supportBelow));
     }
 
     private static DeferredBlock<DroopingSeaweedBlock> drooping(String name, MapColor color, SoundType sound) {
+        return drooping(name, color, sound, null);
+    }
+
+    private static DeferredBlock<DroopingSeaweedBlock> drooping(String name, MapColor color, SoundType sound,
+            @Nullable TagKey<Block> anchorAbove) {
         return BLOCKS.register(name, () -> new DroopingSeaweedBlock(BlockBehaviour.Properties.of()
                 .mapColor(color)
                 .strength(0.3F)
                 .sound(sound)
                 .noOcclusion()
-                .dynamicShape()));
+                .dynamicShape(), anchorAbove));
     }
 
     private static DeferredBlock<MatCarpetBlock> mat(String name, MapColor color) {

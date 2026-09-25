@@ -46,6 +46,12 @@ public final class MiddleLevelOceanColumnRules {
         if (biome.equals(BrimstoneCalderaPlacement.location())) {
             return TargetBiome.BRIMSTONE_CALDERA;
         }
+        if (biome.equals(CrystalNestPlacement.location())) {
+            return TargetBiome.CRYSTAL_NEST;
+        }
+        if (biome.equals(DeepSeaPlacement.location())) {
+            return TargetBiome.DEEP_SEA;
+        }
         return TargetBiome.NONE;
     }
 
@@ -72,6 +78,8 @@ public final class MiddleLevelOceanColumnRules {
         JELLY_JUNGLE,
         MIDDLE_LEVEL_OCEAN,
         BRINE_MIRROR_GORGE,
-        BRIMSTONE_CALDERA
+        BRIMSTONE_CALDERA,
+        CRYSTAL_NEST,
+        DEEP_SEA
     }
 }

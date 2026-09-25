@@ -24,7 +24,8 @@ public final class DefaultOceanLayerStacks {
     public static OceanLayerStack defaultDeepStack() {
         return new OceanLayerStack(
                 OceanLayerStacks.DEFAULT_ID,
-                List.of(OceanLayer.surface(), OceanLayer.reefCeiling(), OceanLayer.middleSea()),
+                List.of(OceanLayer.surface(), OceanLayer.reefCeiling(), OceanLayer.middleSea(),
+                        OceanLayer.deepSea()),
                 1.0D,
                 16.0D,
                 16,

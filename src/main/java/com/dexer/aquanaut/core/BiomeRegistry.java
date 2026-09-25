@@ -3,6 +3,8 @@ package com.dexer.aquanaut.core;
 import com.dexer.aquanaut.common.worldgen.BrimstoneCalderaPlacement;
 import com.dexer.aquanaut.common.worldgen.BrineMirrorGorgePlacement;
 import com.dexer.aquanaut.common.worldgen.CoralForestPlacement;
+import com.dexer.aquanaut.common.worldgen.CrystalNestPlacement;
+import com.dexer.aquanaut.common.worldgen.DeepSeaPlacement;
 import com.dexer.aquanaut.common.worldgen.JellyJunglePlacement;
 import com.dexer.aquanaut.common.worldgen.MiddleLevelOceanPlacement;
 import com.dexer.aquanaut.common.worldgen.MiddleLevelOceanRegion;
@@ -22,6 +24,10 @@ public final class BiomeRegistry {
             BrineMirrorGorgePlacement.location());
     public static final ResourceKey<Biome> BRIMSTONE_CALDERA = ResourceKey.create(Registries.BIOME,
             BrimstoneCalderaPlacement.location());
+    public static final ResourceKey<Biome> CRYSTAL_NEST = ResourceKey.create(Registries.BIOME,
+            CrystalNestPlacement.location());
+    public static final ResourceKey<Biome> DEEP_SEA = ResourceKey.create(Registries.BIOME,
+            DeepSeaPlacement.location());
 
     private BiomeRegistry() {
     }

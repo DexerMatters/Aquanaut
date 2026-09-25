@@ -48,9 +48,12 @@ public final class AshDriftFeature extends Feature<NoneFeatureConfiguration> {
                 }
                 double edge = 1.0D - Math.sqrt(dist2) / (radius + 1.0D);
 
-                // Loose ash pockets where the drift presses into the old rock.
+                // Loose ash pockets where the drift presses into the old rock. Settled dust,
+                // never a falling block: the ash must stay where it settled instead of
+                // sliding off into the water at the first block update.
                 if (random.nextDouble() < edge * 0.35D) {
-                    level.setBlock(pos, BlockRegistry.VOLCANIC_ASH.get().defaultBlockState(), 2);
+                    level.setBlock(pos, BlockRegistry.ASH_LAYER.get().defaultBlockState()
+                            .setValue(AshLayerBlock.LAYERS, 8), 2);
                     placed = true;
                 }
 

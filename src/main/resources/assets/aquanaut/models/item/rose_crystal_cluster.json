@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "aquanaut:block/rose_crystal_cluster"
+  }
+}

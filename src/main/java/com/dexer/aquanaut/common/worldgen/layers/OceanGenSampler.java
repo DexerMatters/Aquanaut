@@ -106,6 +106,24 @@ public final class OceanGenSampler {
         return edgeAtBlock[localX * 16 + localZ];
     }
 
+    /**
+     * Edge strength for block columns up to 16 blocks outside the chunk (local -1..16).
+     * The crystal-nest decoration pass needs one block of halo to decide which faces a
+     * surface really has; sampling the same chamfer field keeps those decisions seamless
+     * across chunk borders.
+     */
+    public double edgeStrengthAtHaloBlock(int localX, int localZ) {
+        if (localX >= 0 && localX < 16 && localZ >= 0 && localZ < 16) {
+            return edgeAtBlock[localX * 16 + localZ];
+        }
+        // Same mapping the constructor uses: quart cell plus the intra-quart fraction.
+        double cellX = HALO_QUART_RADIUS + localX / 4.0D;
+        double cellZ = HALO_QUART_RADIUS + localZ / 4.0D;
+        float d = sampleDistance(cellX, cellZ);
+        double fullStrengthCells = Math.max(0.25, stack.regionEdgeFadeBlocks() / 4.0D);
+        return SoftMixNoise.smoothstep(d / fullStrengthCells);
+    }
+
     public double[] edgeAtBlock() {
         return edgeAtBlock;
     }

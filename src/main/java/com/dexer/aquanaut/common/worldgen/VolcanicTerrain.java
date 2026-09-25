@@ -32,7 +32,11 @@ public final class VolcanicTerrain {
     private static final BlockState SCORIA = BlockRegistry.SCORIA.get().defaultBlockState();
     private static final BlockState AGGLOMERATE = BlockRegistry.VOLCANIC_AGGLOMERATE.get().defaultBlockState();
     private static final BlockState PUMICE = BlockRegistry.PUMICE.get().defaultBlockState();
-    private static final BlockState ASH = BlockRegistry.VOLCANIC_ASH.get().defaultBlockState();
+    // Fine ash as settled dust layers: a falling block here would slide off the cones and
+    // drift down through the water column the moment anything updates it.
+    private static final BlockState ASH = BlockRegistry.ASH_LAYER.get().defaultBlockState()
+            .setValue(AshLayerBlock.LAYERS, 8)
+            .setValue(BlockStateProperties.WATERLOGGED, true);
     private static final BlockState SULFUR_CRUST = BlockRegistry.SULFUR_CRUST.get().defaultBlockState();
     private static final BlockState SINTER = BlockRegistry.SINTER.get().defaultBlockState();
     private static final BlockState ACID_ETCHED = BlockRegistry.ACID_ETCHED_BASALT.get().defaultBlockState();
@@ -63,12 +67,22 @@ public final class VolcanicTerrain {
     /** The per-column shading plan, or {@code null} on columns outside the volcanic biome. */
     public static Column columnAt(OceanLayerStack stack, int blockX, int blockZ,
                                   int floorY, double edgeFade) {
+        return columnAt(stack, blockX, blockZ, floorY, edgeFade, Double.POSITIVE_INFINITY);
+    }
+
+    /**
+     * The per-column shading plan, or {@code null} on columns outside the volcanic biome.
+     * {@code maxRelief} caps how far cones may rise above the floor so summits keep clear
+     * water below the reef overhead.
+     */
+    public static Column columnAt(OceanLayerStack stack, int blockX, int blockZ,
+                                  int floorY, double edgeFade, double maxRelief) {
         double weight = brimstoneWeight(stack, blockX >> 2, blockZ >> 2);
         double strength = VolcanoGeometry.strength(weight, edgeFade);
         if (strength <= 0.0D) {
             return null;
         }
-        VolcanoGeometry.ColumnShape shape = VolcanoGeometry.shapeAt(blockX, blockZ, floorY, strength);
+        VolcanoGeometry.ColumnShape shape = VolcanoGeometry.shapeAt(blockX, blockZ, floorY, strength, maxRelief);
         // Satellite vents only erupt between the giants, never on an edifice's own flanks.
         VolcanoGeometry.StackShape satellite = shape.partOfEdifice()
                 ? VolcanoGeometry.StackShape.NONE

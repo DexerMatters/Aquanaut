@@ -33,11 +33,6 @@ public final class VolcanoGeometry {
     public static final double ACTIVE_CHANCE = 0.68D;
     /** Strength below which the volcanic relief sinks back into the plain. */
     public static final double MIN_STRENGTH = 0.25D;
-    /**
-     * Breach plugs always top out above the reef cap (whose ceiling lives at Y <= 39):
-     * the conduit that ties a vent straight into the upper floor.
-     */
-    public static final double BREACH_TOP_MIN_Y = 41.0D;
     /** Cell size of the satellite scoria-cone and spatter-ridge field. */
     public static final int STACK_CELL = 30;
     /** Fraction of stack cells that actually erupt a satellite vent. */
@@ -193,8 +188,8 @@ public final class VolcanoGeometry {
         int cx = cellX * FIELD_CELL + FIELD_CELL / 4 + (int) (unit(roll, 1) * (FIELD_CELL / 2.0D));
         int cz = cellZ * FIELD_CELL + FIELD_CELL / 4 + (int) (unit(roll, 2) * (FIELD_CELL / 2.0D));
 
-        int baseRadius = 24 + (int) (unit(roll, 3) * 20.0D);            // 24..43 — giant massifs
-        int height = 32 + (int) (unit(roll, 4) * 22.0D);                // 32..53 — majestic summits
+        int baseRadius = 16 + (int) (unit(roll, 3) * 12.0D);            // 16..27 — compact massifs
+        int height = 22 + (int) (unit(roll, 4) * 12.0D);                // 22..33 — modest summits
         double craterRatio = 0.30D + unit(roll, 5) * 0.16D;             // wide summit calderas
         int craterRadius = Math.max(6, (int) Math.round(baseRadius * craterRatio));
         int craterDepth = 6 + (int) (unit(roll, 6) * 7.0D);
@@ -209,7 +204,7 @@ public final class VolcanoGeometry {
         // The dome never chokes its own crater: a full ring of crater floor survives.
         int plugRadius = Math.max(3, Math.min(3 + (int) (unit(roll, 10) * 3.0D), craterRadius - 3));
         int plugHeight = breach
-                ? 16 + (int) (unit(roll, 11) * 10.0D)                   // the neck meets the upper floor
+                ? 10 + (int) (unit(roll, 11) * 8.0D)                    // the neck stands proud of the rim
                 : 4 + (int) (unit(roll, 11) * 7.0D);                    // resurgent dome in the crater
         int fillDepth = craterType == CraterType.SULFUR_PAN ? 0 : 1 + (int) (unit(roll, 12) * 3.0D);
 
@@ -238,6 +233,16 @@ public final class VolcanoGeometry {
      * (main cones and their parasitic cones), or {@code null} on open plain.
      */
     public static ColumnShape shapeAt(int blockX, int blockZ, int floorY, double strength) {
+        return shapeAt(blockX, blockZ, floorY, strength, Double.POSITIVE_INFINITY);
+    }
+
+    /**
+     * As {@link #shapeAt(int, int, int, double)}, but every summit, rim and vent dome is
+     * kept within {@code maxRelief} blocks above the geological floor so middle-sea
+     * mountains never crowd the reef overhead.
+     */
+    public static ColumnShape shapeAt(int blockX, int blockZ, int floorY, double strength,
+                                      double maxRelief) {
         if (strength <= MIN_STRENGTH) {
             return plainShape(blockX, blockZ, floorY, strength);
         }
@@ -250,12 +255,12 @@ public final class VolcanoGeometry {
                 if (volcano == null) {
                     continue;
                 }
-                ColumnShape candidate = edificeShape(volcano, null, blockX, blockZ, floorY, strength);
+                ColumnShape candidate = edificeShape(volcano, null, blockX, blockZ, floorY, strength, maxRelief);
                 if (candidate != null && candidate.surfaceY > best.surfaceY) {
                     best = candidate;
                 }
                 for (Parasite parasite : volcano.parasites()) {
-                    ColumnShape flank = edificeShape(volcano, parasite, blockX, blockZ, floorY, strength);
+                    ColumnShape flank = edificeShape(volcano, parasite, blockX, blockZ, floorY, strength, maxRelief);
                     if (flank != null && flank.surfaceY > best.surfaceY) {
                         best = flank;
                     }
@@ -276,6 +281,14 @@ public final class VolcanoGeometry {
     /** Package-private for tests: the shading plan of exactly one cone or flank cone. */
     static ColumnShape edificeShape(Volcano volcano, Parasite parasite,
                                     int blockX, int blockZ, int floorY, double strength) {
+        return edificeShape(volcano, parasite, blockX, blockZ, floorY, strength,
+                Double.POSITIVE_INFINITY);
+    }
+
+    /** Package-private for tests: the shading plan of exactly one cone or flank cone. */
+    static ColumnShape edificeShape(Volcano volcano, Parasite parasite,
+                                    int blockX, int blockZ, int floorY, double strength,
+                                    double maxRelief) {
         int centerX = volcano.centerX() + (parasite == null ? 0 : parasite.offsetX());
         int centerZ = volcano.centerZ() + (parasite == null ? 0 : parasite.offsetZ());
         int baseRadius = parasite == null ? volcano.baseRadius() : parasite.radius();
@@ -379,9 +392,36 @@ public final class VolcanoGeometry {
             double apronHeight = 4.5D * runOut * runOut * strength;
             surfaceY = Math.max(surfaceY, floorY + apronHeight);
         }
+        // Keep the whole edifice under the mountain ceiling: one uniform vertical squeeze
+        // per volcano preserves the profile — peaks shrink, they never get sliced flat.
+        double scale = verticalScale(volcano, floorY, strength, maxRelief);
+        if (scale < 1.0D) {
+            surfaceY = floorY + (surfaceY - floorY) * scale;
+            if (fillY > Double.NEGATIVE_INFINITY) {
+                fillY = floorY + (fillY - floorY) * scale;
+            }
+            if (openTopY > Double.NEGATIVE_INFINITY) {
+                openTopY = floorY + (openTopY - floorY) * scale;
+            }
+        }
         return new ColumnShape(volcano, parasite, distance, surfaceY,
                 Math.max(0.0D, surfaceY - floorY), fillY, craterInterior, openTopY,
                 channelStrength);
+    }
+
+    /**
+     * Uniform vertical scale factor that keeps every part of the edifice within
+     * {@code maxRelief} blocks of the floor. The raw bound covers the tallest of the
+     * cone-and-rim profile and the vent dome (including breach necks that would
+     * otherwise pierce the reef).
+     */
+    static double verticalScale(Volcano volcano, int floorY, double strength, double maxRelief) {
+        if (!Double.isFinite(maxRelief)) {
+            return 1.0D;
+        }
+        double plugRelief = plugTopY(volcano, floorY, strength) - floorY;
+        double rawMax = Math.max(volcano.height() * strength + volcano.rimHeight(), plugRelief) + 2.0D;
+        return rawMax <= 0.0D ? 1.0D : SoftMixNoise.clamp01(maxRelief / rawMax);
     }
 
     /** 1 inside the notch torn out of a breached rim, fading to 0 outside it. */
@@ -414,19 +454,20 @@ public final class VolcanoGeometry {
     }
 
     /**
-     * Top Y of the summit vent. A breach neck is forced up through the reef cap so the vent
-     * column always meets the upper floor; a resurgent dome stays inside its crater.
+     * Top Y of the summit vent. The neck never overtops its own cone — relief stays
+     * proportional so the whole edifice squashes as one shape under the mountain line —
+     * but a breach neck still stands proud of the crater rim, the conduit that runs out
+     * through the breached flank. A resurgent dome stays inside its crater.
      */
     public static double plugTopY(Volcano volcano, double floorY, double strength) {
         double scaledHeight = volcano.height() * strength;
         double plugBase = floorY + (volcano.craterType() == CraterType.SULFUR_PAN
                 ? scaledHeight * 0.35D
                 : scaledHeight * 0.55D);
-        double plugTop = plugBase + volcano.plugHeight() * strength;
+        double plugTop = Math.min(plugBase + volcano.plugHeight() * strength,
+                floorY + scaledHeight);
         if (volcano.breach()) {
-            double target = BREACH_TOP_MIN_Y + (volcano.plugHeight() % 6);
-            double breachTop = floorY + (target - floorY) * SoftMixNoise.smoothstep(strength);
-            plugTop = Math.max(plugTop, breachTop);
+            plugTop = Math.max(plugTop, floorY + scaledHeight * 0.85D);
         }
         return plugTop;
     }
@@ -471,8 +512,8 @@ public final class VolcanoGeometry {
     }
 
     /**
-     * Layers of the breach rubble apron spilled across the upper floor around a plug that
-     * pierced the reef cap: returns the rubble top Y for this column, or 0 when outside.
+     * Layers of the breach rubble apron spilled across the plain around a breach neck:
+     * returns the rubble top Y for this column, or 0 when outside.
      */
     public static double breachRubbleTop(Volcano volcano, double distance, double plugTopY, double strength) {
         if (volcano == null || !volcano.breach() || strength < 0.5D) {

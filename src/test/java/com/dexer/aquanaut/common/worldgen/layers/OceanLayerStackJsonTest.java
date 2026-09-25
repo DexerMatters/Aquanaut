@@ -16,9 +16,12 @@ public final class OceanLayerStackJsonTest {
     void jarDefaultStackParses() throws Exception {
         Path path = Path.of("src/main/resources/data/aquanaut/worldgen/ocean_layer_stack/default_deep_stack.json");
         OceanLayerStack stack = OceanLayerStackJson.fromPath(path);
-        assertEquals(3, stack.layers().size());
+        assertEquals(4, stack.layers().size());
         assertTrue(stack.layers().get(1).rewritesBiome());
         assertEquals(2, stack.layers().get(1).mix().entries().size());
+        // The deep sea is the last layer and its single placeholder biome fills the abyss.
+        assertEquals("aquanaut:deep_sea", stack.layers().get(3).id().toString());
+        assertEquals(1, stack.layers().get(3).mix().entries().size());
     }
 
     @Test

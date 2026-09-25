@@ -1,0 +1,11 @@
+{
+  "type": "neoforge:remove_features",
+  "biomes": "#minecraft:is_deep_ocean",
+  "features": [
+    "minecraft:monster_room",
+    "minecraft:monster_room_deep",
+    "minecraft:lake_lava_underground",
+    "minecraft:lake_lava_surface",
+    "minecraft:amethyst_geode"
+  ]
+}

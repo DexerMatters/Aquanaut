@@ -13,9 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public final class OceanLayerStackTest {
 
     @Test
-    void defaultStackHasThreeLayersAndDeepOceanParents() {
+    void defaultStackHasFourLayersAndDeepOceanParents() {
         OceanLayerStack stack = OceanLayerStacks.defaultStack();
-        assertEquals(3, stack.layers().size());
+        assertEquals(4, stack.layers().size());
         assertTrue(stack.isParentBiome(minecraft("deep_ocean")));
         assertFalse(stack.isParentBiome(minecraft("ocean")));
         assertTrue(stack.supportsQuartCell(minecraft("deep_ocean"), 16));
@@ -35,6 +35,10 @@ public final class OceanLayerStackTest {
         assertEquals("aquanaut:reef_ceiling", stack.dominantLayerAtBlockY(36).id().toString());
         assertEquals("aquanaut:middle_sea", stack.dominantLayerAtBlockY(20).id().toString());
         assertEquals("aquanaut:surface_ocean", stack.dominantLayerAtBlockY(64).id().toString());
+        // Below the reef the deep sea owns the remaining world depth; the middle-sea
+        // district biomes stay dominant through the reef itself.
+        assertEquals("aquanaut:middle_sea", stack.dominantLayerAtBlockY(-40).id().toString());
+        assertEquals("aquanaut:deep_sea", stack.dominantLayerAtBlockY(-50).id().toString());
     }
 
     @Test

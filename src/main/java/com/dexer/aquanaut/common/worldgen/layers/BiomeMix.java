@@ -46,7 +46,9 @@ public record BiomeMix(List<MixEntry> entries, double horizontalBlendQuarts) {
                     quartZ + a.noiseOffsetZ(),
                     cell,
                     a.noiseSalt());
-            double blend = SoftMixNoise.clamp01(horizontalBlendQuarts / (double) cell) * 0.35D;
+            noise += bend(quartX + a.noiseOffsetX(), quartZ + a.noiseOffsetZ(),
+                    cell, a.noiseSalt());
+            double blend = SoftMixNoise.clamp01(horizontalBlendQuarts / (double) cell) * 0.8D;
             double[] pair = SoftMixNoise.softBinaryWeights(noise, blend);
             double wa = Math.max(1e-6, a.weight());
             double wb = Math.max(1e-6, b.weight());
@@ -65,11 +67,29 @@ public record BiomeMix(List<MixEntry> entries, double horizontalBlendQuarts) {
                     quartZ + entry.noiseOffsetZ(),
                     cell,
                     entry.noiseSalt());
+            noise += bend(quartX + entry.noiseOffsetX(), quartZ + entry.noiseOffsetZ(),
+                    cell, entry.noiseSalt());
             double affinity = SoftMixNoise.smoothstep((noise + 1.0D) * 0.5D);
             weights[i] = Math.max(1e-6, entry.weight()) * Math.max(1e-6, affinity);
             total += weights[i];
         }
         return normalize(weights, total);
+    }
+
+    /**
+     * Organic border ripple: two octaves of the value-noise family bend district borders
+     * into peninsulas and bays at two scales, so transitions read as meandering coastlines
+     * instead of clean drawn contours. The amplitude follows the layer's declared
+     * {@code horizontal_blend_quarts} (full bend at 4 quarts of blend).
+     */
+    private double bend(int quartX, int quartZ, int cell, long seed) {
+        double amplitude = SoftMixNoise.clamp01(horizontalBlendQuarts / 4.0D) * 0.18D;
+        if (amplitude <= 0.0D) {
+            return 0.0D;
+        }
+        double broad = SoftMixNoise.valueNoise(quartX, quartZ, Math.max(2, cell / 2), seed ^ 0x9E37L);
+        double fine = SoftMixNoise.valueNoise(quartX, quartZ, Math.max(2, cell / 4), seed ^ 0x51L);
+        return (broad * 0.6D + fine * 0.4D) * amplitude;
     }
 
     public MixEntry dominantAt(int quartX, int quartZ) {

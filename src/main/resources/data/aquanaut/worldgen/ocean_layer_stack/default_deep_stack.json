@@ -66,9 +66,9 @@
     {
       "id": "aquanaut:middle_sea",
       "band": {
-        "min_y": -64,
+        "min_y": -42,
         "max_y": 34,
-        "blend_down": 0.0,
+        "blend_down": 2.0,
         "blend_up": 2.0
       },
       "biomes": {
@@ -84,7 +84,7 @@
           },
           {
             "biome": "aquanaut:brine_mirror_gorge",
-            "weight": 0.55,
+            "weight": 0.48,
             "noise_scale": 80,
             "noise_offset_x": 19,
             "noise_offset_z": -13,
@@ -92,11 +92,39 @@
           },
           {
             "biome": "aquanaut:brimstone_caldera",
-            "weight": 0.35,
+            "weight": 0.45,
             "noise_scale": 80,
             "noise_offset_x": 19,
             "noise_offset_z": -13,
             "noise_salt": 23
+          },
+          {
+            "biome": "aquanaut:crystal_nest",
+            "weight": 0.52,
+            "noise_scale": 80,
+            "noise_offset_x": 31,
+            "noise_offset_z": -27,
+            "noise_salt": 41
+          }
+        ]
+      },
+      "terrain": "aquanaut:middle_cavity",
+      "carve": true
+    },
+    {
+      "id": "aquanaut:deep_sea",
+      "band": {
+        "min_y": -64,
+        "max_y": -38,
+        "blend_down": 0.0,
+        "blend_up": 4.0
+      },
+      "biomes": {
+        "horizontal_blend_quarts": 0.0,
+        "entries": [
+          {
+            "biome": "aquanaut:deep_sea",
+            "weight": 1.0
           }
         ]
       },

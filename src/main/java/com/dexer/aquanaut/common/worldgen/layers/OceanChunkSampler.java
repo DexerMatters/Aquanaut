@@ -105,6 +105,50 @@ public final class OceanChunkSampler {
         return terrain.topWaterY();
     }
 
+    /**
+     * True when {@link #sample} would mark at least one quart column of this chunk as supported,
+     * i.e. the fill planned real mod terrain here. Vanilla carvers must never touch covered
+     * chunks: the mod carves its own voids analytically, and any carved air pocket inside the
+     * drowned terrain culls the surrounding water faces.
+     *
+     * <p>
+     * A cheap parent-biome pre-check runs first (the surface probe sits at block Y 64, above
+     * every rewrite band, so the palette there is the untouched noise biome at any pipeline
+     * stage) and skips the noise probes entirely for land and coast chunks.
+     */
+    public static boolean isCovered(ChunkAccess chunk,
+                                    OceanLayerStack stack,
+                                    int minCellY,
+                                    int cellCountY,
+                                    int cellWidth,
+                                    int cellHeight,
+                                    BlockState defaultBlock,
+                                    java.util.function.Supplier<NoiseChunk> probeFactory,
+                                    java.util.function.BiFunction<Integer, Integer, ResourceLocation> haloBiomeAt) {
+        ChunkPos chunkPos = chunk.getPos();
+        int baseQuartX = QuartPos.fromBlock(chunkPos.getMinBlockX());
+        int baseQuartZ = QuartPos.fromBlock(chunkPos.getMinBlockZ());
+        int surfaceQuartY = MiddleLevelOceanPlacement.surfaceSampleQuartY();
+        boolean parentPresent = false;
+        for (int lx = 0; lx < OceanGenSampler.QUARTS && !parentPresent; lx++) {
+            for (int lz = 0; lz < OceanGenSampler.QUARTS; lz++) {
+                ResourceLocation biome = chunk.getNoiseBiome(baseQuartX + lx, surfaceQuartY, baseQuartZ + lz)
+                        .unwrapKey()
+                        .map(key -> key.location())
+                        .orElse(null);
+                if (stack.isParentBiome(biome)) {
+                    parentPresent = true;
+                    break;
+                }
+            }
+        }
+        if (!parentPresent) {
+            return false;
+        }
+        return sample(chunk, stack, topWaterY(stack), minCellY, cellCountY, cellWidth, cellHeight,
+                defaultBlock, probeFactory, haloBiomeAt).anySupported();
+    }
+
     public static TerrainModule stackTerrain(OceanLayerStack stack) {
         ResourceLocation terrainId = stack.layers().get(stack.layers().size() - 1).terrain();
         return OceanLayerStacks.terrain(terrainId);

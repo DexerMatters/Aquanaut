@@ -39,6 +39,14 @@ public final class MiddleLevelOceanRegion extends Region {
                 BiomeRegistry.BRIMSTONE_CALDERA,
                 BrimstoneCalderaPlacement.holderAnchorParameter(),
                 BrimstoneCalderaPlacement.holderAnchorOffset());
+        addHiddenBiome(mapper,
+                BiomeRegistry.CRYSTAL_NEST,
+                CrystalNestPlacement.holderAnchorParameter(),
+                CrystalNestPlacement.holderAnchorOffset());
+        addHiddenBiome(mapper,
+                BiomeRegistry.DEEP_SEA,
+                DeepSeaPlacement.holderAnchorParameter(),
+                DeepSeaPlacement.holderAnchorOffset());
     }
 
     private void addHiddenBiome(Consumer<Pair<Climate.ParameterPoint, ResourceKey<Biome>>> mapper,

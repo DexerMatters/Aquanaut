@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "part=top": {
+      "model": "aquanaut:block/crystal_fringe_top"
+    },
+    "part=body": {
+      "model": "aquanaut:block/crystal_fringe_body"
+    },
+    "part=tail": {
+      "model": "aquanaut:block/crystal_fringe_tail"
+    }
+  }
+}

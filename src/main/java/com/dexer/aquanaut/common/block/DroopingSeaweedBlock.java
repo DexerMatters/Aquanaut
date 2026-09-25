@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -25,8 +26,10 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import javax.annotation.Nullable;
+
 public final class DroopingSeaweedBlock extends Block implements SimpleWaterloggedBlock {
-    public static final MapCodec<DroopingSeaweedBlock> CODEC = simpleCodec(DroopingSeaweedBlock::new);
+    public static final MapCodec<DroopingSeaweedBlock> CODEC = simpleCodec(props -> new DroopingSeaweedBlock(props));
     public static final EnumProperty<SeaweedPart> PART = EnumProperty.create("part", SeaweedPart.class);
     private static final VoxelShape TOP_SHAPE = Shapes.or(
             Block.box(2.0D, 0.0D, 5.0D, 14.0D, 16.0D, 11.0D),
@@ -38,8 +41,22 @@ public final class DroopingSeaweedBlock extends Block implements SimpleWaterlogg
             Block.box(4.0D, 0.0D, 5.0D, 12.0D, 16.0D, 11.0D),
             Block.box(5.0D, 0.0D, 4.0D, 11.0D, 16.0D, 12.0D));
 
+    @Nullable
+    private final TagKey<Block> anchorAbove;
+
     public DroopingSeaweedBlock(BlockBehaviour.Properties properties) {
+        this(properties, null);
+    }
+
+    /**
+     * With an {@code anchorAbove} tag the strand may only hang from that rock — the rule
+     * crystal fringe (垂晶穗) obeys ("crystals grow only on 晶巢岩") while kelp and salt
+     * fringe keep dangling from anything.
+     */
+    public DroopingSeaweedBlock(BlockBehaviour.Properties properties,
+                                @Nullable TagKey<Block> anchorAbove) {
         super(properties);
+        this.anchorAbove = anchorAbove;
         registerDefaultState(defaultBlockState()
                 .setValue(PART, SeaweedPart.TOP)
                 .setValue(BlockStateProperties.WATERLOGGED, false));
@@ -68,9 +85,10 @@ public final class DroopingSeaweedBlock extends Block implements SimpleWaterlogg
         if (aboveState.is(this)) {
             part = SeaweedPart.TAIL;
         }
-        return defaultBlockState()
+        BlockState state = defaultBlockState()
                 .setValue(PART, part)
                 .setValue(BlockStateProperties.WATERLOGGED, true);
+        return state.canSurvive(level, pos) ? state : null;
     }
 
     @Override
@@ -129,7 +147,8 @@ public final class DroopingSeaweedBlock extends Block implements SimpleWaterlogg
     protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         SeaweedPart part = state.getValue(PART);
         if (part == SeaweedPart.TOP) {
-            return state.getValue(BlockStateProperties.WATERLOGGED);
+            return state.getValue(BlockStateProperties.WATERLOGGED)
+                    && (anchorAbove == null || level.getBlockState(pos.above()).is(anchorAbove));
         }
         BlockState above = level.getBlockState(pos.above());
         return above.getBlock() == this;

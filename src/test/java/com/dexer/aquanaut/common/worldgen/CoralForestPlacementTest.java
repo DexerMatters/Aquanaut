@@ -39,8 +39,10 @@ public final class CoralForestPlacementTest {
         MiddleLevelOceanColumnRules.TargetBiome deep =
                 MiddleLevelOceanColumnRules.targetBiome(minecraft("deep_ocean"), 16, 0, 7, 0);
         assertTrue(deep == MiddleLevelOceanColumnRules.TargetBiome.MIDDLE_LEVEL_OCEAN
-                        || deep == MiddleLevelOceanColumnRules.TargetBiome.BRINE_MIRROR_GORGE,
-                "middle-sea layer is MLO or brine mirror gorge");
+                        || deep == MiddleLevelOceanColumnRules.TargetBiome.BRINE_MIRROR_GORGE
+                        || deep == MiddleLevelOceanColumnRules.TargetBiome.BRIMSTONE_CALDERA
+                        || deep == MiddleLevelOceanColumnRules.TargetBiome.CRYSTAL_NEST,
+                "middle-sea layer is one of the four floor biomes");
         assertEquals(MiddleLevelOceanColumnRules.TargetBiome.NONE,
                 MiddleLevelOceanColumnRules.targetBiome(minecraft("deep_ocean"), 16, 0, 10, 0));
     }

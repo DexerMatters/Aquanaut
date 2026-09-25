@@ -401,6 +401,35 @@ public final class ItemRegistry {
                         BlockRegistry.THERMOPHILIC_MAT_RUST);
         public static final DeferredItem<BlockItem> THERMOPHILIC_MAT_OLIVE = blockItem("thermophilic_mat_olive",
                         BlockRegistry.THERMOPHILIC_MAT_OLIVE);
+        // Crystal Nest (水晶巢) block items
+        public static final DeferredItem<BlockItem> CRYSTAL_NEST_STONE = blockItem("crystal_nest_stone",
+                        BlockRegistry.CRYSTAL_NEST_STONE);
+        public static final DeferredItem<BlockItem> CRYSTAL_DRUSE = blockItem("crystal_druse",
+                        BlockRegistry.CRYSTAL_DRUSE);
+        public static final DeferredItem<BlockItem> CRYSTAL_COLUMN = blockItem("crystal_column",
+                        BlockRegistry.CRYSTAL_COLUMN);
+        public static final DeferredItem<BlockItem> WHITE_CRYSTAL_CLUSTER = blockItem("white_crystal_cluster",
+                        BlockRegistry.WHITE_CRYSTAL_CLUSTER);
+        public static final DeferredItem<BlockItem> ROSE_CRYSTAL_CLUSTER = blockItem("rose_crystal_cluster",
+                        BlockRegistry.ROSE_CRYSTAL_CLUSTER);
+        public static final DeferredItem<BlockItem> AMETHYST_CRYSTAL_CLUSTER = blockItem(
+                        "amethyst_crystal_cluster", BlockRegistry.AMETHYST_CRYSTAL_CLUSTER);
+        public static final DeferredItem<BlockItem> AQUA_CRYSTAL_CLUSTER = blockItem("aqua_crystal_cluster",
+                        BlockRegistry.AQUA_CRYSTAL_CLUSTER);
+        public static final DeferredItem<BlockItem> SMOKY_CRYSTAL_CLUSTER = blockItem("smoky_crystal_cluster",
+                        BlockRegistry.SMOKY_CRYSTAL_CLUSTER);
+        public static final DeferredItem<BlockItem> RESONANT_CRYSTAL_CLUSTER = blockItem(
+                        "resonant_crystal_cluster", BlockRegistry.RESONANT_CRYSTAL_CLUSTER);
+        public static final DeferredItem<BlockItem> LIFE_GEM_CLUSTER = blockItem("life_gem_cluster",
+                        BlockRegistry.LIFE_GEM_CLUSTER);
+        public static final DeferredItem<BlockItem> ALGAE_MAT = blockItem("algae_mat",
+                        BlockRegistry.ALGAE_MAT);
+        public static final DeferredItem<BlockItem> ALGAE_TUFT = blockItem("algae_tuft",
+                        BlockRegistry.ALGAE_TUFT);
+        public static final DeferredItem<BlockItem> CRYSTAL_SPROUT = blockItem("crystal_sprout",
+                        BlockRegistry.CRYSTAL_SPROUT);
+        public static final DeferredItem<BlockItem> CRYSTAL_FRINGE = blockItem("crystal_fringe",
+                        BlockRegistry.CRYSTAL_FRINGE);
         // Brimstone Caldera goods
         public static final DeferredItem<Item> SULFUR_LUMP = ITEMS.registerSimpleItem("sulfur_lump");
         public static final DeferredItem<BucketItem> SULFURIC_ACID_BUCKET = ITEMS.registerItem(
@@ -836,6 +865,21 @@ public final class ItemRegistry {
                                 output.accept(THERMOPHILIC_MAT_RUST.get());
                                 output.accept(THERMOPHILIC_MAT_OLIVE.get());
                                 output.accept(SULFURIC_ACID_BUCKET.get());
+                                // Crystal Nest
+                                output.accept(CRYSTAL_NEST_STONE.get());
+                                output.accept(CRYSTAL_DRUSE.get());
+                                output.accept(CRYSTAL_COLUMN.get());
+                                output.accept(WHITE_CRYSTAL_CLUSTER.get());
+                                output.accept(ROSE_CRYSTAL_CLUSTER.get());
+                                output.accept(AMETHYST_CRYSTAL_CLUSTER.get());
+                                output.accept(AQUA_CRYSTAL_CLUSTER.get());
+                                output.accept(SMOKY_CRYSTAL_CLUSTER.get());
+                                output.accept(RESONANT_CRYSTAL_CLUSTER.get());
+                                output.accept(LIFE_GEM_CLUSTER.get());
+                                output.accept(ALGAE_MAT.get());
+                                output.accept(ALGAE_TUFT.get());
+                                output.accept(CRYSTAL_SPROUT.get());
+                                output.accept(CRYSTAL_FRINGE.get());
                                 output.accept(SEAWEED.get());
                                 output.accept(SEAWEED_FRUIT.get());
                                 output.accept(SEAWEED_STEM.get());

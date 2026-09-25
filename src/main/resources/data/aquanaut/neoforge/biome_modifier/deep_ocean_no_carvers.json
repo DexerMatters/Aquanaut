@@ -1,0 +1,9 @@
+{
+  "type": "neoforge:remove_carvers",
+  "biomes": "#minecraft:is_deep_ocean",
+  "carvers": [
+    "minecraft:cave",
+    "minecraft:cave_extra_underground",
+    "minecraft:canyon"
+  ]
+}

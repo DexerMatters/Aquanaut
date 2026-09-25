@@ -5,8 +5,6 @@ import com.dexer.aquanaut.common.worldgen.layers.TerrainModule;
 
 public final class MiddleLevelOceanTerrainProfile {
     private static final long WALL_SEED = 0xDEADBEEFL;
-    private static final long PILLAR_PATCH_SEED = 0xA1B2C3D4L;
-    private static final long PILLAR_CORE_SEED = 0xC0FFEE11L;
     // Crack openings: two rotated octaves of the same value-noise family. The rotation is what
     // keeps the outlines irregular — a single axis-aligned grid reads as a field of squares.
     private static final long CRACK_OUTLINE_SEED = 0x9E3779B9L;
@@ -68,38 +66,24 @@ public final class MiddleLevelOceanTerrainProfile {
                         Math.max(2.0D, terrain.crackCellSize() * CRACK_DETAIL_CELL_SCALE),
                         CRACK_DETAIL_SEED, terrain.crackDetailThreshold());
 
-        int pillarTopY = 0;
-        if (!crack && isPillarAt(blockX, blockZ, terrain)) {
-            double connectNoise = unitHash(blockX / 3, blockZ / 3, 0xD4C3B2A1L);
-            if (connectNoise < terrain.pillarConnectedChance()) {
-                pillarTopY = capBottomY;
-            } else {
-                double heightNoise = unitHash(blockX / 3, blockZ / 3, 0x1A2B3C4DL);
-                double ratio = terrain.pillarHeightMinRatio()
-                        + heightNoise * (terrain.pillarHeightMaxRatio() - terrain.pillarHeightMinRatio());
-                int cavHeight = capBottomY - cavityFloorY;
-                pillarTopY = cavityFloorY + (int) Math.round(ratio * cavHeight);
-            }
+        // Low sedimentary massifs rise from the floor: mesas, ridges, mounds and spires
+        // with their own silhouettes, all well below the reef overhead.
+        int outcropTopY = Integer.MIN_VALUE;
+        if (!crack) {
+            outcropTopY = OutcropGeometry.topYAt(blockX, blockZ, cavityFloorY,
+                    capBottomY - cavityFloorY, mountainTopLimit(capBottomY, cavityFloorY));
         }
 
-        return new ColumnProfile(capTopY, capBottomY, cavityFloorY, crack, pillarTopY);
+        return new ColumnProfile(capTopY, capBottomY, cavityFloorY, crack, outcropTopY);
     }
 
     /**
-     * Pillars form blobby outcrops in patch regions, not per-block white noise.
+     * The highest Y any middle-sea relief may reach. Mountains, pillars and cones top out
+     * at 32% of the chamber height — low hills and seamounts, with a very wide band of
+     * open water between their summits and the reef overhead.
      */
-    public static boolean isPillarAt(int blockX, int blockZ, TerrainModule terrain) {
-        double patch = sample(blockX, blockZ, 20, PILLAR_PATCH_SEED);
-        double mid = sample(blockX, blockZ, 8, PILLAR_PATCH_SEED ^ 0x55AA33L);
-        double field = patch * 0.7D + mid * 0.3D;
-        // Outcrop regions occupy roughly pillarChance of the map in coherent blobs.
-        double regionThreshold = 1.0D - Math.min(0.35D, Math.max(0.02D, terrain.pillarChance() * 3.5D));
-        if (field < regionThreshold) {
-            return false;
-        }
-        // Solid-ish cores inside the outcrop (not salt-and-pepper).
-        double core = sample(blockX, blockZ, 4, PILLAR_CORE_SEED);
-        return core > 0.42D;
+    public static int mountainTopLimit(int capBottomY, int cavityFloorY) {
+        return cavityFloorY + (int) Math.round((capBottomY - cavityFloorY) * 0.32D);
     }
 
     /**
@@ -184,13 +168,18 @@ public final class MiddleLevelOceanTerrainProfile {
     }
 
     public record ColumnProfile(int capTopY, int capBottomY, int cavityFloorY, boolean crack,
-                                int pillarTopY) {
+                                int outcropTopY) {
         public int capThickness() {
             return capTopY - capBottomY + 1;
         }
 
         public int cavityHeight() {
             return capBottomY - cavityFloorY;
+        }
+
+        /** Whether a sedimentary massif rises from this column at all. */
+        public boolean hasOutcrop() {
+            return outcropTopY != Integer.MIN_VALUE;
         }
     }
 }

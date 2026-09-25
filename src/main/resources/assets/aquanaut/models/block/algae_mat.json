@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "aquanaut:block/algae_mat_top",
+    "side": "aquanaut:block/algae_mat_side",
+    "bottom": "aquanaut:block/algae_mat_top"
+  }
+}

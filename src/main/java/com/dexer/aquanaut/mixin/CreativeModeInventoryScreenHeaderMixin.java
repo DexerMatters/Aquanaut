@@ -103,7 +103,10 @@ public abstract class CreativeModeInventoryScreenHeaderMixin {
 
             int x = AQUANAUT$GRID_LEFT;
             int y = AQUANAUT$GRID_TOP + gridRow * AQUANAUT$CELL;
-            guiGraphics.blit(header.background(), x, y, 0, 0, AQUANAUT$GRID_WIDTH, AQUANAUT$CELL);
+            // The banner is its own texture, not a 256x256 atlas slice: name the texture size or
+            // the legacy blit overload samples the wrong corner of the sheet.
+            guiGraphics.blit(header.background(), x, y, 0, 0.0F, 0.0F, AQUANAUT$GRID_WIDTH, AQUANAUT$CELL,
+                            AQUANAUT$GRID_WIDTH, AQUANAUT$CELL);
             int textY = y + (AQUANAUT$CELL - font.lineHeight) / 2;
             guiGraphics.drawString(font, header.title(), x + 5, textY, 0xFFFFFF, true);
         }

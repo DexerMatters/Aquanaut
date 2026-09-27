@@ -5,6 +5,8 @@ import java.util.function.Supplier;
 
 import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.diving.DivingEquipmentSlotType;
+import com.dexer.aquanaut.common.inventory.CreativeTabHeader;
+import com.dexer.aquanaut.common.inventory.SectionedTabOutput;
 import com.dexer.aquanaut.common.item.AirSupplyItem;
 import com.dexer.aquanaut.common.item.BiologicalDetectorItem;
 import com.dexer.aquanaut.common.item.BubbleGunItem;
@@ -25,6 +27,7 @@ import com.dexer.aquanaut.common.item.ThermophilicSampleItem;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.food.FoodProperties;
@@ -802,8 +805,28 @@ public final class ItemRegistry {
                                 output.accept(SLIME_MASK.get());
                         });
 
+        /**
+         * The natural tab: everything the ocean grows, filed under the biome it grows in. The
+         * headers name the biome and its blocks come from that biome's world generation -- the
+         * middle-sea floor of {@code OceanColumnPlanner}, the reef of {@code CoralForestPillar},
+         * the flora of the jelly jungle features, the brine, brimstone and crystal features --
+         * so the classification reads the world rather than a hand-picked mood board. The four
+         * fabricated blocks at the end grow nowhere and claim no biome.
+         */
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> ENVIRONMENT_TAB = tab("environment",
                         RED_CORAL_BLOCK, output -> {
+                                // Middle-Level Ocean: the reef floor geology of the middle sea --
+                                // cap sand and mud over limestone and shale strata.
+                                output.header(CreativeTabHeader.biome(BiomeRegistry.MIDDLE_LEVEL_OCEAN));
+                                output.accept(CORAL_SAND.get());
+                                output.accept(NUTRIENT_RICH_MUD.get());
+                                output.accept(SHALE.get());
+                                output.accept(LIMESTONE.get());
+
+                                // Coral Forest: the reef itself -- living and dead coral, the
+                                // ringed coral trees of the reef pillars, and the shellstone
+                                // built from reef shellfish.
+                                output.header(CreativeTabHeader.biome(BiomeRegistry.CORAL_FOREST));
                                 output.accept(RED_CORAL_BLOCK.get());
                                 output.accept(BLUE_CORAL_BLOCK.get());
                                 output.accept(BLUE_SMOOTH_CORAL_BLOCK.get());
@@ -833,12 +856,26 @@ public final class ItemRegistry {
                                 output.accept(HARD_SHELL_BRICKS.get());
                                 output.accept(POLISHED_HARD_SHELL_BLOCK.get());
                                 output.accept(HARD_SHELL_FRAME.get());
-                                output.accept(CORAL_SAND.get());
-                                output.accept(NUTRIENT_RICH_MUD.get());
+
+                                // Jelly Jungle: the seaweed forests and the jelly bulges the
+                                // jungle vegetation grows through and wraps in kelp.
+                                output.header(CreativeTabHeader.biome(BiomeRegistry.JELLY_JUNGLE));
                                 output.accept(DROOPING_SEAWEED.get());
-                                output.accept(SHALE.get());
-                                output.accept(LIMESTONE.get());
-                                // Brine Mirror Gorge
+                                output.accept(SEAWEED.get());
+                                output.accept(SEAWEED_FRUIT.get());
+                                output.accept(SEAWEED_STEM.get());
+                                output.accept(LIGHT_RED_JELLY_BLOCK.get());
+                                output.accept(LIGHT_CYAN_JELLY_BLOCK.get());
+                                output.accept(WHITE_JELLY_BLOCK.get());
+                                output.accept(LIGHT_GOLDEN_JELLY_BLOCK.get());
+                                output.accept(LIGHT_RED_JELLY_BLOCK_SEAWEED.get());
+                                output.accept(LIGHT_CYAN_JELLY_BLOCK_SEAWEED.get());
+                                output.accept(WHITE_JELLY_BLOCK_SEAWEED.get());
+                                output.accept(LIGHT_GOLDEN_JELLY_BLOCK_SEAWEED.get());
+
+                                // Brine Mirror Gorge: the evaporite terraces, diapirs and
+                                // crystal grottoes of the brine features.
+                                output.header(CreativeTabHeader.biome(BiomeRegistry.BRINE_MIRROR_GORGE));
                                 output.accept(HALITE_CRUST.get());
                                 output.accept(HALITE_PIPE.get());
                                 output.accept(VARVE_SHALE.get());
@@ -852,7 +889,10 @@ public final class ItemRegistry {
                                 output.accept(SYLVITE_CRUST.get());
                                 output.accept(MIRROR_FLAKE.get());
                                 output.accept(GYPSUM_ROSE.get());
-                                // Brimstone Caldera
+
+                                // Brimstone Caldera: the volcanic terrain, its sulfur crusts
+                                // and the vent flora of the smoker and fumarole fields.
+                                output.header(CreativeTabHeader.biome(BiomeRegistry.BRIMSTONE_CALDERA));
                                 output.accept(VOLCANIC_BASALT.get());
                                 output.accept(SCORIA.get());
                                 output.accept(PILLOW_BASALT.get());
@@ -871,7 +911,10 @@ public final class ItemRegistry {
                                 output.accept(SULFUR_STALACTITE.get());
                                 output.accept(EMBER_KELP.get());
                                 output.accept(FUMAROLE.get());
-                                // Crystal Nest
+
+                                // Crystal Nest: the hanging lattice and its crystal clusters,
+                                // algae mats and seaweed.
+                                output.header(CreativeTabHeader.biome(BiomeRegistry.CRYSTAL_NEST));
                                 output.accept(CRYSTAL_NEST_STONE.get());
                                 output.accept(CRYSTAL_DRUSE.get());
                                 output.accept(CRYSTAL_COLUMN.get());
@@ -886,17 +929,9 @@ public final class ItemRegistry {
                                 output.accept(ALGAE_TUFT.get());
                                 output.accept(CRYSTAL_SPROUT.get());
                                 output.accept(CRYSTAL_FRINGE.get());
-                                output.accept(SEAWEED.get());
-                                output.accept(SEAWEED_FRUIT.get());
-                                output.accept(SEAWEED_STEM.get());
-                                output.accept(LIGHT_RED_JELLY_BLOCK.get());
-                                output.accept(LIGHT_CYAN_JELLY_BLOCK.get());
-                                output.accept(WHITE_JELLY_BLOCK.get());
-                                output.accept(LIGHT_GOLDEN_JELLY_BLOCK.get());
-                                output.accept(LIGHT_RED_JELLY_BLOCK_SEAWEED.get());
-                                output.accept(LIGHT_CYAN_JELLY_BLOCK_SEAWEED.get());
-                                output.accept(WHITE_JELLY_BLOCK_SEAWEED.get());
-                                output.accept(LIGHT_GOLDEN_JELLY_BLOCK_SEAWEED.get());
+
+                                // Structures: the fabricated blocks, which grow in no biome.
+                                output.header(CreativeTabHeader.of("structures"));
                                 output.accept(GAS_PIPE.get());
                                 output.accept(FISHING_NET.get());
                                 output.accept(PLEXIGLASS.get());
@@ -971,11 +1006,13 @@ public final class ItemRegistry {
 
         private static DeferredHolder<CreativeModeTab, CreativeModeTab> tab(String name,
                         Supplier<? extends Item> iconItem,
-                        Consumer<CreativeModeTab.Output> contents) {
+                        Consumer<SectionedTabOutput> contents) {
+                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, name);
                 return CREATIVE_MODE_TABS.register(name, () -> CreativeModeTab.builder()
                                 .title(Component.translatable("itemGroup." + Aquanaut.MODID + "." + name))
                                 .icon(() -> new ItemStack(iconItem.get()))
-                                .displayItems((parameters, output) -> contents.accept(output))
+                                .displayItems((parameters, output) -> contents
+                                                .accept(SectionedTabOutput.of(id, output)))
                                 .build());
         }
 }

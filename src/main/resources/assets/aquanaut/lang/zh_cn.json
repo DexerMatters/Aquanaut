@@ -153,6 +153,7 @@
   "gui.aquanaut.compass.title": "罗盘目标",
   "gui.aquanaut.compass.nearest": "最近的标记",
   "gui.aquanaut.compass.hint": "松开确认",
+  "gui.aquanaut.creative_header.structures": "结构",
   "gui.aquanaut.tag.name": "名称",
   "gui.aquanaut.tag.apply": "应用",
   "gui.aquanaut.tag.empty": "（空）",

@@ -152,6 +152,7 @@
   "gui.aquanaut.compass.title": "Compass target",
   "gui.aquanaut.compass.nearest": "Nearest marker",
   "gui.aquanaut.compass.hint": "Release to confirm",
+  "gui.aquanaut.creative_header.structures": "Structures",
   "gui.aquanaut.tag.name": "Name",
   "gui.aquanaut.tag.apply": "Apply",
   "gui.aquanaut.tag.empty": "(empty)",

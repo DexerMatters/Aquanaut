@@ -17,6 +17,7 @@
     "client": [
         "CameraAccessor",
         "CreativeModeInventoryScreenMixin",
+        "CreativeModeInventoryScreenHeaderMixin",
         "ItemRendererMixin",
         "BufferSourceMixin",
         "HarpoonRendererMixin",

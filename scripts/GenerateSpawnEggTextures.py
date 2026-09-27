@@ -119,6 +119,8 @@ SPECIES: tuple[Species, ...] = (
             note="toothed maw ringed by arms"),
     Species("three_headed_shark", "three_jaws", "gills", canvas="d", accent_shift=0.9,
             note="three heads, three rows of teeth"),
+    Species("salt_crust", "crust_spiral", "crystals", canvas="m", accent_shift=1.15,
+            note="halite-crusted shell spiral over salt crystals"),
     # The submarine drone deliberately has no spawn egg: it is a machine, so it ships without one
     # rather than being hatched. See scripts/GenerateSubmarineDroneTextures.py for its own art.
 )
@@ -705,6 +707,55 @@ def emblem_hydra_maw(p: Painter) -> None:
         p.put(int(round(mx - 0.5)), int(round(my - 0.5)), "w")
 
 
+def crystal(p: Painter, cx: float, cy: float, size: float = 1.6, face: str = "g") -> None:
+    """A halite crystal: an angular chip with a bright face and one hard glint."""
+    p.line(cx - size, cy, cx, cy - size, "o")
+    p.line(cx, cy - size, cx + size, cy, "o")
+    p.line(cx + size, cy, cx, cy + size, "o")
+    p.line(cx, cy + size, cx - size, cy, "o")
+    p.line(cx - size + 0.7, cy, cx, cy - size + 0.7, face)
+    p.line(cx, cy - size + 0.7, cx + size - 0.7, cy, face)
+    p.put(int(round(cx - 0.5)), int(round(cy - size * 0.4)), "w")
+
+
+def emblem_crust_spiral(p: Painter) -> None:
+    """salt_crust: a halite-crusted gastropod shell, its coil studded with salt crystals.
+
+    The creature grazes salt pillars behind a pale shell whose whorl is traced in pink
+    flesh - squared off almost like a carved labyrinth - so the egg wears that same
+    coil: a blocky pink channel winding into a bright apex, halite crystals growing on
+    the shoulder, and the grazing foot sliding out below.
+    """
+    # the shell body: lit halite inside a deep contour
+    p.disc(7.5, 6.5, 6.8, "D")
+    p.disc(7.5, 6.5, 6.0, "l")
+
+    def groove(x0: int, y0: int, x1: int, y1: int, dx: int, dy: int) -> None:
+        """Dark whorl wall with the pink channel of flesh just inside it."""
+        p.line(x0, y0, x1, y1, "D")
+        p.line(x0 + dx, y0 + dy, x1 + dx, y1 + dy, "a")
+
+    groove(3, 2, 11, 2, 0, 1)     # outer whorl, clockwise
+    groove(11, 2, 11, 10, -1, 0)
+    groove(11, 10, 4, 10, 0, -1)
+    groove(4, 10, 4, 4, 1, 0)
+    groove(4, 4, 9, 4, 0, 1)      # second whorl
+    groove(9, 4, 9, 8, -1, 0)
+    groove(9, 8, 6, 8, 0, -1)
+    groove(6, 8, 6, 5, 1, 0)
+    groove(6, 5, 7, 5, 0, 1)      # the apex the coil winds into
+    p.disc(7.2, 6.2, 0.9, "w")
+
+    # halite crystals encrusting the shell's shoulder and the ledge it grazes
+    for cx, cy, size in ((11.8, 2.8, 1.7), (13.2, 6.6, 1.5), (2.6, 10.0, 1.6), (11.2, 11.4, 2.0)):
+        crystal(p, cx, cy, size, "w")
+    crystal(p, 5.6, 12.8, 1.8, "g")
+    # the pink foot sliding out from under the shell
+    p.arc(8.0, 15.4, 6.2, 195.0, 345.0, "D")
+    p.arc(8.0, 15.4, 5.4, 195.0, 345.0, "a")
+    sparkle(p, 3.2, 12.8, 1.5)
+
+
 def emblem_three_jaws(p: Painter) -> None:
     """three_headed_shark: three bright heads in a diagonal pack, teeth bared."""
     for cx, cy, radius in ((5.0, 10.6, 3.4), (8.6, 6.6, 2.9), (11.6, 3.8, 2.2)):
@@ -739,6 +790,7 @@ EMBLEMS = {
     "reef_sprig": emblem_reef_sprig,
     "hydra_maw": emblem_hydra_maw,
     "three_jaws": emblem_three_jaws,
+    "crust_spiral": emblem_crust_spiral,
 }
 
 
@@ -808,6 +860,16 @@ def texture_body(painter: Painter, species: Species, rng: random.Random) -> None
             angle = math.radians(index * 30.0 + 15.0)
             painter.line(8.0 + 3.0 * math.cos(angle), 8.0 - 3.0 * math.sin(angle),
                          8.0 + 6.6 * math.cos(angle), 8.0 - 6.6 * math.sin(angle), "o")
+    elif kind == "crystals":
+        # halite crust: faint lit chips, kept quiet so the shell coil stays readable
+        for index in range(5):
+            x = rng.randint(2, 13)
+            y = rng.randint(2, 13)
+            if painter.role[y][x] != species.canvas:
+                continue
+            painter.put(x, y, "l")
+            if painter.get(x + 1, y) == species.canvas:
+                painter.put(x + 1, y, "g")
     else:  # mottle
         for index in range(8):
             x = rng.randint(2, 13)

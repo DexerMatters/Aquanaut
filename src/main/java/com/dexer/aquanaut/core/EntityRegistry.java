@@ -44,6 +44,7 @@ import com.dexer.aquanaut.common.entity.RingfishEntity;
 import com.dexer.aquanaut.common.entity.GiantAbyssWormEntity;
 import com.dexer.aquanaut.common.entity.GiantOctopusTentacleEntity;
 import com.dexer.aquanaut.common.entity.SardineEntity;
+import com.dexer.aquanaut.common.entity.SaltCrustEntity;
 import com.dexer.aquanaut.common.entity.SpringfishEntity;
 import com.dexer.aquanaut.common.entity.SubmarineDroneEntity;
 import com.dexer.aquanaut.common.entity.SwirlEntity;
@@ -80,6 +81,14 @@ public class EntityRegistry {
                     .<SardineEntity>of(SardineEntity::new, MobCategory.WATER_CREATURE)
                     .sized(0.55F, 0.42F)
                     .build("sardine"));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SaltCrustEntity>> SALT_CRUST = ENTITIES.register(
+            "salt_crust",
+            () -> EntityType.Builder
+                    .<SaltCrustEntity>of(SaltCrustEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(1.0F, 0.8F)
+                    .clientTrackingRange(8)
+                    .build("salt_crust"));
 
     public static final DeferredHolder<EntityType<?>, EntityType<AnglerfishEntity>> ANGLERFISH = ENTITIES.register(
             "anglerfish",
@@ -448,6 +457,7 @@ public class EntityRegistry {
     public static void registerAttributes(EntityAttributeCreationEvent event) {
         event.put(EntityRegistry.OCTOPUS.get(), OctopusEntity.createAttributes());
         event.put(EntityRegistry.SARDINE.get(), SardineEntity.createAttributes());
+        event.put(EntityRegistry.SALT_CRUST.get(), SaltCrustEntity.createAttributes());
         event.put(EntityRegistry.ANGLERFISH.get(), AnglerfishEntity.createAttributes());
         event.put(EntityRegistry.ELECTROFISH.get(), ElectrofishEntity.createAttributes());
         event.put(EntityRegistry.DONUTFISH.get(), DonutfishEntity.createAttributes());

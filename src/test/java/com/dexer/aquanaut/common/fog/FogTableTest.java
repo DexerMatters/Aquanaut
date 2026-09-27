@@ -15,8 +15,6 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -32,11 +30,7 @@ public final class FogTableTest {
     void defaultsAreCompleteAndUsable() {
         FogTable table = FogTable.defaults();
         assertTrue(table.biomeIds().size() >= 5, "every Aquanaut ocean is described");
-        assertNotNull(table.acid(), "the acid medium exists");
         assertTrue(table.fallback().farPlane() > FogTable.defaults().fallback().nearPlane());
-        assertTrue(table.acid().visibility().farPlane() < 64.0F,
-                "acid is drawn in much tighter than open water");
-        assertEquals(0x6E7A2A, table.acid().rgb());
     }
 
     @Test
@@ -114,36 +108,6 @@ public final class FogTableTest {
     }
 
     @Test
-    void coloursAcceptEveryWrittenFormAndFallBackOnNonsense() {
-        JsonObject json = JsonParser.parseString("""
-                {
-                  "mediums": {
-                    "acid": {"color": "#123456"},
-                    "sludge": {"color": "abcdef", "far": 30.0},
-                    "broken": {"color": "not-a-colour"},
-                    "colourless": {"far": 12.0}
-                  }
-                }
-                """).getAsJsonObject();
-        FogTable table = FogTable.parse(json);
-        assertEquals(0x123456, table.acid().rgb());
-        assertEquals(0xABCDEF, table.medium("sludge").rgb());
-        assertEquals(30.0F, table.medium("sludge").visibility().farPlane(), 1e-6F);
-        assertEquals(FogTable.defaults().acid().rgb(), table.medium("broken").rgb(),
-                "an unreadable colour falls back to the acid's own rather than to white");
-        assertNull(table.medium("colourless"),
-                "a medium with neither a colour nor a known identity is not introduced at all");
-    }
-
-    @Test
-    void acidColourChannelsReadCorrectly() {
-        FogMediumProfile acid = FogTable.defaults().acid();
-        assertEquals(0x6E / 255.0F, acid.red(), 1e-6F);
-        assertEquals(0x7A / 255.0F, acid.green(), 1e-6F);
-        assertEquals(0x2A / 255.0F, acid.blue(), 1e-6F);
-    }
-
-    @Test
     void everyAquanautBiomeDeclaresItsVisibility() throws IOException {
         List<String> missing = new ArrayList<>();
         try (Stream<Path> files = Files.list(BIOME_DIRECTORY)) {
@@ -176,7 +140,6 @@ public final class FogTableTest {
     void shippedProfileParsesAndMatchesItsDefaults() throws IOException {
         FogTable shipped = loadedTable();
         assertEquals(128.0F, shipped.visibility(id("middle_level_ocean")).farPlane(), 1e-6F);
-        assertEquals(0x6E7A2A, shipped.acid().rgb());
         assertTrue(shipped.visibility(id("brine_mirror_gorge")).farPlane()
                         > shipped.visibility(id("jelly_jungle")).farPlane(),
                 "the mirror gorge is the clear one and the jungle the murky one");

@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 
 /**
  * Placement constants for Brimstone Caldera, the volcanic middle-sea biome: fields of
- * giant sulfur-shrouded volcanoes, hot springs, fumaroles and sulfuric acid lakes.
+ * giant sulfur-shrouded volcanoes, hot springs, fumaroles and crater lakes.
  */
 public final class BrimstoneCalderaPlacement {
     private static final int REGION_WEIGHT = 2;

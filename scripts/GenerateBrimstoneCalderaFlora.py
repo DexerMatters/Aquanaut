@@ -24,6 +24,7 @@ from typing import List, Tuple
 
 SIZE = 16
 OUT = Path("src/main/resources/assets/aquanaut/textures/block")
+OUT_ITEM = Path("src/main/resources/assets/aquanaut/textures/item")
 RGBA = Tuple[int, int, int, int]
 Grid = List[List[RGBA]]
 
@@ -771,6 +772,63 @@ def gen_thermophilic_mat(kind: str, seed: int) -> Grid:
 
 
 # ---------------------------------------------------------------------------
+# Thermophilic mat samples - 嗜热菌样本: a swatch of mat slime lifted off the
+# rock, drawn as an item sprite in the mat's own palette
+# ---------------------------------------------------------------------------
+
+def gen_thermophilic_sample(kind: str, seed: int) -> Grid:
+    base, dark, swirl, crest, sheen = MAT_PALETTES[kind]
+    g: Grid = [[(0, 0, 0, 0) for _ in range(SIZE)] for _ in range(SIZE)]
+
+    def blob_radius(theta: float) -> float:
+        return 4.7 + 1.15 * math.sin(3.0 * theta + 0.7) + 0.65 * math.sin(5.0 * theta + 2.1)
+
+    # silhouette: a soft splat of slime, wider than tall
+    for y in range(SIZE):
+        for x in range(SIZE):
+            fx, fy = x + 0.5 - 7.6, (y + 0.5 - 7.8) * 1.12
+            if math.hypot(fx, fy) > blob_radius(math.atan2(fy, fx)):
+                continue
+            # the mat's own swirl streamers, scaled down to item size
+            wx, wy = domain_warp_p(x / 3.5, y / 3.5, seed, 4, 4, 0.65)
+            q = fbm_p(2.0 * (wx + wy), wx - wy, seed + 17, 6, 4, 4)
+            h = hash2(x * 1.3, y * 0.9, seed + 6)
+            # domed top-left key light
+            light = smooth((2.6 - (fx * 0.8 + fy * 0.9)) / 5.2)
+            col = lerp_c(dark, base, 0.32 + 0.68 * light)
+            col = lerp_c(col, swirl, smooth((0.11 - abs(q - 0.56)) / 0.11) * 0.85)
+            col = lerp_c(col, crest, smooth((0.035 - abs(q - 0.575)) / 0.035) * 0.6)
+            col = lerp_c(col, crest if h > 0.5 else dark, abs(h - 0.5) * 0.18)
+            g[y][x] = col
+
+    # bubble domes with top-left specular caps - the mat's signature
+    for bx, by, r in ((5.2, 5.2, 1.9), (9.8, 7.4, 1.6), (6.2, 10.6, 1.7)):
+        for oy in range(-2, 3):
+            for ox in range(-2, 3):
+                px, py = int(bx) + ox, int(by) + oy
+                if not (0 <= px < SIZE and 0 <= py < SIZE) or g[py][px][3] == 0:
+                    continue
+                d = math.hypot(px + 0.5 - bx, py + 0.5 - by)
+                if d > r:
+                    continue
+                nx, ny = (px + 0.5 - bx) / r, (py + 0.5 - by) / r
+                dome = lerp_c(dark, swirl, smooth(0.5 - 0.5 * (nx + ny)))
+                if d > r - 0.55:
+                    dome = lerp_c(dome, dark, 0.5)          # dome rim
+                if nx < -0.35 and ny < -0.35 and d < r * 0.62:
+                    dome = lerp_c(dome, sheen, 0.75)        # specular cap
+                g[py][px] = dome
+
+    # one droplet sliding off the lower right rim
+    for px, py in ((13, 11), (12, 12), (13, 12), (13, 13)):
+        plot(g, px, py, lerp_c(dark, swirl, 0.6))
+    plot(g, 12, 12, lerp_c(swirl, sheen, 0.5))     # specular cap
+    plot(g, 13, 13, lerp_c(dark, base, 0.3))       # rounded foot
+    outline(g, lerp_c(dark, (0, 0, 0, 255), 0.55))
+    return g
+
+
+# ---------------------------------------------------------------------------
 # Sulfur moss - tileable dense fuzzy cushion with bubble tufts and gaps
 # ---------------------------------------------------------------------------
 
@@ -890,6 +948,10 @@ def main() -> None:
     write_png(OUT / "thermophilic_mat_gold.png", gen_thermophilic_mat("gold", 40))
     write_png(OUT / "thermophilic_mat_rust.png", gen_thermophilic_mat("rust", 41))
     write_png(OUT / "thermophilic_mat_olive.png", gen_thermophilic_mat("olive", 42))
+    OUT_ITEM.mkdir(parents=True, exist_ok=True)
+    write_png(OUT_ITEM / "thermophilic_sample_gold.png", gen_thermophilic_sample("gold", 60))
+    write_png(OUT_ITEM / "thermophilic_sample_rust.png", gen_thermophilic_sample("rust", 61))
+    write_png(OUT_ITEM / "thermophilic_sample_olive.png", gen_thermophilic_sample("olive", 62))
     write_png(OUT / "sulfur_moss.png", gen_sulfur_moss())
     print()
     for name, desc in DESCRIPTIONS:

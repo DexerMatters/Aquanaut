@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 /**
  * Binds {@link VolcanoGeometry} to real block states: volcanic strata, fluted lava domes
- * and resurgent necks, crater lakes of sulfuric acid, sinter spring pools, sulfur pans,
+ * and resurgent necks, crater lakes, sinter spring pools, sulfur pans,
  * the satellite scoria cones of the plain, breach rubble and the ash dusting. One
  * {@code Column} is prepared per block column during the terrain fill and answers
  * {@code stateForY} queries; anything it does not claim falls through to the regular
@@ -162,7 +162,7 @@ public final class VolcanicTerrain {
                     return SULFUR_CRUST;
                 }
                 return switch (volcano.craterType()) {
-                    case ACID_LAKE -> ACID_ETCHED;
+                    case CRATER_LAKE -> ACID_ETCHED;
                     case HOT_SPRING -> SINTER;
                     case SULFUR_PAN -> SULFUR_CRUST;
                 };
@@ -181,7 +181,7 @@ public final class VolcanicTerrain {
             if (shape.craterInterior() && volcano != null) {
                 return switch (volcano.craterType()) {
                     case HOT_SPRING -> SINTER;
-                    case ACID_LAKE -> ACID_ETCHED;
+                    case CRATER_LAKE -> ACID_ETCHED;
                     case SULFUR_PAN -> SULFUR_CRUST;
                 };
             }
@@ -251,11 +251,9 @@ public final class VolcanicTerrain {
             return (seam & 0x7L) == 0L ? AGGLOMERATE : SCORIA;
         }
 
+        /** Every pooled crater — lake or hot spring — holds the caldera's own water. */
         private BlockState craterFill() {
-            return switch (shape.volcano().craterType()) {
-                case ACID_LAKE -> BlockRegistry.SULFURIC_ACID.get().defaultBlockState();
-                default -> WATER;
-            };
+            return WATER;
         }
     }
 }

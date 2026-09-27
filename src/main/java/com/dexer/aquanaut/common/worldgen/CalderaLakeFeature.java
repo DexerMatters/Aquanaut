@@ -13,11 +13,12 @@ import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 /**
- * 硫酸湖 — a sulfuric acid lake: a shallow bowl eaten into the volcanic floor, its walls
- * bleached and etched by acid, filled with heavy olive-green leachate that exhales mist.
+ * 火山口湖 — a caldera lake: a shallow bowl eaten into the volcanic floor, its walls
+ * bleached and etched pale, drowned by the same water that floods the rest of the
+ * caldera and fringed with pumice and sulfur frosting along the shore.
  */
-public final class AcidLakeFeature extends Feature<NoneFeatureConfiguration> {
-    public AcidLakeFeature() {
+public final class CalderaLakeFeature extends Feature<NoneFeatureConfiguration> {
+    public CalderaLakeFeature() {
         super(NoneFeatureConfiguration.CODEC);
     }
 
@@ -33,10 +34,8 @@ public final class AcidLakeFeature extends Feature<NoneFeatureConfiguration> {
         BlockPos floor = findFloor(level, origin);
         int radius = 4 + random.nextInt(5);
         int depth = 2 + random.nextInt(3);
-        BlockState acid = BlockRegistry.SULFURIC_ACID.get().defaultBlockState();
         boolean placed = false;
 
-        int liquidTopY = floor.getY() - 1;
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
                 double distance = Math.sqrt(dx * dx + dz * dz);
@@ -54,20 +53,11 @@ public final class AcidLakeFeature extends Feature<NoneFeatureConfiguration> {
                 int groundY = ground.getY();
                 int bowlFloorY = groundY - columnDepth;
 
-                // Etched bowl: the acid has eaten the rock pale wherever it touches.
+                // Etched bowl: the rock is bleached pale wherever the water eats at it.
                 for (int y = groundY; y > bowlFloorY; y--) {
                     level.setBlock(new BlockPos(ground.getX(), y, ground.getZ()),
                             BlockRegistry.ACID_ETCHED_BASALT.get().defaultBlockState(), 2);
                     placed = true;
-                }
-
-                // Heavy liquid pools flat up to just under the rim.
-                for (int y = bowlFloorY + 2; y <= Math.min(liquidTopY, groundY); y++) {
-                    BlockPos fill = new BlockPos(ground.getX(), y, ground.getZ());
-                    if (level.getFluidState(fill).is(FluidTags.WATER)) {
-                        level.setBlock(fill, acid, 2);
-                        placed = true;
-                    }
                 }
 
                 // Rim fringe: pumice rafts and sulfur frosting around the shore.

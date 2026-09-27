@@ -6,8 +6,7 @@ package com.dexer.aquanaut.common.fog;
  * <p>Geometry only — the colour is never stored here. While the camera is submerged the
  * authoritative colour comes from the world's own fog state (the biome's water fog colour,
  * modified by the abyss ramp), so a biome's colour is defined in exactly one place: its
- * biome JSON. Only media the world has no colour for (sulfuric acid) carry one themselves,
- * in {@link FogMediumProfile}.</p>
+ * biome JSON.</p>
  *
  * @param nearPlane     distance the fog starts at, in blocks (negative starts behind the eye)
  * @param farPlane      distance the fog closes at, in blocks

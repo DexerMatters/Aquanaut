@@ -260,18 +260,10 @@ def ash_layer() -> None:
     write(DATA / "loot_table" / "blocks" / "ash_layer.json", loot("ash_layer"))
 
 
-def acid() -> None:
-    write(ASSETS / "blockstates" / "sulfuric_acid.json",
-          simple_variant("aquanaut:block/sulfuric_acid"))
-    write(ASSETS / "models" / "block" / "sulfuric_acid.json", {
-        "textures": {"particle": "aquanaut:block/sulfuric_acid_still"},
-    })
-
-
 def particle_descriptions() -> None:
     # 1.21 builds every sprite-set particle from assets/<ns>/particles/<type>.json;
     # without these the engine leaves the sprite set unbound and crashes on spawn.
-    for name in ("sulfuric_acid_mist", "vent_steam", "sulfur_gas", "ash_mote"):
+    for name in ("vent_steam", "sulfur_gas", "ash_mote"):
         write(ASSETS / "particles" / f"{name}.json", {"textures": [f"aquanaut:{name}"]})
 
 
@@ -289,7 +281,6 @@ def main() -> None:
     for name in MATS:
         mat(name)
     ash_layer()
-    acid()
     particle_descriptions()
     print("brimstone caldera data written")
 

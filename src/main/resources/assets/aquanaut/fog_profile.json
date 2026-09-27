@@ -1,10 +1,9 @@
 {
   "__comment": [
-    "Aquanaut fog authority. How far the eye reaches inside each ocean, and the look of any",
-    "medium the world has no colour for. Colours are NOT set here for water: while the camera",
-    "is submerged the authoritative colour is the biome's own water_fog_color (which the abyss",
-    "ramp then darkens), so the same colour reaches a shader pack through the vanilla fog state",
-    "and the fallback veil drawn on top of it.",
+    "Aquanaut fog authority. How far the eye reaches inside each ocean. Colours are NOT set",
+    "here: while the camera is submerged the authoritative colour is the biome's own",
+    "water_fog_color (which the abyss ramp then darkens), so the same colour reaches a shader",
+    "pack through the vanilla fog state and the fallback veil drawn on top of it.",
     "near/far are block distances; cast is 0..1 how strongly the medium tints the screen."
   ],
   "default": {
@@ -51,15 +50,6 @@
       "near": -1.0,
       "far": 40.0,
       "cast": 0.72
-    }
-  },
-  "mediums": {
-    "acid": {
-      "__comment": "Sulfuric acid has no vanilla FogType and no biome colour of its own.",
-      "color": "#6e7a2a",
-      "near": 1.0,
-      "far": 22.0,
-      "cast": 0.85
     }
   }
 }

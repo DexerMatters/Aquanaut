@@ -21,6 +21,7 @@ import com.dexer.aquanaut.common.item.ScoopNetItem;
 import com.dexer.aquanaut.common.item.SubmarineCompassItem;
 import com.dexer.aquanaut.common.item.SubmarineDroneControllerItem;
 import com.dexer.aquanaut.common.item.SubmarineDroneItem;
+import com.dexer.aquanaut.common.item.ThermophilicSampleItem;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -29,7 +30,6 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
@@ -401,6 +401,17 @@ public final class ItemRegistry {
                         BlockRegistry.THERMOPHILIC_MAT_RUST);
         public static final DeferredItem<BlockItem> THERMOPHILIC_MAT_OLIVE = blockItem("thermophilic_mat_olive",
                         BlockRegistry.THERMOPHILIC_MAT_OLIVE);
+        // 嗜热菌样本: the mats grow in the world and stay out of the creative inventory;
+        // these samples are what a player plants them with.
+        public static final DeferredItem<ThermophilicSampleItem> THERMOPHILIC_SAMPLE_GOLD = ITEMS.registerItem(
+                        "thermophilic_sample_gold",
+                        props -> new ThermophilicSampleItem(BlockRegistry.THERMOPHILIC_MAT_GOLD.get(), props));
+        public static final DeferredItem<ThermophilicSampleItem> THERMOPHILIC_SAMPLE_RUST = ITEMS.registerItem(
+                        "thermophilic_sample_rust",
+                        props -> new ThermophilicSampleItem(BlockRegistry.THERMOPHILIC_MAT_RUST.get(), props));
+        public static final DeferredItem<ThermophilicSampleItem> THERMOPHILIC_SAMPLE_OLIVE = ITEMS.registerItem(
+                        "thermophilic_sample_olive",
+                        props -> new ThermophilicSampleItem(BlockRegistry.THERMOPHILIC_MAT_OLIVE.get(), props));
         // Crystal Nest (水晶巢) block items
         public static final DeferredItem<BlockItem> CRYSTAL_NEST_STONE = blockItem("crystal_nest_stone",
                         BlockRegistry.CRYSTAL_NEST_STONE);
@@ -430,12 +441,6 @@ public final class ItemRegistry {
                         BlockRegistry.CRYSTAL_SPROUT);
         public static final DeferredItem<BlockItem> CRYSTAL_FRINGE = blockItem("crystal_fringe",
                         BlockRegistry.CRYSTAL_FRINGE);
-        // Brimstone Caldera goods
-        public static final DeferredItem<Item> SULFUR_LUMP = ITEMS.registerSimpleItem("sulfur_lump");
-        public static final DeferredItem<BucketItem> SULFURIC_ACID_BUCKET = ITEMS.registerItem(
-                        "sulfuric_acid_bucket",
-                        props -> new BucketItem(FluidRegistry.SULFURIC_ACID.get(),
-                                        props.craftRemainder(Items.BUCKET).stacksTo(1)));
         public static final DeferredItem<BlockItem> SEAWEED = blockItem("seaweed",
                         BlockRegistry.SEAWEED);
         public static final DeferredItem<BlockItem> SEAWEED_FRUIT = blockItem("seaweed_fruit",
@@ -500,6 +505,8 @@ public final class ItemRegistry {
                         EntityRegistry.OCTOPUS, 0x7A6250, 0x261B17);
         public static final DeferredItem<DeferredSpawnEggItem> SARDINE_SPAWN_EGG = spawnEgg("sardine_spawn_egg",
                         EntityRegistry.SARDINE, 0x7BA4C6, 0x25435F);
+        public static final DeferredItem<DeferredSpawnEggItem> SALT_CRUST_SPAWN_EGG = spawnEgg("salt_crust_spawn_egg",
+                        EntityRegistry.SALT_CRUST, 0xF2E8DC, 0xE8A9B4);
         public static final DeferredItem<DeferredSpawnEggItem> ANGLERFISH_SPAWN_EGG = spawnEgg("anglerfish_spawn_egg",
                         EntityRegistry.ANGLERFISH, 0xB78644, 0x53381D);
         public static final DeferredItem<DeferredSpawnEggItem> ELECTROFISH_SPAWN_EGG = spawnEgg("electrofish_spawn_egg",
@@ -643,6 +650,7 @@ public final class ItemRegistry {
                         OCTOPUS_SPAWN_EGG, output -> {
                                 output.accept(OCTOPUS_SPAWN_EGG.get());
                                 output.accept(SARDINE_SPAWN_EGG.get());
+                                output.accept(SALT_CRUST_SPAWN_EGG.get());
                                 output.accept(ANGLERFISH_SPAWN_EGG.get());
                                 output.accept(ELECTROFISH_SPAWN_EGG.get());
                                 output.accept(DONUTFISH_SPAWN_EGG.get());
@@ -720,7 +728,9 @@ public final class ItemRegistry {
                                 output.accept(RING_RIB.get());
                                 output.accept(ROTTEN_TISSUE.get());
                                 output.accept(SPRING.get());
-                                output.accept(SULFUR_LUMP.get());
+                                output.accept(THERMOPHILIC_SAMPLE_GOLD.get());
+                                output.accept(THERMOPHILIC_SAMPLE_RUST.get());
+                                output.accept(THERMOPHILIC_SAMPLE_OLIVE.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TOOLS_TAB = tab("tools",
@@ -861,10 +871,6 @@ public final class ItemRegistry {
                                 output.accept(SULFUR_STALACTITE.get());
                                 output.accept(EMBER_KELP.get());
                                 output.accept(FUMAROLE.get());
-                                output.accept(THERMOPHILIC_MAT_GOLD.get());
-                                output.accept(THERMOPHILIC_MAT_RUST.get());
-                                output.accept(THERMOPHILIC_MAT_OLIVE.get());
-                                output.accept(SULFURIC_ACID_BUCKET.get());
                                 // Crystal Nest
                                 output.accept(CRYSTAL_NEST_STONE.get());
                                 output.accept(CRYSTAL_DRUSE.get());

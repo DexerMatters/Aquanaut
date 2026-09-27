@@ -1,7 +1,7 @@
 package com.dexer.aquanaut.core;
 
 import com.dexer.aquanaut.Aquanaut;
-import com.dexer.aquanaut.common.worldgen.AcidLakeFeature;
+import com.dexer.aquanaut.common.worldgen.CalderaLakeFeature;
 import com.dexer.aquanaut.common.worldgen.AshDriftFeature;
 import com.dexer.aquanaut.common.worldgen.BrimstoneGardenFeature;
 import com.dexer.aquanaut.common.worldgen.BrineMirrorFeature;
@@ -72,8 +72,8 @@ public final class FeatureRegistry {
             FEATURES.register("brimstone_garden", BrimstoneGardenFeature::new);
     public static final DeferredHolder<Feature<?>, AshDriftFeature> ASH_DRIFTS =
             FEATURES.register("ash_drifts", AshDriftFeature::new);
-    public static final DeferredHolder<Feature<?>, AcidLakeFeature> ACID_LAKE =
-            FEATURES.register("acid_lake", AcidLakeFeature::new);
+    public static final DeferredHolder<Feature<?>, CalderaLakeFeature> CALDERA_LAKE =
+            FEATURES.register("caldera_lake", CalderaLakeFeature::new);
     public static final DeferredHolder<Feature<?>, VentFloraFeature> VENT_FLORA =
             FEATURES.register("vent_flora", VentFloraFeature::new);
     public static final DeferredHolder<Feature<?>, SaltDiapirFeature> SALT_DIAPIR =

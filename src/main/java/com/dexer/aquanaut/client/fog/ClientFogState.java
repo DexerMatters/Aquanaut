@@ -3,15 +3,11 @@ package com.dexer.aquanaut.client.fog;
 import com.dexer.aquanaut.common.PressureHelper;
 import com.dexer.aquanaut.common.fog.FogMath;
 import com.dexer.aquanaut.common.fog.FogMedium;
-import com.dexer.aquanaut.common.fog.FogMediumProfile;
-import com.dexer.aquanaut.common.fog.FogProfiles;
 import com.dexer.aquanaut.common.fog.FogVisibility;
-import com.dexer.aquanaut.core.TagRegistry;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -134,14 +130,9 @@ public final class ClientFogState {
         if (medium.submerged() && level != null) {
             // Aim at the blended neighbourhood rather than at the one biome underfoot.
             FogField.Blend blend = FogField.sample(level, camera.getPosition());
-            if (medium == FogMedium.ACID) {
-                FogMediumProfile acid = FogProfiles.get().acid();
-                aim(acid.red(), acid.green(), acid.blue(), acid.visibility(), ramp, seconds);
-            } else {
-                aim(((blend.rgb() >> 16) & 0xFF) / 255.0F,
-                        ((blend.rgb() >> 8) & 0xFF) / 255.0F, (blend.rgb() & 0xFF) / 255.0F,
-                        blend.visibility(), ramp, seconds);
-            }
+            aim(((blend.rgb() >> 16) & 0xFF) / 255.0F,
+                    ((blend.rgb() >> 8) & 0xFF) / 255.0F, (blend.rgb() & 0xFF) / 255.0F,
+                    blend.visibility(), ramp, seconds);
             submersion = FogMath.ease(submersion, 1.0F, seconds, SUBMERSION_TAU);
         } else {
             // Air: the world's own fog is left alone, but the authority keeps easing its state
@@ -188,8 +179,8 @@ public final class ClientFogState {
     }
 
     /**
-     * Which medium the camera sits in. Acid wins over water (a corrosive pool is not the
-     * biome's sea), and it is found by tag because no vanilla {@code FogType} describes it.
+     * Which medium the camera sits in — water when the world's own fog says so, air
+     * otherwise.
      */
     public static FogMedium mediumAt(Camera camera) {
         if (camera == null || camera.getEntity() == null) {
@@ -198,13 +189,6 @@ public final class ClientFogState {
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) {
             return FogMedium.AIR;
-        }
-        BlockPos eye = BlockPos.containing(camera.getPosition());
-        if (level.getFluidState(eye).is(TagRegistry.SULFURIC_ACID)) {
-            double surface = eye.getY() + level.getFluidState(eye).getHeight(level, eye);
-            if (camera.getPosition().y < surface) {
-                return FogMedium.ACID;
-            }
         }
         return camera.getFluidInCamera() == FogType.WATER ? FogMedium.WATER : FogMedium.AIR;
     }

@@ -11,33 +11,25 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * The whole fog table: how far the eye reaches in each ocean, and the profile of every
- * medium the world cannot describe by itself.
+ * The whole fog table: how far the eye reaches in each ocean.
  *
  * <p>Biome colours are deliberately absent. While the camera is submerged the authoritative
  * colour is the world's own fog state — the biome's {@code water_fog_color}, already
  * modified by the abyss ramp — so a colour lives in exactly one place, its biome JSON, and
- * a pack that reads vanilla fog gets the same colour the veil is drawn with. Only media the
- * world has no colour for (sulfuric acid) bring one here.</p>
+ * a pack that reads vanilla fog gets the same colour the veil is drawn with.</p>
  *
  * <p>{@link #parse} layers a data file over {@link #defaults()}, so a partial or missing
  * file is still a working table.</p>
  */
 public final class FogTable {
-    /** Id of the acid medium inside the table's {@code mediums} block. */
-    public static final String ACID = "acid";
-
     private static final String MODID = "aquanaut";
 
     private final FogVisibility fallback;
     private final Map<ResourceLocation, FogVisibility> biomes;
-    private final Map<String, FogMediumProfile> mediums;
 
-    public FogTable(FogVisibility fallback, Map<ResourceLocation, FogVisibility> biomes,
-                    Map<String, FogMediumProfile> mediums) {
+    public FogTable(FogVisibility fallback, Map<ResourceLocation, FogVisibility> biomes) {
         this.fallback = Objects.requireNonNull(fallback, "fallback");
         this.biomes = Map.copyOf(biomes);
-        this.mediums = Map.copyOf(mediums);
     }
 
     public FogVisibility fallback() {
@@ -57,21 +49,6 @@ public final class FogTable {
 
     public Set<ResourceLocation> biomeIds() {
         return biomes.keySet();
-    }
-
-    /** A medium profile such as {@link #ACID}, or {@code null} when the table has none. */
-    public FogMediumProfile medium(String id) {
-        return mediums.get(id);
-    }
-
-    /** The acid profile, falling back to the built-in one if a data file dropped it. */
-    public FogMediumProfile acid() {
-        FogMediumProfile acid = mediums.get(ACID);
-        return acid != null ? acid : defaults().mediums.get(ACID);
-    }
-
-    public Set<String> mediumIds() {
-        return mediums.keySet();
     }
 
     /** A biome weighted by how much it influences a point — the mixture between two oceans. */
@@ -119,11 +96,7 @@ public final class FogTable {
         biomes.put(id("brimstone_caldera"), new FogVisibility(-3.0F, 80.0F, 0.55F));
         biomes.put(id("crystal_nest"), new FogVisibility(-5.0F, 144.0F, 0.28F));
 
-        Map<String, FogMediumProfile> mediums = new LinkedHashMap<>();
-        // The acid's surface tint (0xFFD8D466) is chosen for a thin film of liquid; a screen
-        // full of acid fog needs the same hue knocked back to something a body can swim in.
-        mediums.put(ACID, new FogMediumProfile(0x6E7A2A, new FogVisibility(1.0F, 22.0F, 0.85F)));
-        return new FogTable(new FogVisibility(-4.0F, 96.0F, 0.45F), biomes, mediums);
+        return new FogTable(new FogVisibility(-4.0F, 96.0F, 0.45F), biomes);
     }
 
     /** Read a table from JSON, layered over {@link #defaults()} so a partial file is valid. */
@@ -154,27 +127,7 @@ public final class FogTable {
                         newBiomes.getOrDefault(biome, newFallback)));
             }
         }
-
-        Map<String, FogMediumProfile> newMediums = new LinkedHashMap<>(mediums);
-        JsonObject mediumBlock = asObject(root.get("mediums"));
-        if (mediumBlock != null) {
-            for (Map.Entry<String, JsonElement> entry : mediumBlock.entrySet()) {
-                FogMediumProfile current = newMediums.get(entry.getKey());
-                if (current == null && !ACID.equals(entry.getKey())) {
-                    // A medium this mod knows nothing about: only a file that names its
-                    // colour may introduce it, and it starts from the acid's murk.
-                    if (asObject(entry.getValue()) == null
-                            || !entry.getValue().getAsJsonObject().has("color")) {
-                        continue;
-                    }
-                    current = defaults().mediums.get(ACID);
-                }
-                if (current != null) {
-                    newMediums.put(entry.getKey(), readMedium(entry.getValue(), current));
-                }
-            }
-        }
-        return new FogTable(newFallback, newBiomes, newMediums);
+        return new FogTable(newFallback, newBiomes);
     }
 
     private static FogVisibility readVisibility(JsonElement element, FogVisibility fallback) {
@@ -188,15 +141,6 @@ public final class FogTable {
         return new FogVisibility(near, far, cast);
     }
 
-    private static FogMediumProfile readMedium(JsonElement element, FogMediumProfile fallback) {
-        JsonObject object = asObject(element);
-        if (object == null) {
-            return fallback;
-        }
-        int rgb = object.has("color") ? readColor(object.get("color"), fallback.rgb()) : fallback.rgb();
-        return new FogMediumProfile(rgb, readVisibility(object, fallback.visibility()));
-    }
-
     private static JsonObject asObject(JsonElement element) {
         return element != null && element.isJsonObject() ? element.getAsJsonObject() : null;
     }
@@ -208,27 +152,6 @@ public final class FogTable {
         }
         try {
             return element.getAsFloat();
-        } catch (NumberFormatException | UnsupportedOperationException e) {
-            return fallback;
-        }
-    }
-
-    /** Accepts {@code "#RRGGBB"}, {@code "RRGGBB"} or a bare decimal/0x integer. */
-    private static int readColor(JsonElement element, int fallback) {
-        if (element == null || !element.isJsonPrimitive()) {
-            return fallback;
-        }
-        try {
-            if (element.getAsJsonPrimitive().isNumber()) {
-                return element.getAsInt() & 0xFFFFFF;
-            }
-            String text = element.getAsString().trim();
-            if (text.startsWith("#")) {
-                text = text.substring(1);
-            } else if (text.startsWith("0x") || text.startsWith("0X")) {
-                return Integer.parseInt(text.substring(2), 16) & 0xFFFFFF;
-            }
-            return Integer.parseInt(text, 16) & 0xFFFFFF;
         } catch (NumberFormatException | UnsupportedOperationException e) {
             return fallback;
         }

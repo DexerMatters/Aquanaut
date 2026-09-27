@@ -8,7 +8,6 @@ import com.dexer.aquanaut.core.GameRuleRegistry;
 import com.dexer.aquanaut.core.GazeRegistry;
 import com.dexer.aquanaut.core.BiomeRegistry;
 import com.dexer.aquanaut.core.FeatureRegistry;
-import com.dexer.aquanaut.core.FluidRegistry;
 import com.dexer.aquanaut.core.ItemRegistry;
 import com.dexer.aquanaut.core.MenuRegistry;
 import com.dexer.aquanaut.core.MobEffectRegistry;
@@ -39,7 +38,6 @@ public class Aquanaut {
         BlockEntityRegistry.register(modEventBus);
         AttachmentRegistry.register(modEventBus);
         EntityRegistry.register(modEventBus);
-        FluidRegistry.register(modEventBus);
         GameRuleRegistry.register(modEventBus);
         GazeRegistry.register(modEventBus);
         ItemRegistry.register(modEventBus);

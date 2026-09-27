@@ -385,44 +385,112 @@ def gen_halite_rosette(seed: int = 8) -> Grid:
 
 
 # ---------------------------------------------------------------------------
-# Salt fringe - stalactite drips with wet tips and mineral banding
+# Salt fringe - a hanging curtain of crystalline salt, drawn to CONNECT: one
+# shared ribbon layout (wrapping across the tile edge) and one shared wobble
+# (periodic in y) keep top/body/tail aligned, so a drop stacks into a single
+# drape and neighbouring drops read as one continuous curtain.
 # ---------------------------------------------------------------------------
 
-def gen_salt_fringe(kind: str, seed: int) -> Grid:
-    main = (228, 208, 214, 255)
-    shade = (175, 150, 162, 255)
-    tip = (255, 232, 222, 255)
-    wet = (245, 220, 215, 255)
+SALT_MAIN = (228, 208, 214, 255)
+SALT_SHADE = (175, 150, 162, 255)
+SALT_DEEP = (128, 102, 116, 255)
+SALT_TIP = (255, 232, 222, 255)
+SALT_WET = (245, 220, 215, 255)
+
+# Ribbon spans as (start, width) around the tile. The first straddles the tile
+# edge (13..2) and is wide enough to keep the seam covered whatever the wobble
+# does, so neighbouring blocks merge into one drape instead of showing a seam.
+SALT_RIBBON_SPANS = ((13, 6), (3, 3), (7, 2), (10, 2))
+# Where each ribbon dies out in the tail, staggered so the drop ends ragged.
+SALT_TAIL_TIPS = (10, 14, 8, 12)
+
+
+def salt_ribbon_at(x: int, y: int) -> Tuple[int, int, int] | None:
+    """(ribbon index, offset in ribbon, ribbon width) at (x, y), or None in a slit.
+
+    Edges drift on a y-periodic wobble, so the layout continues across the
+    top/body/tail seam and tiles on itself.
+    """
+    for index, (start, width) in enumerate(SALT_RIBBON_SPANS):
+        phase = index * 1.9
+        shift = int(round(math.sin(2.0 * math.pi * y / SIZE + phase)))
+        pinch = 1 if math.sin(4.0 * math.pi * y / SIZE + phase * 2.0) > 0.8 else 0
+        width_at = max(1, width - pinch)
+        for offset in range(width_at):
+            if (start + shift + offset) % SIZE == x:
+                return index, offset, width_at
+    return None
+
+
+def salt_crust_depth(x: int) -> int:
+    """Underside of the valance the curtain hangs from; wraps at the tile edge."""
+    return 2 + (1 if (x * 5 + x * x) % 16 < 7 else 0)
+
+
+def salt_top_drip_end(x: int) -> int:
+    """Where a thin secondary drip weeping off the valance stops."""
+    return salt_crust_depth(x) + 3 + (x * 3 + 1) % 5
+
+
+def salt_ribbon_pixel(x: int, y: int, offset: int, width: int, seed: int) -> RGBA:
+    """Ribbon cross-section: deep edges, lit flank, mineral banding, sparkles."""
+    t = (offset + 0.5) / max(1, width)
+    if t < 0.3:
+        col = lerp_c(SALT_DEEP, SALT_MAIN, smooth(t / 0.3))
+    else:
+        col = lerp_c(SALT_MAIN, SALT_SHADE, smooth((t - 0.3) / 0.7) * 0.8)
+    col = lerp_c(col, SALT_TIP, grain(x / 2.0, y / 3.0, seed) * 0.22)
+    if y % 4 == 3:
+        col = lerp_c(col, SALT_SHADE, 0.35)      # mineral growth rings
+    if hash2(x, y, seed + 3) > 0.93:
+        col = lerp_c(col, SALT_TIP, 0.6)         # crystalline sparkle
+    return col
+
+
+def gen_salt_fringe(kind: str, seed: int = 7) -> Grid:
     g: Grid = [[(0, 0, 0, 0) for _ in range(SIZE)] for _ in range(SIZE)]
-    rng = random.Random(seed)
-    for x in range(1, 15):
-        base_len = {"top": 14, "body": 10, "tail": 6}[kind]
-        length = base_len + rng.randint(-2, 2)
-        # tapered drip profile
-        thick = rng.randint(1, 2)
-        for y in range(min(length, SIZE)):
-            taper = 1.0 - (y / max(length, 1)) * (0.55 if kind == "tail" else 0.35)
-            w = 1 if taper < 0.45 else thick
-            for dx in range(-w // 2, w // 2 + 1):
-                xx = x + dx
-                if xx < 0 or xx >= SIZE:
-                    continue
-                n = grain(xx / 2.0, y / 3.0, seed + x)
-                col = lerp_c(shade, main, 0.4 + n * 0.5)
-                # growth rings
-                if y % 3 == 0:
-                    col = lerp_c(col, shade, 0.3)
-                if y >= length - 2:
-                    col = lerp_c(col, wet if kind != "tail" else tip, 0.55)
-                if y == length - 1:
-                    col = tip
-                # crystalline sparkle
-                if hash2(xx, y + x, seed + 3) > 0.9:
-                    col = lerp_c(col, tip, 0.5)
-                g[y][xx] = col
-        # occasional side drip bead
-        if kind == "top" and rng.random() < 0.35 and length + 1 < SIZE:
-            g[length][x] = lerp_c(tip, wet, 0.4)
+
+    if kind == "top":
+        # the crust valance the whole curtain hangs from
+        for x in range(SIZE):
+            depth = salt_crust_depth(x)
+            for y in range(depth):
+                col = lerp_c(SALT_SHADE, SALT_MAIN,
+                             0.35 + grain(x / 2.0, y / 3.0, seed) * 0.5)
+                if y == depth - 1:
+                    col = lerp_c(col, SALT_DEEP, 0.45)
+                if hash2(x, y, seed + 1) > 0.9:
+                    col = lerp_c(col, SALT_TIP, 0.5)
+                g[y][x] = col
+
+    for y in range(SIZE):
+        for x in range(SIZE):
+            if g[y][x][3]:
+                continue
+            cell = salt_ribbon_at(x, y)
+            if cell is not None:
+                index, offset, width = cell
+                if kind == "tail":
+                    # ribbons die out on staggered wet tips, some still dripping
+                    tip_row = SALT_TAIL_TIPS[index]
+                    if y == tip_row + 1 and index % 2 == 0:
+                        g[y][x] = lerp_c(SALT_WET, SALT_TIP, 0.4)   # hanging bead
+                        continue
+                    if y > tip_row:
+                        continue
+                    col = salt_ribbon_pixel(x, y, offset, width, seed)
+                    if y >= tip_row - 2:
+                        col = lerp_c(col, SALT_WET, 0.55)           # wet tip
+                    if y == tip_row:
+                        col = SALT_TIP
+                    g[y][x] = col
+                else:
+                    g[y][x] = salt_ribbon_pixel(x, y, offset, width, seed)
+            elif kind == "top" and y < salt_top_drip_end(x):
+                end = salt_top_drip_end(x)
+                g[y][x] = SALT_TIP if y == end - 1 else lerp_c(SALT_SHADE, SALT_WET, 0.5)
+            elif (x * 3 + y * 5) % 16 < 4:
+                g[y][x] = lerp_c(SALT_SHADE, SALT_MAIN, 0.25)      # membrane webbing
     return g
 
 
@@ -436,8 +504,8 @@ def main() -> None:
     write_png(OUT / "brine_mirror_top.png", gen_brine_mirror_top())
     write_png(OUT / "calcite_quill.png", gen_calcite_quill())
     write_png(OUT / "halite_rosette.png", gen_halite_rosette())
-    for i, kind in enumerate(("top", "body", "tail")):
-        write_png(OUT / f"salt_fringe_{kind}.png", gen_salt_fringe(kind, 100 + i * 13))
+    for kind in ("top", "body", "tail"):
+        write_png(OUT / f"salt_fringe_{kind}.png", gen_salt_fringe(kind, 7))
         write_mcmeta(OUT / f"salt_fringe_{kind}.png.mcmeta", 6)
 
 

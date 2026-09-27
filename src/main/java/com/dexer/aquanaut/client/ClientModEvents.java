@@ -51,6 +51,7 @@ import com.dexer.aquanaut.client.renderer.RingfishRenderer;
 import com.dexer.aquanaut.client.renderer.GiantAbyssWormRenderer;
 import com.dexer.aquanaut.client.renderer.GiantOctopusTentacleRenderer;
 import com.dexer.aquanaut.client.renderer.SardineRenderer;
+import com.dexer.aquanaut.client.renderer.SaltCrustRenderer;
 import com.dexer.aquanaut.client.renderer.SpringfishRenderer;
 import com.dexer.aquanaut.client.renderer.SwirlMakerRenderer;
 import com.dexer.aquanaut.client.renderer.SwirlRenderer;
@@ -66,7 +67,6 @@ import com.dexer.aquanaut.common.item.GasFlowMeterItem;
 import com.dexer.aquanaut.common.item.SubmarineDroneControllerItem;
 import com.dexer.aquanaut.core.EntityRegistry;
 import com.dexer.aquanaut.core.BlockEntityRegistry;
-import com.dexer.aquanaut.core.FluidRegistry;
 import com.dexer.aquanaut.core.ItemRegistry;
 import com.dexer.aquanaut.core.MenuRegistry;
 import com.dexer.aquanaut.core.ParticleRegistry;
@@ -80,7 +80,6 @@ import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
@@ -173,6 +172,7 @@ public final class ClientModEvents {
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(EntityRegistry.OCTOPUS.get(), OctopusRenderer::new);
         event.registerEntityRenderer(EntityRegistry.SARDINE.get(), SardineRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.SALT_CRUST.get(), SaltCrustRenderer::new);
         event.registerEntityRenderer(EntityRegistry.ANGLERFISH.get(), AnglerfishRenderer::new);
         event.registerEntityRenderer(EntityRegistry.ELECTROFISH.get(), ElectrofishRenderer::new);
         event.registerEntityRenderer(EntityRegistry.DONUTFISH.get(), DonutfishRenderer::new);
@@ -245,33 +245,11 @@ public final class ClientModEvents {
         event.registerItem(customRenderer(HandheldSearchlightItemRenderer::getInstance),
                 ItemRegistry.HANDHELD_SEARCHLIGHT.get());
         event.registerItem(GasFlowMeterItem.CLIENT_EXTENSIONS, ItemRegistry.GAS_FLOW_METER.get());
-        event.registerFluidType(SULFURIC_ACID_CLIENT, FluidRegistry.SULFURIC_ACID_TYPE.get());
     }
-
-    /** Sulfuric acid renders with its own still/flowing textures and a sour green fog tint. */
-    private static final IClientFluidTypeExtensions SULFURIC_ACID_CLIENT = new IClientFluidTypeExtensions() {
-        @Override
-        public int getTintColor() {
-            return 0xFFD8D466;
-        }
-
-        @Override
-        public ResourceLocation getStillTexture() {
-            return ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, "block/sulfuric_acid_still");
-        }
-
-        @Override
-        public ResourceLocation getFlowingTexture() {
-            return ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, "block/sulfuric_acid_flow");
-        }
-    };
 
     /** Vapor, steam and drifting ash of the Brimstone Caldera. */
     @SubscribeEvent
     public static void registerParticleProviders(RegisterParticleProvidersEvent event) {
-        event.registerSpriteSet(ParticleRegistry.SULFURIC_ACID_MIST.get(),
-                sprites -> new SoftWispParticle.Provider(sprites, 0.80F, 0.82F, 0.48F,
-                        0.42F, 30, 0.002F, 0.55F));
         event.registerSpriteSet(ParticleRegistry.VENT_STEAM.get(),
                 sprites -> new SoftWispParticle.Provider(sprites, 0.93F, 0.94F, 0.95F,
                         0.36F, 24, 0.003F, 0.50F));

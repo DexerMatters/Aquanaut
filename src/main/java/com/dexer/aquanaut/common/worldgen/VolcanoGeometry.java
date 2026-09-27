@@ -50,8 +50,8 @@ public final class VolcanoGeometry {
 
     /** What pools at the bottom of a summit crater. */
     public enum CraterType {
-        /** A sulfuric acid lake — the signature 硫酸湖 of the caldera. */
-        ACID_LAKE,
+        /** A still crater lake (火山口湖). */
+        CRATER_LAKE,
         /** A sinter-rimmed hot spring pool (热泉). */
         HOT_SPRING,
         /** A dry sulfur pan dusted with fumarole vents (硫磺). */
@@ -195,7 +195,7 @@ public final class VolcanoGeometry {
         int craterDepth = 6 + (int) (unit(roll, 6) * 7.0D);
         int rimHeight = 2 + (int) (unit(roll, 7) * 4.0D);
         CraterType craterType = switch ((int) (unit(roll, 8) * 3.0D)) {
-            case 0 -> CraterType.ACID_LAKE;
+            case 0 -> CraterType.CRATER_LAKE;
             case 1 -> CraterType.HOT_SPRING;
             default -> CraterType.SULFUR_PAN;
         };

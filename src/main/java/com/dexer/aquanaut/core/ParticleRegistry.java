@@ -9,16 +9,13 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
- * Ambient and vent particles of Brimstone Caldera: acid mist over the 硫酸湖, steam and
- * sulfur gas over the hot springs (热泉), and the ash motes drifting through the water.
+ * Ambient and vent particles of Brimstone Caldera: steam and sulfur gas over the hot
+ * springs (热泉), and the ash motes drifting through the water.
  */
 public final class ParticleRegistry {
     public static final DeferredRegister<ParticleType<?>> PARTICLE_TYPES =
             DeferredRegister.create(Registries.PARTICLE_TYPE, Aquanaut.MODID);
 
-    /** Pale vapor billowing off sulfuric acid pools. */
-    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> SULFURIC_ACID_MIST =
-            PARTICLE_TYPES.register("sulfuric_acid_mist", () -> new SimpleParticleType(true));
     /** Hot spring steam hissing from fumaroles and sinter vents. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> VENT_STEAM =
             PARTICLE_TYPES.register("vent_steam", () -> new SimpleParticleType(true));

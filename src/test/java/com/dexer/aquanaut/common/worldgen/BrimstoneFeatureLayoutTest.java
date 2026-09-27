@@ -27,7 +27,7 @@ public final class BrimstoneFeatureLayoutTest {
             "aquanaut:sulfur_veins",
             "aquanaut:brimstone_garden",
             "aquanaut:ash_drifts",
-            "aquanaut:acid_lake",
+            "aquanaut:caldera_lake",
             "aquanaut:vent_flora");
 
     @Test

@@ -13,7 +13,6 @@ import com.dexer.aquanaut.common.block.MatCarpetBlock;
 import com.dexer.aquanaut.common.block.PlexiglassBlock;
 import com.dexer.aquanaut.common.block.DynamicLightBlock;
 import com.dexer.aquanaut.common.block.CrystalPlantBlock;
-import com.dexer.aquanaut.common.block.SulfuricAcidBlock;
 import com.dexer.aquanaut.common.block.SeaweedBlock;
 import com.dexer.aquanaut.common.block.SeaweedStemBlock;
 import net.minecraft.tags.TagKey;
@@ -189,15 +188,6 @@ public final class BlockRegistry {
             MapColor.COLOR_ORANGE);
     public static final DeferredBlock<MatCarpetBlock> THERMOPHILIC_MAT_OLIVE = mat("thermophilic_mat_olive",
             MapColor.PLANT);
-    public static final DeferredBlock<SulfuricAcidBlock> SULFURIC_ACID = BLOCKS.register("sulfuric_acid",
-            () -> new SulfuricAcidBlock(FluidRegistry.SULFURIC_ACID.get(), BlockBehaviour.Properties.of()
-                    .mapColor(MapColor.COLOR_LIGHT_GREEN)
-                    .replaceable()
-                    .noCollission()
-                    .strength(100.0F)
-                    .pushReaction(PushReaction.DESTROY)
-                    .noLootTable()
-                    .liquid()));
 
     // Crystal Nest (水晶巢) — the geode lattice of the middle sea: nest rock, chamber
     // linings, wall crystals in six orientations, and the algae that carpets every surface

@@ -9,6 +9,7 @@ import com.dexer.aquanaut.common.block.DroopingSeaweedBlock;
 import com.dexer.aquanaut.common.block.FishingNetBlock;
 import com.dexer.aquanaut.common.block.GasPipeBlock;
 import com.dexer.aquanaut.common.block.FumaroleBlock;
+import com.dexer.aquanaut.common.block.InvestigationBoardBlock;
 import com.dexer.aquanaut.common.block.MatCarpetBlock;
 import com.dexer.aquanaut.common.block.PlexiglassBlock;
 import com.dexer.aquanaut.common.block.DynamicLightBlock;
@@ -297,6 +298,16 @@ public final class BlockRegistry {
                     .strength(2.5F, 4.0F)
                     .sound(SoundType.METAL)
                     .noOcclusion()
+                    .requiresCorrectToolForDrops()));
+
+    /** Wall-mounted two-by-one investigation board, assembled from four linked cells. */
+    public static final DeferredBlock<InvestigationBoardBlock> INVESTIGATION_BOARD = BLOCKS.register(
+            "investigation_board", () -> new InvestigationBoardBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(2.5F, 4.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .dynamicShape()
                     .requiresCorrectToolForDrops()));
 
     private BlockRegistry() {

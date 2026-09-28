@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north,part=bottom_left": { "model": "aquanaut:block/investigation_board" },
+    "facing=north,part=bottom_right": { "model": "aquanaut:block/investigation_board" },
+    "facing=north,part=top_left": { "model": "aquanaut:block/investigation_board" },
+    "facing=north,part=top_right": { "model": "aquanaut:block/investigation_board" },
+    "facing=east,part=bottom_left": { "model": "aquanaut:block/investigation_board" },
+    "facing=east,part=bottom_right": { "model": "aquanaut:block/investigation_board" },
+    "facing=east,part=top_left": { "model": "aquanaut:block/investigation_board" },
+    "facing=east,part=top_right": { "model": "aquanaut:block/investigation_board" },
+    "facing=south,part=bottom_left": { "model": "aquanaut:block/investigation_board" },
+    "facing=south,part=bottom_right": { "model": "aquanaut:block/investigation_board" },
+    "facing=south,part=top_left": { "model": "aquanaut:block/investigation_board" },
+    "facing=south,part=top_right": { "model": "aquanaut:block/investigation_board" },
+    "facing=west,part=bottom_left": { "model": "aquanaut:block/investigation_board" },
+    "facing=west,part=bottom_right": { "model": "aquanaut:block/investigation_board" },
+    "facing=west,part=top_left": { "model": "aquanaut:block/investigation_board" },
+    "facing=west,part=top_right": { "model": "aquanaut:block/investigation_board" }
+  }
+}

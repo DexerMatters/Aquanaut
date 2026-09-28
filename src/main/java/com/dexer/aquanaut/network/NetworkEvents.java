@@ -31,6 +31,10 @@ public final class NetworkEvents {
                 NotebookProgressSyncPayload.TYPE,
                 NotebookProgressSyncPayload.STREAM_CODEC,
                 NotebookProgressSyncPayload::handle);
+        registrar.playToClient(
+                InvestigationProgressSyncPayload.TYPE,
+                InvestigationProgressSyncPayload.STREAM_CODEC,
+                InvestigationProgressSyncPayload::handle);
         registrar.playToServer(
                 DivingEquipmentClickPayload.TYPE,
                 DivingEquipmentClickPayload.STREAM_CODEC,

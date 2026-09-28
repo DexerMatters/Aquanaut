@@ -23,6 +23,7 @@ import com.dexer.aquanaut.client.renderer.BlueJellyfishRenderer;
 import com.dexer.aquanaut.client.renderer.BlueRingedWormfishRenderer;
 import com.dexer.aquanaut.client.renderer.DissectionTableBlockEntityRenderer;
 import com.dexer.aquanaut.client.renderer.GasPipeBlockEntityRenderer;
+import com.dexer.aquanaut.client.renderer.InvestigationBoardBlockEntityRenderer;
 import com.dexer.aquanaut.client.renderer.CatfishRenderer;
 import com.dexer.aquanaut.client.renderer.CursorRenderer;
 import com.dexer.aquanaut.client.renderer.BiologicalDetectorRenderer;
@@ -219,6 +220,8 @@ public final class ClientModEvents {
         event.registerBlockEntityRenderer(BlockEntityRegistry.GAS_PIPE.get(), GasPipeBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(BlockEntityRegistry.DISSECTION_TABLE.get(),
                 DissectionTableBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(BlockEntityRegistry.INVESTIGATION_BOARD.get(),
+                InvestigationBoardBlockEntityRenderer::new);
     }
 
     @SubscribeEvent

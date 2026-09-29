@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {"item": "aquanaut:transparent_tissue"},
+    {"item": "aquanaut:light_cyan_jelly"},
+    {"item": "aquanaut:volcanic_ash"}
+  ],
+  "result": {
+    "id": "aquanaut:photosensitive_film",
+    "count": 4
+  }
+}

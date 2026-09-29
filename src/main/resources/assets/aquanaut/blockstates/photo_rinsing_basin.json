@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "facing=north,waterlogged=false": { "model": "aquanaut:block/photo_rinsing_basin" },
+    "facing=north,waterlogged=true":  { "model": "aquanaut:block/photo_rinsing_basin" },
+    "facing=east,waterlogged=false":  { "model": "aquanaut:block/photo_rinsing_basin", "y": 90 },
+    "facing=east,waterlogged=true":   { "model": "aquanaut:block/photo_rinsing_basin", "y": 90 },
+    "facing=south,waterlogged=false": { "model": "aquanaut:block/photo_rinsing_basin", "y": 180 },
+    "facing=south,waterlogged=true":  { "model": "aquanaut:block/photo_rinsing_basin", "y": 180 },
+    "facing=west,waterlogged=false":  { "model": "aquanaut:block/photo_rinsing_basin", "y": 270 },
+    "facing=west,waterlogged=true":   { "model": "aquanaut:block/photo_rinsing_basin", "y": 270 }
+  }
+}

@@ -4,6 +4,7 @@ import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.block.entity.DissectionTableBlockEntity;
 import com.dexer.aquanaut.common.block.entity.GasPipeBlockEntity;
 import com.dexer.aquanaut.common.block.entity.InvestigationBoardBlockEntity;
+import com.dexer.aquanaut.common.block.entity.PhotoRinsingBasinBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
@@ -23,6 +24,12 @@ public final class BlockEntityRegistry {
             .register("dissection_table",
                     () -> BlockEntityType.Builder
                             .of(DissectionTableBlockEntity::new, BlockRegistry.DISSECTION_TABLE.get())
+                            .build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<PhotoRinsingBasinBlockEntity>> PHOTO_RINSING_BASIN = BLOCK_ENTITY_TYPES
+            .register("photo_rinsing_basin",
+                    () -> BlockEntityType.Builder
+                            .of(PhotoRinsingBasinBlockEntity::new, BlockRegistry.PHOTO_RINSING_BASIN.get())
                             .build(null));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<InvestigationBoardBlockEntity>> INVESTIGATION_BOARD = BLOCK_ENTITY_TYPES

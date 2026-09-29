@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {"item": "aquanaut:halite_crust"},
+    {"item": "aquanaut:sulfur_crust"},
+    {"item": "aquanaut:thermophilic_mat_rust"}
+  ],
+  "result": {
+    "id": "aquanaut:brine_developing_salts",
+    "count": 4
+  }
+}

@@ -12,6 +12,7 @@ import com.dexer.aquanaut.common.block.FumaroleBlock;
 import com.dexer.aquanaut.common.block.InvestigationBoardBlock;
 import com.dexer.aquanaut.common.block.MatCarpetBlock;
 import com.dexer.aquanaut.common.block.PlexiglassBlock;
+import com.dexer.aquanaut.common.block.PhotoRinsingBasinBlock;
 import com.dexer.aquanaut.common.block.DynamicLightBlock;
 import com.dexer.aquanaut.common.block.CrystalPlantBlock;
 import com.dexer.aquanaut.common.block.SeaweedBlock;
@@ -294,6 +295,15 @@ public final class BlockRegistry {
     /** Dissection table: a 1x1 bench on its own, merged into 2x1 / 2x2 benches by placement. */
     public static final DeferredBlock<DissectionTableBlock> DISSECTION_TABLE = BLOCKS.register("dissection_table",
             () -> new DissectionTableBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.METAL)
+                    .strength(2.5F, 4.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .requiresCorrectToolForDrops()));
+
+    /** Shell-lined workstation that develops exposed film in an underwater chemical rinse. */
+    public static final DeferredBlock<PhotoRinsingBasinBlock> PHOTO_RINSING_BASIN = BLOCKS.register(
+            "photo_rinsing_basin", () -> new PhotoRinsingBasinBlock(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.METAL)
                     .strength(2.5F, 4.0F)
                     .sound(SoundType.METAL)

@@ -60,11 +60,14 @@ import com.dexer.aquanaut.client.renderer.TripodRenderer;
 import com.dexer.aquanaut.client.renderer.item.GasFlowMeterItemRenderer;
 import com.dexer.aquanaut.client.renderer.item.HandheldAirBladderItemRenderer;
 import com.dexer.aquanaut.client.renderer.item.HandheldSearchlightItemRenderer;
+import com.dexer.aquanaut.client.renderer.item.ShellCameraItemRenderer;
 import com.dexer.aquanaut.client.light.ClientDynamicLightManager;
 import com.dexer.aquanaut.client.particle.SoftWispParticle;
 import com.dexer.aquanaut.client.searchlight.SearchlightClientProvider;
 import com.dexer.aquanaut.client.screen.AquariumScreen;
+import com.dexer.aquanaut.client.screen.PhotoRinsingScreen;
 import com.dexer.aquanaut.common.item.GasFlowMeterItem;
+import com.dexer.aquanaut.common.item.ShellCameraItem;
 import com.dexer.aquanaut.common.item.SubmarineDroneControllerItem;
 import com.dexer.aquanaut.core.EntityRegistry;
 import com.dexer.aquanaut.core.BlockEntityRegistry;
@@ -76,7 +79,9 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.util.Mth;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.ModelEvent;
@@ -85,6 +90,7 @@ import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 
@@ -229,6 +235,7 @@ public final class ClientModEvents {
         GasFlowMeterItemRenderer.registerAdditionalModels(event);
         HandheldAirBladderItemRenderer.registerAdditionalModels(event);
         HandheldSearchlightItemRenderer.registerAdditionalModels(event);
+        ShellCameraItemRenderer.registerAdditionalModels(event);
     }
 
     /**
@@ -247,6 +254,7 @@ public final class ClientModEvents {
                 ItemRegistry.LARGE_HANDHELD_AIR_BLADDER.get());
         event.registerItem(customRenderer(HandheldSearchlightItemRenderer::getInstance),
                 ItemRegistry.HANDHELD_SEARCHLIGHT.get());
+        event.registerItem(customRenderer(ShellCameraItemRenderer::getInstance), ItemRegistry.SHELL_CAMERA.get());
         event.registerItem(GasFlowMeterItem.CLIENT_EXTENSIONS, ItemRegistry.GAS_FLOW_METER.get());
     }
 
@@ -276,5 +284,30 @@ public final class ClientModEvents {
     @SubscribeEvent
     public static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(MenuRegistry.AQUARIUM.get(), AquariumScreen::new);
+        event.register(MenuRegistry.PHOTO_RINSING_BASIN.get(), PhotoRinsingScreen::new);
+    }
+
+    /**
+     * Vanilla's cooldown sweep asks {@code ItemCooldowns}, which is keyed by item, so it would
+     * darken every shell camera in the inventory at once. The wind-on is tracked per stack, so the
+     * sweep is drawn here for the one camera that actually fired, in the vanilla shape and colour.
+     */
+    @SubscribeEvent
+    public static void registerItemDecorations(RegisterItemDecorationsEvent event) {
+        event.register(ItemRegistry.SHELL_CAMERA.get(), (graphics, font, stack, x, y) -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            if (minecraft.level == null) {
+                return false;
+            }
+            float partialTick = minecraft.getTimer().getGameTimeDeltaPartialTick(false);
+            float fraction = ShellCameraItem.cooldownFraction(stack, minecraft.level.getGameTime(), partialTick);
+            if (fraction <= 0.0F) {
+                return false;
+            }
+            int top = y + Mth.floor(16.0F * (1.0F - fraction));
+            int bottom = top + Mth.ceil(16.0F * fraction);
+            graphics.fill(x, top, x + 16, bottom, Integer.MAX_VALUE);
+            return false;
+        });
     }
 }

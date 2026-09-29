@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IPI",
+    "SHS",
+    "SSS"
+  ],
+  "key": {
+    "I": {"item": "minecraft:iron_ingot"},
+    "P": {"item": "aquanaut:plexiglass"},
+    "S": {"item": "aquanaut:shell"},
+    "H": {"item": "aquanaut:hard_shell"}
+  },
+  "result": {
+    "id": "aquanaut:photo_rinsing_basin",
+    "count": 1
+  }
+}

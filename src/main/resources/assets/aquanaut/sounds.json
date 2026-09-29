@@ -143,5 +143,28 @@
                 "pitch": 0.7
             }
         ]
+    },
+    "camera_shutter": {
+        "subtitle": "subtitles.aquanaut.camera_shutter",
+        "sounds": [
+            {
+                "name": "minecraft:item.spyglass.stop_using",
+                "type": "event",
+                "volume": 0.8,
+                "pitch": 1.15
+            },
+            {
+                "name": "minecraft:block.iron_trapdoor.close",
+                "type": "event",
+                "volume": 0.32,
+                "pitch": 1.75
+            },
+            {
+                "name": "minecraft:block.wooden_button.click_off",
+                "type": "event",
+                "volume": 0.36,
+                "pitch": 1.45
+            }
+        ]
     }
 }

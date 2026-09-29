@@ -12,6 +12,8 @@ import com.dexer.aquanaut.common.item.BiologicalDetectorItem;
 import com.dexer.aquanaut.common.item.BubbleGunItem;
 import com.dexer.aquanaut.common.item.CursorItem;
 import com.dexer.aquanaut.common.item.DivingEquipmentItem;
+import com.dexer.aquanaut.common.item.DevelopedPhotoItem;
+import com.dexer.aquanaut.common.item.ExposedFilmItem;
 import com.dexer.aquanaut.common.item.FishingNetBlockItem;
 import com.dexer.aquanaut.common.item.GasFlowMeterItem;
 import com.dexer.aquanaut.common.item.HandheldAirBladderItem;
@@ -20,6 +22,7 @@ import com.dexer.aquanaut.common.item.LargeHandheldAirBladderItem;
 import com.dexer.aquanaut.common.item.HarpoonItem;
 import com.dexer.aquanaut.common.item.NotebookItem;
 import com.dexer.aquanaut.common.item.ScoopNetItem;
+import com.dexer.aquanaut.common.item.ShellCameraItem;
 import com.dexer.aquanaut.common.item.SubmarineCompassItem;
 import com.dexer.aquanaut.common.item.SubmarineDroneControllerItem;
 import com.dexer.aquanaut.common.item.SubmarineDroneItem;
@@ -497,12 +500,23 @@ public final class ItemRegistry {
                 props -> new BlockItem(BlockRegistry.PLEXIGLASS.get(), props));
         public static final DeferredItem<BlockItem> DISSECTION_TABLE = blockItem("dissection_table",
                         BlockRegistry.DISSECTION_TABLE);
+        public static final DeferredItem<BlockItem> PHOTO_RINSING_BASIN = blockItem("photo_rinsing_basin",
+                        BlockRegistry.PHOTO_RINSING_BASIN);
         public static final DeferredItem<BlockItem> INVESTIGATION_BOARD = blockItem("investigation_board",
                         BlockRegistry.INVESTIGATION_BOARD);
         public static final DeferredItem<GasFlowMeterItem> GAS_FLOW_METER = ITEMS.registerItem("gas_flow_meter",
                         properties -> new GasFlowMeterItem(properties.stacksTo(1)));
         public static final DeferredItem<HandheldSearchlightItem> HANDHELD_SEARCHLIGHT = ITEMS.registerItem(
                         "handheld_searchlight", properties -> new HandheldSearchlightItem(properties));
+        public static final DeferredItem<ShellCameraItem> SHELL_CAMERA = ITEMS.registerItem("shell_camera",
+                        ShellCameraItem::new);
+        public static final DeferredItem<Item> PHOTOSENSITIVE_FILM = ITEMS.registerSimpleItem("photosensitive_film");
+        public static final DeferredItem<Item> BRINE_DEVELOPING_SALTS = ITEMS.registerSimpleItem(
+                        "brine_developing_salts");
+        public static final DeferredItem<ExposedFilmItem> EXPOSED_FILM = ITEMS.registerItem("exposed_film",
+                        ExposedFilmItem::new);
+        public static final DeferredItem<DevelopedPhotoItem> DEVELOPED_PHOTO = ITEMS.registerItem("developed_photo",
+                        DevelopedPhotoItem::new);
         public static final DeferredItem<Item> BUBBLE_GUN = ITEMS.registerItem("bubble_gun",
                         properties -> new BubbleGunItem(properties.durability(60).stacksTo(1)));
 
@@ -736,12 +750,16 @@ public final class ItemRegistry {
                                 output.accept(THERMOPHILIC_SAMPLE_GOLD.get());
                                 output.accept(THERMOPHILIC_SAMPLE_RUST.get());
                                 output.accept(THERMOPHILIC_SAMPLE_OLIVE.get());
+                                output.accept(PHOTOSENSITIVE_FILM.get());
+                                output.accept(BRINE_DEVELOPING_SALTS.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TOOLS_TAB = tab("tools",
                         BUBBLE_GUN, output -> {
                                 output.accept(GAS_FLOW_METER.get());
                                 output.accept(HANDHELD_SEARCHLIGHT.get());
+                                output.accept(SHELL_CAMERA.get());
+                                output.accept(DEVELOPED_PHOTO.get());
                                 output.accept(CURSOR.get());
                                 output.accept(SUBMARINE_COMPASS.get());
                                 output.accept(SUBMARINE_DRONE.get());
@@ -938,6 +956,7 @@ public final class ItemRegistry {
                                 output.accept(FISHING_NET.get());
                                 output.accept(PLEXIGLASS.get());
                                 output.accept(DISSECTION_TABLE.get());
+                                output.accept(PHOTO_RINSING_BASIN.get());
                                 output.accept(INVESTIGATION_BOARD.get());
                         });
 

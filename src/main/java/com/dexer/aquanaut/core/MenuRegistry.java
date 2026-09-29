@@ -1,6 +1,7 @@
 package com.dexer.aquanaut.core;
 
 import com.dexer.aquanaut.Aquanaut;
+import com.dexer.aquanaut.common.inventory.PhotoRinsingMenu;
 import com.dexer.aquanaut.common.inventory.aquarium.AquariumContainerMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.inventory.MenuType;
@@ -19,6 +20,12 @@ public final class MenuRegistry {
             (Object) MENUS.register("aquarium",
                     () -> IMenuTypeExtension.create(
                             (containerId, inv, buf) -> new AquariumContainerMenu(containerId, inv)));
+
+    @SuppressWarnings("unchecked")
+    public static final net.neoforged.neoforge.registries.DeferredHolder<MenuType<?>, MenuType<PhotoRinsingMenu>> PHOTO_RINSING_BASIN =
+            (net.neoforged.neoforge.registries.DeferredHolder<MenuType<?>, MenuType<PhotoRinsingMenu>>)
+            (Object) MENUS.register("photo_rinsing_basin",
+                    () -> IMenuTypeExtension.create(PhotoRinsingMenu::new));
 
     private MenuRegistry() {
     }

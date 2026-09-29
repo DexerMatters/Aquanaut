@@ -64,6 +64,10 @@ public final class NetworkEvents {
                 CompassTargetPayload.STREAM_CODEC,
                 CompassTargetPayload::handle);
         registrar.playToServer(
+                TakePhotoPayload.TYPE,
+                TakePhotoPayload.STREAM_CODEC,
+                TakePhotoPayload::handle);
+        registrar.playToServer(
                 SubmarineDroneLinkPayload.TYPE,
                 SubmarineDroneLinkPayload.STREAM_CODEC,
                 SubmarineDroneLinkPayload::handle);

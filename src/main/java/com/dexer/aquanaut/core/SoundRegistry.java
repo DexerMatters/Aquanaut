@@ -17,6 +17,7 @@ public final class SoundRegistry {
     public static final DeferredHolder<SoundEvent, SoundEvent> BUBBLE_AMBIENT = register("bubble_ambient");
     public static final DeferredHolder<SoundEvent, SoundEvent> BUBBLE_MERGE = register("bubble_merge");
     public static final DeferredHolder<SoundEvent, SoundEvent> CREEPORPEDO_IGNITE = register("creeporpedo_ignite");
+    public static final DeferredHolder<SoundEvent, SoundEvent> CAMERA_SHUTTER = register("camera_shutter");
 
     // ── submarine drone ───────────────────────────────────────────────────────
     /** Controller handshake: the drone answers the link request. */

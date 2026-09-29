@@ -19,18 +19,30 @@ import java.util.Map;
 /** Fixed whiteboard UI whose directed graph can be panned and zoomed independently. */
 public final class InvestigationBoardScreen extends Screen {
     /** Light vanilla-style screen dimming: the running world remains clearly visible behind the board. */
+    /** Vanilla container chrome: the same panel, outline and bevels a chest or furnace uses. */
+    private static final ResourceLocation PANEL_TEXTURE =
+            ResourceLocation.withDefaultNamespace("textures/gui/container/crafting_table.png");
+    /** The panel field, left a little see-through so the world stays faintly visible behind it. */
+    private static final int PANEL = 0xEAC6C6C6;
+    private static final int OUTLINE = 0xFF000000;
+    private static final int EDGE_LIGHT = 0xFFFFFFFF;
+    private static final int EDGE_DARK = 0xFF555555;
+    /** Recessed wells use the vanilla slot recipe. */
+    private static final int WELL = 0xFF8B8B8B;
+    private static final int WELL_EDGE_DARK = 0xFF373737;
+    private static final int WELL_EDGE_LIGHT = 0xFFFFFFFF;
+    /** Vanilla label ink, plus a light ink for anything sitting on the dark graph surface. */
+    private static final int LABEL = 0xFF404040;
+    private static final int BOARD_INK = 0xFFDDE5E7;
     private static final int SHADE_TOP = 0x48000000;
     private static final int SHADE_BOTTOM = 0x60000000;
-    private static final int FRAME_DARK = 0xFF252C30;
-    private static final int FRAME = 0xFF68757B;
-    private static final int FRAME_LIGHT = 0xFFB9C3C6;
-    private static final int FRAME_SHINE = 0xFFE2E8E9;
-    private static final int BOARD_DARK = 0xFFAEB8B5;
-    private static final int BOARD = 0xA8E9EDE8;
-    private static final int BOARD_LIGHT = 0xB8F8FAF6;
-    private static final int BOARD_GRID = 0x78D7DEDA;
-    private static final int PANEL = 0xFF59666C;
-    private static final int PANEL_INNER = 0xFFF0F2EE;
+    /**
+     * The graph surface. Darker than the old whiteboard and more see-through, so the board reads
+     * as smoked glass over the world rather than a painted panel.
+     */
+    private static final int BOARD = 0x8A1B2126;
+    private static final int BOARD_GRID = 0x1EFFFFFF;
+    private static final int BOARD_TOP = 0x14FFFFFF;
     private static final int INK = 0xFF2C241C;
     private static final int PAPER = 0xFFE4D6AE;
     private static final int PAPER_LIGHT = 0xFFF2E7C7;
@@ -41,8 +53,7 @@ public final class InvestigationBoardScreen extends Screen {
     private static final int GOLD = 0xFFFFCC48;
     private static final int GOLD_DARK = 0xFF9A6B20;
     private static final int DETAIL_INK = 0xFF263238;
-    private static final int MUTED = 0xFF69767A;
-    private static final int WHITE = 0xFFE8EEF0;
+    private static final int MUTED = 0xFF4E5658;
     private static final int MIN_BOARD_WIDTH = 300;
     private static final int MIN_BOARD_HEIGHT = 190;
     private static final int DEFAULT_BOARD_WIDTH = 640;
@@ -231,42 +242,59 @@ public final class InvestigationBoardScreen extends Screen {
     private void drawFrame(GuiGraphics graphics, Layout layout) {
         Rect r = layout.outer;
         graphics.fill(r.x + 4, r.y + 5, r.right() + 4, r.bottom() + 5, 0x77000000);
-        graphics.fill(r.x, r.y, r.right(), r.bottom(), FRAME_DARK);
-        graphics.fill(r.x + 2, r.y + 2, r.right() - 2, r.bottom() - 2, FRAME);
-        graphics.fill(r.x + 4, r.y + 4, r.right() - 4, r.bottom() - 4, FRAME_LIGHT);
-        graphics.fill(r.x + 5, r.y + 5, r.right() - 5, r.y + 7, FRAME_SHINE);
-        graphics.fill(r.x + 5, r.y + 7, r.x + 7, r.bottom() - 5, FRAME_SHINE);
-        graphics.fill(r.x + 7, r.bottom() - 7, r.right() - 5, r.bottom() - 5, FRAME_DARK);
-        graphics.fill(r.right() - 7, r.y + 7, r.right() - 5, r.bottom() - 5, FRAME_DARK);
-        drawBolt(graphics, r.x + 8, r.y + 8);
-        drawBolt(graphics, r.right() - 11, r.y + 8);
-        drawBolt(graphics, r.x + 8, r.bottom() - 11);
-        drawBolt(graphics, r.right() - 11, r.bottom() - 11);
+        drawPanel(graphics, r.x, r.y, r.right(), r.bottom());
+    }
+
+    /**
+     * The vanilla container panel: a 1px black outline, a 2px light bevel down the top and left
+     * and a matching dark bevel down the bottom and right. The rounded corners are blitted straight
+     * from the crafting-table sheet, so they are byte-identical to vanilla instead of approximated.
+     */
+    private static void drawPanel(GuiGraphics graphics, int x1, int y1, int x2, int y2) {
+        graphics.fill(x1, y1, x2, y2, PANEL);
+        graphics.fill(x1, y1, x2, y1 + 1, OUTLINE);
+        graphics.fill(x1, y1, x1 + 1, y2, OUTLINE);
+        graphics.fill(x2 - 1, y1, x2, y2, OUTLINE);
+        graphics.fill(x1, y2 - 1, x2, y2, OUTLINE);
+        graphics.fill(x1 + 1, y1 + 1, x2 - 1, y1 + 3, EDGE_LIGHT);
+        graphics.fill(x1 + 1, y1 + 1, x1 + 3, y2 - 1, EDGE_LIGHT);
+        graphics.fill(x1 + 1, y2 - 3, x2 - 1, y2 - 1, EDGE_DARK);
+        graphics.fill(x2 - 3, y1 + 1, x2 - 1, y2 - 1, EDGE_DARK);
+        graphics.blit(PANEL_TEXTURE, x1, y1, 0, 0, 4, 4);
+        graphics.blit(PANEL_TEXTURE, x2 - 4, y1, 172, 0, 4, 4);
+        graphics.blit(PANEL_TEXTURE, x1, y2 - 4, 0, 162, 4, 4);
+        graphics.blit(PANEL_TEXTURE, x2 - 4, y2 - 4, 172, 162, 4, 4);
+    }
+
+    /** A recessed vanilla well, using the same recipe as a slot: dark top/left, light bottom/right. */
+    private static void drawWell(GuiGraphics graphics, int x1, int y1, int x2, int y2) {
+        graphics.fill(x1, y1, x2, y2, WELL);
+        graphics.fill(x1, y1, x2, y1 + 1, WELL_EDGE_DARK);
+        graphics.fill(x1, y1, x1 + 1, y2, WELL_EDGE_DARK);
+        graphics.fill(x1, y2 - 1, x2, y2, WELL_EDGE_LIGHT);
+        graphics.fill(x2 - 1, y1, x2, y2, WELL_EDGE_LIGHT);
     }
 
     private void drawHeader(GuiGraphics graphics, Layout layout) {
         int x = layout.outer.x + 13;
         int y = layout.outer.y + 10;
-        graphics.drawString(font, Component.translatable("gui.aquanaut.investigation.title"), x, y, WHITE, false);
-        graphics.fill(layout.outer.x + 8, layout.outer.y + 27, layout.outer.right() - 8, layout.outer.y + 29,
-                FRAME_DARK);
+        graphics.drawString(font, Component.translatable("gui.aquanaut.investigation.title"), x, y, LABEL, false);
+        graphics.fill(layout.outer.x + 8, layout.outer.y + 27, layout.outer.right() - 8, layout.outer.y + 28,
+                EDGE_DARK);
+        graphics.fill(layout.outer.x + 8, layout.outer.y + 28, layout.outer.right() - 8, layout.outer.y + 29,
+                EDGE_LIGHT);
     }
 
     private void drawWhiteboard(GuiGraphics graphics, Layout layout) {
         Rect r = layout.graph;
-        graphics.fill(r.x - 3, r.y - 3, r.right() + 3, r.bottom() + 3, FRAME_DARK);
+        drawWell(graphics, r.x - 2, r.y - 2, r.right() + 2, r.bottom() + 2);
         graphics.fill(r.x, r.y, r.right(), r.bottom(), BOARD);
         for (int y = r.y + 18; y < r.bottom(); y += 28) {
             for (int x = r.x + 18; x < r.right(); x += 28) {
                 graphics.fill(x, y, Math.min(x + 1, r.right()), Math.min(y + 1, r.bottom()), BOARD_GRID);
             }
         }
-        // Faint blocky wipe marks stop the white surface looking like a blank flat fill.
-        for (int y = r.y + 38; y < r.bottom(); y += 67) {
-            int start = r.x + 25 + (y * 13 % Math.max(26, r.w / 3));
-            graphics.fill(start, y, Math.min(start + 31, r.right() - 4), y + 1, 0x30A6B2AE);
-        }
-        graphics.fill(r.x, r.y, r.right(), r.y + 2, BOARD_LIGHT);
+        graphics.fill(r.x, r.y, r.right(), r.y + 2, BOARD_TOP);
         graphics.fill(r.x, r.bottom() - 2, r.right(), r.bottom(), 0x90AEB8B5);
     }
 
@@ -308,7 +336,7 @@ public final class InvestigationBoardScreen extends Screen {
         graphics.fill(r.x + 2, r.y + 2, r.right() - 2, r.y + 4,
                 discovered ? 0x33FFFFFF : 0x22000000);
         // Square magnet and folded lower corner.
-        graphics.fill(r.centerX() - 3, r.y - 2, r.centerX() + 4, r.y + 4, FRAME_DARK);
+        graphics.fill(r.centerX() - 3, r.y - 2, r.centerX() + 4, r.y + 4, OUTLINE);
         graphics.fill(r.centerX() - 2, r.y - 1, r.centerX() + 3, r.y + 3,
                 node.tone() == InvestigationNode.Tone.WARNING ? RED_STRING : 0xFF397D91);
         graphics.fill(r.right() - 7, r.bottom() - 1, r.right(), r.bottom(), PAPER_SHADOW);
@@ -327,9 +355,7 @@ public final class InvestigationBoardScreen extends Screen {
 
     private void drawDetails(GuiGraphics graphics, Layout layout, InvestigationProgress progress) {
         Rect r = layout.details;
-        graphics.fill(r.x, r.y, r.right(), r.bottom(), PANEL);
-        graphics.fill(r.x + 2, r.y + 2, r.right() - 2, r.bottom() - 2, PANEL_INNER);
-        graphics.fill(r.x + 2, r.y + 2, r.right() - 2, r.y + 4, FRAME_SHINE);
+        drawWell(graphics, r.x, r.y, r.right(), r.bottom());
         graphics.enableScissor(r.x + 5, r.y + 5, r.right() - 5, r.bottom() - 5);
 
         int x = r.x + 11;
@@ -418,12 +444,12 @@ public final class InvestigationBoardScreen extends Screen {
     private void drawFooter(GuiGraphics graphics, Layout layout) {
         int y = layout.outer.bottom() - 15;
         Component controls = Component.translatable("gui.aquanaut.investigation.controls");
-        graphics.drawString(font, controls, layout.outer.x + 13, y, FRAME_DARK, false);
+        graphics.drawString(font, controls, layout.outer.x + 13, y, LABEL, false);
         String nodes = InvestigationCatalog.nodes().size() + " "
                 + Component.translatable("gui.aquanaut.investigation.clues").getString();
         int textWidth = font.width(nodes);
         if (layout.outer.w > font.width(controls) + textWidth + 42) {
-            graphics.drawString(font, nodes, layout.outer.right() - textWidth - 18, y, FRAME_DARK, false);
+            graphics.drawString(font, nodes, layout.outer.right() - textWidth - 18, y, LABEL, false);
         }
     }
 
@@ -432,13 +458,7 @@ public final class InvestigationBoardScreen extends Screen {
         int x = layout.graph.right() - font.width(scale) - 5;
         int y = layout.graph.bottom() - 12;
         graphics.fill(x - 3, y - 2, layout.graph.right() - 2, layout.graph.bottom() - 2, 0x99000000);
-        graphics.drawString(font, scale, x, y, WHITE, false);
-    }
-
-    private static void drawBolt(GuiGraphics graphics, int x, int y) {
-        graphics.fill(x, y, x + 4, y + 4, FRAME_DARK);
-        graphics.fill(x + 1, y + 1, x + 3, y + 3, FRAME_SHINE);
-        graphics.fill(x + 1, y + 2, x + 3, y + 3, FRAME);
+        graphics.drawString(font, scale, x, y, BOARD_INK, false);
     }
 
     private int drawWrapped(GuiGraphics graphics, Component text, int x, int y, int width, int color, int gapAfter) {
@@ -460,8 +480,8 @@ public final class InvestigationBoardScreen extends Screen {
     }
 
     private static void drawDivider(GuiGraphics graphics, int x, int y, int width) {
-        graphics.fill(x, y, x + width, y + 1, BOARD_DARK);
-        graphics.fill(x, y + 1, x + Math.max(12, width / 3), y + 2, FRAME);
+        graphics.fill(x, y, x + width, y + 1, EDGE_DARK);
+        graphics.fill(x, y + 1, x + Math.max(12, width / 3), y + 2, WELL_EDGE_LIGHT);
     }
 
     private static void drawStar(GuiGraphics graphics, int x, int y, int color, boolean bright) {
@@ -532,8 +552,8 @@ public final class InvestigationBoardScreen extends Screen {
         int trackHeight = r.h - 14;
         int thumbHeight = Math.max(15, trackHeight * trackHeight / (trackHeight + maxScroll));
         int thumbY = trackTop + detailScroll * (trackHeight - thumbHeight) / maxScroll;
-        graphics.fill(r.right() - 5, trackTop, r.right() - 3, trackTop + trackHeight, BOARD_DARK);
-        graphics.fill(r.right() - 5, thumbY, r.right() - 3, thumbY + thumbHeight, FRAME);
+        graphics.fill(r.right() - 5, trackTop, r.right() - 3, trackTop + trackHeight, WELL_EDGE_DARK);
+        graphics.fill(r.right() - 5, thumbY, r.right() - 3, thumbY + thumbHeight, PANEL);
     }
 
     private record Layout(Rect outer, Rect graph, Rect details) {

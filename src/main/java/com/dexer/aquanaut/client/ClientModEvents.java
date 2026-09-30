@@ -22,6 +22,7 @@ import com.dexer.aquanaut.client.renderer.ThreeHeadedSharkRenderer;
 import com.dexer.aquanaut.client.renderer.BlueJellyfishRenderer;
 import com.dexer.aquanaut.client.renderer.BlueRingedWormfishRenderer;
 import com.dexer.aquanaut.client.renderer.DissectionTableBlockEntityRenderer;
+import com.dexer.aquanaut.client.renderer.DivingEquipmentRenderLayer;
 import com.dexer.aquanaut.client.renderer.GasPipeBlockEntityRenderer;
 import com.dexer.aquanaut.client.renderer.InvestigationBoardBlockEntityRenderer;
 import com.dexer.aquanaut.client.renderer.CatfishRenderer;
@@ -80,6 +81,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.util.Mth;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -93,6 +96,8 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 
 @EventBusSubscriber(modid = Aquanaut.MODID, value = Dist.CLIENT)
 public final class ClientModEvents {
@@ -228,6 +233,29 @@ public final class ClientModEvents {
                 DissectionTableBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(BlockEntityRegistry.INVESTIGATION_BOARD.get(),
                 InvestigationBoardBlockEntityRenderer::new);
+    }
+
+    @SubscribeEvent
+    public static void addDivingEquipmentPlayerLayers(EntityRenderersEvent.AddLayers event) {
+        for (PlayerSkin.Model skin : event.getSkins()) {
+            PlayerRenderer renderer = event.getSkin(skin);
+            if (renderer != null) {
+                renderer.addLayer(new DivingEquipmentRenderLayer(renderer));
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void clearDivingEquipmentOnPlayerLeave(EntityLeaveLevelEvent event) {
+        if (event.getLevel().isClientSide
+                && event.getEntity() instanceof net.minecraft.world.entity.player.Player player) {
+            ClientDivingEquipmentData.remove(player.getUUID());
+        }
+    }
+
+    @SubscribeEvent
+    public static void clearDivingEquipmentOnLogout(ClientPlayerNetworkEvent.LoggingOut event) {
+        ClientDivingEquipmentData.clear();
     }
 
     @SubscribeEvent

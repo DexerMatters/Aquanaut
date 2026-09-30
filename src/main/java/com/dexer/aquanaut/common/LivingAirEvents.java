@@ -20,6 +20,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -131,6 +132,14 @@ public final class LivingAirEvents {
     }
 
     @SubscribeEvent
+    public static void onPlayerStartTracking(PlayerEvent.StartTracking event) {
+        if (event.getEntity() instanceof ServerPlayer tracker
+                && event.getTarget() instanceof ServerPlayer tracked) {
+            PacketDistributor.sendToPlayer(tracker, DivingEquipmentSyncPayload.fromPlayer(tracked));
+        }
+    }
+
+    @SubscribeEvent
     public static void onPlayerTickPre(PlayerTickEvent.Pre event) {
         if (event.getEntity().level().isClientSide)
             return;
@@ -208,7 +217,8 @@ public final class LivingAirEvents {
                 + DivingEquipmentHelper.getSyncItemId(serverPlayer, DivingEquipmentSlotType.FLIPPERS);
         String lastSyncKey = LAST_SENT_DIVING_ITEMS.get(uuid);
         if (lastSyncKey == null || !lastSyncKey.equals(syncKey)) {
-            PacketDistributor.sendToPlayer(serverPlayer, DivingEquipmentSyncPayload.fromPlayer(serverPlayer));
+            PacketDistributor.sendToPlayersTrackingEntityAndSelf(serverPlayer,
+                    DivingEquipmentSyncPayload.fromPlayer(serverPlayer));
             LAST_SENT_DIVING_ITEMS.put(uuid, syncKey);
         }
     }

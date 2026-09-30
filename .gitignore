@@ -47,6 +47,7 @@ scripts/blockbench/src/
 
 ### Agents ###
 /.mimocode
+/.scratch
 
 ## Python $$
 **/__pycache__/*

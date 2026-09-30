@@ -15,13 +15,14 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 /**
  * Server-to-client sync of diving slot display stacks.
  */
-public record DivingEquipmentSyncPayload(String maskItemId, String tankItemId, String flippersItemId)
+public record DivingEquipmentSyncPayload(String playerId, String maskItemId, String tankItemId, String flippersItemId)
         implements CustomPacketPayload {
 
     public static final Type<DivingEquipmentSyncPayload> TYPE = new Type<>(
             ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, "diving_slot_sync"));
 
     public static final StreamCodec<ByteBuf, DivingEquipmentSyncPayload> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8, DivingEquipmentSyncPayload::playerId,
             ByteBufCodecs.STRING_UTF8, DivingEquipmentSyncPayload::maskItemId,
             ByteBufCodecs.STRING_UTF8, DivingEquipmentSyncPayload::tankItemId,
             ByteBufCodecs.STRING_UTF8, DivingEquipmentSyncPayload::flippersItemId,
@@ -34,13 +35,18 @@ public record DivingEquipmentSyncPayload(String maskItemId, String tankItemId, S
 
     public static DivingEquipmentSyncPayload fromPlayer(ServerPlayer player) {
         return new DivingEquipmentSyncPayload(
+                player.getUUID().toString(),
                 DivingEquipmentHelper.getSyncItemId(player, DivingEquipmentSlotType.MASK),
                 DivingEquipmentHelper.getSyncItemId(player, DivingEquipmentSlotType.TANK),
                 DivingEquipmentHelper.getSyncItemId(player, DivingEquipmentSlotType.FLIPPERS));
     }
 
     public static void handle(DivingEquipmentSyncPayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> ClientDivingEquipmentData.setFromIds(
-                payload.maskItemId(), payload.tankItemId(), payload.flippersItemId()));
+        context.enqueueWork(() -> {
+            ClientDivingEquipmentData.setFromIds(
+                    payload.playerId(), payload.maskItemId(), payload.tankItemId(), payload.flippersItemId());
+            ClientDivingEquipmentData.applyToLocalPlayer(
+                    payload.playerId(), payload.maskItemId(), payload.tankItemId(), payload.flippersItemId());
+        });
     }
 }

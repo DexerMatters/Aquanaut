@@ -1,5 +1,8 @@
 package com.dexer.aquanaut.common.worldgen;
 
+import com.dexer.aquanaut.common.worldgen.blend.BlendMath;
+import com.dexer.aquanaut.common.worldgen.blend.CellSource;
+import com.dexer.aquanaut.common.worldgen.blend.EmergenceCurve;
 import com.dexer.aquanaut.common.worldgen.layers.SoftMixNoise;
 
 import java.util.Arrays;
@@ -39,6 +42,18 @@ public final class VolcanoGeometry {
     public static final double STACK_CHANCE = 0.58D;
     /** Angular half-width (radians) of the notch torn out of a breached crater rim. */
     private static final double BREACH_NOTCH_RADIANS = 0.40D;
+    /**
+     * Half-width of the rift trench in noise units. The C1 taper window spans |rift| < this;
+     * the width sets the graben's flanks — wide enough that the raw walls stay erodible by
+     * the cliff guard instead of cutting slot canyons.
+     */
+    private static final double RIFT_HALF_WIDTH = 0.075D;
+    /** Deepest point of a rift trench, in blocks. */
+    private static final double RIFT_DEPTH = 9.0D;
+    /** Strength below which the (cheap) edifice scan is skipped entirely — sub-block relief. */
+    private static final double EDIFICE_SKIP_STRENGTH = 0.02D;
+    /** Strength below which satellite vents stay buried. */
+    private static final double STACK_SKIP_STRENGTH = 0.05D;
 
     private static final long CELL_SEED = 0x564F4C43L; // "VOLC"
     private static final long CONE_SEED = 0x434F4E45L; // "CONE"
@@ -152,22 +167,62 @@ public final class VolcanoGeometry {
     }
 
     /**
+     * The pure per-column volcanic plan: everything the block shader needs to answer state
+     * queries for one column. Deliberately free of Minecraft types so planning stays
+     * unit-testable; the block states live in {@code VolcanicTerrain}.
+     */
+    public record VolcanicColumnPlan(int blockX, int blockZ, int floorY, double strength,
+                                     ColumnShape shape,
+                                     double stackTopY, double stackAxis) {
+
+        /** Whether a satellite vent stands on this column. */
+        public boolean hasStack() {
+            return stackAxis <= 1.0D;
+        }
+    }
+
+    /**
+     * The volcanic plan of one column, or {@code null} outside the volcanic biome.
+     * {@code maxRelief} caps how far cones may rise above the floor so summits keep clear
+     * water below the reef overhead. Relief scales with {@code strength}, which ramps from
+     * zero, so edifices grow out of the plain at the district fringe instead of popping in.
+     */
+    public static VolcanicColumnPlan columnPlan(double strength, int blockX, int blockZ,
+                                                int floorY, double maxRelief,
+                                                CellSource<Volcano> volcanoes,
+                                                CellSource<Stack> stacks,
+                                                EmergenceCurve satelliteEmergence) {
+        if (strength <= 0.0D) {
+            return null;
+        }
+        ColumnShape shape = shapeAt(blockX, blockZ, floorY, strength, maxRelief, volcanoes);
+        // Satellite vents only erupt between the giants, never on an edifice's own flanks.
+        StackShape satellite = shape.partOfEdifice()
+                ? StackShape.NONE
+                : stackShapeAt(blockX, blockZ, shape.surfaceY(), strength,
+                        stacks, satelliteEmergence);
+        return new VolcanicColumnPlan(blockX, blockZ, floorY, strength, shape,
+                satellite.topY(), satellite.axisFraction());
+    }
+
+    /**
      * Swell-and-rift relief of the volcanic plain itself: broad seamount swells cut by
      * narrow graben trenches along the zero contour of a large noise field. Creative
      * terrain that never touches the cave ceiling.
+     *
+     * <p>The trench is a C1 {@link BlendMath#taper} window over the rift field: depth
+     * reaches its maximum on the zero contour and both value and slope decay to exactly
+     * zero at the window edge. The old hard band ({@code if |rift| < w then −(4+5·depth)})
+     * left a constant 4-block step along the contour — a cliff-walled, machine-drawn
+     * crack; the taper turns the same trench into a smooth-sided graben.</p>
      */
-    public static int floorOffset(int blockX, int blockZ) {
+    public static double floorOffset(int blockX, int blockZ) {
         double swell = SoftMixNoise.valueNoise(blockX, blockZ, 120, PLAIN_SEED) * 6.5D
                 + SoftMixNoise.valueNoise(blockX, blockZ, 44, PLAIN_SEED ^ 0x1234L) * 2.5D;
         double rift = SoftMixNoise.valueNoise(blockX, blockZ, 96, PLAIN_SEED ^ 0x5678L);
         double detail = SoftMixNoise.valueNoise(blockX, blockZ, 20, PLAIN_SEED ^ 0x9ABCL) * 1.5D;
-        int offset = (int) Math.round(swell + detail);
-        // A trench carves where the broad field crosses zero: long, narrow, dramatic rifts.
-        if (Math.abs(rift) < 0.045D) {
-            double depth = 1.0D - Math.abs(rift) / 0.045D;
-            offset -= (int) Math.round(4.0D + depth * 5.0D);
-        }
-        return offset;
+        double trench = RIFT_DEPTH * BlendMath.taper(rift / RIFT_HALF_WIDTH);
+        return swell + detail - trench;
     }
 
     /**
@@ -175,7 +230,18 @@ public final class VolcanoGeometry {
      * the region edge fade. Cone heights and aprons scale with this so districts blend.
      */
     public static double strength(double brimstoneWeight, double edgeFade) {
-        double district = SoftMixNoise.smoothstep((brimstoneWeight - MIN_STRENGTH) / (0.55D - MIN_STRENGTH));
+        return strength(brimstoneWeight, edgeFade, 0.55D);
+    }
+
+    /**
+     * As {@link #strength(double, double)}, with a configurable full-relief weight: the
+     * emergence window of the giant edifices. Relief grows from exactly zero at
+     * {@link #MIN_STRENGTH}, so cones rise out of the plain instead of popping into
+     * existence on the window contour.
+     */
+    public static double strength(double brimstoneWeight, double edgeFade, double fullWeight) {
+        double span = Math.max(1e-6, fullWeight - MIN_STRENGTH);
+        double district = SoftMixNoise.smoothstep((brimstoneWeight - MIN_STRENGTH) / span);
         return SoftMixNoise.clamp01(district) * SoftMixNoise.clamp01(edgeFade);
     }
 
@@ -243,7 +309,21 @@ public final class VolcanoGeometry {
      */
     public static ColumnShape shapeAt(int blockX, int blockZ, int floorY, double strength,
                                       double maxRelief) {
-        if (strength <= MIN_STRENGTH) {
+        return shapeAt(blockX, blockZ, floorY, strength, maxRelief, VolcanoGeometry::volcanoAt);
+    }
+
+    /**
+     * Source-injected variant so a chunk build can memoize the edifice records.
+     *
+     * <p>There is deliberately no relief threshold here: every part of an edifice scales
+     * with {@code strength}, which itself ramps from zero, so at the district fringe the
+     * cones are flush mounds growing out of the plain. The old hard
+     * {@code strength <= MIN_STRENGTH} gate made each edifice pop into existence at a
+     * quarter of its height along a contour line — a cliff ring around every volcano.</p>
+     */
+    public static ColumnShape shapeAt(int blockX, int blockZ, int floorY, double strength,
+                                      double maxRelief, CellSource<Volcano> volcanoes) {
+        if (strength <= EDIFICE_SKIP_STRENGTH) {
             return plainShape(blockX, blockZ, floorY, strength);
         }
         int cellX = Math.floorDiv(blockX, FIELD_CELL);
@@ -251,7 +331,7 @@ public final class VolcanoGeometry {
         ColumnShape best = plainShape(blockX, blockZ, floorY, strength);
         for (int dx = -1; dx <= 1; dx++) {
             for (int dz = -1; dz <= 1; dz++) {
-                Volcano volcano = volcanoAt(cellX + dx, cellZ + dz);
+                Volcano volcano = volcanoes.at(cellX + dx, cellZ + dz);
                 if (volcano == null) {
                     continue;
                 }
@@ -529,7 +609,7 @@ public final class VolcanoGeometry {
     }
 
     /** The satellite vent seeded for a stack cell, or {@code null} on quiet plain. */
-    static Stack stackAt(int cellX, int cellZ) {
+    public static Stack stackAt(int cellX, int cellZ) {
         long roll = SoftMixNoise.mix(cellX, cellZ, STACK_SEED);
         if (unit(roll, 0) >= STACK_CHANCE) {
             return null;
@@ -549,7 +629,22 @@ public final class VolcanoGeometry {
      * so the plain reads as a field of small volcanoes rather than scattered pillars.
      */
     public static StackShape stackShapeAt(int blockX, int blockZ, double groundY, double strength) {
-        if (strength < 0.35D) {
+        return stackShapeAt(blockX, blockZ, groundY, strength,
+                VolcanoGeometry::stackAt, EmergenceCurve.DEFAULT_SATELLITE);
+    }
+
+    /**
+     * Source- and curve-injected variant. The emergence curve replaces the old hard
+     * {@code strength < 0.35} gate: satellite relief grows from zero at the window start,
+     * so vents bud out of the plain instead of appearing full-sized on a contour.
+     */
+    public static StackShape stackShapeAt(int blockX, int blockZ, double groundY, double strength,
+                                          CellSource<Stack> stacks, EmergenceCurve emergence) {
+        if (strength <= STACK_SKIP_STRENGTH) {
+            return StackShape.NONE;
+        }
+        double relief = strength * emergence.apply(strength);
+        if (relief <= 1e-3D) {
             return StackShape.NONE;
         }
         int cellX = Math.floorDiv(blockX, STACK_CELL);
@@ -558,7 +653,7 @@ public final class VolcanoGeometry {
         double bestAxis = 2.0D;
         for (int dx = -1; dx <= 1; dx++) {
             for (int dz = -1; dz <= 1; dz++) {
-                Stack stack = stackAt(cellX + dx, cellZ + dz);
+                Stack stack = stacks.at(cellX + dx, cellZ + dz);
                 if (stack == null) {
                     continue;
                 }
@@ -580,7 +675,7 @@ public final class VolcanoGeometry {
                     // Truncated crown: a shallow summit basin, not a needle.
                     profile = Math.pow(1.0D - 0.09D, 0.72D) * 0.86D;
                 }
-                double top = groundY + stack.height() * strength * profile;
+                double top = groundY + stack.height() * relief * profile;
                 if (top > bestTop) {
                     bestTop = top;
                     bestAxis = t;

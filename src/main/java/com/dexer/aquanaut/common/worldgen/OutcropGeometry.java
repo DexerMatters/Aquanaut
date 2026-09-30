@@ -1,5 +1,6 @@
 package com.dexer.aquanaut.common.worldgen;
 
+import com.dexer.aquanaut.common.worldgen.blend.CellSource;
 import com.dexer.aquanaut.common.worldgen.layers.SoftMixNoise;
 
 /**
@@ -13,6 +14,11 @@ import com.dexer.aquanaut.common.worldgen.layers.SoftMixNoise;
  * mounds, and rare steep spires. All heights live in the lower half of the chamber so
  * the reef ceiling always keeps a wide band of open water above the summits.</p>
  *
+ * <p>Relief is exposed as a continuous field ({@link #reliefAt}) that fades smoothly to
+ * zero at every footprint border, so massifs grow out of the floor instead of standing
+ * on a cliff ring, and mesa terracing is masked by noise and radial fade — stepped beds
+ * read as eroded strata in patches instead of a uniform staircase.</p>
+ *
  * <p>The class is intentionally free of Minecraft types so the shape maths stays
  * unit-testable.</p>
  */
@@ -25,6 +31,9 @@ public final class OutcropGeometry {
     public static final int TERRACE_STEP = 3;
 
     private static final long CELL_SEED = 0x0C7C0975L;
+    private static final long TERRACE_MASK_SEED = 0x7E44ACE1L;
+    /** Cell of the noise that decides where mesa terracing shows at all. */
+    private static final int TERRACE_MASK_CELL = 14;
 
     /** Silhouette family of one massif. */
     public enum Kind {
@@ -106,34 +115,51 @@ public final class OutcropGeometry {
     }
 
     /**
-     * Top Y of the massif surface at a column, clamped to {@code mountainTopY}, or
-     * {@link Integer#MIN_VALUE} where no outcrop reaches. The strongest of the 3x3
-     * neighbouring field cells wins, exactly like the volcanic field.
+     * Continuous massif relief at a column, in blocks above the cavity floor (0 where no
+     * outcrop reaches). The strongest of the 3x3 neighbouring field cells wins, exactly
+     * like the volcanic field; every member silhouette fades smoothly to zero at its
+     * footprint border, so the maximum — and the field — is continuous.
      */
-    public static int topYAt(int blockX, int blockZ, int cavityFloorY, int cavityHeight,
-                             int mountainTopY) {
+    public static double reliefAt(int blockX, int blockZ, double cavityHeight, double maxRelief) {
+        return reliefAt(blockX, blockZ, cavityHeight, maxRelief, OutcropGeometry::outcropAt);
+    }
+
+    /** Source-injected variant so a chunk build can memoize the cell records. */
+    public static double reliefAt(int blockX, int blockZ, double cavityHeight, double maxRelief,
+                                  CellSource<Outcrop> source) {
         int cellX = Math.floorDiv(blockX, CELL);
         int cellZ = Math.floorDiv(blockZ, CELL);
         double best = 0.0D;
-        boolean any = false;
         for (int dx = -1; dx <= 1; dx++) {
             for (int dz = -1; dz <= 1; dz++) {
-                Outcrop outcrop = outcropAt(cellX + dx, cellZ + dz);
+                Outcrop outcrop = source.at(cellX + dx, cellZ + dz);
                 if (outcrop == null) {
                     continue;
                 }
-                double relief = reliefAt(outcrop, blockX, blockZ, cavityHeight,
-                        mountainTopY - cavityFloorY);
-                if (relief > best) {
-                    best = relief;
-                    any = true;
-                }
+                best = Math.max(best, reliefAt(outcrop, blockX, blockZ, cavityHeight, maxRelief));
             }
         }
-        if (!any) {
+        return best;
+    }
+
+    /**
+     * Top Y of the massif surface at a column, clamped to {@code mountainTopY}, or
+     * {@link Integer#MIN_VALUE} where no outcrop reaches.
+     */
+    public static int topYAt(int blockX, int blockZ, int cavityFloorY, int cavityHeight,
+                             int mountainTopY) {
+        return topYAt(blockX, blockZ, cavityFloorY, cavityHeight, mountainTopY,
+                OutcropGeometry::outcropAt);
+    }
+
+    /** Source-injected variant so a chunk build can memoize the cell records. */
+    public static int topYAt(int blockX, int blockZ, int cavityFloorY, int cavityHeight,
+                             int mountainTopY, CellSource<Outcrop> source) {
+        double relief = reliefAt(blockX, blockZ, cavityHeight, mountainTopY - cavityFloorY, source);
+        if (relief <= 0.05D) {
             return Integer.MIN_VALUE;
         }
-        return cavityFloorY + (int) Math.round(best);
+        return cavityFloorY + (int) Math.round(relief);
     }
 
     private static double reliefAt(Outcrop outcrop, int blockX, int blockZ,
@@ -158,8 +184,13 @@ public final class OutcropGeometry {
                 } else {
                     double u = (t - outcrop.plateauRatio()) / (1.0D - outcrop.plateauRatio());
                     relief = height * Math.max(0.0D, 1.0D - u * 1.05D);
-                    // Terraced cliffs: the beds step back in floors of TERRACE_STEP blocks.
-                    relief = Math.round(relief / TERRACE_STEP) * TERRACE_STEP;
+                    // Terraced cliffs, but only where the mask noise says the beds are
+                    // bare: the quantisation is blended in and out over the slope, so the
+                    // mesa reads as eroded strata in patches instead of a uniform
+                    // staircase, and every terrace edge fades instead of ringing.
+                    double mask = terraceMask(blockX, blockZ, t, outcrop.plateauRatio());
+                    double quantized = Math.round(relief / TERRACE_STEP) * TERRACE_STEP;
+                    relief += (quantized - relief) * mask;
                 }
             }
             case RIDGE -> {
@@ -179,6 +210,18 @@ public final class OutcropGeometry {
             }
         }
         return Math.min(relief, maxRelief);
+    }
+
+    /**
+     * Where mesa terracing shows: sparse noise patches, faded in from the plateau rim and
+     * faded out toward the toe so the quantised beds never start or end on a lip.
+     */
+    private static double terraceMask(int blockX, int blockZ, double t, double plateauRatio) {
+        double patch = (SoftMixNoise.valueNoise(blockX, blockZ, TERRACE_MASK_CELL, TERRACE_MASK_SEED) + 1.0D) * 0.5D;
+        double sparse = SoftMixNoise.smoothstep(patch * 1.6D - 0.55D);
+        double fromRim = SoftMixNoise.smoothstep((t - plateauRatio) / 0.25D);
+        double toToe = 1.0D - SoftMixNoise.smoothstep((t - 0.85D) / 0.40D);
+        return sparse * fromRim * toToe;
     }
 
     /** Deterministic unit hash in [0, 1) for one cell roll and a draw index. */

@@ -1,12 +1,15 @@
 package com.dexer.aquanaut.common.worldgen;
 
+import com.dexer.aquanaut.common.worldgen.blend.BoundaryWarp;
 import com.dexer.aquanaut.common.worldgen.layers.SoftMixNoise;
 import com.dexer.aquanaut.common.worldgen.layers.TerrainModule;
 
 public final class MiddleLevelOceanTerrainProfile {
     private static final long WALL_SEED = 0xDEADBEEFL;
-    // Crack openings: two rotated octaves of the same value-noise family. The rotation is what
-    // keeps the outlines irregular — a single axis-aligned grid reads as a field of squares.
+    // Crack openings: two rotated octaves of the same value-noise family, sampled through a
+    // two-octave domain warp. The rotation and the warp are what keep the outlines irregular —
+    // a single axis-aligned grid reads as a field of squares, and an unwarped threshold reads
+    // as a drawn contour.
     private static final long CRACK_OUTLINE_SEED = 0x9E3779B9L;
     private static final long CRACK_DETAIL_SEED = 0x7F4A7C15L;
     private static final double CRACK_ROTATION = 0.62D;
@@ -40,6 +43,12 @@ public final class MiddleLevelOceanTerrainProfile {
     }
 
     public static ColumnProfile profileFor(int blockX, int blockZ, int minBuildHeight, TerrainModule terrain) {
+        return profileFor(blockX, blockZ, minBuildHeight, terrain, OutcropGeometry::outcropAt);
+    }
+
+    /** Source-injected variant so a chunk build can memoize the massif cell records. */
+    public static ColumnProfile profileFor(int blockX, int blockZ, int minBuildHeight, TerrainModule terrain,
+                                           com.dexer.aquanaut.common.worldgen.blend.CellSource<OutcropGeometry.Outcrop> outcrops) {
         // Cap top: broad undulation only (no 10-block detail).
         double capTopNoise = sample(blockX, blockZ, 36, 0x5F3759DFL);
         double capTopMid = sample(blockX, blockZ, 18, 0x5F3759DFL ^ 0xABCDEF01L);
@@ -59,22 +68,46 @@ public final class MiddleLevelOceanTerrainProfile {
         int cavityDepth = terrain.minCavityDepth() + floor(cavityBlend * terrain.cavityDepthVariants());
         int cavityFloorY = Math.max(minBuildHeight + terrain.minFloorMargin(), capBottomY - cavityDepth);
 
-        // Broad outline plus a finer irregularity field, both rotated off the block grid.
-        boolean crack = crackField(blockX, blockZ, terrain.crackCellSize(), CRACK_OUTLINE_SEED,
-                terrain.crackThreshold())
-                && crackField(blockX, blockZ,
-                        Math.max(2.0D, terrain.crackCellSize() * CRACK_DETAIL_CELL_SCALE),
-                        CRACK_DETAIL_SEED, terrain.crackDetailThreshold());
+        // Continuous shaft openness through the cap: the product of two warped, rotated
+        // ramp fields. The cap thins into a lens as openness grows and vanishes at 1, so
+        // shafts are funnel-shaped sinkholes with sloped walls — never vertical slots.
+        double capOpenness = capOpenness(blockX, blockZ, terrain);
 
         // Low sedimentary massifs rise from the floor: mesas, ridges, mounds and spires
-        // with their own silhouettes, all well below the reef overhead.
-        int outcropTopY = Integer.MIN_VALUE;
-        if (!crack) {
-            outcropTopY = OutcropGeometry.topYAt(blockX, blockZ, cavityFloorY,
-                    capBottomY - cavityFloorY, mountainTopLimit(capBottomY, cavityFloorY));
-        }
+        // with their own silhouettes, all well below the reef overhead. Their relief scales
+        // with the remaining cap solidity so nothing towers under an open shaft and no
+        // massif ends on the crack contour line.
+        double outcropRelief = OutcropGeometry.reliefAt(blockX, blockZ,
+                capBottomY - cavityFloorY,
+                mountainTopLimit(capBottomY, cavityFloorY) - cavityFloorY,
+                outcrops)
+                * (1.0D - capOpenness);
+        int outcropTopY = outcropRelief > 0.05D
+                ? cavityFloorY + (int) Math.round(outcropRelief)
+                : Integer.MIN_VALUE;
 
-        return new ColumnProfile(capTopY, capBottomY, cavityFloorY, crack, outcropTopY);
+        return new ColumnProfile(capTopY, capBottomY, cavityFloorY, capOpenness,
+                outcropRelief, outcropTopY);
+    }
+
+    /**
+     * Continuous openness of the reef cap at a column, in [0, 1]: 0 = sealed cap,
+     * 1 = a wide-open shaft connecting the two seas. Both underlying fields are rotated
+     * off the block grid and sampled through the module's boundary warp, and each enters
+     * through a smoothstep ramp of width {@code crack_open_width} instead of a hard
+     * threshold, so the opening tapers in over several blocks and its outline meanders
+     * and branches at two scales.
+     */
+    public static double capOpenness(int blockX, int blockZ, TerrainModule terrain) {
+        double[] warped = terrain.blend().fieldWarp().warp(blockX, blockZ, new double[2]);
+        double width = Math.max(1e-3, terrain.blend().crackOpenWidth());
+        double broad = crackField(warped[0], warped[1], terrain.crackCellSize(), CRACK_OUTLINE_SEED, 1.0D - CRACK_DETAIL_WEIGHT);
+        double detail = crackField(warped[0], warped[1],
+                Math.max(2.0D, terrain.crackCellSize() * CRACK_DETAIL_CELL_SCALE),
+                CRACK_DETAIL_SEED, CRACK_DETAIL_WEIGHT);
+        double broadRamp = SoftMixNoise.smoothstep((broad - terrain.crackThreshold()) / width);
+        double detailRamp = SoftMixNoise.smoothstep((detail - terrain.crackDetailThreshold()) / width);
+        return broadRamp * detailRamp;
     }
 
     /**
@@ -87,12 +120,11 @@ public final class MiddleLevelOceanTerrainProfile {
     }
 
     /**
-     * True where a rotated two-octave field exceeds {@code threshold}. Rotating each octave and
-     * shifting the detail octave by {@link #CRACK_DETAIL_WEIGHT} breaks up the straight,
-     * axis-aligned borders a single grid-aligned sample produces.
+     * One octave of the crack outline field: rotated off the block grid and shifted by
+     * {@code weight} toward the finer detail octave, so straight axis-aligned borders break up.
      */
-    private static boolean crackField(int blockX, int blockZ, double cellSize, long seed,
-                                      double threshold) {
+    private static double crackField(double blockX, double blockZ, double cellSize, long seed,
+                                     double detailWeight) {
         double cos = Math.cos(CRACK_ROTATION);
         double sin = Math.sin(CRACK_ROTATION);
         double broad = sample(
@@ -105,76 +137,92 @@ public final class MiddleLevelOceanTerrainProfile {
                 blockX * detailCos - blockZ * detailSin,
                 blockX * detailSin + blockZ * detailCos,
                 cellSize * CRACK_DETAIL_RATIO, seed ^ 0x51L);
-        return broad * (1.0D - CRACK_DETAIL_WEIGHT) + detail * CRACK_DETAIL_WEIGHT > threshold;
+        return broad * (1.0D - detailWeight) + detail * detailWeight;
     }
 
     private static double sample(int blockX, int blockZ, int cellSize, long seed) {
-        int cellX = Math.floorDiv(blockX, cellSize);
-        int cellZ = Math.floorDiv(blockZ, cellSize);
-        double localX = (double) Math.floorMod(blockX, cellSize) / cellSize;
-        double localZ = (double) Math.floorMod(blockZ, cellSize) / cellSize;
-        double smoothX = SoftMixNoise.smoothstep(localX);
-        double smoothZ = SoftMixNoise.smoothstep(localZ);
-
-        double sample00 = unitHash(cellX, cellZ, seed);
-        double sample10 = unitHash(cellX + 1, cellZ, seed);
-        double sample01 = unitHash(cellX, cellZ + 1, seed);
-        double sample11 = unitHash(cellX + 1, cellZ + 1, seed);
-        double lerpX0 = SoftMixNoise.lerp(smoothX, sample00, sample10);
-        double lerpX1 = SoftMixNoise.lerp(smoothX, sample01, sample11);
-        return SoftMixNoise.lerp(smoothZ, lerpX0, lerpX1);
+        return sample((double) blockX, (double) blockZ, (double) cellSize, seed);
     }
 
     /**
-     * Continuous (non-integer-cell) sample of the same value-noise family, used where the crack
-     * field is rotated and therefore lands between grid cells.
+     * Continuous (non-integer-cell) sample of the value-noise family, used where the crack
+     * field is rotated and warped and therefore lands between grid cells. Lattice values are
+     * mapped into [0, 1].
      */
     private static double sample(double blockX, double blockZ, double cellSize, long seed) {
-        double cellX = blockX / cellSize;
-        double cellZ = blockZ / cellSize;
-        int baseX = (int) Math.floor(cellX);
-        int baseZ = (int) Math.floor(cellZ);
-        double smoothX = SoftMixNoise.smoothstep(cellX - baseX);
-        double smoothZ = SoftMixNoise.smoothstep(cellZ - baseZ);
-
-        double sample00 = unitHash(baseX, baseZ, seed);
-        double sample10 = unitHash(baseX + 1, baseZ, seed);
-        double sample01 = unitHash(baseX, baseZ + 1, seed);
-        double sample11 = unitHash(baseX + 1, baseZ + 1, seed);
-        double lerpX0 = SoftMixNoise.lerp(smoothX, sample00, sample10);
-        double lerpX1 = SoftMixNoise.lerp(smoothX, sample01, sample11);
-        return SoftMixNoise.lerp(smoothZ, lerpX0, lerpX1);
+        double noise = SoftMixNoise.valueNoise(blockX, blockZ, cellSize, seed);
+        return (noise + 1.0D) * 0.5D;
     }
 
     private static int floor(double value) {
         return (int) Math.floor(value);
     }
 
-    private static double unitHash(int x, int z, long seed) {
-        long mixed = hash(x, z, seed);
-        return ((mixed >>> 11) & ((1L << 53) - 1)) / (double) (1L << 53);
+    /**
+     * The rock band surviving dissolution of a cap [{@code capBottomY}, {@code capTopY}]:
+     * the band thins symmetrically from both faces as openness grows (a lens), so shafts
+     * are funnel-shaped sinkholes with sloped walls instead of vertical slots, and the
+     * band disappears entirely once less than one block of cap remains.
+     */
+    public record LensBand(int topY, int bottomY) {
+        public boolean sealed() {
+            return bottomY <= topY;
+        }
     }
 
-    private static long hash(int x, int z, long seed) {
-        return mix(seed ^ ((long) x * 0x632BE59BD9B4E019L) ^ ((long) z * 0x9E3779B97F4A7C15L));
+    public static LensBand lensBand(int capTopY, int capBottomY, double openness) {
+        int thickness = capTopY - capBottomY + 1;
+        double effective = thickness * (1.0D - SoftMixNoise.clamp01(openness));
+        if (effective < 1.0D) {
+            return new LensBand(capBottomY - 1, capBottomY);
+        }
+        int removed = thickness - (int) Math.floor(effective);
+        int top = capTopY - removed / 2;
+        return new LensBand(top, top - (int) Math.ceil(effective) + 1);
     }
 
-    private static long mix(long value) {
-        value ^= value >>> 30;
-        value *= 0xBF58476D1CE4E5B9L;
-        value ^= value >>> 27;
-        value *= 0x94D049BB133111EBL;
-        return value ^ (value >>> 31);
-    }
-
-    public record ColumnProfile(int capTopY, int capBottomY, int cavityFloorY, boolean crack,
-                                int outcropTopY) {
+    /**
+     * One column of the cap/cavity story. The cap is a lens: {@link #capOpenness()} thins it
+     * symmetrically from both faces until it vanishes, so the effective band
+     * [{@link #effCapBottomY()}, {@link #effCapTopY()}] is what the planner actually fills.
+     */
+    public record ColumnProfile(int capTopY, int capBottomY, int cavityFloorY, double capOpenness,
+                                double outcropRelief, int outcropTopY) {
         public int capThickness() {
             return capTopY - capBottomY + 1;
         }
 
+        /** Effective (post-dissolution) cap thickness in blocks; 0 once the shaft is open. */
+        public double effectiveThickness() {
+            return capThickness() * (1.0D - capOpenness);
+        }
+
+        public LensBand lens() {
+            return lensBand(capTopY, capBottomY, capOpenness);
+        }
+
+        /** Top of the rock band actually present. */
+        public int effCapTopY() {
+            return lens().topY();
+        }
+
+        /** Bottom of the rock band actually present; above {@link #effCapTopY()} when open. */
+        public int effCapBottomY() {
+            return lens().bottomY();
+        }
+
+        /** Whether any cap rock survives at this column at all. */
+        public boolean capSealed() {
+            return lens().sealed();
+        }
+
         public int cavityHeight() {
             return capBottomY - cavityFloorY;
+        }
+
+        /** Legacy boolean view of the shaft: open once more than half dissolved. */
+        public boolean crack() {
+            return capOpenness >= 0.5D;
         }
 
         /** Whether a sedimentary massif rises from this column at all. */

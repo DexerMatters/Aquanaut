@@ -8,20 +8,30 @@ public final class SoftMixNoise {
     }
 
     public static double valueNoise(int x, int z, int cellSize, long seed) {
-        if (cellSize <= 0) {
+        return valueNoise((double) x, (double) z, (double) cellSize, seed);
+    }
+
+    /**
+     * Continuous-coordinate variant of the same value-noise lattice. Integer coordinates and
+     * cell sizes sample exactly like {@link #valueNoise(int, int, int, long)}, but warped or
+     * interpolated sample points land between lattice cells instead of snapping to them, so
+     * domain-warped fields stay continuous.
+     */
+    public static double valueNoise(double x, double z, double cellSize, long seed) {
+        if (cellSize <= 0.0D) {
             return 0.0D;
         }
-        int cellX = Math.floorDiv(x, cellSize);
-        int cellZ = Math.floorDiv(z, cellSize);
-        double fracX = Math.floorMod(x, cellSize) / (double) cellSize;
-        double fracZ = Math.floorMod(z, cellSize) / (double) cellSize;
-        double sx = smoothstep(fracX);
-        double sz = smoothstep(fracZ);
+        double cellX = x / cellSize;
+        double cellZ = z / cellSize;
+        int baseX = (int) Math.floor(cellX);
+        int baseZ = (int) Math.floor(cellZ);
+        double sx = smoothstep(cellX - baseX);
+        double sz = smoothstep(cellZ - baseZ);
 
-        double n00 = cornerNoise(cellX, cellZ, seed);
-        double n10 = cornerNoise(cellX + 1, cellZ, seed);
-        double n01 = cornerNoise(cellX, cellZ + 1, seed);
-        double n11 = cornerNoise(cellX + 1, cellZ + 1, seed);
+        double n00 = cornerNoise(baseX, baseZ, seed);
+        double n10 = cornerNoise(baseX + 1, baseZ, seed);
+        double n01 = cornerNoise(baseX, baseZ + 1, seed);
+        double n11 = cornerNoise(baseX + 1, baseZ + 1, seed);
         double nx0 = lerp(sx, n00, n10);
         double nx1 = lerp(sx, n01, n11);
         return lerp(sz, nx0, nx1);

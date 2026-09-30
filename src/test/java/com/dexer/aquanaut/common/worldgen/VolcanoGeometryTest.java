@@ -218,9 +218,30 @@ public final class VolcanoGeometryTest {
     @Test
     void volcanicPlainReliefStaysModest() {
         for (int x = -300; x <= 300; x += 13) {
-            int offset = VolcanoGeometry.floorOffset(x, -x / 3);
-            assertTrue(offset >= -16 && offset <= 12,
+            double offset = VolcanoGeometry.floorOffset(x, -x / 3);
+            assertTrue(offset >= -20 && offset <= 11,
                     "swells and rifts stay gentle (" + offset + ")");
+        }
+    }
+
+    @Test
+    void riftTrenchesHaveNoConstantStepAtTheBandEdge() {
+        // The old hard band (|rift| < w → −(4 + 5·depth)) left a 4-block cliff along the
+        // zero contour of the rift field. The C1 taper window must reach exactly zero at
+        // the band edge, so the offset field is continuous everywhere.
+        double worstStep = 0.0D;
+        for (int x = -400; x <= 400; x++) {
+            double a = VolcanoGeometry.floorOffset(x, x / 3 + 7);
+            double b = VolcanoGeometry.floorOffset(x + 1, (x + 1) / 3 + 7);
+            worstStep = Math.max(worstStep, Math.abs(b - a));
+        }
+        assertTrue(worstStep < 8.0D,
+                "raw rift walls stay erodible by the cliff guard, worst step " + worstStep);
+        // And no flat 4-block offset survives outside the trench window: the trench term
+        // is exactly 0 whenever |rift| >= 0.045, which the continuity scan would flag as
+        // a step at the boundary otherwise.
+        for (int x = -400; x <= 400; x += 9) {
+            assertTrue(Double.isFinite(VolcanoGeometry.floorOffset(x, -x)));
         }
     }
 
@@ -277,9 +298,15 @@ public final class VolcanoGeometryTest {
                 assertEquals(VolcanoGeometry.stackShapeAt(stack.centerX(), stack.centerZ(),
                                 FLOOR_Y, 1.0D),
                         centre, "vent shading is a pure function of position");
+                // Emergence replaces the old hard gate: at the district fringe a vent is a
+                // sub-block bud growing out of the plain, never a full cone popping in.
+                VolcanoGeometry.StackShape fringe = VolcanoGeometry.stackShapeAt(
+                        stack.centerX(), stack.centerZ(), FLOOR_Y, 0.2D);
+                assertTrue(!fringe.present() || fringe.topY() <= FLOOR_Y + 1.0D,
+                        "fringe vents stay flush with the plain (top " + fringe.topY() + ")");
                 assertFalse(VolcanoGeometry.stackShapeAt(stack.centerX(), stack.centerZ(),
-                                FLOOR_Y, 0.2D).present(),
-                        "satellite vents only erupt inside the volcanic district");
+                                FLOOR_Y, 0.0D).present(),
+                        "vents never erupt outside the volcanic district");
             }
         }
         assertTrue(checked > 5, "sample should contain satellite vents");

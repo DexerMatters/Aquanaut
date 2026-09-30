@@ -5,6 +5,7 @@ import com.dexer.aquanaut.common.worldgen.MiddleLevelOceanPlacement;
 import com.dexer.aquanaut.common.worldgen.layers.BiomeRewriter;
 import com.dexer.aquanaut.common.worldgen.layers.OceanChunkSampler;
 import com.dexer.aquanaut.common.worldgen.layers.OceanColumnPlanner;
+import com.dexer.aquanaut.common.worldgen.layers.OceanColumnShading;
 import com.dexer.aquanaut.common.worldgen.layers.OceanGenSampler;
 import com.dexer.aquanaut.common.worldgen.layers.OceanLayerStack;
 import com.dexer.aquanaut.common.worldgen.layers.OceanLayerStacks;
@@ -94,10 +95,14 @@ public abstract class NoiseBasedChunkGeneratorMixin {
                         .orElse(null));
 
         BiomeRewriter.rewrite(chunk, sampler, generatorAccessor.aquanaut$getBiomeSource());
-        OceanColumnPlanner.ColumnPlan[] columns = OceanColumnPlanner.planColumns(chunk, sampler, terrain);
+        // One blend grid per chunk: district weights, the guarded geological floor and the
+        // composed reef fields are evaluated once per column and shared by every consumer.
+        com.dexer.aquanaut.common.worldgen.layers.ChunkTerrainBlend blend =
+                com.dexer.aquanaut.common.worldgen.layers.ChunkTerrainBlend.build(chunk, sampler, terrain);
+        OceanColumnPlanner.ColumnPlan[] columns = blend.chunkPlans();
         // The crystal nest skins its 3D lattice and decorates every surface up front; cells
         // it does not claim fall through to the regular column plan below.
-        CrystalNestTerrain.Chunk crystalNest = CrystalNestTerrain.build(chunk, sampler, terrain);
+        CrystalNestTerrain.Chunk crystalNest = CrystalNestTerrain.build(chunk, sampler, terrain, blend);
 
         for (int cx = 0; cx < cellsX; cx++) {
             noiseChunk.advanceCellX(cx);
@@ -142,7 +147,7 @@ public abstract class NoiseBasedChunkGeneratorMixin {
                                             ? crystalNest.stateAt(blockX, blockY, blockZ)
                                             : null;
                                     if (blockstate == null) {
-                                        blockstate = col.stateForY(blockY);
+                                        blockstate = OceanColumnShading.stateForY(col, blockY);
                                     }
                                 } else {
                                     blockstate = noiseChunk.getInterpolatedState();

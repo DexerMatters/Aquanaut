@@ -172,15 +172,68 @@ public final class OceanLayerStackJson {
                 optDouble(root, "pillar_height_max_ratio", 0.40D),
                 (int) optDouble(root, "pillar_base_extra", 4),
                 (int) optDouble(root, "crack_cell_size", 80),
-                optDouble(root, "crack_threshold", 0.56D),
-                optDouble(root, "crack_detail_threshold", 0.44D),
+                optDouble(root, "crack_threshold", 0.40D),
+                optDouble(root, "crack_detail_threshold", 0.32D),
                 optDouble(root, "crack_open_edge", 0.32D),
                 optDouble(root, "pillar_edge", 0.45D),
                 optDouble(root, "coral_tree_edge", 0.58D),
                 optDouble(root, "coral_tree_chance", 0.06D),
                 (int) optDouble(root, "top_water_y", 62),
                 optDouble(root, "wall_intrusion", 0.15D),
-                (int) optDouble(root, "wall_cell_size", 64));
+                (int) optDouble(root, "wall_cell_size", 64),
+                parseBlend(root));
+    }
+
+    /**
+     * Optional {@code blend} section carrying the terrain-mix strategy tunables; any
+     * omitted key keeps its production default, so legacy terrain JSON parses unchanged.
+     */
+    public static TerrainModule.BlendProfile parseBlend(JsonObject root) {
+        TerrainModule.BlendProfile defaults = TerrainModule.BlendProfile.defaults();
+        if (!root.has("blend")) {
+            return defaults;
+        }
+        JsonObject blend = root.getAsJsonObject("blend");
+        return new TerrainModule.BlendProfile(
+                optDouble(blend, "dissolution_gain", defaults.dissolutionGain()),
+                optDouble(blend, "dissolution_modulation", defaults.dissolutionModulation()),
+                optDouble(blend, "dissolution_cut", defaults.dissolutionCut()),
+                optDouble(blend, "dissolution_width", defaults.dissolutionWidth()),
+                optDouble(blend, "warp_amplitude", defaults.warpAmplitudeBlocks()),
+                optDouble(blend, "warp_broad_cell", defaults.warpBroadCell()),
+                optDouble(blend, "warp_fine_cell", defaults.warpFineCell()),
+                optDouble(blend, "emergence_edifice_full", defaults.emergenceEdificeFull()),
+                optDouble(blend, "emergence_satellite_from", defaults.emergenceSatelliteFrom()),
+                optDouble(blend, "emergence_satellite_full", defaults.emergenceSatelliteFull()),
+                optDouble(blend, "soft_max_p", defaults.softMaxP()),
+                optDouble(blend, "slope_max_step", defaults.slopeMaxStep()),
+                optDouble(blend, "slope_max_deviation", defaults.slopeMaxDeviation()),
+                (int) optDouble(blend, "slope_reach", defaults.slopeReach()),
+                (int) optDouble(blend, "dither_cell", defaults.ditherCell()),
+                optDouble(blend, "dither_gamma", defaults.ditherGamma()),
+                optDouble(blend, "crack_open_width", defaults.crackOpenWidth()));
+    }
+
+    public static JsonObject writeBlend(TerrainModule.BlendProfile blend) {
+        JsonObject root = new JsonObject();
+        root.addProperty("dissolution_gain", blend.dissolutionGain());
+        root.addProperty("dissolution_modulation", blend.dissolutionModulation());
+        root.addProperty("dissolution_cut", blend.dissolutionCut());
+        root.addProperty("dissolution_width", blend.dissolutionWidth());
+        root.addProperty("warp_amplitude", blend.warpAmplitudeBlocks());
+        root.addProperty("warp_broad_cell", blend.warpBroadCell());
+        root.addProperty("warp_fine_cell", blend.warpFineCell());
+        root.addProperty("emergence_edifice_full", blend.emergenceEdificeFull());
+        root.addProperty("emergence_satellite_from", blend.emergenceSatelliteFrom());
+        root.addProperty("emergence_satellite_full", blend.emergenceSatelliteFull());
+        root.addProperty("soft_max_p", blend.softMaxP());
+        root.addProperty("slope_max_step", blend.slopeMaxStep());
+        root.addProperty("slope_max_deviation", blend.slopeMaxDeviation());
+        root.addProperty("slope_reach", blend.slopeReach());
+        root.addProperty("dither_cell", blend.ditherCell());
+        root.addProperty("dither_gamma", blend.ditherGamma());
+        root.addProperty("crack_open_width", blend.crackOpenWidth());
+        return root;
     }
 
     public static void registerTerrainJson(ResourceLocation id, String json) {

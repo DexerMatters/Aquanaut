@@ -75,19 +75,18 @@ public final class CrystalNestTerrain {
 
     /**
      * The lattice strength of one column: the soft biome-mix weight, faded out at the
-     * region border and zeroed where the ceiling is broken. This is the transition field
-     * that melts the crystal nest into its neighboring biomes.
+     * region border and scaled back by the dissolving ceiling. This is the transition
+     * field that melts the crystal nest into its neighboring biomes — every factor is
+     * continuous, so the lattice thins out gradually instead of stopping on a contour.
      */
-    public static double strengthFor(double weight, double edgeStrength, boolean crackedCeiling) {
-        if (crackedCeiling) {
-            return 0.0D;
-        }
+    public static double strengthFor(double weight, double edgeStrength, double capOpenness) {
         double ramp = SoftMixNoise.smoothstep((weight - WEIGHT_FLOOR) / (WEIGHT_FULL - WEIGHT_FLOOR));
-        return Math.min(1.0D, ramp) * edgeStrength;
+        return Math.min(1.0D, ramp) * edgeStrength * (1.0D - SoftMixNoise.clamp01(capOpenness));
     }
 
     /** Skins the crystal nest for one chunk, or {@code null} where the lattice never reaches. */
-    public static Chunk build(ChunkAccess chunk, OceanGenSampler sampler, TerrainModule terrain) {
+    public static Chunk build(ChunkAccess chunk, OceanGenSampler sampler, TerrainModule terrain,
+                              com.dexer.aquanaut.common.worldgen.layers.ChunkTerrainBlend blend) {
         if (!terrain.enabled() || !sampler.anySupported()) {
             return null;
         }
@@ -99,18 +98,19 @@ public final class CrystalNestTerrain {
         OceanColumnPlanner.ColumnPlan[] plans = new OceanColumnPlanner.ColumnPlan[padded * padded];
         double[] strength = new double[padded * padded];
         double maxStrength = 0.0D;
-        // One analytic plan per column over the chunk plus one block of halo: the skin
-        // needs real face information across the border and the plans match the ones the
-        // fill pass writes, block for block.
+        // One shared plan per column over the chunk plus one block of halo: the skin needs
+        // real face information across the border, and reusing the chunk blend's plans keeps
+        // them bit-identical to the ones the fill pass writes — at a fraction of the cost of
+        // re-planning every halo column analytically.
         for (int px = 0; px < padded; px++) {
-            int blockX = minX - SKIN_PAD + px;
+            int localX = px - SKIN_PAD;
             for (int pz = 0; pz < padded; pz++) {
-                int blockZ = minZ - SKIN_PAD + pz;
-                OceanColumnPlanner.ColumnPlan plan = OceanColumnPlanner.planColumnAt(
-                        sampler, terrain, minBuildHeight, blockX, blockZ);
+                int localZ = pz - SKIN_PAD;
+                OceanColumnPlanner.ColumnPlan plan = blend.planAt(localX, localZ);
                 plans[px * padded + pz] = plan;
-                double weight = crystalWeight(sampler.stack(), blockX >> 2, blockZ >> 2);
-                double strengthHere = strengthFor(weight, plan.edgeStrength(), plan.profile().crack());
+                double weight = blend.biomeWeightAtBlock(CrystalNestPlacement.location(),
+                        minX + localX, minZ + localZ);
+                double strengthHere = strengthFor(weight, plan.edgeStrength(), plan.capOpenness());
                 strength[px * padded + pz] = strengthHere;
                 maxStrength = Math.max(maxStrength, strengthHere);
             }
@@ -123,7 +123,7 @@ public final class CrystalNestTerrain {
         int yHi = Integer.MIN_VALUE;
         for (OceanColumnPlanner.ColumnPlan plan : plans) {
             yLo = Math.min(yLo, plan.cavityFloorY());
-            yHi = Math.max(yHi, plan.profile().capBottomY() - 1);
+            yHi = Math.max(yHi, plan.capBand().bottomY() - 1);
         }
         yLo = Math.max(yLo, minBuildHeight);
         yHi = Math.min(yHi, minBuildHeight + chunk.getHeight() - 1);
@@ -149,7 +149,9 @@ public final class CrystalNestTerrain {
 
         CrystalNestSkin.SolidQuery legacySolid = (x, y, z) -> {
             OceanColumnPlanner.ColumnPlan plan = plans[(x - minX + SKIN_PAD) * padded + (z - minZ + SKIN_PAD)];
-            return plan != null && isWholeSolid(plan.stateForY(y), chunk, x, y, z);
+            return plan != null && isWholeSolid(
+                    com.dexer.aquanaut.common.worldgen.layers.OceanColumnShading.stateForY(plan, y),
+                    chunk, x, y, z);
         };
         CrystalNestSkin.StrengthQuery strengthQuery = (x, z) ->
                 strength[(x - minX + SKIN_PAD) * padded + (z - minZ + SKIN_PAD)];

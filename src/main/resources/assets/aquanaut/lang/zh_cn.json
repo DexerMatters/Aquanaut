@@ -570,5 +570,9 @@
   "gui.aquanaut.investigation.link.migration.title": "断裂的迁徙路线",
   "gui.aquanaut.investigation.link.migration.detail": "孢子沿无生命走廊的边缘出现，仿佛正从海沟深处向外扩散。",
   "gui.aquanaut.investigation.link.coordinates.title": "口述坐标",
-  "gui.aquanaut.investigation.link.coordinates.detail": "K-17日志中最后一组可辨认坐标，正好落在寂静海沟的边界。"
+  "gui.aquanaut.investigation.link.coordinates.detail": "K-17日志中最后一组可辨认坐标，正好落在寂静海沟的边界。",
+  "generator.aquanaut.water_world": "水世界",
+  "gui.aquanaut.water_world.screen.summary": "无陆之地，唯有汪洋。",
+  "gui.aquanaut.water_world.screen.description": "这个世界只由深海群系与 Aquanaut 的海洋群系构成：广阔深海之下，珊瑚森林、凝胶丛林、盐镜峡、硫磺火山区、水晶巢与中层海洋层层展开。",
+  "gui.aquanaut.water_world.screen.hint": "将世界类型选为「水世界」，然后创建世界即可潜入。"
 }

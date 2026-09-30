@@ -570,5 +570,9 @@
   "gui.aquanaut.investigation.link.migration.title": "Broken Migration Route",
   "gui.aquanaut.investigation.link.migration.detail": "Spores appear along the edge of the lifeless corridor, as though carried outward from the trench.",
   "gui.aquanaut.investigation.link.coordinates.title": "Spoken Coordinates",
-  "gui.aquanaut.investigation.link.coordinates.detail": "The last intelligible coordinate in K-17's log resolves to the silent trench boundary."
+  "gui.aquanaut.investigation.link.coordinates.detail": "The last intelligible coordinate in K-17's log resolves to the silent trench boundary.",
+  "generator.aquanaut.water_world": "Water World",
+  "gui.aquanaut.water_world.screen.summary": "No land — only ocean.",
+  "gui.aquanaut.water_world.screen.description": "A world of nothing but deep ocean and Aquanaut's own seas: beneath the waves lie coral forests, jelly jungles, brine mirror gorges, brimstone calderas, crystal nests and the middle-level ocean, layer upon layer.",
+  "gui.aquanaut.water_world.screen.hint": "Select \"Water World\" as the world type and create the world to dive in."
 }

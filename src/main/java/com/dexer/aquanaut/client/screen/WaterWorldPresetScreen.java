@@ -7,7 +7,10 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+
+import java.util.List;
 
 /**
  * The customize screen behind the water world preset, opened from the create-world screen's
@@ -61,7 +64,7 @@ public class WaterWorldPresetScreen extends Screen {
                 .copy().withStyle(ChatFormatting.ITALIC);
 
         int wrapWidth = Math.min(this.width - 40, 360);
-        var descriptionLines = this.font.split(description, wrapWidth);
+        List<FormattedCharSequence> descriptionLines = this.font.split(description, wrapWidth);
         int descriptionBottom = this.height - 52;
         int descriptionTop = descriptionBottom - descriptionLines.size() * (this.font.lineHeight + 2);
         int aquariumTop = 58;
@@ -75,7 +78,7 @@ public class WaterWorldPresetScreen extends Screen {
                 FISH_SCALE, millis, FISH_COUNT, BUBBLE_COUNT, 255);
 
         int lineY = descriptionTop;
-        for (var line : descriptionLines) {
+        for (FormattedCharSequence line : descriptionLines) {
             guiGraphics.drawCenteredString(this.font, line, this.width / 2, lineY, DESCRIPTION_COLOR);
             lineY += this.font.lineHeight + 2;
         }

@@ -61,9 +61,11 @@ import com.dexer.aquanaut.client.renderer.TripodRenderer;
 import com.dexer.aquanaut.client.renderer.item.GasFlowMeterItemRenderer;
 import com.dexer.aquanaut.client.renderer.item.HandheldAirBladderItemRenderer;
 import com.dexer.aquanaut.client.renderer.item.HandheldSearchlightItemRenderer;
+import com.dexer.aquanaut.client.renderer.item.PortableSonarItemRenderer;
 import com.dexer.aquanaut.client.renderer.item.ShellCameraItemRenderer;
 import com.dexer.aquanaut.client.light.ClientDynamicLightManager;
 import com.dexer.aquanaut.client.particle.SoftWispParticle;
+import com.dexer.aquanaut.client.particle.SonarMoteParticle;
 import com.dexer.aquanaut.client.searchlight.SearchlightClientProvider;
 import com.dexer.aquanaut.client.screen.AquariumScreen;
 import com.dexer.aquanaut.client.screen.PhotoRinsingScreen;
@@ -263,6 +265,7 @@ public final class ClientModEvents {
         GasFlowMeterItemRenderer.registerAdditionalModels(event);
         HandheldAirBladderItemRenderer.registerAdditionalModels(event);
         HandheldSearchlightItemRenderer.registerAdditionalModels(event);
+        PortableSonarItemRenderer.registerAdditionalModels(event);
         ShellCameraItemRenderer.registerAdditionalModels(event);
     }
 
@@ -282,6 +285,8 @@ public final class ClientModEvents {
                 ItemRegistry.LARGE_HANDHELD_AIR_BLADDER.get());
         event.registerItem(customRenderer(HandheldSearchlightItemRenderer::getInstance),
                 ItemRegistry.HANDHELD_SEARCHLIGHT.get());
+        event.registerItem(customRenderer(PortableSonarItemRenderer::getInstance),
+                ItemRegistry.PORTABLE_SONAR.get());
         event.registerItem(customRenderer(ShellCameraItemRenderer::getInstance), ItemRegistry.SHELL_CAMERA.get());
         event.registerItem(GasFlowMeterItem.CLIENT_EXTENSIONS, ItemRegistry.GAS_FLOW_METER.get());
     }
@@ -298,6 +303,7 @@ public final class ClientModEvents {
         event.registerSpriteSet(ParticleRegistry.ASH_MOTE.get(),
                 sprites -> new SoftWispParticle.Provider(sprites, 0.30F, 0.30F, 0.33F,
                         0.16F, 45, 0.004F, 0.75F));
+        event.registerSpriteSet(ParticleRegistry.SONAR_MOTE.get(), SonarMoteParticle.Provider::new);
     }
 
     private static IClientItemExtensions customRenderer(Supplier<BlockEntityWithoutLevelRenderer> renderer) {

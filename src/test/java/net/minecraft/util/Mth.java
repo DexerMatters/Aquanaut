@@ -37,6 +37,11 @@ public final class Mth {
         return value < truncated ? truncated - 1 : truncated;
     }
 
+    public static int floor(float value) {
+        int truncated = (int) value;
+        return value < truncated ? truncated - 1 : truncated;
+    }
+
     public static long floorLong(double value) {
         long truncated = (long) value;
         return value < truncated ? truncated - 1L : truncated;

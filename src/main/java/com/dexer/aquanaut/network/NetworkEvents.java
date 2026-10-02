@@ -35,6 +35,10 @@ public final class NetworkEvents {
                 InvestigationProgressSyncPayload.TYPE,
                 InvestigationProgressSyncPayload.STREAM_CODEC,
                 InvestigationProgressSyncPayload::handle);
+        registrar.playToClient(
+                SonarPingPayload.TYPE,
+                SonarPingPayload.STREAM_CODEC,
+                SonarPingPayload::handle);
         registrar.playToServer(
                 DivingEquipmentClickPayload.TYPE,
                 DivingEquipmentClickPayload.STREAM_CODEC,

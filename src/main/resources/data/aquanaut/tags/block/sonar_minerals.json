@@ -1,0 +1,28 @@
+{
+  "values": [
+    "#c:ores",
+    "#minecraft:crystal_sound_blocks",
+    "minecraft:amethyst_block",
+    "minecraft:budding_amethyst",
+    "minecraft:obsidian",
+    "minecraft:crying_obsidian",
+    "minecraft:prismarine",
+    "minecraft:prismarine_bricks",
+    "minecraft:dark_prismarine",
+    "minecraft:sea_lantern",
+    "minecraft:glowstone",
+    "minecraft:quartz_block",
+    "minecraft:quartz_bricks",
+    "minecraft:quartz_pillar",
+    "minecraft:chiseled_quartz_block",
+    "minecraft:smooth_quartz",
+    "minecraft:diamond_block",
+    "minecraft:emerald_block",
+    "minecraft:lapis_block",
+    "aquanaut:crystal_nest_stone",
+    "aquanaut:crystal_druse",
+    "aquanaut:crystal_column",
+    "aquanaut:crystal_sprout",
+    "aquanaut:crystal_fringe"
+  ]
+}

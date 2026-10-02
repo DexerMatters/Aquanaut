@@ -86,6 +86,10 @@ public final class InvestigationBoardPlacementTest {
             case WEST -> 90.0F;
             case SOUTH -> 180.0F;
             case EAST -> 270.0F;
+            // A board hangs on a wall, so it has no renderer yaw for a facing with no horizontal
+            // component. The shim grew UP and DOWN for the sonar's cavity probes; nothing here uses
+            // them, and saying so is better than inventing an angle.
+            case UP, DOWN -> throw new IllegalArgumentException("not a horizontal facing: " + facing);
         };
     }
 

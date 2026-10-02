@@ -21,6 +21,7 @@ import com.dexer.aquanaut.common.item.HandheldSearchlightItem;
 import com.dexer.aquanaut.common.item.LargeHandheldAirBladderItem;
 import com.dexer.aquanaut.common.item.HarpoonItem;
 import com.dexer.aquanaut.common.item.NotebookItem;
+import com.dexer.aquanaut.common.item.PortableSonarItem;
 import com.dexer.aquanaut.common.item.ScoopNetItem;
 import com.dexer.aquanaut.common.item.ShellCameraItem;
 import com.dexer.aquanaut.common.item.SubmarineCompassItem;
@@ -508,6 +509,8 @@ public final class ItemRegistry {
                         properties -> new GasFlowMeterItem(properties.stacksTo(1)));
         public static final DeferredItem<HandheldSearchlightItem> HANDHELD_SEARCHLIGHT = ITEMS.registerItem(
                         "handheld_searchlight", properties -> new HandheldSearchlightItem(properties));
+        public static final DeferredItem<PortableSonarItem> PORTABLE_SONAR = ITEMS.registerItem(
+                        "portable_sonar", properties -> new PortableSonarItem(properties));
         public static final DeferredItem<ShellCameraItem> SHELL_CAMERA = ITEMS.registerItem("shell_camera",
                         ShellCameraItem::new);
         public static final DeferredItem<Item> PHOTOSENSITIVE_FILM = ITEMS.registerSimpleItem("photosensitive_film");
@@ -758,6 +761,7 @@ public final class ItemRegistry {
                         BUBBLE_GUN, output -> {
                                 output.accept(GAS_FLOW_METER.get());
                                 output.accept(HANDHELD_SEARCHLIGHT.get());
+                                output.accept(PORTABLE_SONAR.get());
                                 output.accept(SHELL_CAMERA.get());
                                 output.accept(DEVELOPED_PHOTO.get());
                                 output.accept(CURSOR.get());

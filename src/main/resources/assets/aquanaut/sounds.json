@@ -166,5 +166,60 @@
                 "pitch": 1.45
             }
         ]
+    },
+    "sonar_ping": {
+        "subtitle": "subtitles.aquanaut.sonar_ping",
+        "sounds": [
+            {
+                "name": "minecraft:block.amethyst_block.resonate",
+                "type": "event",
+                "volume": 0.85,
+                "pitch": 1.85
+            }
+        ]
+    },
+    "sonar_echo_biological": {
+        "subtitle": "subtitles.aquanaut.sonar_echo_biological",
+        "sounds": [
+            {
+                "name": "minecraft:entity.dolphin.ambient_water",
+                "type": "event",
+                "volume": 0.5,
+                "pitch": 1.25
+            }
+        ]
+    },
+    "sonar_echo_mineral": {
+        "subtitle": "subtitles.aquanaut.sonar_echo_mineral",
+        "sounds": [
+            {
+                "name": "minecraft:block.amethyst_block.chime",
+                "type": "event",
+                "volume": 0.9,
+                "pitch": 1.95
+            }
+        ]
+    },
+    "sonar_echo_cavity": {
+        "subtitle": "subtitles.aquanaut.sonar_echo_cavity",
+        "sounds": [
+            {
+                "name": "minecraft:block.conduit.deactivate",
+                "type": "event",
+                "volume": 0.8,
+                "pitch": 0.55
+            }
+        ]
+    },
+    "sonar_echo_abyss": {
+        "subtitle": "subtitles.aquanaut.sonar_echo_abyss",
+        "sounds": [
+            {
+                "name": "minecraft:entity.elder_guardian.curse",
+                "type": "event",
+                "volume": 0.9,
+                "pitch": 0.65
+            }
+        ]
     }
 }

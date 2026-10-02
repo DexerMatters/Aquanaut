@@ -250,6 +250,7 @@
   "item.aquanaut.handheld_air_bladder": "手持气囊",
   "tooltip.aquanaut.handheld_air_bladder.floats": "手持时可持续漂浮，不会下沉",
   "item.aquanaut.handheld_searchlight": "手持探照灯",
+  "item.aquanaut.portable_sonar": "便携声纳",
   "item.aquanaut.shell_camera": "贝壳相机",
   "tooltip.aquanaut.shell_camera.hold": "按住右键进行取景",
   "tooltip.aquanaut.shell_camera.film": "需要准备好的感光胶片",
@@ -277,6 +278,9 @@
   "tooltip.aquanaut.handheld_searchlight.off": "灯光已熄灭",
   "tooltip.aquanaut.handheld_searchlight.hint": "右键开关探照灯",
   "tooltip.aquanaut.handheld_searchlight.beam": "空气中可投射 %s 格平滑真实光源，水下 %s 格",
+  "tooltip.aquanaut.portable_sonar.ranging": "声呐已激活",
+  "tooltip.aquanaut.portable_sonar.idle": "声呐待机",
+  "tooltip.aquanaut.portable_sonar.hint": "右键发射声纳脉冲探测周围，潜行右键关闭",
   "item.aquanaut.large_handheld_air_bladder": "大型手持气囊",
   "tooltip.aquanaut.large_handheld_air_bladder.ascends": "手持时迅速上浮至水面",
   "item.aquanaut.fang": "尖牙",
@@ -574,5 +578,12 @@
   "generator.aquanaut.water_world": "水世界",
   "gui.aquanaut.water_world.screen.summary": "无陆之地，唯有汪洋。",
   "gui.aquanaut.water_world.screen.description": "这个世界只由深海群系与 Aquanaut 的海洋群系构成：广阔深海之下，珊瑚森林、凝胶丛林、盐镜峡、硫磺火山区、水晶巢与中层海洋层层展开。",
-  "gui.aquanaut.water_world.screen.hint": "将世界类型选为「水世界」，然后创建世界即可潜入。"
+  "gui.aquanaut.water_world.screen.hint": "将世界类型选为「水世界」，然后创建世界即可潜入。",
+  "hud.aquanaut.sonar.range": "%s 格",
+  "subtitles.aquanaut.sonar_ping": "声纳脉冲",
+  "subtitles.aquanaut.sonar_echo_biological": "柔和回声",
+  "subtitles.aquanaut.sonar_echo_mineral": "尖锐回声",
+  "subtitles.aquanaut.sonar_echo_cavity": "低沉回声",
+  "subtitles.aquanaut.sonar_echo_abyss": "深渊长回声",
+  "hud.aquanaut.sonar.title": "声纳"
 }

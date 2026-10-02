@@ -249,6 +249,7 @@
   "item.aquanaut.handheld_air_bladder": "Handheld Air Bladder",
   "tooltip.aquanaut.handheld_air_bladder.floats": "Keeps you afloat while held",
   "item.aquanaut.handheld_searchlight": "Handheld Searchlight",
+  "item.aquanaut.portable_sonar": "Portable Sonar",
   "item.aquanaut.shell_camera": "Shell Camera",
   "tooltip.aquanaut.shell_camera.hold": "Hold right-click to frame a photograph",
   "tooltip.aquanaut.shell_camera.film": "Requires prepared photosensitive film",
@@ -276,6 +277,9 @@
   "tooltip.aquanaut.handheld_searchlight.off": "Lamp dark",
   "tooltip.aquanaut.handheld_searchlight.hint": "Right-click to switch the lamp on or off",
   "tooltip.aquanaut.handheld_searchlight.beam": "Creates a smooth real-light pool %s blocks through air, %s through water",
+  "tooltip.aquanaut.portable_sonar.ranging": "Ranging",
+  "tooltip.aquanaut.portable_sonar.idle": "Standby",
+  "tooltip.aquanaut.portable_sonar.hint": "Right-click to sound the water; sneak-right-click to power down",
   "item.aquanaut.large_handheld_air_bladder": "Large Handheld Air Bladder",
   "tooltip.aquanaut.large_handheld_air_bladder.ascends": "Rockets you up to the surface",
   "item.aquanaut.fang": "Fang",
@@ -574,5 +578,12 @@
   "generator.aquanaut.water_world": "Water World",
   "gui.aquanaut.water_world.screen.summary": "No land — only ocean.",
   "gui.aquanaut.water_world.screen.description": "A world of nothing but deep ocean and Aquanaut's own seas: beneath the waves lie coral forests, jelly jungles, brine mirror gorges, brimstone calderas, crystal nests and the middle-level ocean, layer upon layer.",
-  "gui.aquanaut.water_world.screen.hint": "Select \"Water World\" as the world type and create the world to dive in."
+  "gui.aquanaut.water_world.screen.hint": "Select \"Water World\" as the world type and create the world to dive in.",
+  "hud.aquanaut.sonar.range": "%s m",
+  "subtitles.aquanaut.sonar_ping": "Sonar pings",
+  "subtitles.aquanaut.sonar_echo_biological": "Soft echo returns",
+  "subtitles.aquanaut.sonar_echo_mineral": "Sharp echo returns",
+  "subtitles.aquanaut.sonar_echo_cavity": "Hollow echo returns",
+  "subtitles.aquanaut.sonar_echo_abyss": "Long echo returns",
+  "hud.aquanaut.sonar.title": "Sonar"
 }

@@ -1,0 +1,16 @@
+{
+  "values": [
+    "aquanaut:three_headed_shark",
+    "aquanaut:giant_abyss_worm",
+    "aquanaut:giant_octopus_tentacle",
+    "aquanaut:pale_abyss_hydra",
+    {
+      "id": "minecraft:elder_guardian",
+      "required": false
+    },
+    {
+      "id": "minecraft:wither",
+      "required": false
+    }
+  ]
+}

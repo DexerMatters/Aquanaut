@@ -1,6 +1,7 @@
 package com.dexer.aquanaut.core;
 
 import com.dexer.aquanaut.Aquanaut;
+import com.dexer.aquanaut.common.sonar.SonarSignal;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -34,6 +35,32 @@ public final class SoundRegistry {
             "submarine_drone_retrieve");
     /** A link was refused: the drone is already under another pilot. */
     public static final DeferredHolder<SoundEvent, SoundEvent> SUBMARINE_DRONE_REJECT = register("submarine_drone_reject");
+
+    // ── portable sonar ────────────────────────────────────────────────────────
+    /** The transducer firing. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> SONAR_PING = register("sonar_ping");
+    /** A body answering: a soft, rounded reflection. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> SONAR_ECHO_BIOLOGICAL = register(
+            "sonar_echo_biological");
+    /** Crystal and ore answering: a hard, bright ring. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> SONAR_ECHO_MINERAL = register("sonar_echo_mineral");
+    /** A void behind a face answering: a low, hollow note. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> SONAR_ECHO_CAVITY = register("sonar_echo_cavity");
+    /** The long echo. */
+    public static final DeferredHolder<SoundEvent, SoundEvent> SONAR_ECHO_ABYSS = register("sonar_echo_abyss");
+
+    /**
+     * The voice a contact answers in. The mapping lives here rather than on {@link SonarSignal} so
+     * that the shared table stays free of game types and can be checked without a registry.
+     */
+    public static SoundEvent echo(SonarSignal signal) {
+        return switch (signal) {
+            case BIOLOGICAL -> SONAR_ECHO_BIOLOGICAL.get();
+            case MINERAL -> SONAR_ECHO_MINERAL.get();
+            case CAVITY -> SONAR_ECHO_CAVITY.get();
+            case ABYSS -> SONAR_ECHO_ABYSS.get();
+        };
+    }
 
     private static DeferredHolder<SoundEvent, SoundEvent> register(String name) {
         ResourceLocation id = ResourceLocation.fromNamespaceAndPath(Aquanaut.MODID, name);

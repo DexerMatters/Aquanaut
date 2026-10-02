@@ -38,6 +38,12 @@ public final class BlockPos implements Comparable<BlockPos> {
         return new BlockPos(this.x + dx, this.y + dy, this.z + dz);
     }
 
+    public BlockPos relative(Direction direction, int distance) {
+        return this.offset(direction.getStepX() * distance,
+                direction.getStepY() * distance,
+                direction.getStepZ() * distance);
+    }
+
     public BlockPos west() {
         return new BlockPos(this.x - 1, this.y, this.z);
     }

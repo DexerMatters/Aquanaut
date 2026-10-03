@@ -37,6 +37,9 @@ public final class MiddleLevelOceanColumnRules {
         if (biome.equals(JellyJunglePlacement.location())) {
             return TargetBiome.JELLY_JUNGLE;
         }
+        if (biome.equals(MudZonePlacement.location())) {
+            return TargetBiome.MUD_ZONE;
+        }
         if (biome.equals(MiddleLevelOceanPlacement.location())) {
             return TargetBiome.MIDDLE_LEVEL_OCEAN;
         }
@@ -76,6 +79,7 @@ public final class MiddleLevelOceanColumnRules {
         NONE,
         CORAL_FOREST,
         JELLY_JUNGLE,
+        MUD_ZONE,
         MIDDLE_LEVEL_OCEAN,
         BRINE_MIRROR_GORGE,
         BRIMSTONE_CALDERA,

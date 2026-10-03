@@ -1,0 +1,12 @@
+{
+  "species_id": "aquanaut:ambush_fish",
+  "entity_id": "aquanaut:ambush_fish",
+  "category": "friendly",
+  "diet": "carnivorous",
+  "blocks": [
+    {"type":"paragraph","stage":"encountered","text":"gui.aquanaut.notebook.waterlife.ambush_fish.paragraph_1"},
+    {"type":"component","stage":"encountered","component_kind":"sprite","resource":"aquanaut:item/ambush_fish_spawn_egg","caption":"gui.aquanaut.notebook.caption.identification_plate"},
+    {"type":"paragraph","stage":"captured","text":"gui.aquanaut.notebook.waterlife.ambush_fish.paragraph_2"},
+    {"type":"component","stage":"captured","component_kind":"model","resource":"aquanaut:ambush_fish","caption":"gui.aquanaut.notebook.caption.morphology_record"}
+  ]
+}

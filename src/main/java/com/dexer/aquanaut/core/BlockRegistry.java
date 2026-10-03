@@ -5,6 +5,10 @@ import com.dexer.aquanaut.common.block.AshLayerBlock;
 import com.dexer.aquanaut.common.block.CrystalClusterBlock;
 import com.dexer.aquanaut.common.block.CrystalColumnBlock;
 import com.dexer.aquanaut.common.block.DissectionTableBlock;
+import com.dexer.aquanaut.common.block.MudBlock;
+import com.dexer.aquanaut.common.block.NutrientRichMudBlock;
+import com.dexer.aquanaut.common.block.ParasiticMudBlock;
+import com.dexer.aquanaut.common.block.ShellPileBlock;
 import com.dexer.aquanaut.common.block.DroopingSeaweedBlock;
 import com.dexer.aquanaut.common.block.FishingNetBlock;
 import com.dexer.aquanaut.common.block.GasPipeBlock;
@@ -23,9 +27,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ColoredFallingBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.SlimeBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
@@ -82,13 +88,47 @@ public final class BlockRegistry {
             MapColor.QUARTZ, 3.5F, 5.0F, SoundType.STONE);
 
     // Natural sediment / stone blocks
+    public static final DeferredBlock<MudBlock> MUD = BLOCKS.register("mud",
+            () -> new MudBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_BROWN).strength(0.7F, 0.9F)
+                    .sound(SoundType.MUD)
+                    .isSuffocating((state, level, pos) -> false)));
+    public static final DeferredBlock<Block> MUD_BRICKS = cube("mud_bricks",
+            MapColor.TERRACOTTA_BROWN, 1.5F, 3.0F, SoundType.STONE);
+    public static final DeferredBlock<StairBlock> MUD_BRICK_STAIRS = BLOCKS.register("mud_brick_stairs",
+            () -> new StairBlock(MUD_BRICKS.get().defaultBlockState(), BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_BROWN).strength(1.5F, 3.0F).sound(SoundType.STONE)
+                    .requiresCorrectToolForDrops()));
+    public static final DeferredBlock<SlabBlock> MUD_BRICK_SLAB = BLOCKS.register("mud_brick_slab",
+            () -> new SlabBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_BROWN).strength(1.5F, 3.0F).sound(SoundType.STONE)
+                    .requiresCorrectToolForDrops()));
+    public static final DeferredBlock<WallBlock> MUD_BRICK_WALL = BLOCKS.register("mud_brick_wall",
+            () -> new WallBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_BROWN).strength(1.5F, 3.0F).sound(SoundType.STONE)
+                    .requiresCorrectToolForDrops()));
+    public static final DeferredBlock<ParasiticMudBlock> PARASITIC_MUD = BLOCKS.register("parasitic_mud",
+            () -> new ParasiticMudBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_BROWN).strength(0.7F, 0.9F).sound(SoundType.MUD)));
+    public static final DeferredBlock<Block> FOSSIL_BED = cube("fossil_bed",
+            MapColor.TERRACOTTA_GRAY, 1.5F, 3.0F, SoundType.STONE);
+    public static final DeferredBlock<ShellPileBlock> SHELL_PILE = BLOCKS.register("shell_pile",
+            () -> new ShellPileBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.SAND).strength(0.5F, 0.8F).sound(SoundType.CORAL_BLOCK)));
+    public static final DeferredBlock<RotatedPillarBlock> SEDIMENT_COLUMN = pillar("sediment_column",
+            MapColor.COLOR_GRAY, 1.8F, 3.0F, SoundType.STONE, true);
+    public static final DeferredBlock<Block> FOSSIL_DISPLAY = cube("fossil_display",
+            MapColor.TERRACOTTA_GRAY, 2.0F, 3.0F, SoundType.STONE);
     public static final DeferredBlock<ColoredFallingBlock> CORAL_SAND = BLOCKS.register("coral_sand",
             () -> new ColoredFallingBlock(new ColorRGBA(0xFFC6C0B7), BlockBehaviour.Properties.of()
                     .mapColor(MapColor.TERRACOTTA_LIGHT_GRAY)
                     .strength(0.6F, 0.8F)
                     .sound(SoundType.SAND)));
-    public static final DeferredBlock<Block> NUTRIENT_RICH_MUD = cube("nutrient_rich_mud",
-            MapColor.TERRACOTTA_BROWN, 0.7F, 0.9F, SoundType.MUD);
+    public static final DeferredBlock<NutrientRichMudBlock> NUTRIENT_RICH_MUD = BLOCKS.register("nutrient_rich_mud",
+            () -> new NutrientRichMudBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_BROWN)
+                    .strength(0.7F, 0.9F)
+                    .sound(SoundType.MUD)));
     public static final DeferredBlock<DroopingSeaweedBlock> DROOPING_SEAWEED = seaweed("drooping_seaweed");
     public static final DeferredBlock<Block> SHALE = cube("shale",
             MapColor.COLOR_GRAY, 1.5F, 3.0F, SoundType.STONE);

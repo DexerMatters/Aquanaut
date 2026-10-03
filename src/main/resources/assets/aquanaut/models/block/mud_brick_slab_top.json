@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:block/slab_top",
+  "textures": {"bottom": "aquanaut:block/mud_bricks", "side": "aquanaut:block/mud_bricks", "top": "aquanaut:block/mud_bricks"}
+}

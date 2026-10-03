@@ -624,6 +624,7 @@ public class NotebookScreen extends Screen {
         return translatedOrFallback(diet.translationKey(), switch (diet) {
             case HERBIVOROUS -> "Herbivorous";
             case CARNIVOROUS -> "Carnivorous";
+            case OMNIVOROUS -> "Omnivorous";
             case ENERGEVOROUS -> "Energivorous";
         });
     }

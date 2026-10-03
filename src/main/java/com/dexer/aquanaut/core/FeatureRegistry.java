@@ -26,6 +26,7 @@ import com.dexer.aquanaut.common.worldgen.SaltDiapirFeature;
 import com.dexer.aquanaut.common.worldgen.SmokerClusterFeature;
 import com.dexer.aquanaut.common.worldgen.SulfurVeinFeature;
 import com.dexer.aquanaut.common.worldgen.VentFloraFeature;
+import com.dexer.aquanaut.common.worldgen.MudZoneSedimentFeature;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.neoforged.bus.api.IEventBus;
@@ -90,6 +91,8 @@ public final class FeatureRegistry {
             FEATURES.register("gypsum_garden", GypsumGardenFeature::new);
     public static final DeferredHolder<Feature<?>, SaltCascadeFeature> SALT_CASCADE =
             FEATURES.register("salt_cascade", SaltCascadeFeature::new);
+    public static final DeferredHolder<Feature<?>, MudZoneSedimentFeature> MUD_ZONE_SEDIMENT = FEATURES.register(
+            "mud_zone_sediment", MudZoneSedimentFeature::new);
 
     private FeatureRegistry() {
     }

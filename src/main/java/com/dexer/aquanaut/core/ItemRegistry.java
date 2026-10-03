@@ -56,6 +56,22 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ItemRegistry {
         public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Aquanaut.MODID);
+        public static final DeferredItem<Item> MUD_BALL = ITEMS.registerSimpleItem("mud_ball");
+        public static final DeferredItem<Item> NUTRIENT_MUD_BALL = ITEMS.registerSimpleItem("nutrient_mud_ball");
+        public static final DeferredItem<Item> FOSSIL_FRAGMENT = ITEMS.registerSimpleItem("fossil_fragment");
+        public static final DeferredItem<BlockItem> MUD = blockItem("mud", BlockRegistry.MUD);
+        public static final DeferredItem<BlockItem> MUD_BRICKS = blockItem("mud_bricks", BlockRegistry.MUD_BRICKS);
+        public static final DeferredItem<BlockItem> MUD_BRICK_STAIRS = blockItem("mud_brick_stairs",
+                        BlockRegistry.MUD_BRICK_STAIRS);
+        public static final DeferredItem<BlockItem> MUD_BRICK_SLAB = blockItem("mud_brick_slab",
+                        BlockRegistry.MUD_BRICK_SLAB);
+        public static final DeferredItem<BlockItem> MUD_BRICK_WALL = blockItem("mud_brick_wall",
+                        BlockRegistry.MUD_BRICK_WALL);
+        public static final DeferredItem<BlockItem> PARASITIC_MUD = blockItem("parasitic_mud", BlockRegistry.PARASITIC_MUD);
+        public static final DeferredItem<BlockItem> FOSSIL_BED = blockItem("fossil_bed", BlockRegistry.FOSSIL_BED);
+        public static final DeferredItem<BlockItem> SHELL_PILE = blockItem("shell_pile", BlockRegistry.SHELL_PILE);
+        public static final DeferredItem<BlockItem> SEDIMENT_COLUMN = blockItem("sediment_column", BlockRegistry.SEDIMENT_COLUMN);
+        public static final DeferredItem<BlockItem> FOSSIL_DISPLAY = blockItem("fossil_display", BlockRegistry.FOSSIL_DISPLAY);
         public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(
                         Registries.CREATIVE_MODE_TAB, Aquanaut.MODID);
 
@@ -66,6 +82,14 @@ public final class ItemRegistry {
         public static final DeferredItem<Item> SARDINE = ITEMS.registerSimpleItem("sardine");
         public static final DeferredItem<Item> COOKED_SARDINE = ITEMS.registerSimpleItem("cooked_sardine",
                         food(4, 0.6F));
+        public static final DeferredItem<Item> CRAB_MEAT = ITEMS.registerSimpleItem("crab_meat",
+                        food(3, 0.3F));
+        public static final DeferredItem<Item> COOKED_CRAB_MEAT = ITEMS.registerSimpleItem("cooked_crab_meat",
+                        food(6, 0.8F));
+        public static final DeferredItem<Item> WORM_MUSCLE = ITEMS.registerSimpleItem("worm_muscle", food(3, 0.3F));
+        public static final DeferredItem<Item> HUMUS_GEL = ITEMS.registerSimpleItem("humus_gel");
+        public static final DeferredItem<Item> ANCIENT_SHELL_FRAGMENT = ITEMS.registerSimpleItem("ancient_shell_fragment");
+        public static final DeferredItem<DivingEquipmentItem> MUDWALKER_CHARM = flippersItem("mudwalker_charm", 256, 1.0F);
 
         public static final DeferredItem<Item> SHARK_FINS = ITEMS.registerSimpleItem("shark_fins");
         public static final DeferredItem<Item> COOKED_SHARK_FINS = ITEMS.registerSimpleItem("cooked_shark_fins",
@@ -596,6 +620,20 @@ public final class ItemRegistry {
         public static final DeferredItem<DeferredSpawnEggItem> FLATFISH_SPAWN_EGG = spawnEgg(
                         "flatfish_spawn_egg",
                         EntityRegistry.FLATFISH, 0x6E6C4B, 0xC3B9A0);
+        public static final DeferredItem<DeferredSpawnEggItem> MUD_SILVERFISH_SPAWN_EGG = spawnEgg(
+                        "mud_silverfish_spawn_egg", EntityRegistry.MUD_SILVERFISH, 0x4B3A2C, 0x1E1713);
+        public static final DeferredItem<DeferredSpawnEggItem> AMBUSH_FISH_SPAWN_EGG = spawnEgg(
+                        "ambush_fish_spawn_egg", EntityRegistry.AMBUSH_FISH, 0x6B6250, 0x30281F);
+        public static final DeferredItem<DeferredSpawnEggItem> GARDEN_EEL_SPAWN_EGG = spawnEgg(
+                        "garden_eel_spawn_egg", EntityRegistry.GARDEN_EEL, 0x8A7A43, 0x3B4A2B);
+        public static final DeferredItem<DeferredSpawnEggItem> HERMIT_CRAB_SPAWN_EGG = spawnEgg(
+                        "hermit_crab_spawn_egg", EntityRegistry.HERMIT_CRAB, 0xA56D45, 0x59402C);
+        public static final DeferredItem<DeferredSpawnEggItem> SEDIMENT_WORM_SPAWN_EGG = spawnEgg(
+                        "sediment_worm_spawn_egg", EntityRegistry.SEDIMENT_WORM, 0x59463D, 0x2E241F);
+        public static final DeferredItem<DeferredSpawnEggItem> HUMUS_JELLY_SPAWN_EGG = spawnEgg(
+                        "humus_jelly_spawn_egg", EntityRegistry.HUMUS_JELLY, 0x4D663B, 0x26351F);
+        public static final DeferredItem<DeferredSpawnEggItem> ANCIENT_NAUTILUS_SPAWN_EGG = spawnEgg(
+                        "ancient_nautilus_spawn_egg", EntityRegistry.ANCIENT_NAUTILUS, 0xA89C83, 0x574A3C);
 
         public static final DeferredItem<DeferredSpawnEggItem> VAMPREY_SPAWN_EGG = spawnEgg(
                         "vamprey_spawn_egg",
@@ -656,7 +694,13 @@ public final class ItemRegistry {
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FOOD_TAB = tab("food",
                         COOKED_SARDINE, output -> {
                                 output.accept(COOKED_OCTOPUS_SHREDS.get());
-                                output.accept(COOKED_SARDINE.get());
+                                 output.accept(COOKED_SARDINE.get());
+                                 output.accept(CRAB_MEAT.get());
+                                  output.accept(COOKED_CRAB_MEAT.get());
+                                 output.accept(WORM_MUSCLE.get());
+                                 output.accept(HUMUS_GEL.get());
+                                 output.accept(ANCIENT_SHELL_FRAGMENT.get());
+                                 output.accept(MUDWALKER_CHARM.get());
                                 output.accept(COOKED_SHARK_FINS.get());
                                 output.accept(FISHNUT.get());
                                 output.accept(COOKED_FISHNUT.get());
@@ -691,7 +735,7 @@ public final class ItemRegistry {
                                 output.accept(TRIPOD_SPAWN_EGG.get());
                                 output.accept(BLUE_RINGED_WORMFISH_SPAWN_EGG.get());
                                 output.accept(BLUE_JELLYFISH_SPAWN_EGG.get());
-                                output.accept(FLATFISH_SPAWN_EGG.get());
+                                 output.accept(FLATFISH_SPAWN_EGG.get());
                                 output.accept(VAMPREY_SPAWN_EGG.get());
                                 output.accept(ORESUCKER_SPAWN_EGG.get());
                                 output.accept(FLAGELLONAUTILUS_SPAWN_EGG.get());
@@ -705,7 +749,15 @@ public final class ItemRegistry {
                                 output.accept(GEMINI_JELLYFISH_SPAWN_EGG.get());
                                 output.accept(ECOFISH_SPAWN_EGG.get());
                                 output.accept(PALE_ABYSS_HYDRA_SPAWN_EGG.get());
-                                output.accept(THREE_HEADED_SHARK_SPAWN_EGG.get());
+                                 output.accept(THREE_HEADED_SHARK_SPAWN_EGG.get());
+                                  output.accept(FLATFISH_SPAWN_EGG.get());
+                                 output.accept(MUD_SILVERFISH_SPAWN_EGG.get());
+                                 output.accept(AMBUSH_FISH_SPAWN_EGG.get());
+                                 output.accept(GARDEN_EEL_SPAWN_EGG.get());
+                                  output.accept(HERMIT_CRAB_SPAWN_EGG.get());
+                                 output.accept(SEDIMENT_WORM_SPAWN_EGG.get());
+                                 output.accept(HUMUS_JELLY_SPAWN_EGG.get());
+                                 output.accept(ANCIENT_NAUTILUS_SPAWN_EGG.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MATERIALS_TAB = tab("materials",
@@ -747,11 +799,15 @@ public final class ItemRegistry {
                                 output.accept(RING_RIB.get());
                                 output.accept(ROTTEN_TISSUE.get());
                                 output.accept(SPRING.get());
-                                output.accept(THERMOPHILIC_SAMPLE_GOLD.get());
+                                 output.accept(THERMOPHILIC_SAMPLE_GOLD.get());
                                 output.accept(THERMOPHILIC_SAMPLE_RUST.get());
                                 output.accept(THERMOPHILIC_SAMPLE_OLIVE.get());
                                 output.accept(PHOTOSENSITIVE_FILM.get());
-                                output.accept(BRINE_DEVELOPING_SALTS.get());
+                                 output.accept(BRINE_DEVELOPING_SALTS.get());
+                                  output.accept(MUD_BALL.get());
+                                  output.accept(NUTRIENT_MUD_BALL.get());
+                                 output.accept(MUD_BALL.get());
+                                 output.accept(NUTRIENT_MUD_BALL.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TOOLS_TAB = tab("tools",
@@ -880,6 +936,19 @@ public final class ItemRegistry {
                                 // Jelly Jungle: the seaweed forests and the jelly bulges the
                                 // jungle vegetation grows through and wraps in kelp.
                                 output.header(CreativeTabHeader.biome(BiomeRegistry.JELLY_JUNGLE));
+                                 output.accept(CORAL_SAND.get());
+                                 output.accept(MUD.get());
+                                 output.accept(MUD_BRICKS.get());
+                                 output.accept(MUD_BRICK_STAIRS.get());
+                                 output.accept(MUD_BRICK_SLAB.get());
+                                 output.accept(MUD_BRICK_WALL.get());
+                                  output.accept(PARASITIC_MUD.get());
+                                 output.accept(FOSSIL_BED.get());
+                                  output.accept(FOSSIL_FRAGMENT.get());
+                                   output.accept(SHELL_PILE.get());
+                                 output.accept(SEDIMENT_COLUMN.get());
+                                 output.accept(FOSSIL_DISPLAY.get());
+                                 output.accept(NUTRIENT_RICH_MUD.get());
                                 output.accept(DROOPING_SEAWEED.get());
                                 output.accept(SEAWEED.get());
                                 output.accept(SEAWEED_FRUIT.get());

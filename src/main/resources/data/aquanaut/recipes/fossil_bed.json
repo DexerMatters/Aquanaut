@@ -1,0 +1,6 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["###", "###", "###"],
+  "key": {"#": {"item": "aquanaut:fossil_fragment"}},
+  "result": {"id": "aquanaut:fossil_bed", "count": 1}
+}

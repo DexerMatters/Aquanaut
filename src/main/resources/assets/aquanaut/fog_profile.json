@@ -27,6 +27,12 @@
       "far": 64.0,
       "cast": 0.48
     },
+    "aquanaut:mud_zone": {
+      "__comment": "Suspended sediment and low-oxygen murk: close, brown, and heavy.",
+      "near": -3.0,
+      "far": 72.0,
+      "cast": 0.62
+    },
     "aquanaut:brine_mirror_gorge": {
       "__comment": "The gorge is the one place in the middle sea where the water stays clear.",
       "near": -6.0,

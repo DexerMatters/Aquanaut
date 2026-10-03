@@ -1,0 +1,6 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["###", "###"],
+  "key": {"#": {"item": "aquanaut:mud_bricks"}},
+  "result": {"id": "aquanaut:mud_brick_wall", "count": 6}
+}

@@ -3,6 +3,7 @@ package com.dexer.aquanaut.common.notebook;
 public enum NotebookDiet {
     HERBIVOROUS,
     CARNIVOROUS,
+    OMNIVOROUS,
     ENERGEVOROUS;
 
     public String serializedName() {

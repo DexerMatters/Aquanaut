@@ -8,6 +8,7 @@ import com.dexer.aquanaut.common.worldgen.DeepSeaPlacement;
 import com.dexer.aquanaut.common.worldgen.JellyJunglePlacement;
 import com.dexer.aquanaut.common.worldgen.MiddleLevelOceanPlacement;
 import com.dexer.aquanaut.common.worldgen.MiddleLevelOceanRegion;
+import com.dexer.aquanaut.common.worldgen.MudZonePlacement;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
@@ -20,6 +21,8 @@ public final class BiomeRegistry {
             CoralForestPlacement.location());
     public static final ResourceKey<Biome> JELLY_JUNGLE = ResourceKey.create(Registries.BIOME,
             JellyJunglePlacement.location());
+    public static final ResourceKey<Biome> MUD_ZONE = ResourceKey.create(Registries.BIOME,
+            MudZonePlacement.location());
     public static final ResourceKey<Biome> BRINE_MIRROR_GORGE = ResourceKey.create(Registries.BIOME,
             BrineMirrorGorgePlacement.location());
     public static final ResourceKey<Biome> BRIMSTONE_CALDERA = ResourceKey.create(Registries.BIOME,

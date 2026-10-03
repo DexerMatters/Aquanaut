@@ -29,6 +29,13 @@ import com.dexer.aquanaut.common.entity.CreeporpedoEntity;
 import com.dexer.aquanaut.common.entity.DonutfishEntity;
 import com.dexer.aquanaut.common.entity.ElectrofishEntity;
 import com.dexer.aquanaut.common.entity.FlatfishEntity;
+import com.dexer.aquanaut.common.entity.AmbushFishEntity;
+import com.dexer.aquanaut.common.entity.GardenEelEntity;
+import com.dexer.aquanaut.common.entity.HermitCrabEntity;
+import com.dexer.aquanaut.common.entity.MudSilverfishEntity;
+import com.dexer.aquanaut.common.entity.SedimentWormEntity;
+import com.dexer.aquanaut.common.entity.HumusJellyEntity;
+import com.dexer.aquanaut.common.entity.AncientNautilusEntity;
 import com.dexer.aquanaut.common.entity.GloomgazerEntity;
 import com.dexer.aquanaut.common.entity.LightningEntity;
 import com.dexer.aquanaut.common.entity.LightingWormEntity;
@@ -290,7 +297,29 @@ public class EntityRegistry {
     public static final DeferredHolder<EntityType<?>, EntityType<FlatfishEntity>> FLATFISH = ENTITIES
             .register("flatfish",
                     () -> EntityType.Builder.<FlatfishEntity>of(FlatfishEntity::new, MobCategory.WATER_CREATURE)
-                            .sized(1.3F, 0.65F).build("flatfish"));
+                             .sized(1.3F, 0.65F).build("flatfish"));
+    public static final DeferredHolder<EntityType<?>, EntityType<MudSilverfishEntity>> MUD_SILVERFISH = ENTITIES
+            .register("mud_silverfish", () -> EntityType.Builder
+                    .<MudSilverfishEntity>of(MudSilverfishEntity::new, MobCategory.MONSTER)
+                    .sized(0.4F, 0.3F).build("mud_silverfish"));
+    public static final DeferredHolder<EntityType<?>, EntityType<AmbushFishEntity>> AMBUSH_FISH = ENTITIES.register(
+            "ambush_fish", () -> EntityType.Builder.<AmbushFishEntity>of(AmbushFishEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(0.8F, 0.3F).build("ambush_fish"));
+    public static final DeferredHolder<EntityType<?>, EntityType<GardenEelEntity>> GARDEN_EEL = ENTITIES.register(
+            "garden_eel", () -> EntityType.Builder.<GardenEelEntity>of(GardenEelEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(0.35F, 0.9F).build("garden_eel"));
+    public static final DeferredHolder<EntityType<?>, EntityType<HermitCrabEntity>> HERMIT_CRAB = ENTITIES.register(
+            "hermit_crab", () -> EntityType.Builder.<HermitCrabEntity>of(HermitCrabEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(0.8F, 0.6F).build("hermit_crab"));
+    public static final DeferredHolder<EntityType<?>, EntityType<SedimentWormEntity>> SEDIMENT_WORM = ENTITIES.register(
+            "sediment_worm", () -> EntityType.Builder.<SedimentWormEntity>of(SedimentWormEntity::new, MobCategory.MONSTER)
+                    .sized(0.9F, 0.35F).build("sediment_worm"));
+    public static final DeferredHolder<EntityType<?>, EntityType<HumusJellyEntity>> HUMUS_JELLY = ENTITIES.register(
+            "humus_jelly", () -> EntityType.Builder.<HumusJellyEntity>of(HumusJellyEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(0.7F, 0.8F).build("humus_jelly"));
+    public static final DeferredHolder<EntityType<?>, EntityType<AncientNautilusEntity>> ANCIENT_NAUTILUS = ENTITIES.register(
+            "ancient_nautilus", () -> EntityType.Builder.<AncientNautilusEntity>of(AncientNautilusEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(0.9F, 0.7F).build("ancient_nautilus"));
 
     public static final DeferredHolder<EntityType<?>, EntityType<VampreyEntity>> VAMPREY = ENTITIES.register(
             "vamprey",
@@ -494,6 +523,13 @@ public class EntityRegistry {
         event.put(EntityRegistry.ECOFISH.get(), EcofishEntity.createAttributes());
         event.put(EntityRegistry.PALE_ABYSS_HYDRA.get(), PaleAbyssHydraEntity.createAttributes());
         event.put(EntityRegistry.THREE_HEADED_SHARK.get(), ThreeHeadedSharkEntity.createAttributes());
+        event.put(EntityRegistry.MUD_SILVERFISH.get(), MudSilverfishEntity.createAttributes().build());
+        event.put(EntityRegistry.AMBUSH_FISH.get(), AmbushFishEntity.createAttributes());
+        event.put(EntityRegistry.GARDEN_EEL.get(), GardenEelEntity.createAttributes());
+        event.put(EntityRegistry.HERMIT_CRAB.get(), HermitCrabEntity.createAttributes());
+        event.put(EntityRegistry.SEDIMENT_WORM.get(), SedimentWormEntity.createAttributes().build());
+        event.put(EntityRegistry.HUMUS_JELLY.get(), HumusJellyEntity.createAttributes());
+        event.put(EntityRegistry.ANCIENT_NAUTILUS.get(), AncientNautilusEntity.createAttributes());
     }
 
     @SubscribeEvent

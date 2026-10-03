@@ -32,6 +32,10 @@ public final class MiddleLevelOceanRegion extends Region {
                 JellyJunglePlacement.holderAnchorParameter(),
                 JellyJunglePlacement.holderAnchorOffset());
         addHiddenBiome(mapper,
+                BiomeRegistry.MUD_ZONE,
+                MudZonePlacement.holderAnchorParameter(),
+                MudZonePlacement.holderAnchorOffset());
+        addHiddenBiome(mapper,
                 BiomeRegistry.BRINE_MIRROR_GORGE,
                 BrineMirrorGorgePlacement.holderAnchorParameter(),
                 BrineMirrorGorgePlacement.holderAnchorOffset());

@@ -83,6 +83,14 @@
             "noise_salt": 7
           },
           {
+            "biome": "aquanaut:mud_zone",
+            "weight": 0.42,
+            "noise_scale": 96,
+            "noise_offset_x": -23,
+            "noise_offset_z": 17,
+            "noise_salt": 53
+          },
+          {
             "biome": "aquanaut:brine_mirror_gorge",
             "weight": 0.48,
             "noise_scale": 80,

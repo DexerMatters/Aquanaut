@@ -546,6 +546,19 @@ public abstract class BaseFishEntity extends WaterAnimal {
         return 4.5D;
     }
 
+    /**
+     * 0 = free-swimming, 1 = pinned to the seabed. A positive bias pulls the cruise depth
+     * target downward toward the floor so bottom-dwelling species skim the sediment instead
+     * of drifting through the water column.
+     */
+    public final double cruiseFloorBias() {
+        return this.getCruiseFloorBias();
+    }
+
+    protected double getCruiseFloorBias() {
+        return 0.0D;
+    }
+
     public final double cruiseDepthPitchDistance() {
         return this.getCruiseDepthPitchDistance();
     }

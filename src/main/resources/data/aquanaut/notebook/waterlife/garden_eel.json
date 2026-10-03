@@ -1,0 +1,12 @@
+{
+  "species_id": "aquanaut:garden_eel",
+  "entity_id": "aquanaut:garden_eel",
+  "category": "friendly",
+  "diet": "herbivorous",
+  "blocks": [
+    {"type":"paragraph","stage":"encountered","text":"gui.aquanaut.notebook.waterlife.garden_eel.paragraph_1"},
+    {"type":"component","stage":"encountered","component_kind":"sprite","resource":"aquanaut:item/garden_eel_spawn_egg","caption":"gui.aquanaut.notebook.caption.identification_plate"},
+    {"type":"paragraph","stage":"captured","text":"gui.aquanaut.notebook.waterlife.garden_eel.paragraph_2"},
+    {"type":"component","stage":"captured","component_kind":"model","resource":"aquanaut:garden_eel","caption":"gui.aquanaut.notebook.caption.morphology_record"}
+  ]
+}

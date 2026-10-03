@@ -721,6 +721,7 @@ public class FishMovementController {
             this.state.setCruiseTargetY(
                     Mth.lerp(0.4D, this.state.cruiseTargetY(), pushUp));
         } else {
+            this.applyFloorBias(fish);
             double targetY = this.state.cruiseTargetY();
             BlockPos targetPos = new BlockPos(
                     (int) Math.floor(fish.getX()), (int) Math.floor(targetY), (int) Math.floor(fish.getZ()));
@@ -730,6 +731,32 @@ public class FishMovementController {
                 this.state.setCruiseTargetY(Mth.lerp(0.35D, targetY, alt));
             }
         }
+    }
+
+    /**
+     * Pulls a bottom-dwelling fish's cruise target down toward the seabed. Scans a bounded
+     * number of blocks below, so it costs nothing in open water and never stalls on a deep
+     * column. The strength comes from the species' {@code cruiseFloorBias}.
+     */
+    private void applyFloorBias(BaseFishEntity fish) {
+        double bias = Mth.clamp(fish.cruiseFloorBias(), 0.0D, 1.0D);
+        if (bias <= 0.0D) {
+            return;
+        }
+        double floorY = Double.NaN;
+        for (int down = 2; down <= 12; down++) {
+            BlockPos below = fish.blockPosition().below(down);
+            if (!fish.level().getFluidState(below).is(FluidTags.WATER)) {
+                floorY = below.getY() + 1.0D;
+                break;
+            }
+        }
+        if (Double.isNaN(floorY)) {
+            return;
+        }
+        double desired = floorY + 0.5D;
+        this.state.setCruiseTargetY(
+                Mth.lerp(bias * 0.35D, this.state.cruiseTargetY(), desired));
     }
 
     private void updateCruisePitchTarget(BaseFishEntity fish) {

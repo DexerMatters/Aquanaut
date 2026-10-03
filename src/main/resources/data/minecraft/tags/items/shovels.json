@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:wooden_shovel",
+    "minecraft:stone_shovel",
+    "minecraft:iron_shovel",
+    "minecraft:golden_shovel",
+    "minecraft:diamond_shovel",
+    "minecraft:netherite_shovel",
+    "aquanaut:coral_shovel",
+    "aquanaut:shell_shovel",
+    "aquanaut:hard_shell_shovel",
+    "aquanaut:marine_alloy_shovel"
+  ]
+}

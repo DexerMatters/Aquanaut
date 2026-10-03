@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "aquanaut:block/shell_pile",
+    "side": "aquanaut:block/shell_pile",
+    "top": "aquanaut:block/shell_pile"
+  }
+}

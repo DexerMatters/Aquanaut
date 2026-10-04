@@ -65,6 +65,7 @@ import com.dexer.aquanaut.client.renderer.MudSilverfishRenderer;
 import com.dexer.aquanaut.client.renderer.SedimentWormRenderer;
 import com.dexer.aquanaut.client.renderer.HumusJellyRenderer;
 import com.dexer.aquanaut.client.renderer.AncientNautilusRenderer;
+import com.dexer.aquanaut.client.renderer.TrilobiteRenderer;
 import com.dexer.aquanaut.client.renderer.item.GasFlowMeterItemRenderer;
 import com.dexer.aquanaut.client.renderer.item.HandheldAirBladderItemRenderer;
 import com.dexer.aquanaut.client.renderer.item.HandheldSearchlightItemRenderer;
@@ -236,6 +237,7 @@ public final class ClientModEvents {
         event.registerEntityRenderer(EntityRegistry.SEDIMENT_WORM.get(), SedimentWormRenderer::new);
         event.registerEntityRenderer(EntityRegistry.HUMUS_JELLY.get(), HumusJellyRenderer::new);
         event.registerEntityRenderer(EntityRegistry.ANCIENT_NAUTILUS.get(), AncientNautilusRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.TRILOBITE.get(), TrilobiteRenderer::new);
         event.registerEntityRenderer(EntityRegistry.AIR_BUBBLE.get(), AirBubbleRenderer::new);
         event.registerEntityRenderer(EntityRegistry.CURSOR.get(), CursorRenderer::new);
         event.registerEntityRenderer(EntityRegistry.SUBMARINE_DRONE.get(), SubmarineDroneRenderer::new);

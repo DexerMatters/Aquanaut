@@ -36,6 +36,7 @@ import com.dexer.aquanaut.common.entity.MudSilverfishEntity;
 import com.dexer.aquanaut.common.entity.SedimentWormEntity;
 import com.dexer.aquanaut.common.entity.HumusJellyEntity;
 import com.dexer.aquanaut.common.entity.AncientNautilusEntity;
+import com.dexer.aquanaut.common.entity.TrilobiteEntity;
 import com.dexer.aquanaut.common.entity.GloomgazerEntity;
 import com.dexer.aquanaut.common.entity.LightningEntity;
 import com.dexer.aquanaut.common.entity.LightingWormEntity;
@@ -320,6 +321,9 @@ public class EntityRegistry {
     public static final DeferredHolder<EntityType<?>, EntityType<AncientNautilusEntity>> ANCIENT_NAUTILUS = ENTITIES.register(
             "ancient_nautilus", () -> EntityType.Builder.<AncientNautilusEntity>of(AncientNautilusEntity::new, MobCategory.WATER_CREATURE)
                     .sized(0.9F, 0.7F).build("ancient_nautilus"));
+    public static final DeferredHolder<EntityType<?>, EntityType<TrilobiteEntity>> TRILOBITE = ENTITIES.register(
+            "trilobite", () -> EntityType.Builder.<TrilobiteEntity>of(TrilobiteEntity::new, MobCategory.WATER_CREATURE)
+                    .sized(0.7F, 0.3F).build("trilobite"));
 
     public static final DeferredHolder<EntityType<?>, EntityType<VampreyEntity>> VAMPREY = ENTITIES.register(
             "vamprey",
@@ -530,6 +534,7 @@ public class EntityRegistry {
         event.put(EntityRegistry.SEDIMENT_WORM.get(), SedimentWormEntity.createAttributes().build());
         event.put(EntityRegistry.HUMUS_JELLY.get(), HumusJellyEntity.createAttributes());
         event.put(EntityRegistry.ANCIENT_NAUTILUS.get(), AncientNautilusEntity.createAttributes());
+        event.put(EntityRegistry.TRILOBITE.get(), TrilobiteEntity.createAttributes());
     }
 
     @SubscribeEvent

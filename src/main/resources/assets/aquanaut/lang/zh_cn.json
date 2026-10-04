@@ -55,6 +55,8 @@
   "entity.aquanaut.sediment_worm": "沉积蠕虫",
   "entity.aquanaut.humus_jelly": "腐殖水母",
   "entity.aquanaut.ancient_nautilus": "古代鹦鹉螺",
+  "entity.aquanaut.trilobite": "三叶虫",
+  "item.aquanaut.trilobite_spawn_egg": "三叶虫刷怪蛋",
   "biome.aquanaut.middle_level_ocean": "中层海洋",
   "biome.aquanaut.coral_forest": "珊瑚森林",
   "biome.aquanaut.jelly_jungle": "凝胶丛林",

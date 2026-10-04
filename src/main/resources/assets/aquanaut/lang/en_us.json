@@ -53,6 +53,8 @@
   "entity.aquanaut.sediment_worm": "Sediment Worm",
   "entity.aquanaut.humus_jelly": "Humus Jelly",
   "entity.aquanaut.ancient_nautilus": "Ancient Nautilus",
+  "entity.aquanaut.trilobite": "Trilobite",
+  "item.aquanaut.trilobite_spawn_egg": "Trilobite Spawn Egg",
   "entity.aquanaut.harpoon": "Harpoon",
   "entity.aquanaut.lightning": "Lightning",
   "biome.aquanaut.middle_level_ocean": "Middle-Level Ocean",

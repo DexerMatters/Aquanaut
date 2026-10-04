@@ -651,6 +651,8 @@ public final class ItemRegistry {
                         "humus_jelly_spawn_egg", EntityRegistry.HUMUS_JELLY, 0x4D663B, 0x26351F);
         public static final DeferredItem<DeferredSpawnEggItem> ANCIENT_NAUTILUS_SPAWN_EGG = spawnEgg(
                         "ancient_nautilus_spawn_egg", EntityRegistry.ANCIENT_NAUTILUS, 0xA89C83, 0x574A3C);
+        public static final DeferredItem<DeferredSpawnEggItem> TRILOBITE_SPAWN_EGG = spawnEgg(
+                        "trilobite_spawn_egg", EntityRegistry.TRILOBITE, 0x6B6A55, 0x3A3A2A);
 
         public static final DeferredItem<DeferredSpawnEggItem> VAMPREY_SPAWN_EGG = spawnEgg(
                         "vamprey_spawn_egg",
@@ -772,6 +774,7 @@ public final class ItemRegistry {
                                 output.accept(SEDIMENT_WORM_SPAWN_EGG.get());
                                 output.accept(HUMUS_JELLY_SPAWN_EGG.get());
                                 output.accept(ANCIENT_NAUTILUS_SPAWN_EGG.get());
+                                output.accept(TRILOBITE_SPAWN_EGG.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MATERIALS_TAB = tab("materials",

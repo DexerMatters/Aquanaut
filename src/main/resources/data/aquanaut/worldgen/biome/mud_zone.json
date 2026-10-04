@@ -143,6 +143,12 @@
         "maxCount": 1,
         "minCount": 1,
         "weight": 1
+      },
+      {
+        "type": "aquanaut:trilobite",
+        "maxCount": 4,
+        "minCount": 2,
+        "weight": 6
       }
     ]
   },

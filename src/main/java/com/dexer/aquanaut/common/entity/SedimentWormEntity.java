@@ -3,6 +3,7 @@ package com.dexer.aquanaut.common.entity;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -27,22 +28,27 @@ import software.bernie.geckolib.util.GeckoLibUtil;
  * back in (RETREATING) and lies dormant (COOLDOWN) before it either strikes again or
  * dissolves back into the sediment. AI is only live during ATTACKING, so the buried phases
  * read as a still, half-buried body. The clip names line up with the states: emerge /
- * idle / retreat.
+ * idle / retreat, plus a one-shot bite.
  */
 public final class SedimentWormEntity extends Silverfish implements GeoEntity {
     private static final EntityDataAccessor<Integer> STRIKE = SynchedEntityData.defineId(
             SedimentWormEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> STRIKE_TIMER = SynchedEntityData.defineId(
             SedimentWormEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> ATTACK_TIMER = SynchedEntityData.defineId(
+            SedimentWormEntity.class, EntityDataSerializers.INT);
 
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation EMERGE = RawAnimation.begin().thenPlay("emerge");
     private static final RawAnimation RETREAT = RawAnimation.begin().thenPlay("retreat");
+    private static final RawAnimation ATTACK = RawAnimation.begin().thenPlay("attack");
 
     private static final int EMERGE_TICKS = 14;
     private static final int ATTACK_TICKS = 70;
     private static final int RETREAT_TICKS = 14;
     private static final int COOLDOWN_TICKS = 100;
+    /** Ticks the bite clip plays for after a landed hit. */
+    private static final int ATTACK_ANIM_TICKS = 12;
     private static final double RISE_SPEED = 0.10D;
     private static final double SINK_SPEED = -0.11D;
     private static final double REARM_RANGE = 8.0D;
@@ -64,14 +70,29 @@ public final class SedimentWormEntity extends Silverfish implements GeoEntity {
         super.defineSynchedData(builder);
         builder.define(STRIKE, Strike.EMERGING.ordinal());
         builder.define(STRIKE_TIMER, EMERGE_TICKS);
+        builder.define(ATTACK_TIMER, 0);
+    }
+
+    @Override
+    public boolean doHurtTarget(Entity target) {
+        boolean hit = super.doHurtTarget(target);
+        if (hit && !level().isClientSide) {
+            entityData.set(ATTACK_TIMER, ATTACK_ANIM_TICKS);
+        }
+        return hit;
     }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 0, state -> switch (strike()) {
-            case EMERGING -> state.setAndContinue(EMERGE);
-            case RETREATING -> state.setAndContinue(RETREAT);
-            case ATTACKING, COOLDOWN -> state.setAndContinue(IDLE);
+        controllers.add(new AnimationController<>(this, "controller", 0, state -> {
+            if (attackTimer() > 0) {
+                return state.setAndContinue(ATTACK);
+            }
+            return switch (strike()) {
+                case EMERGING -> state.setAndContinue(EMERGE);
+                case RETREATING -> state.setAndContinue(RETREAT);
+                case ATTACKING, COOLDOWN -> state.setAndContinue(IDLE);
+            };
         }));
     }
 
@@ -92,6 +113,9 @@ public final class SedimentWormEntity extends Silverfish implements GeoEntity {
     @Override
     public void aiStep() {
         if (!level().isClientSide) {
+            if (attackTimer() > 0) {
+                entityData.set(ATTACK_TIMER, attackTimer() - 1);
+            }
             int timer = strikeTimer();
             if (timer > 0) {
                 timer--;
@@ -146,6 +170,10 @@ public final class SedimentWormEntity extends Silverfish implements GeoEntity {
 
     private int strikeTimer() {
         return entityData.get(STRIKE_TIMER);
+    }
+
+    private int attackTimer() {
+        return entityData.get(ATTACK_TIMER);
     }
 
     private enum Strike {

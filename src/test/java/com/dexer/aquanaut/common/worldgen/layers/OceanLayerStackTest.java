@@ -13,9 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public final class OceanLayerStackTest {
 
     @Test
-    void defaultStackHasFiveLayersAndDeepOceanParents() {
+    void defaultStackHasFourLayersAndDeepOceanParents() {
         OceanLayerStack stack = OceanLayerStacks.defaultStack();
-        assertEquals(5, stack.layers().size());
+        assertEquals(4, stack.layers().size());
         assertTrue(stack.isParentBiome(minecraft("deep_ocean")));
         assertFalse(stack.isParentBiome(minecraft("ocean")));
         assertTrue(stack.supportsQuartCell(minecraft("deep_ocean"), 16));
@@ -23,10 +23,10 @@ public final class OceanLayerStackTest {
     }
 
     @Test
-    void rewriteRangeCoversShallowReefAndMiddleSea() {
+    void rewriteRangeCoversReefAndMiddleSeaOnly() {
         OceanLayerStack stack = OceanLayerStacks.defaultStack();
         assertEquals(-64, stack.minRewriteBlockY());
-        assertEquals(64, stack.maxRewriteBlockY());
+        assertEquals(39, stack.maxRewriteBlockY());
     }
 
     @Test
@@ -44,8 +44,8 @@ public final class OceanLayerStackTest {
     @Test
     void middleSeaBandIsLargerAndMeetsTheReefCeilingFloor() {
         OceanLayerStack stack = OceanLayerStacks.defaultStack();
-        OceanLayer reef = stack.layers().get(2);
-        OceanLayer middle = stack.layers().get(3);
+        OceanLayer reef = stack.layers().get(1);
+        OceanLayer middle = stack.layers().get(2);
         // The middle sea is the larger band and now reaches up to the reef ceiling's own floor
         // (was 31), so the deep-ocean biome range no longer overhangs it.
         assertEquals(35, reef.band().minY());

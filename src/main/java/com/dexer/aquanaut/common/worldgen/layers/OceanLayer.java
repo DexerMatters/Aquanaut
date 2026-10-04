@@ -20,23 +20,6 @@ public record OceanLayer(ResourceLocation id,
                 false);
     }
 
-    /**
-     * The shallow shelf sea above the reef: the water band a diver meets first. It is mud
-     * zone top to bottom, so the biome reads as mud the moment you enter the ocean rather
-     * than only after descending to the deep floor. No terrain of its own (carve false) —
-     * it only repaints the biome of the shallow water column.
-     */
-    public static OceanLayer shallowMud() {
-        return new OceanLayer(
-                ResourceLocation.fromNamespaceAndPath("aquanaut", "shallow_mud"),
-                new DepthBand(40, 64, 0.0D, 4.0D),
-                new BiomeMix(java.util.List.of(
-                        MixEntry.of(ResourceLocation.fromNamespaceAndPath("aquanaut", "mud_zone"))
-                ), 0.0D),
-                ResourceLocation.withDefaultNamespace("none"),
-                false);
-    }
-
     public static OceanLayer reefCeiling() {
         return new OceanLayer(
                 ResourceLocation.fromNamespaceAndPath("aquanaut", "reef_ceiling"),

@@ -15,7 +15,12 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 public final class AmbushFishEntity extends BaseFishEntity implements GeoEntity {
     private static final RawAnimation SWIM = RawAnimation.begin().thenLoop("swim");
+    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
+    private static final RawAnimation BURST_ESCAPE = RawAnimation.begin().thenPlay("burst_escape");
+    /** Below this horizontal speed the fish reads as lying in wait rather than cruising. */
+    private static final double MOVE_SPEED_SQR = 4.0E-4D;
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
     public AmbushFishEntity(EntityType<? extends WaterAnimal> type, Level level) { super(type, level); }
     public static AttributeSupplier createAttributes() {
         return WaterAnimal.createMobAttributes().add(Attributes.MAX_HEALTH, 4.0D)
@@ -29,8 +34,13 @@ public final class AmbushFishEntity extends BaseFishEntity implements GeoEntity 
     @Override protected double getCruiseFloorBias() { return 0.95D; }
     @Override protected double getCruiseDepthRange() { return 1.5D; }
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 0,
-                state -> state.setAndContinue(SWIM)));
+        controllers.add(new AnimationController<>(this, "controller", 0, state -> {
+            if (isEscapeLaunching() || isSprintingAway()) {
+                return state.setAndContinue(BURST_ESCAPE);
+            }
+            return state.setAndContinue(
+                    getDeltaMovement().horizontalDistanceSqr() > MOVE_SPEED_SQR ? SWIM : IDLE);
+        }));
     }
     @Override public AnimatableInstanceCache getAnimatableInstanceCache() { return cache; }
 }

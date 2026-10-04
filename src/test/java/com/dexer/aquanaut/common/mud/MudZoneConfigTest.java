@@ -13,8 +13,8 @@ public final class MudZoneConfigTest {
     }
 
     @Test
-    void nauseaLastsThreeSeconds() {
-        assertEquals(60, MudZoneConfig.NAUSEA_DURATION_TICKS, "3 seconds = 60 ticks");
+    void hungerLastsThreeSeconds() {
+        assertEquals(60, MudZoneConfig.HUNGER_DURATION_TICKS, "3 seconds = 60 ticks");
     }
 
     @Test

@@ -13,7 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** Mud enriched with organic matter that disorients anything stepping on it. */
+/** Mud enriched with organic matter that makes anything stepping on it hungry. */
 public final class NutrientRichMudBlock extends Block {
     public static final MapCodec<NutrientRichMudBlock> CODEC = simpleCodec(NutrientRichMudBlock::new);
 
@@ -30,9 +30,9 @@ public final class NutrientRichMudBlock extends Block {
     public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
         if (!level.isClientSide && entity instanceof LivingEntity living) {
             living.addEffect(new MobEffectInstance(
-                    MobEffects.CONFUSION,
-                    MudZoneConfig.NAUSEA_DURATION_TICKS,
-                    MudZoneConfig.NAUSEA_AMPLIFIER,
+                    MobEffects.HUNGER,
+                    MudZoneConfig.HUNGER_DURATION_TICKS,
+                    MudZoneConfig.HUNGER_AMPLIFIER,
                     false,
                     true));
         }

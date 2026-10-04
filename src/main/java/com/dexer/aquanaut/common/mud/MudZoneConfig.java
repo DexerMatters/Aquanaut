@@ -31,11 +31,11 @@ public final class MudZoneConfig {
 
     // --- Nutrient-rich mud ---
 
-    /** Nausea duration applied when an entity steps on nutrient-rich mud. */
-    public static final int NAUSEA_DURATION_TICKS = 60;
+    /** Hunger duration applied when an entity steps on nutrient-rich mud. */
+    public static final int HUNGER_DURATION_TICKS = 60;
 
-    /** Nausea effect amplifier (0 = level I). */
-    public static final int NAUSEA_AMPLIFIER = 0;
+    /** Hunger effect amplifier (0 = level I). */
+    public static final int HUNGER_AMPLIFIER = 0;
 
     /** Chance per random tick to emit a green bubble particle. */
     public static final float NUTRIENT_BUBBLE_CHANCE = 0.35F;

@@ -116,39 +116,39 @@
     "water_creature": [
       {
         "type": "aquanaut:hermit_crab",
-        "maxCount": 3,
-        "minCount": 1,
-        "weight": 6
+        "maxCount": 5,
+        "minCount": 2,
+        "weight": 8
       },
       {
         "type": "aquanaut:ambush_fish",
-        "maxCount": 4,
+        "maxCount": 6,
+        "minCount": 3,
+        "weight": 9
+      },
+      {
+        "type": "aquanaut:garden_eel",
+        "maxCount": 9,
+        "minCount": 4,
+        "weight": 8
+      },
+      {
+        "type": "aquanaut:humus_jelly",
+        "maxCount": 5,
         "minCount": 2,
         "weight": 7
       },
       {
-        "type": "aquanaut:garden_eel",
-        "maxCount": 6,
-        "minCount": 3,
-        "weight": 6
-      },
-      {
-        "type": "aquanaut:humus_jelly",
-        "maxCount": 3,
-        "minCount": 1,
-        "weight": 5
-      },
-      {
         "type": "aquanaut:ancient_nautilus",
-        "maxCount": 1,
+        "maxCount": 2,
         "minCount": 1,
-        "weight": 1
+        "weight": 2
       },
       {
         "type": "aquanaut:trilobite",
-        "maxCount": 4,
+        "maxCount": 5,
         "minCount": 2,
-        "weight": 6
+        "weight": 7
       }
     ]
   },

@@ -4,6 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import com.dexer.aquanaut.Aquanaut;
+import com.dexer.aquanaut.common.mud.DeathCapItem;
 import com.dexer.aquanaut.common.diving.DivingEquipmentSlotType;
 import com.dexer.aquanaut.common.inventory.CreativeTabHeader;
 import com.dexer.aquanaut.common.inventory.SectionedTabOutput;
@@ -88,6 +89,8 @@ public final class ItemRegistry {
                         food(6, 0.8F));
         public static final DeferredItem<Item> WORM_MUSCLE = ITEMS.registerSimpleItem("worm_muscle", food(3, 0.3F));
         public static final DeferredItem<Item> MUD_BEAN = ITEMS.registerSimpleItem("mud_bean", food(2, 0.4F));
+        public static final DeferredItem<Item> DEATH_CAP = ITEMS.register("death_cap",
+                        () -> new DeathCapItem(food(2, 0.3F)));
         public static final DeferredItem<Item> HUMUS_GEL = ITEMS.registerSimpleItem("humus_gel");
         public static final DeferredItem<Item> ANCIENT_SHELL_FRAGMENT = ITEMS.registerSimpleItem("ancient_shell_fragment");
         public static final DeferredItem<DivingEquipmentItem> MUDWALKER_CHARM = flippersItem("mudwalker_charm", 256, 1.0F);
@@ -718,6 +721,7 @@ public final class ItemRegistry {
                                 output.accept(COOKED_CRAB_MEAT.get());
                                 output.accept(WORM_MUSCLE.get());
                                 output.accept(MUD_BEAN.get());
+                                output.accept(DEATH_CAP.get());
                                 output.accept(COOKED_SHARK_FINS.get());
                                 output.accept(FISHNUT.get());
                                 output.accept(COOKED_FISHNUT.get());

@@ -157,6 +157,19 @@ public final class BlockRegistry {
     public static final DeferredBlock<Block> GLOW_MUSHROOM_CAP = glowBlock("glow_mushroom_cap", 8);
     public static final DeferredBlock<Block> GLOW_MUSHROOM_INSIDE = glowBlock("glow_mushroom_inside", 7);
 
+    // Mud Zone building set, deeper sediment and a lamp.
+    public static final DeferredBlock<Block> PACKED_MUD = cube("packed_mud",
+            MapColor.TERRACOTTA_BROWN, 1.0F, 1.5F, SoundType.MUD);
+    public static final DeferredBlock<Block> CRACKED_MUD = cube("cracked_mud",
+            MapColor.TERRACOTTA_BROWN, 0.8F, 1.2F, SoundType.MUD);
+    public static final DeferredBlock<Block> SILTSTONE = cube("siltstone",
+            MapColor.COLOR_GRAY, 1.6F, 3.0F, SoundType.STONE);
+    public static final DeferredBlock<Block> MUD_LAMP = glowBlock("mud_lamp", 12);
+    public static final DeferredBlock<CrystalPlantBlock> SILT_REED = crystalPlant("silt_reed", 0,
+            MapColor.COLOR_GREEN);
+    public static final DeferredBlock<CrystalPlantBlock> PALE_PUFFBALL = crystalPlant("pale_puffball", 4,
+            MapColor.QUARTZ);
+
     // Brine Mirror Gorge - evaporite minerals and crystal flora
     public static final DeferredBlock<Block> HALITE_CRUST = cube("halite_crust",
             MapColor.TERRACOTTA_WHITE, 0.8F, 1.2F, SoundType.CALCITE);

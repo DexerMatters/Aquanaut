@@ -497,6 +497,13 @@ public final class ItemRegistry {
                         BlockRegistry.GLOW_MUSHROOM_CAP);
         public static final DeferredItem<BlockItem> GLOW_MUSHROOM_INSIDE = blockItem("glow_mushroom_inside",
                         BlockRegistry.GLOW_MUSHROOM_INSIDE);
+        public static final DeferredItem<BlockItem> PACKED_MUD = blockItem("packed_mud", BlockRegistry.PACKED_MUD);
+        public static final DeferredItem<BlockItem> CRACKED_MUD = blockItem("cracked_mud", BlockRegistry.CRACKED_MUD);
+        public static final DeferredItem<BlockItem> SILTSTONE = blockItem("siltstone", BlockRegistry.SILTSTONE);
+        public static final DeferredItem<BlockItem> MUD_LAMP = blockItem("mud_lamp", BlockRegistry.MUD_LAMP);
+        public static final DeferredItem<BlockItem> SILT_REED = blockItem("silt_reed", BlockRegistry.SILT_REED);
+        public static final DeferredItem<BlockItem> PALE_PUFFBALL = blockItem("pale_puffball",
+                        BlockRegistry.PALE_PUFFBALL);
         // Jelly blocks
         public static final DeferredItem<BlockItem> LIGHT_RED_JELLY_BLOCK = blockItem("light_red_jelly_block",
                         BlockRegistry.LIGHT_RED_JELLY_BLOCK);
@@ -994,6 +1001,12 @@ public final class ItemRegistry {
                                 output.accept(GLOW_MUSHROOM_STEM.get());
                                 output.accept(GLOW_MUSHROOM_CAP.get());
                                 output.accept(GLOW_MUSHROOM_INSIDE.get());
+                                output.accept(PACKED_MUD.get());
+                                output.accept(CRACKED_MUD.get());
+                                output.accept(SILTSTONE.get());
+                                output.accept(MUD_LAMP.get());
+                                output.accept(SILT_REED.get());
+                                output.accept(PALE_PUFFBALL.get());
 
                                 // Brine Mirror Gorge: the evaporite terraces, diapirs and
                                 // crystal grottoes of the brine features.

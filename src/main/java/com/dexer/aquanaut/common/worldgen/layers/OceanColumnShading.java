@@ -213,6 +213,8 @@ public final class OceanColumnShading {
         return switch (strataIndex(blockX, blockZ, blockY, 16,
                 OceanColumnPlanner.LITH_STRATA_SEED ^ 0x59L)) {
             case 0 -> BlockRegistry.NUTRIENT_RICH_MUD.get().defaultBlockState();
+            case 1, 2 -> BlockRegistry.PACKED_MUD.get().defaultBlockState();
+            case 3 -> BlockRegistry.SILTSTONE.get().defaultBlockState();
             case 15 -> BlockRegistry.FOSSIL_BED.get().defaultBlockState();
             default -> BlockRegistry.MUD.get().defaultBlockState();
         };

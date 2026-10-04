@@ -3,6 +3,7 @@ package com.dexer.aquanaut.core;
 import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.worldgen.CalderaLakeFeature;
 import com.dexer.aquanaut.common.worldgen.AshDriftFeature;
+import com.dexer.aquanaut.common.worldgen.BoneGraveyardFeature;
 import com.dexer.aquanaut.common.worldgen.BrimstoneGardenFeature;
 import com.dexer.aquanaut.common.worldgen.BrineMirrorFeature;
 import com.dexer.aquanaut.common.worldgen.BrineTerraceFeature;
@@ -108,6 +109,8 @@ public final class FeatureRegistry {
             "mud_flora", MudFloraFeature::new);
     public static final DeferredHolder<Feature<?>, GlowMushroomFeature> GLOW_MUSHROOM = FEATURES.register(
             "glow_mushroom", GlowMushroomFeature::new);
+    public static final DeferredHolder<Feature<?>, BoneGraveyardFeature> BONE_GRAVEYARD = FEATURES.register(
+            "bone_graveyard", BoneGraveyardFeature::new);
 
     private FeatureRegistry() {
     }

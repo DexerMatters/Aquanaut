@@ -168,6 +168,11 @@ public final class OceanColumnPlanner {
     public static List<ReefDriverRef> reefDrivers(OceanLayerStack stack) {
         List<ReefDriverRef> drivers = new ArrayList<>();
         for (OceanLayer layer : stack.layers()) {
+            // Only terrain-shaping layers own reef geology; a repaint-only layer (the shallow
+            // mud shelf) must not add a second contribution for a biome it shares.
+            if (!layer.carve()) {
+                continue;
+            }
             DistrictWeightField field = null;
             int index = 0;
             for (MixEntry entry : layer.mix().entries()) {

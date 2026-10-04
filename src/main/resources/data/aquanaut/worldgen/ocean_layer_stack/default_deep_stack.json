@@ -32,6 +32,26 @@
       "carve": false
     },
     {
+      "id": "aquanaut:shallow_mud",
+      "band": {
+        "min_y": 40,
+        "max_y": 64,
+        "blend_down": 0.0,
+        "blend_up": 4.0
+      },
+      "biomes": {
+        "horizontal_blend_quarts": 0.0,
+        "entries": [
+          {
+            "biome": "aquanaut:mud_zone",
+            "weight": 1.0
+          }
+        ]
+      },
+      "terrain": "minecraft:none",
+      "carve": false
+    },
+    {
       "id": "aquanaut:reef_ceiling",
       "band": {
         "min_y": 35,

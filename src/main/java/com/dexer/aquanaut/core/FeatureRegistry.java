@@ -27,6 +27,7 @@ import com.dexer.aquanaut.common.worldgen.SmokerClusterFeature;
 import com.dexer.aquanaut.common.worldgen.SulfurVeinFeature;
 import com.dexer.aquanaut.common.worldgen.VentFloraFeature;
 import com.dexer.aquanaut.common.worldgen.FossilOutcropFeature;
+import com.dexer.aquanaut.common.worldgen.GlowMushroomFeature;
 import com.dexer.aquanaut.common.worldgen.MudCrackFeature;
 import com.dexer.aquanaut.common.worldgen.MudFloraFeature;
 import com.dexer.aquanaut.common.worldgen.MudMoundFeature;
@@ -105,6 +106,8 @@ public final class FeatureRegistry {
             "mud_crack", MudCrackFeature::new);
     public static final DeferredHolder<Feature<?>, MudFloraFeature> MUD_FLORA = FEATURES.register(
             "mud_flora", MudFloraFeature::new);
+    public static final DeferredHolder<Feature<?>, GlowMushroomFeature> GLOW_MUSHROOM = FEATURES.register(
+            "glow_mushroom", GlowMushroomFeature::new);
 
     private FeatureRegistry() {
     }

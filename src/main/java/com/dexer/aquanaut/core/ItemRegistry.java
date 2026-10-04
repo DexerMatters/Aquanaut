@@ -484,6 +484,16 @@ public final class ItemRegistry {
                         BlockRegistry.BEAN_KELP);
         public static final DeferredItem<BlockItem> GLOW_FUNGUS = blockItem("glow_fungus",
                         BlockRegistry.GLOW_FUNGUS);
+        public static final DeferredItem<BlockItem> GLOW_FUNGUS_AMBER = blockItem("glow_fungus_amber",
+                        BlockRegistry.GLOW_FUNGUS_AMBER);
+        public static final DeferredItem<BlockItem> GLOW_FUNGUS_VIOLET = blockItem("glow_fungus_violet",
+                        BlockRegistry.GLOW_FUNGUS_VIOLET);
+        public static final DeferredItem<BlockItem> GLOW_MUSHROOM_STEM = blockItem("glow_mushroom_stem",
+                        BlockRegistry.GLOW_MUSHROOM_STEM);
+        public static final DeferredItem<BlockItem> GLOW_MUSHROOM_CAP = blockItem("glow_mushroom_cap",
+                        BlockRegistry.GLOW_MUSHROOM_CAP);
+        public static final DeferredItem<BlockItem> GLOW_MUSHROOM_INSIDE = blockItem("glow_mushroom_inside",
+                        BlockRegistry.GLOW_MUSHROOM_INSIDE);
         // Jelly blocks
         public static final DeferredItem<BlockItem> LIGHT_RED_JELLY_BLOCK = blockItem("light_red_jelly_block",
                         BlockRegistry.LIGHT_RED_JELLY_BLOCK);
@@ -972,6 +982,11 @@ public final class ItemRegistry {
                                 output.accept(MUD_BLOOM.get());
                                 output.accept(BEAN_KELP.get());
                                 output.accept(GLOW_FUNGUS.get());
+                                output.accept(GLOW_FUNGUS_AMBER.get());
+                                output.accept(GLOW_FUNGUS_VIOLET.get());
+                                output.accept(GLOW_MUSHROOM_STEM.get());
+                                output.accept(GLOW_MUSHROOM_CAP.get());
+                                output.accept(GLOW_MUSHROOM_INSIDE.get());
 
                                 // Brine Mirror Gorge: the evaporite terraces, diapirs and
                                 // crystal grottoes of the brine features.

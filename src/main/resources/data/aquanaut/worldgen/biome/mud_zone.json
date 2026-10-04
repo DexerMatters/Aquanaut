@@ -57,7 +57,8 @@
       "minecraft:disk_gravel",
       "aquanaut:mud_zone_sediment",
       "aquanaut:mud_mound",
-      "aquanaut:fossil_outcrop"
+      "aquanaut:fossil_outcrop",
+      "aquanaut:glow_mushroom"
     ],
     [
       "aquanaut:mud_crack"

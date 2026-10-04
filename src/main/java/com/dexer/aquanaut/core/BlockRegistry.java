@@ -148,6 +148,14 @@ public final class BlockRegistry {
             MapColor.COLOR_GREEN);
     public static final DeferredBlock<CrystalPlantBlock> GLOW_FUNGUS = crystalPlant("glow_fungus", 7,
             MapColor.COLOR_CYAN);
+    public static final DeferredBlock<CrystalPlantBlock> GLOW_FUNGUS_AMBER = crystalPlant("glow_fungus_amber", 6,
+            MapColor.COLOR_ORANGE);
+    public static final DeferredBlock<CrystalPlantBlock> GLOW_FUNGUS_VIOLET = crystalPlant("glow_fungus_violet", 5,
+            MapColor.COLOR_PURPLE);
+    // The huge glow mushroom's parts, grown out of a glow fungus by bone meal.
+    public static final DeferredBlock<Block> GLOW_MUSHROOM_STEM = glowBlock("glow_mushroom_stem", 0);
+    public static final DeferredBlock<Block> GLOW_MUSHROOM_CAP = glowBlock("glow_mushroom_cap", 8);
+    public static final DeferredBlock<Block> GLOW_MUSHROOM_INSIDE = glowBlock("glow_mushroom_inside", 7);
 
     // Brine Mirror Gorge - evaporite minerals and crystal flora
     public static final DeferredBlock<Block> HALITE_CRUST = cube("halite_crust",
@@ -471,6 +479,15 @@ public final class BlockRegistry {
                 .noOcclusion()
                 .dynamicShape()
                 .lightLevel(state -> light), supportBelow));
+    }
+
+    /** A solid, softly glowing mushroom block (stem / cap / inside). */
+    private static DeferredBlock<Block> glowBlock(String name, int light) {
+        return BLOCKS.register(name, () -> new Block(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.COLOR_CYAN)
+                .strength(0.4F)
+                .sound(SoundType.WOOD)
+                .lightLevel(state -> light)));
     }
 
     private static DeferredBlock<DroopingSeaweedBlock> drooping(String name, MapColor color, SoundType sound) {

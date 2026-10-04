@@ -44,6 +44,12 @@ public final class MudFloraFeature extends Feature<NoneFeatureConfiguration> {
         for (int i = 0; i < 2 + random.nextInt(3); i++) {
             placedAny |= placeLeaf(level, sampleFloor(level, origin, random), BlockRegistry.GLOW_FUNGUS.get());
         }
+        for (int i = 0; i < 1 + random.nextInt(2); i++) {
+            placedAny |= placeLeaf(level, sampleFloor(level, origin, random), BlockRegistry.GLOW_FUNGUS_AMBER.get());
+        }
+        for (int i = 0; i < 1 + random.nextInt(2); i++) {
+            placedAny |= placeLeaf(level, sampleFloor(level, origin, random), BlockRegistry.GLOW_FUNGUS_VIOLET.get());
+        }
         // Shells are a seasoning, not a bed: one small patch at most, and usually none.
         if (random.nextFloat() < 0.2F) {
             placedAny |= placeShellDebris(level, sampleFloor(level, origin, random), random);

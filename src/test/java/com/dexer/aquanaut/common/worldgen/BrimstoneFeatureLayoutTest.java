@@ -64,7 +64,9 @@ public final class BrimstoneFeatureLayoutTest {
         JsonArray entries = middleSea.getAsJsonObject("biomes").getAsJsonArray("entries");
         List<String> biomes = new ArrayList<>();
         entries.forEach(entry -> biomes.add(entry.getAsJsonObject().get("biome").getAsString()));
-        assertEquals(4, biomes.size(), "middle sea mixes MLO, the gorge, the caldera and the crystal nest");
+        assertEquals(5, biomes.size(),
+                "middle sea mixes MLO, the gorge, the caldera, the crystal nest and the mud zone");
+        assertTrue(biomes.contains("aquanaut:mud_zone"));
         assertTrue(biomes.contains("aquanaut:brimstone_caldera"));
         assertTrue(biomes.contains("aquanaut:crystal_nest"));
     }
@@ -73,7 +75,9 @@ public final class BrimstoneFeatureLayoutTest {
     void javaLayerMirrorMatchesTheDataStack() {
         OceanLayer middleSea = OceanLayer.middleSea();
         List<String> biomes = middleSea.mix().entries().stream().map(entry -> entry.biome().toString()).toList();
-        assertEquals(4, biomes.size());
+        assertEquals(5, biomes.size());
+        assertTrue(biomes.contains("aquanaut:mud_zone"),
+                "the built-in stack must carry the mud zone like the JSON does");
         assertTrue(biomes.contains("aquanaut:crystal_nest"),
                 "the built-in stack must carry the crystal nest like the JSON does");
         assertTrue(biomes.contains(BrimstoneCalderaPlacement.location().toString()),

@@ -16,6 +16,7 @@ import software.bernie.geckolib.util.GeckoLibUtil;
 
 public final class GardenEelEntity extends BaseFishEntity implements GeoEntity {
     private static final RawAnimation IDLE_SWAY = RawAnimation.begin().thenLoop("idle_sway");
+    private static final RawAnimation HIDE = RawAnimation.begin().thenPlay("hide");
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     public GardenEelEntity(EntityType<? extends WaterAnimal> type, Level level) { super(type, level); }
     public static AttributeSupplier createAttributes() {
@@ -31,8 +32,12 @@ public final class GardenEelEntity extends BaseFishEntity implements GeoEntity {
     @Override protected double getCruiseFloorBias() { return 1.0D; }
     @Override protected double getCruiseDepthRange() { return 0.8D; }
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 0,
-                state -> state.setAndContinue(IDLE_SWAY)));
+        controllers.add(new AnimationController<>(this, "controller", 0, state -> {
+            if (this.isSprintingAway()) {
+                return state.setAndContinue(HIDE);
+            }
+            return state.setAndContinue(IDLE_SWAY);
+        }));
     }
     @Override public AnimatableInstanceCache getAnimatableInstanceCache() { return cache; }
 }

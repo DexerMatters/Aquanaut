@@ -312,6 +312,9 @@ public final class ClientModEvents {
         event.registerSpriteSet(ParticleRegistry.ASH_MOTE.get(),
                 sprites -> new SoftWispParticle.Provider(sprites, 0.30F, 0.30F, 0.33F,
                         0.16F, 45, 0.004F, 0.75F));
+        event.registerSpriteSet(ParticleRegistry.MUD_MOTE.get(),
+                sprites -> new SoftWispParticle.Provider(sprites, 0.42F, 0.37F, 0.30F,
+                        0.22F, 50, 0.0008F, 0.7F));
     }
 
     private static IClientItemExtensions customRenderer(Supplier<BlockEntityWithoutLevelRenderer> renderer) {

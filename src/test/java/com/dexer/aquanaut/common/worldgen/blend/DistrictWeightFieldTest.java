@@ -22,7 +22,7 @@ public final class DistrictWeightFieldTest {
     @Test
     void weightsSumToOneEverywhere() {
         DistrictWeightField field = new DistrictWeightField(middleSea());
-        double[] out = new double[4];
+        double[] out = new double[middleSea().entries().size()];
         for (int x = -130; x <= 130; x += 7) {
             for (int z = -130; z <= 130; z += 11) {
                 field.weightsAtBlock(x, z, out);
@@ -39,8 +39,8 @@ public final class DistrictWeightFieldTest {
     @Test
     void adjacentBlocksNeverStairStep() {
         DistrictWeightField field = new DistrictWeightField(middleSea());
-        double[] a = new double[4];
-        double[] b = new double[4];
+        double[] a = new double[middleSea().entries().size()];
+        double[] b = new double[middleSea().entries().size()];
         double worst = 0.0D;
         for (int x = -64; x < 64; x++) {
             for (int z = -64; z < 64; z += 5) {
@@ -61,13 +61,13 @@ public final class DistrictWeightFieldTest {
     void blockFieldTracksTheQuartLattice() {
         BiomeMix mix = middleSea();
         DistrictWeightField field = new DistrictWeightField(mix);
-        double[] out = new double[4];
+        double[] out = new double[middleSea().entries().size()];
         for (int cellX = -8; cellX <= 8; cellX += 4) {
             for (int cellZ = -8; cellZ <= 8; cellZ += 4) {
                 double[] quart = mix.weightsAt(cellX, cellZ);
                 // The two central columns of the cell straddle the lattice node.
                 field.weightsAtBlock(cellX * 4 + 1, cellZ * 4 + 1, out);
-                for (int i = 0; i < 4; i++) {
+                for (int i = 0; i < out.length; i++) {
                     assertTrue(Math.abs(out[i] - quart[i]) < 0.05D,
                             "interpolated weights stay close to their lattice value at the cell centre");
                 }
@@ -80,8 +80,8 @@ public final class DistrictWeightFieldTest {
         BiomeMix mix = middleSea();
         DistrictWeightField memoized = new DistrictWeightField(mix, true);
         DistrictWeightField direct = new DistrictWeightField(mix, false);
-        double[] a = new double[4];
-        double[] b = new double[4];
+        double[] a = new double[middleSea().entries().size()];
+        double[] b = new double[middleSea().entries().size()];
         for (int x = -40; x <= 40; x += 3) {
             for (int z = -40; z <= 40; z += 7) {
                 memoized.weightsAtBlock(x, z, a);

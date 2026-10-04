@@ -9,6 +9,12 @@
       "sound": "minecraft:ambient.cave",
       "tick_delay": 6000
     },
+    "particle": {
+      "options": {
+        "type": "aquanaut:mud_mote"
+      },
+      "probability": 0.02
+    },
     "sky_color": 8103167,
     "water_color": 2502444,
     "water_fog_color": 1710101
@@ -49,16 +55,21 @@
       "minecraft:disk_sand",
       "minecraft:disk_clay",
       "minecraft:disk_gravel",
-      "aquanaut:mud_zone_sediment"
+      "aquanaut:mud_zone_sediment",
+      "aquanaut:mud_mound",
+      "aquanaut:fossil_outcrop"
     ],
-    [],
+    [
+      "aquanaut:mud_crack"
+    ],
     [
       "minecraft:spring_water",
       "minecraft:spring_lava"
     ],
     [
       "minecraft:glow_lichen",
-      "minecraft:seagrass_deep"
+      "minecraft:seagrass_deep",
+      "aquanaut:mud_flora"
     ],
     [
       "minecraft:freeze_top_layer"

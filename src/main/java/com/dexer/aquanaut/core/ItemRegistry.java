@@ -87,6 +87,7 @@ public final class ItemRegistry {
         public static final DeferredItem<Item> COOKED_CRAB_MEAT = ITEMS.registerSimpleItem("cooked_crab_meat",
                         food(6, 0.8F));
         public static final DeferredItem<Item> WORM_MUSCLE = ITEMS.registerSimpleItem("worm_muscle", food(3, 0.3F));
+        public static final DeferredItem<Item> MUD_BEAN = ITEMS.registerSimpleItem("mud_bean", food(2, 0.4F));
         public static final DeferredItem<Item> HUMUS_GEL = ITEMS.registerSimpleItem("humus_gel");
         public static final DeferredItem<Item> ANCIENT_SHELL_FRAGMENT = ITEMS.registerSimpleItem("ancient_shell_fragment");
         public static final DeferredItem<DivingEquipmentItem> MUDWALKER_CHARM = flippersItem("mudwalker_charm", 256, 1.0F);
@@ -477,6 +478,12 @@ public final class ItemRegistry {
                         BlockRegistry.SEAWEED_FRUIT);
         public static final DeferredItem<BlockItem> SEAWEED_STEM = blockItem("seaweed_stem",
                         BlockRegistry.SEAWEED_STEM);
+        public static final DeferredItem<BlockItem> MUD_BLOOM = blockItem("mud_bloom",
+                        BlockRegistry.MUD_BLOOM);
+        public static final DeferredItem<BlockItem> BEAN_KELP = blockItem("bean_kelp",
+                        BlockRegistry.BEAN_KELP);
+        public static final DeferredItem<BlockItem> GLOW_FUNGUS = blockItem("glow_fungus",
+                        BlockRegistry.GLOW_FUNGUS);
         // Jelly blocks
         public static final DeferredItem<BlockItem> LIGHT_RED_JELLY_BLOCK = blockItem("light_red_jelly_block",
                         BlockRegistry.LIGHT_RED_JELLY_BLOCK);
@@ -694,13 +701,11 @@ public final class ItemRegistry {
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FOOD_TAB = tab("food",
                         COOKED_SARDINE, output -> {
                                 output.accept(COOKED_OCTOPUS_SHREDS.get());
-                                 output.accept(COOKED_SARDINE.get());
-                                 output.accept(CRAB_MEAT.get());
-                                  output.accept(COOKED_CRAB_MEAT.get());
-                                 output.accept(WORM_MUSCLE.get());
-                                 output.accept(HUMUS_GEL.get());
-                                 output.accept(ANCIENT_SHELL_FRAGMENT.get());
-                                 output.accept(MUDWALKER_CHARM.get());
+                                output.accept(COOKED_SARDINE.get());
+                                output.accept(CRAB_MEAT.get());
+                                output.accept(COOKED_CRAB_MEAT.get());
+                                output.accept(WORM_MUSCLE.get());
+                                output.accept(MUD_BEAN.get());
                                 output.accept(COOKED_SHARK_FINS.get());
                                 output.accept(FISHNUT.get());
                                 output.accept(COOKED_FISHNUT.get());
@@ -735,7 +740,7 @@ public final class ItemRegistry {
                                 output.accept(TRIPOD_SPAWN_EGG.get());
                                 output.accept(BLUE_RINGED_WORMFISH_SPAWN_EGG.get());
                                 output.accept(BLUE_JELLYFISH_SPAWN_EGG.get());
-                                 output.accept(FLATFISH_SPAWN_EGG.get());
+                                output.accept(FLATFISH_SPAWN_EGG.get());
                                 output.accept(VAMPREY_SPAWN_EGG.get());
                                 output.accept(ORESUCKER_SPAWN_EGG.get());
                                 output.accept(FLAGELLONAUTILUS_SPAWN_EGG.get());
@@ -749,15 +754,14 @@ public final class ItemRegistry {
                                 output.accept(GEMINI_JELLYFISH_SPAWN_EGG.get());
                                 output.accept(ECOFISH_SPAWN_EGG.get());
                                 output.accept(PALE_ABYSS_HYDRA_SPAWN_EGG.get());
-                                 output.accept(THREE_HEADED_SHARK_SPAWN_EGG.get());
-                                  output.accept(FLATFISH_SPAWN_EGG.get());
-                                 output.accept(MUD_SILVERFISH_SPAWN_EGG.get());
-                                 output.accept(AMBUSH_FISH_SPAWN_EGG.get());
-                                 output.accept(GARDEN_EEL_SPAWN_EGG.get());
-                                  output.accept(HERMIT_CRAB_SPAWN_EGG.get());
-                                 output.accept(SEDIMENT_WORM_SPAWN_EGG.get());
-                                 output.accept(HUMUS_JELLY_SPAWN_EGG.get());
-                                 output.accept(ANCIENT_NAUTILUS_SPAWN_EGG.get());
+                                output.accept(THREE_HEADED_SHARK_SPAWN_EGG.get());
+                                output.accept(MUD_SILVERFISH_SPAWN_EGG.get());
+                                output.accept(AMBUSH_FISH_SPAWN_EGG.get());
+                                output.accept(GARDEN_EEL_SPAWN_EGG.get());
+                                output.accept(HERMIT_CRAB_SPAWN_EGG.get());
+                                output.accept(SEDIMENT_WORM_SPAWN_EGG.get());
+                                output.accept(HUMUS_JELLY_SPAWN_EGG.get());
+                                output.accept(ANCIENT_NAUTILUS_SPAWN_EGG.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MATERIALS_TAB = tab("materials",
@@ -799,15 +803,16 @@ public final class ItemRegistry {
                                 output.accept(RING_RIB.get());
                                 output.accept(ROTTEN_TISSUE.get());
                                 output.accept(SPRING.get());
-                                 output.accept(THERMOPHILIC_SAMPLE_GOLD.get());
+                                output.accept(THERMOPHILIC_SAMPLE_GOLD.get());
                                 output.accept(THERMOPHILIC_SAMPLE_RUST.get());
                                 output.accept(THERMOPHILIC_SAMPLE_OLIVE.get());
                                 output.accept(PHOTOSENSITIVE_FILM.get());
-                                 output.accept(BRINE_DEVELOPING_SALTS.get());
-                                  output.accept(MUD_BALL.get());
-                                  output.accept(NUTRIENT_MUD_BALL.get());
-                                 output.accept(MUD_BALL.get());
-                                 output.accept(NUTRIENT_MUD_BALL.get());
+                                output.accept(BRINE_DEVELOPING_SALTS.get());
+                                output.accept(MUD_BALL.get());
+                                output.accept(NUTRIENT_MUD_BALL.get());
+                                output.accept(FOSSIL_FRAGMENT.get());
+                                output.accept(HUMUS_GEL.get());
+                                output.accept(ANCIENT_SHELL_FRAGMENT.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TOOLS_TAB = tab("tools",
@@ -879,6 +884,7 @@ public final class ItemRegistry {
                                 output.accept(ANGLERFISH_MASK.get());
                                 output.accept(ENDER_MASK.get());
                                 output.accept(SLIME_MASK.get());
+                                output.accept(MUDWALKER_CHARM.get());
                         });
 
         /**
@@ -936,19 +942,6 @@ public final class ItemRegistry {
                                 // Jelly Jungle: the seaweed forests and the jelly bulges the
                                 // jungle vegetation grows through and wraps in kelp.
                                 output.header(CreativeTabHeader.biome(BiomeRegistry.JELLY_JUNGLE));
-                                 output.accept(CORAL_SAND.get());
-                                 output.accept(MUD.get());
-                                 output.accept(MUD_BRICKS.get());
-                                 output.accept(MUD_BRICK_STAIRS.get());
-                                 output.accept(MUD_BRICK_SLAB.get());
-                                 output.accept(MUD_BRICK_WALL.get());
-                                  output.accept(PARASITIC_MUD.get());
-                                 output.accept(FOSSIL_BED.get());
-                                  output.accept(FOSSIL_FRAGMENT.get());
-                                   output.accept(SHELL_PILE.get());
-                                 output.accept(SEDIMENT_COLUMN.get());
-                                 output.accept(FOSSIL_DISPLAY.get());
-                                 output.accept(NUTRIENT_RICH_MUD.get());
                                 output.accept(DROOPING_SEAWEED.get());
                                 output.accept(SEAWEED.get());
                                 output.accept(SEAWEED_FRUIT.get());
@@ -961,6 +954,24 @@ public final class ItemRegistry {
                                 output.accept(LIGHT_CYAN_JELLY_BLOCK_SEAWEED.get());
                                 output.accept(WHITE_JELLY_BLOCK_SEAWEED.get());
                                 output.accept(LIGHT_GOLDEN_JELLY_BLOCK_SEAWEED.get());
+
+                                // Mud Zone: the sediment floor, its mudstone builds, fossil beds
+                                // and shell litter -- filed under its own biome, not the jungle.
+                                output.header(CreativeTabHeader.biome(BiomeRegistry.MUD_ZONE));
+                                output.accept(MUD.get());
+                                output.accept(NUTRIENT_RICH_MUD.get());
+                                output.accept(PARASITIC_MUD.get());
+                                output.accept(MUD_BRICKS.get());
+                                output.accept(MUD_BRICK_STAIRS.get());
+                                output.accept(MUD_BRICK_SLAB.get());
+                                output.accept(MUD_BRICK_WALL.get());
+                                output.accept(FOSSIL_BED.get());
+                                output.accept(FOSSIL_DISPLAY.get());
+                                output.accept(SHELL_PILE.get());
+                                output.accept(SEDIMENT_COLUMN.get());
+                                output.accept(MUD_BLOOM.get());
+                                output.accept(BEAN_KELP.get());
+                                output.accept(GLOW_FUNGUS.get());
 
                                 // Brine Mirror Gorge: the evaporite terraces, diapirs and
                                 // crystal grottoes of the brine features.

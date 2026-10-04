@@ -62,6 +62,12 @@ public final class MudZoneConfig {
     /** Chance to upgrade to a larger shell when near shell blocks. */
     public static final float SHELL_UPGRADE_CHANCE = 0.10F;
 
+    /** Largest shell tier a hermit crab can grow into; the model scales with the tier. */
+    public static final int SHELL_MAX_SIZE = 3;
+
+    /** Extra max health granted per shell tier. */
+    public static final double SHELL_HEALTH_PER_TIER = 2.0D;
+
     /** Radius in blocks scanned for shell blocks when rolling an upgrade. */
     public static final double SHELL_SEARCH_RADIUS = 4.0D;
 

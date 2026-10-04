@@ -6,12 +6,12 @@ import software.bernie.geckolib.model.GeoModel;
 
 public final class AncientNautilusModel extends GeoModel<AncientNautilusEntity> {
     @Override public ResourceLocation getModelResource(AncientNautilusEntity entity) {
-        return ResourceLocation.fromNamespaceAndPath("aquanaut", "geo/flagellonautilus.geo.json");
+        return ResourceLocation.fromNamespaceAndPath("aquanaut", "geo/ancient_nautilus.geo.json");
     }
     @Override public ResourceLocation getTextureResource(AncientNautilusEntity entity) {
-        return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/flagellonautilus.png");
+        return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/ancient_nautilus.png");
     }
     @Override public ResourceLocation getAnimationResource(AncientNautilusEntity entity) {
-        return ResourceLocation.fromNamespaceAndPath("aquanaut", "animations/flagellonautilus.animation.json");
+        return ResourceLocation.fromNamespaceAndPath("aquanaut", "animations/ancient_nautilus.animation.json");
     }
 }

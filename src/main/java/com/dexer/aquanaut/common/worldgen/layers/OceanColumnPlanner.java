@@ -222,15 +222,17 @@ public final class OceanColumnPlanner {
     }
 
     /**
-     * The void-appetite ramp: normalized district weights saturate below 1 (four districts
-     * share the partition), so the raw "1 − solidity" of a crystal-nest core tops out near
-     * 0.9 and the reef would never fully open. Reshaping through this window keeps the
-     * karst border phase (partial, speckled dissolution) and guarantees the nest core
-     * opens both seas into one another — continuously, with no threshold cliff: below
+     * The void-appetite ramp: normalized district weights saturate below 1 (the middle sea's
+     * districts share the partition), so the raw "1 − solidity" of a crystal-nest core tops
+     * out below 1 and the reef would never fully open. Reshaping through this window keeps the
+     * karst border phase (partial, speckled dissolution) and guarantees the nest core opens
+     * both seas into one another — continuously, with no threshold cliff: below
      * {@code VOID_RAMP_FROM} the slab stays sealed, above {@code VOID_RAMP_TO} it is gone.
+     * The window tracks the district count: adding a fifth district to the middle sea lowered
+     * the nest's peak normalized share from ~0.60 to ~0.52, so the ramp moved with it.
      */
-    static final double VOID_RAMP_FROM = 0.30D;
-    static final double VOID_RAMP_TO = 0.60D;
+    static final double VOID_RAMP_FROM = 0.24D;
+    static final double VOID_RAMP_TO = 0.50D;
 
     static double shapedVoid(double rawVoid) {
         return SoftMixNoise.smoothstep((rawVoid - VOID_RAMP_FROM) / (VOID_RAMP_TO - VOID_RAMP_FROM));

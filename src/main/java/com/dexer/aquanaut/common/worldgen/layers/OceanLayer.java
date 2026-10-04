@@ -51,7 +51,7 @@ public record OceanLayer(ResourceLocation id,
                         // Sediment districts: broad, low, soft-edged basins of mud that
                         // settle onto the middle-sea floor between the other provinces.
                         MixEntry.patch(ResourceLocation.fromNamespaceAndPath("aquanaut", "mud_zone"),
-                                0.42D, 96, -23, 17, 53L),
+                                0.42D, 128, -23, 17, 53L),
                         MixEntry.patch(ResourceLocation.fromNamespaceAndPath("aquanaut", "brine_mirror_gorge"),
                                 0.48D, 80, 19, -13, 7L),
                         MixEntry.patch(ResourceLocation.fromNamespaceAndPath("aquanaut", "brimstone_caldera"),

@@ -5,8 +5,11 @@ import com.dexer.aquanaut.core.BlockRegistry;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.WaterAnimal;
@@ -20,12 +23,23 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 public final class HermitCrabEntity extends WaterAnimal implements GeoEntity {
+    private static final RawAnimation WALK = RawAnimation.begin().thenLoop("walk");
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation HIDE = RawAnimation.begin().thenPlay("hide");
+    private static final RawAnimation EMERGE = RawAnimation.begin().thenPlay("emerge");
     private static final EntityDataAccessor<Boolean> SHELLED = SynchedEntityData.defineId(HermitCrabEntity.class,
             EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> SHELL_SIZE = SynchedEntityData.defineId(HermitCrabEntity.class,
             EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> EMERGE_TIMER = SynchedEntityData.defineId(HermitCrabEntity.class,
+            EntityDataSerializers.INT);
+    /** Ticks the emerge clip plays for: 0.4 s at 20 tps, matching the exported clip. */
+    private static final int EMERGE_TICKS = 8;
+    /** Horizontal speed above which the crab reads as walking rather than idle. */
+    private static final double CRAWL_SPEED_SQR = 4.0E-4D;
+    /** The current shell tier's health bonus, keyed so a new tier replaces it instead of stacking. */
+    private static final ResourceLocation SHELL_HEALTH_ID =
+            ResourceLocation.fromNamespaceAndPath("aquanaut", "shell_tier_health");
     private int shellTicks;
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -38,6 +52,7 @@ public final class HermitCrabEntity extends WaterAnimal implements GeoEntity {
         super.defineSynchedData(builder);
         builder.define(SHELLED, false);
         builder.define(SHELL_SIZE, 0);
+        builder.define(EMERGE_TIMER, 0);
     }
     @Override public boolean hurt(DamageSource source, float amount) {
         if (!level().isClientSide) {
@@ -52,23 +67,52 @@ public final class HermitCrabEntity extends WaterAnimal implements GeoEntity {
             }
             return;
         }
-        if (!level().isClientSide && tickCount % 40 == 0 && shellSize() == 0
+        if (!level().isClientSide && emergeTimer() > 0) {
+            entityData.set(EMERGE_TIMER, emergeTimer() - 1);
+        }
+        if (!level().isClientSide && tickCount % 40 == 0 && shellSize() < MudZoneConfig.SHELL_MAX_SIZE
                 && level().getBlockStates(new net.minecraft.world.phys.AABB(blockPosition()).inflate(
                         MudZoneConfig.SHELL_SEARCH_RADIUS))
                         .anyMatch(state -> state.is(BlockRegistry.SHELL_BLOCK.get())
                                 || state.is(BlockRegistry.HARD_SHELL_BLOCK.get())
                                 || state.is(BlockRegistry.SHELL_PILE.get()))
                 && random.nextFloat() < MudZoneConfig.SHELL_UPGRADE_CHANCE) {
-            entityData.set(SHELL_SIZE, 1);
+            growShell();
         }
         super.aiStep();
     }
     public boolean isShelled() { return entityData.get(SHELLED); }
     public int shellSize() { return entityData.get(SHELL_SIZE); }
+    private int emergeTimer() { return entityData.get(EMERGE_TIMER); }
+    private boolean isCrawling() {
+        return getDeltaMovement().horizontalDistanceSqr() > CRAWL_SPEED_SQR;
+    }
+    /**
+     * Grow into the next shell tier: a bigger shell (the renderer scales with the tier), a
+     * tougher body, and a fresh emerge so the swap reads as an event.
+     */
+    private void growShell() {
+        int tier = Math.min(shellSize() + 1, MudZoneConfig.SHELL_MAX_SIZE);
+        entityData.set(SHELL_SIZE, tier);
+        AttributeInstance health = getAttribute(Attributes.MAX_HEALTH);
+        if (health != null) {
+            health.removeModifier(SHELL_HEALTH_ID);
+            health.addPermanentModifier(new AttributeModifier(SHELL_HEALTH_ID,
+                    tier * MudZoneConfig.SHELL_HEALTH_PER_TIER, AttributeModifier.Operation.ADD_VALUE));
+            setHealth(getMaxHealth());
+        }
+        entityData.set(EMERGE_TIMER, EMERGE_TICKS);
+    }
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, state -> {
             if (isShelled()) {
                 return state.setAndContinue(HIDE);
+            }
+            if (emergeTimer() > 0) {
+                return state.setAndContinue(EMERGE);
+            }
+            if (isCrawling()) {
+                return state.setAndContinue(WALK);
             }
             return state.setAndContinue(IDLE);
         }));
@@ -76,6 +120,10 @@ public final class HermitCrabEntity extends WaterAnimal implements GeoEntity {
     @Override public AnimatableInstanceCache getAnimatableInstanceCache() { return cache; }
     private void setShelled(boolean value) {
         entityData.set(SHELLED, value);
-        if (value) shellTicks = MudZoneConfig.SHELL_DURATION_TICKS;
+        if (value) {
+            shellTicks = MudZoneConfig.SHELL_DURATION_TICKS;
+        } else {
+            entityData.set(EMERGE_TIMER, EMERGE_TICKS);
+        }
     }
 }

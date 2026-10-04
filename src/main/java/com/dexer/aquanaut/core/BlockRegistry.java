@@ -140,6 +140,13 @@ public final class BlockRegistry {
     public static final DeferredBlock<SeaweedBlock> SEAWEED_FRUIT = leafSeaweed("seaweed_fruit");
     public static final DeferredBlock<SeaweedStemBlock> SEAWEED_STEM = seaweedStem("seaweed_stem");
 
+    // Mud Zone flora -- a flower, a glowing fungus and an edible kelp. All reuse the mod's
+    // existing plant blocks (SeaweedBlock / CrystalPlantBlock); only the assets are new.
+    public static final DeferredBlock<SeaweedBlock> MUD_BLOOM = leafSeaweed("mud_bloom");
+    public static final DeferredBlock<SeaweedBlock> BEAN_KELP = leafSeaweed("bean_kelp");
+    public static final DeferredBlock<CrystalPlantBlock> GLOW_FUNGUS = crystalPlant("glow_fungus", 7,
+            MapColor.COLOR_CYAN);
+
     // Brine Mirror Gorge - evaporite minerals and crystal flora
     public static final DeferredBlock<Block> HALITE_CRUST = cube("halite_crust",
             MapColor.TERRACOTTA_WHITE, 0.8F, 1.2F, SoundType.CALCITE);

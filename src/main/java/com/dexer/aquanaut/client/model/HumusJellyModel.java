@@ -6,12 +6,12 @@ import software.bernie.geckolib.model.GeoModel;
 
 public final class HumusJellyModel extends GeoModel<HumusJellyEntity> {
     @Override public ResourceLocation getModelResource(HumusJellyEntity entity) {
-        return ResourceLocation.fromNamespaceAndPath("aquanaut", "geo/blue_jellyfish.geo.json");
+        return ResourceLocation.fromNamespaceAndPath("aquanaut", "geo/humus_jelly.geo.json");
     }
     @Override public ResourceLocation getTextureResource(HumusJellyEntity entity) {
-        return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/blue_jellyfish.png");
+        return ResourceLocation.fromNamespaceAndPath("aquanaut", "textures/entity/humus_jelly.png");
     }
     @Override public ResourceLocation getAnimationResource(HumusJellyEntity entity) {
-        return ResourceLocation.fromNamespaceAndPath("aquanaut", "animations/blue_jellyfish.animation.json");
+        return ResourceLocation.fromNamespaceAndPath("aquanaut", "animations/humus_jelly.animation.json");
     }
 }

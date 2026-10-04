@@ -124,6 +124,7 @@ public final class OceanColumnShading {
             case VOLCANIC -> BlockRegistry.VOLCANIC_AGGLOMERATE.get().defaultBlockState();
             // The brine gorge: varve shale with halite-crust lenses.
             case HALITE -> brineFloorStateFor(blockX, blockY, blockZ, plan.cavityFloorY());
+            case MUD -> mudFloorStateFor(blockX, blockY, blockZ, plan.cavityFloorY());
             case SEDIMENTARY -> floorStateFor(blockX, blockY, blockZ, plan.cavityFloorY());
         };
     }
@@ -161,6 +162,40 @@ public final class OceanColumnShading {
             case 0 -> BlockRegistry.VARVE_SHALE.get().defaultBlockState();
             case 1 -> BlockRegistry.SHALE.get().defaultBlockState();
             default -> BlockRegistry.HALITE_CRUST.get().defaultBlockState();
+        };
+    }
+
+    /**
+     * Mud-zone ground: a waterlogged mud veneer over banded mudstone with fossil beds.
+     * Nutrient-rich mud forms the humus patches; parasitic mud stays rare so it reads as
+     * an anomaly rather than the default.
+     */
+    private static BlockState mudFloorStateFor(int blockX, int blockY, int blockZ, int cavityFloorY) {
+        int depth = Math.max(0, cavityFloorY - blockY);
+        if (depth == 0) {
+            int patch = strataIndex(blockX, blockZ, blockY, 16,
+                    OceanColumnPlanner.LITH_STRATA_SEED ^ 0x3DL);
+            if (patch == 0) {
+                return BlockRegistry.PARASITIC_MUD.get().defaultBlockState();
+            }
+            if (patch <= 4) {
+                return BlockRegistry.NUTRIENT_RICH_MUD.get().defaultBlockState();
+            }
+            return BlockRegistry.MUD.get().defaultBlockState();
+        }
+        if (depth <= 2) {
+            double silt = SoftMixNoise.valueNoise(blockX, blockZ, 12,
+                    OceanColumnPlanner.LITH_REGION_SEED ^ 0x3DL);
+            return silt > 0.62D
+                    ? BlockRegistry.NUTRIENT_RICH_MUD.get().defaultBlockState()
+                    : BlockRegistry.MUD.get().defaultBlockState();
+        }
+        return switch (strataIndex(blockX, blockZ, blockY, 16,
+                OceanColumnPlanner.LITH_STRATA_SEED ^ 0x59L)) {
+            case 0, 1 -> BlockRegistry.VARVE_SHALE.get().defaultBlockState();
+            case 2, 3, 4 -> BlockRegistry.SHALE.get().defaultBlockState();
+            case 15 -> BlockRegistry.FOSSIL_BED.get().defaultBlockState();
+            default -> BlockRegistry.MUD.get().defaultBlockState();
         };
     }
 

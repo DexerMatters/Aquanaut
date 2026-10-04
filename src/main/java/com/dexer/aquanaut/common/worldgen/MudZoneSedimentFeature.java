@@ -3,6 +3,8 @@ package com.dexer.aquanaut.common.worldgen;
 import com.dexer.aquanaut.core.BiomeRegistry;
 import com.dexer.aquanaut.core.BlockRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
@@ -11,7 +13,7 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
-/** Places shallow organic sediment patches on the middle-level ocean floor. */
+/** Converts the mud-zone floor's sediment into a thick, coherent mud bed. */
 public final class MudZoneSedimentFeature extends Feature<NoneFeatureConfiguration> {
     public MudZoneSedimentFeature() {
         super(NoneFeatureConfiguration.CODEC);
@@ -26,17 +28,18 @@ public final class MudZoneSedimentFeature extends Feature<NoneFeatureConfigurati
             return false;
         }
 
-        int radius = 2 + random.nextInt(3);
+        int radius = 3 + random.nextInt(4);
+        BlockPos floor = findFloor(level, origin);
         boolean placed = false;
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
-                if (dx * dx + dz * dz > radius * radius || random.nextFloat() < 0.18F) {
+                if (dx * dx + dz * dz > radius * radius || random.nextFloat() < 0.08F) {
                     continue;
                 }
-                int depth = 1 + random.nextInt(2);
+                int depth = 2 + random.nextInt(2);
                 for (int dy = 0; dy < depth; dy++) {
-                    cursor.set(origin.getX() + dx, origin.getY() - dy, origin.getZ() + dz);
+                    cursor.set(floor.getX() + dx, floor.getY() - dy, floor.getZ() + dz);
                     BlockState state = level.getBlockState(cursor);
                     if (!isSediment(state)) {
                         break;
@@ -51,7 +54,18 @@ public final class MudZoneSedimentFeature extends Feature<NoneFeatureConfigurati
 
     private static boolean isSediment(BlockState state) {
         return state.is(Blocks.SAND) || state.is(Blocks.GRAVEL) || state.is(Blocks.CLAY)
+                || state.is(Blocks.DIRT) || state.is(Blocks.COARSE_DIRT)
                 || state.is(BlockRegistry.CORAL_SAND.get());
+    }
+
+    /** Drops from above the column to the first solid sediment block so the bed is not offset. */
+    private static BlockPos findFloor(WorldGenLevel level, BlockPos origin) {
+        BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos(origin.getX(), origin.getY() + 16,
+                origin.getZ());
+        while (mutable.getY() > origin.getY() - 16 && level.getFluidState(mutable).is(FluidTags.WATER)) {
+            mutable.move(Direction.DOWN);
+        }
+        return mutable.immutable();
     }
 
     private static BlockState mudState(WorldGenLevel level, BlockPos pos, RandomSource random) {

@@ -33,8 +33,8 @@ public final class MudMoundFeature extends Feature<NoneFeatureConfiguration> {
         }
 
         BlockPos floor = findFloor(level, origin);
-        int radius = 3 + random.nextInt(4);
-        int peak = 1 + random.nextInt(4);
+        int radius = 4 + random.nextInt(4);
+        int peak = 2 + random.nextInt(4);
         boolean placed = false;
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
         for (int dx = -radius; dx <= radius; dx++) {

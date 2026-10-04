@@ -1,6 +1,5 @@
 package com.dexer.aquanaut.common.worldgen;
 
-import com.dexer.aquanaut.common.block.DroopingSeaweedBlock;
 import com.dexer.aquanaut.core.BiomeRegistry;
 import com.dexer.aquanaut.core.BlockRegistry;
 import net.minecraft.core.BlockPos;
@@ -9,19 +8,17 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.KelpBlock;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 /**
- * The mud zone's growth layer: seaweed beds, kelp stands, shell litter and drooping seaweed
- * hanging off the reef above. The murk calls for a soft, low canopy rather than a forest,
- * but it is dense enough that the biome reads as alive the moment a diver drops in. Reuses
- * the mod's seaweed blocks and the shell pile; no new flora material.
+ * The mud zone's growth layer: the biome's own plants only -- mud bloom, bean kelp and
+ * glow fungus -- plus a rare, small shell scatter. It deliberately does NOT place seaweed,
+ * seaweed fruit, kelp or drooping seaweed: those belong to the seaweed/jelly provinces,
+ * and reusing them here made the mud flats read as a second jelly jungle instead of their
+ * own biome.
  */
 public final class MudFloraFeature extends Feature<NoneFeatureConfiguration> {
     public MudFloraFeature() {
@@ -38,26 +35,18 @@ public final class MudFloraFeature extends Feature<NoneFeatureConfiguration> {
         }
 
         boolean placedAny = false;
-        for (int i = 0; i < 5 + random.nextInt(4); i++) {
-            placedAny |= placeSeaweedCluster(level, sampleFloor(level, origin, random), random);
-        }
-        for (int i = 0; i < 4 + random.nextInt(3); i++) {
-            placedAny |= placeShortKelp(level, sampleFloor(level, origin, random), random);
-        }
-        for (int i = 0; i < 3 + random.nextInt(3); i++) {
-            placedAny |= placeShellDebris(level, sampleFloor(level, origin, random), random);
-        }
-        for (int i = 0; i < 3 + random.nextInt(3); i++) {
-            placedAny |= placeFloatingDroopingSeaweed(level, sampleFloor(level, origin, random), random);
-        }
-        for (int i = 0; i < 4 + random.nextInt(4); i++) {
+        for (int i = 0; i < 6 + random.nextInt(5); i++) {
             placedAny |= placeLeaf(level, sampleFloor(level, origin, random), BlockRegistry.MUD_BLOOM.get());
         }
-        for (int i = 0; i < 3 + random.nextInt(3); i++) {
+        for (int i = 0; i < 4 + random.nextInt(4); i++) {
             placedAny |= placeLeaf(level, sampleFloor(level, origin, random), BlockRegistry.BEAN_KELP.get());
         }
         for (int i = 0; i < 2 + random.nextInt(3); i++) {
             placedAny |= placeLeaf(level, sampleFloor(level, origin, random), BlockRegistry.GLOW_FUNGUS.get());
+        }
+        // Shells are a seasoning, not a bed: one small patch at most, and usually none.
+        if (random.nextFloat() < 0.2F) {
+            placedAny |= placeShellDebris(level, sampleFloor(level, origin, random), random);
         }
         return placedAny;
     }
@@ -82,59 +71,15 @@ public final class MudFloraFeature extends Feature<NoneFeatureConfiguration> {
         return mutable.immutable();
     }
 
-    private static boolean placeSeaweedCluster(WorldGenLevel level, BlockPos floor, RandomSource random) {
-        BlockPos center = floor.above();
-        if (!level.getFluidState(center).is(FluidTags.WATER)) {
-            return false;
-        }
-        boolean placedAny = false;
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dz = -1; dz <= 1; dz++) {
-                if (random.nextFloat() < 0.45F) {
-                    continue;
-                }
-                BlockPos target = center.offset(dx, random.nextInt(3), dz);
-                if (!level.getFluidState(target).is(FluidTags.WATER)) {
-                    continue;
-                }
-                Block block = random.nextFloat() < 0.14F
-                        ? BlockRegistry.SEAWEED_FRUIT.get()
-                        : BlockRegistry.SEAWEED.get();
-                level.setBlock(target, block.defaultBlockState().setValue(BlockStateProperties.WATERLOGGED, true), 2);
-                placedAny = true;
-            }
-        }
-        return placedAny;
-    }
-
-    private static boolean placeShortKelp(WorldGenLevel level, BlockPos floor, RandomSource random) {
-        if (!level.getBlockState(floor).isFaceSturdy(level, floor, Direction.UP)) {
-            return false;
-        }
-        int maxHeight = 2 + random.nextInt(5);
-        int height = 0;
-        for (int i = 1; i <= maxHeight; i++) {
-            if (!level.getFluidState(floor.above(i)).is(FluidTags.WATER)) {
-                break;
-            }
-            height = i;
-        }
-        if (height < 1) {
-            return false;
-        }
-        for (int i = 1; i < height; i++) {
-            level.setBlock(floor.above(i), Blocks.KELP_PLANT.defaultBlockState(), 2);
-        }
-        level.setBlock(floor.above(height),
-                Blocks.KELP.defaultBlockState().setValue(KelpBlock.AGE, random.nextInt(24)), 2);
-        return true;
-    }
-
+    /** A small, rare scatter of shell litter. */
     private static boolean placeShellDebris(WorldGenLevel level, BlockPos floor, RandomSource random) {
         boolean placedAny = false;
-        int extent = random.nextInt(3);
+        int extent = random.nextInt(2);
         for (int dx = -extent; dx <= extent; dx++) {
             for (int dz = -extent; dz <= extent; dz++) {
+                if (random.nextFloat() < 0.35F) {
+                    continue;
+                }
                 BlockPos target = floor.offset(dx, 1, dz);
                 if (!level.getFluidState(target).is(FluidTags.WATER)) {
                     continue;
@@ -144,30 +89,5 @@ public final class MudFloraFeature extends Feature<NoneFeatureConfiguration> {
             }
         }
         return placedAny;
-    }
-
-    /** A curtain of seaweed hanging off the reef above, like the jelly jungle's. */
-    private static boolean placeFloatingDroopingSeaweed(WorldGenLevel level, BlockPos floor, RandomSource random) {
-        BlockPos top = floor.above(4 + random.nextInt(10));
-        int height = 2 + random.nextInt(7);
-        for (int offset = 0; offset < height; offset++) {
-            if (!level.getFluidState(top.below(offset)).is(FluidTags.WATER)) {
-                return false;
-            }
-        }
-        for (int offset = 0; offset < height; offset++) {
-            BlockPos current = top.below(offset);
-            BlockState state = BlockRegistry.DROOPING_SEAWEED.get().defaultBlockState()
-                    .setValue(BlockStateProperties.WATERLOGGED, true);
-            if (offset == 0) {
-                state = state.setValue(DroopingSeaweedBlock.PART, DroopingSeaweedBlock.SeaweedPart.TOP);
-            } else if (offset == height - 1) {
-                state = state.setValue(DroopingSeaweedBlock.PART, DroopingSeaweedBlock.SeaweedPart.TAIL);
-            } else {
-                state = state.setValue(DroopingSeaweedBlock.PART, DroopingSeaweedBlock.SeaweedPart.BODY);
-            }
-            level.setBlock(current, state, 2);
-        }
-        return true;
     }
 }

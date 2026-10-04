@@ -32,8 +32,8 @@ public final class FossilOutcropFeature extends Feature<NoneFeatureConfiguration
         }
 
         BlockPos floor = findFloor(level, origin);
-        int radius = 2 + random.nextInt(3);
-        int peak = 1 + random.nextInt(3);
+        int radius = 2 + random.nextInt(2);
+        int peak = 1 + random.nextInt(2);
         boolean placed = false;
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
         for (int dx = -radius; dx <= radius; dx++) {
@@ -61,7 +61,7 @@ public final class FossilOutcropFeature extends Feature<NoneFeatureConfiguration
                 }
             }
         }
-        if (placed && random.nextFloat() < 0.6F) {
+        if (placed && random.nextFloat() < 0.4F) {
             // Expose one fossil node at the crest.
             cursor.set(floor.getX(), floor.getY() + 1, floor.getZ());
             level.setBlock(cursor, BlockRegistry.FOSSIL_BED.get().defaultBlockState(), 2);
@@ -70,7 +70,7 @@ public final class FossilOutcropFeature extends Feature<NoneFeatureConfiguration
     }
 
     private static BlockState outcropState(RandomSource random) {
-        if (random.nextFloat() < 0.22F) {
+        if (random.nextFloat() < 0.12F) {
             return BlockRegistry.FOSSIL_BED.get().defaultBlockState();
         }
         return random.nextFloat() < 0.6F

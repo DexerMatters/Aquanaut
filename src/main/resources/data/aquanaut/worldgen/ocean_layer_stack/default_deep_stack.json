@@ -56,7 +56,15 @@
             "noise_scale": 32,
             "noise_offset_x": 11,
             "noise_offset_z": -7,
-            "noise_salt": 2
+            "noise_salt": 3
+          },
+          {
+            "biome": "aquanaut:mud_zone",
+            "weight": 0.5,
+            "noise_scale": 40,
+            "noise_offset_x": -19,
+            "noise_offset_z": 9,
+            "noise_salt": 71
           }
         ]
       },
@@ -81,14 +89,6 @@
             "noise_offset_x": 19,
             "noise_offset_z": -13,
             "noise_salt": 7
-          },
-          {
-            "biome": "aquanaut:mud_zone",
-            "weight": 0.42,
-            "noise_scale": 128,
-            "noise_offset_x": -23,
-            "noise_offset_z": 17,
-            "noise_salt": 53
           },
           {
             "biome": "aquanaut:brine_mirror_gorge",

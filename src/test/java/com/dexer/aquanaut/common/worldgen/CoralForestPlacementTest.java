@@ -34,7 +34,8 @@ public final class CoralForestPlacementTest {
         MiddleLevelOceanColumnRules.TargetBiome band =
                 MiddleLevelOceanColumnRules.targetBiome(minecraft("deep_ocean"), 16, 0, 9, 0);
         assertTrue(band == MiddleLevelOceanColumnRules.TargetBiome.CORAL_FOREST
-                        || band == MiddleLevelOceanColumnRules.TargetBiome.JELLY_JUNGLE,
+                        || band == MiddleLevelOceanColumnRules.TargetBiome.JELLY_JUNGLE
+                        || band == MiddleLevelOceanColumnRules.TargetBiome.MUD_ZONE,
                 "reef band should route to a custom reef biome");
         MiddleLevelOceanColumnRules.TargetBiome deep =
                 MiddleLevelOceanColumnRules.targetBiome(minecraft("deep_ocean"), 16, 0, 7, 0);

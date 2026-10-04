@@ -57,16 +57,17 @@ public final class OceanLayerStackTest {
     }
 
     @Test
-    void reefMixProducesBothBiomesAcrossLargeSampling() {
+    void reefMixProducesTheReefBiomesAcrossLargeSampling() {
         BiomeMix mix = OceanLayer.reefCeiling().mix();
         Set<ResourceLocation> seen = new HashSet<>();
-        for (int x = -200; x <= 200; x += 25) {
-            for (int z = -200; z <= 200; z += 25) {
+        for (int x = -200; x <= 200; x += 8) {
+            for (int z = -200; z <= 200; z += 8) {
                 seen.add(mix.dominantBiomeAt(x, z));
             }
         }
         assertTrue(seen.contains(ResourceLocation.fromNamespaceAndPath("aquanaut", "coral_forest")));
         assertTrue(seen.contains(ResourceLocation.fromNamespaceAndPath("aquanaut", "jelly_jungle")));
+        assertTrue(seen.contains(ResourceLocation.fromNamespaceAndPath("aquanaut", "mud_zone")));
     }
 
     @Test
@@ -75,7 +76,11 @@ public final class OceanLayerStackTest {
         int mixed = 0;
         for (int x = -128; x <= 128; x++) {
             double[] weights = mix.weightsAt(x, 0);
-            assertEquals(1.0, weights[0] + weights[1], 1e-6);
+            double sum = 0.0D;
+            for (double w : weights) {
+                sum += w;
+            }
+            assertEquals(1.0, sum, 1e-6);
             if (weights[0] > 0.15 && weights[1] > 0.15) {
                 mixed++;
             }

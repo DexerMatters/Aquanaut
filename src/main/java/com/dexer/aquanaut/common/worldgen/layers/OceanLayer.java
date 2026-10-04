@@ -27,8 +27,15 @@ public record OceanLayer(ResourceLocation id,
                 new BiomeMix(java.util.List.of(
                         MixEntry.patch(ResourceLocation.fromNamespaceAndPath("aquanaut", "coral_forest"),
                                 0.5D, 32, 11, -7),
+                        // Distinct salts: with three entries the mix uses per-entry noise (argmax),
+                        // so coral and jelly can no longer share one field without one shadowing
+                        // the other.
                         MixEntry.patch(ResourceLocation.fromNamespaceAndPath("aquanaut", "jelly_jungle"),
-                                0.5D, 32, 11, -7)
+                                0.5D, 32, 11, -7, 3L),
+                        // The mud flats: broad sediment shelves sharing the reef band with the
+                        // coral and jelly provinces, so the mud zone sits at the same depth.
+                        MixEntry.patch(ResourceLocation.fromNamespaceAndPath("aquanaut", "mud_zone"),
+                                0.5D, 40, -19, 9, 71L)
                 ), 3.0D),
                 ResourceLocation.fromNamespaceAndPath("aquanaut", "reef_cap"),
                 true);
@@ -48,10 +55,6 @@ public record OceanLayer(ResourceLocation id,
                 new BiomeMix(java.util.List.of(
                         MixEntry.patch(ResourceLocation.fromNamespaceAndPath("aquanaut", "middle_level_ocean"),
                                 0.30D, 80, 19, -13, 7L),
-                        // Sediment districts: broad, low, soft-edged basins of mud that
-                        // settle onto the middle-sea floor between the other provinces.
-                        MixEntry.patch(ResourceLocation.fromNamespaceAndPath("aquanaut", "mud_zone"),
-                                0.42D, 128, -23, 17, 53L),
                         MixEntry.patch(ResourceLocation.fromNamespaceAndPath("aquanaut", "brine_mirror_gorge"),
                                 0.48D, 80, 19, -13, 7L),
                         MixEntry.patch(ResourceLocation.fromNamespaceAndPath("aquanaut", "brimstone_caldera"),

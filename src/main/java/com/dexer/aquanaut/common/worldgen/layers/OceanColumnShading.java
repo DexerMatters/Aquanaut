@@ -56,7 +56,7 @@ public final class OceanColumnShading {
         }
 
         if (blockY <= capTop && blockY >= capBottom) {
-            return capStateFor(blockX, blockY, blockZ, capTop, capBottom);
+            return capStateFor(plan, blockX, blockY, blockZ, capTop, capBottom);
         }
 
         // Sedimentary outcrops belong to the quiet middle sea. Volcanic ground grows its
@@ -261,7 +261,16 @@ public final class OceanColumnShading {
         };
     }
 
-    private static BlockState capStateFor(int blockX, int blockY, int blockZ, int capTop, int capBottom) {
+    private static BlockState capStateFor(OceanColumnPlanner.ColumnPlan plan,
+                                          int blockX, int blockY, int blockZ, int capTop, int capBottom) {
+        // A mud district turns its stretch of the reef shelf into a mud flat instead of a
+        // sandy reef; the coral and jelly provinces keep their sand and limestone.
+        ReefDescriptor.Family family = ReefDescriptor.Family.VALUES[
+                plan.contact().pickFamily(plan.reef().familyWeights(),
+                        blockX, blockY, blockZ, OceanColumnPlanner.REEF_DITHER_SEED)];
+        if (family == ReefDescriptor.Family.MUD) {
+            return mudFloorStateFor(blockX, blockY, blockZ, capTop);
+        }
         int depth = capTop - blockY;
 
         if (depth == 0) {

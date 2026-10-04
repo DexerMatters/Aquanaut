@@ -18,7 +18,7 @@ public final class OceanLayerStackJsonTest {
         OceanLayerStack stack = OceanLayerStackJson.fromPath(path);
         assertEquals(4, stack.layers().size());
         assertTrue(stack.layers().get(1).rewritesBiome());
-        assertEquals(2, stack.layers().get(1).mix().entries().size());
+        assertEquals(3, stack.layers().get(1).mix().entries().size());
         // The deep sea is the last layer and its single placeholder biome fills the abyss.
         assertEquals("aquanaut:deep_sea", stack.layers().get(3).id().toString());
         assertEquals(1, stack.layers().get(3).mix().entries().size());

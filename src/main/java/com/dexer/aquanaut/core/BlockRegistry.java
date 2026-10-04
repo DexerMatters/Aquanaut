@@ -142,8 +142,10 @@ public final class BlockRegistry {
 
     // Mud Zone flora -- a flower, a glowing fungus and an edible kelp. All reuse the mod's
     // existing plant blocks (SeaweedBlock / CrystalPlantBlock); only the assets are new.
-    public static final DeferredBlock<SeaweedBlock> MUD_BLOOM = leafSeaweed("mud_bloom");
-    public static final DeferredBlock<SeaweedBlock> BEAN_KELP = leafSeaweed("bean_kelp");
+    public static final DeferredBlock<CrystalPlantBlock> MUD_BLOOM = crystalPlant("mud_bloom", 0,
+            MapColor.COLOR_GREEN);
+    public static final DeferredBlock<CrystalPlantBlock> BEAN_KELP = crystalPlant("bean_kelp", 0,
+            MapColor.COLOR_GREEN);
     public static final DeferredBlock<CrystalPlantBlock> GLOW_FUNGUS = crystalPlant("glow_fungus", 7,
             MapColor.COLOR_CYAN);
 

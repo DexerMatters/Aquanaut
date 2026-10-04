@@ -1,7 +1,7 @@
 {
   "render_type": "minecraft:cutout",
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cross",
   "textures": {
-    "all": "aquanaut:block/bean_kelp"
+    "cross": "aquanaut:block/bean_kelp"
   }
 }

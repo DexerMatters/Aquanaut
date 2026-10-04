@@ -1,3 +1,6 @@
 {
-  "parent": "aquanaut:block/bean_kelp"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "aquanaut:block/bean_kelp"
+  }
 }

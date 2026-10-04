@@ -73,7 +73,7 @@ public abstract class NoiseBasedChunkGeneratorMixin {
         int cellsZ = 16 / cellWidth;
         BlockState defaultBlock = this.settings.value().defaultBlock();
 
-        OceanLayerStack stack = OceanLayerStacks.active();
+        OceanLayerStack stack = OceanLayerStacks.activeFor(chunk.getMinBuildHeight());
         TerrainModule terrain = OceanChunkSampler.stackTerrain(stack);
         ChunkGeneratorAccessor generatorAccessor = (ChunkGeneratorAccessor) this;
         int surfaceQuartY = MiddleLevelOceanPlacement.surfaceSampleQuartY();
@@ -203,7 +203,7 @@ public abstract class NoiseBasedChunkGeneratorMixin {
 
     private boolean aquanaut$isCoveredChunk(ChunkAccess chunk, StructureManager structureManager,
             WorldGenRegion worldGenRegion, RandomState randomState, int cellWidth, int cellHeight) {
-        OceanLayerStack stack = OceanLayerStacks.active();
+        OceanLayerStack stack = OceanLayerStacks.activeFor(chunk.getMinBuildHeight());
         if (stack == null || stack.layers().isEmpty()) {
             return false;
         }

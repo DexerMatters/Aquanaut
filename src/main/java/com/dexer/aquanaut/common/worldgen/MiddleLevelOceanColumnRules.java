@@ -7,8 +7,16 @@ import net.minecraft.resources.ResourceLocation;
 
 /**
  * Thin facade over the active {@link OceanLayerStack}. Prefer the layers package for new code.
+ *
+ * <p>
+ * The overloads that omit a world floor answer for the authored layout, i.e. the vanilla-height
+ * column. Code running inside a live level should pass {@code level.getMinBuildHeight()} (or
+ * {@code chunk.getMinBuildHeight()}) instead, so a deeper dimension resolves the extended abyss
+ * band rather than the vanilla-height one.
+ * </p>
  */
 public final class MiddleLevelOceanColumnRules {
+
     private MiddleLevelOceanColumnRules() {
     }
 
@@ -16,12 +24,37 @@ public final class MiddleLevelOceanColumnRules {
         return OceanLayerStacks.active().supportsQuartCell(surfaceBiomeLocation, openWaterColumns);
     }
 
+    public static boolean supportsQuartCell(ResourceLocation surfaceBiomeLocation, int openWaterColumns,
+                                            int minBuildHeight) {
+        return OceanLayerStacks.activeFor(minBuildHeight)
+                .supportsQuartCell(surfaceBiomeLocation, openWaterColumns);
+    }
+
     public static TargetBiome targetBiome(ResourceLocation surfaceBiomeLocation,
                                           int openWaterColumns,
                                           int quartX,
                                           int quartY,
                                           int quartZ) {
-        OceanLayerStack stack = OceanLayerStacks.active();
+        return targetBiome(OceanLayerStacks.active(), surfaceBiomeLocation, openWaterColumns,
+                quartX, quartY, quartZ);
+    }
+
+    public static TargetBiome targetBiome(ResourceLocation surfaceBiomeLocation,
+                                          int openWaterColumns,
+                                          int quartX,
+                                          int quartY,
+                                          int quartZ,
+                                          int minBuildHeight) {
+        return targetBiome(OceanLayerStacks.activeFor(minBuildHeight), surfaceBiomeLocation,
+                openWaterColumns, quartX, quartY, quartZ);
+    }
+
+    private static TargetBiome targetBiome(OceanLayerStack stack,
+                                           ResourceLocation surfaceBiomeLocation,
+                                           int openWaterColumns,
+                                           int quartX,
+                                           int quartY,
+                                           int quartZ) {
         if (!stack.supportsQuartCell(surfaceBiomeLocation, openWaterColumns)) {
             return TargetBiome.NONE;
         }
@@ -59,7 +92,14 @@ public final class MiddleLevelOceanColumnRules {
      * Soft horizontal mix weight for jelly jungle on the reef band (1 = full jelly).
      */
     public static double jellyWeight(int quartX, int quartZ) {
-        OceanLayerStack stack = OceanLayerStacks.active();
+        return jellyWeight(OceanLayerStacks.active(), quartX, quartZ);
+    }
+
+    public static double jellyWeight(int quartX, int quartZ, int minBuildHeight) {
+        return jellyWeight(OceanLayerStacks.activeFor(minBuildHeight), quartX, quartZ);
+    }
+
+    private static double jellyWeight(OceanLayerStack stack, int quartX, int quartZ) {
         for (var layer : stack.layers()) {
             if (layer.mix().entries().size() >= 2
                     && layer.mix().entries().get(0).biome().equals(CoralForestPlacement.location())) {

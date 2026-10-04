@@ -16,6 +16,12 @@ public final class OceanLayerStacks {
             ResourceLocation.fromNamespaceAndPath("aquanaut", "default_deep_stack");
 
     private static final Map<ResourceLocation, OceanLayerStack> STACKS = new ConcurrentHashMap<>();
+    /**
+     * Active stack resolved per world floor. Cached because chunk generation asks for it once
+     * per chunk and the resolution allocates a full mapped layer list; invalidated whenever the
+     * registry or the active id changes.
+     */
+    private static final Map<Integer, OceanLayerStack> RESOLVED = new ConcurrentHashMap<>();
     private static volatile ResourceLocation activeId = DEFAULT_ID;
 
     static {
@@ -39,6 +45,7 @@ public final class OceanLayerStacks {
 
     public static void register(OceanLayerStack stack) {
         STACKS.put(stack.id(), stack);
+        RESOLVED.clear();
     }
 
     public static void replaceAll(Collection<OceanLayerStack> stacks) {
@@ -50,17 +57,29 @@ public final class OceanLayerStacks {
         if (!STACKS.containsKey(activeId)) {
             activeId = DEFAULT_ID;
         }
+        RESOLVED.clear();
     }
 
     public static void setActive(ResourceLocation id) {
         if (STACKS.containsKey(id)) {
             activeId = id;
+            RESOLVED.clear();
         }
     }
 
     public static OceanLayerStack active() {
         OceanLayerStack stack = STACKS.get(activeId);
         return stack != null ? stack : STACKS.get(DEFAULT_ID);
+    }
+
+    /**
+     * The active stack resolved for a world whose floor sits at {@code minBuildHeight}: the abyss
+     * band is extended to match the band above it and the rest of the layout is untouched. At the
+     * reference floor this is exactly {@link #active()}.
+     */
+    public static OceanLayerStack activeFor(int minBuildHeight) {
+        OceanLayerStack stack = active();
+        return RESOLVED.computeIfAbsent(minBuildHeight, stack::deepenedFor);
     }
 
     public static OceanLayerStack get(ResourceLocation id) {

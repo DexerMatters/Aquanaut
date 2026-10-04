@@ -2,6 +2,7 @@ package com.dexer.aquanaut.common.worldgen.layers;
 
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,6 +25,46 @@ public record OceanLayerStack(ResourceLocation id,
 
     public boolean isParentBiome(ResourceLocation biomeLocation) {
         return biomeLocation != null && parentBiomes.contains(biomeLocation);
+    }
+
+    /**
+     * This stack as it applies to a world whose floor sits at {@code minBuildHeight}.
+     *
+     * <p>
+     * Extending the world's Y range changes exactly one thing: the deepest band — the abyss, the
+     * last layer — grows downward until it is as tall as the band above it. Everything else keeps
+     * the position and height it was authored with: the surface ocean, the reef ceiling, the
+     * middle sea and its chamber all stay put. The area under the abyss band is deliberately left
+     * unclaimed, so future abyssal content has somewhere to go.
+     * </p>
+     *
+     * <p>
+     * At the reference floor the world floor clamps the band back to its authored extent, and the
+     * stack comes back unchanged.
+     * </p>
+     */
+    public OceanLayerStack deepenedFor(int minBuildHeight) {
+        if (layers.size() < 2) {
+            return this;
+        }
+        int deepest = layers.size() - 1;
+        DepthBand band = layers.get(deepest).band();
+        if (minBuildHeight >= band.minY()) {
+            return this;
+        }
+        DepthBand above = layers.get(deepest - 1).band();
+        int abyssHeight = above.maxY() - above.minY() + 1;
+        int min = Math.max(minBuildHeight, band.maxY() - abyssHeight + 1);
+        if (min >= band.minY()) {
+            return this;
+        }
+        List<OceanLayer> extended = new ArrayList<>(layers);
+        OceanLayer abyss = layers.get(deepest);
+        extended.set(deepest, new OceanLayer(abyss.id(),
+                new DepthBand(min, band.maxY(), band.blendDown(), band.blendUp()),
+                abyss.mix(), abyss.terrain(), abyss.carve()));
+        return new OceanLayerStack(id, extended, verticalBlendQuarts, regionEdgeFadeBlocks,
+                minOpenWaterColumns, parentBiomes);
     }
 
     public int minRewriteBlockY() {

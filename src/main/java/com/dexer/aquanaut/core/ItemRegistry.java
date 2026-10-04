@@ -504,6 +504,8 @@ public final class ItemRegistry {
                         BlockRegistry.PHOTO_RINSING_BASIN);
         public static final DeferredItem<BlockItem> INVESTIGATION_BOARD = blockItem("investigation_board",
                         BlockRegistry.INVESTIGATION_BOARD);
+        public static final DeferredItem<BlockItem> SIEVE = blockItem("sieve",
+                        BlockRegistry.SIEVE);
         public static final DeferredItem<GasFlowMeterItem> GAS_FLOW_METER = ITEMS.registerItem("gas_flow_meter",
                         properties -> new GasFlowMeterItem(properties.stacksTo(1)));
         public static final DeferredItem<HandheldSearchlightItem> HANDHELD_SEARCHLIGHT = ITEMS.registerItem(
@@ -958,6 +960,7 @@ public final class ItemRegistry {
                                 output.accept(DISSECTION_TABLE.get());
                                 output.accept(PHOTO_RINSING_BASIN.get());
                                 output.accept(INVESTIGATION_BOARD.get());
+                                output.accept(SIEVE.get());
                         });
 
         private ItemRegistry() {

@@ -493,6 +493,9 @@
   "block.aquanaut.investigation_board": "Investigation Board",
   "item.aquanaut.investigation_board": "Investigation Board",
   "block.aquanaut.investigation_board.tooltip": "A wall-mounted evidence board for organizing field notes and specimens.",
+  "block.aquanaut.sieve": "Sifting Sieve",
+  "item.aquanaut.sieve": "Sifting Sieve",
+  "block.aquanaut.sieve.tooltip": "A woven screen in a stone frame with a tall net bag hanging below: whatever is sifted through gathers in the bag, visible through the net.",
   "tooltip.aquanaut.air_supply": "Restores %s bubbles of air",
   "gui.aquanaut.notebook.waterlife.vamprey.paragraph_1": "Field observation records a ribbon of pale muscle threading the dark, and a faint metallic note in the water before it is seen at all.",
   "gui.aquanaut.notebook.waterlife.vamprey.paragraph_2": "The jaw is a sucker ring lined with recurved fangs. It feeds on air as much as on flesh — divers report the gauge falling faster than the wound explains.",
@@ -573,6 +576,8 @@
   "gui.aquanaut.investigation.link.coordinates.detail": "The last intelligible coordinate in K-17's log resolves to the silent trench boundary.",
   "generator.aquanaut.water_world": "Water World",
   "gui.aquanaut.water_world.screen.summary": "No land — only ocean.",
-  "gui.aquanaut.water_world.screen.description": "A world of nothing but deep ocean and Aquanaut's own seas: beneath the waves lie coral forests, jelly jungles, brine mirror gorges, brimstone calderas, crystal nests and the middle-level ocean, layer upon layer.",
-  "gui.aquanaut.water_world.screen.hint": "Select \"Water World\" as the world type and create the world to dive in."
+  "gui.aquanaut.water_world.screen.description": "A world of nothing but deep ocean and Aquanaut's own seas. Its water column runs 832 blocks — sea level at y=63, bedrock at y=-512: coral forests and jelly jungles roof the reef, brine mirror gorges, brimstone calderas, crystal nests and the middle-level ocean fill the sea beneath it, and the deep sea reaches down through the abyss.",
+  "gui.aquanaut.water_world.screen.hint": "Select \"Water World\" as the world type and create the world to dive in.",
+  "pack.aquanaut.abyssal_overworld": "Abyssal Overworld (832 blocks tall)",
+  "pack.aquanaut.abyssal_overworld.desc": "Deepens every overworld to y=-512, 832 blocks tall. Do NOT disable this pack once a world has generated terrain below y=-64: that range is deleted the next time the world is saved."
 }

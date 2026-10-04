@@ -13,6 +13,7 @@ import com.dexer.aquanaut.core.MenuRegistry;
 import com.dexer.aquanaut.core.MobEffectRegistry;
 import com.dexer.aquanaut.core.ParticleRegistry;
 import com.dexer.aquanaut.core.SoundRegistry;
+import com.dexer.aquanaut.core.WorldgenPackRegistry;
 import com.dexer.aquanaut.common.light.ServerDynamicLightManager;
 import com.dexer.aquanaut.common.searchlight.SearchlightServerProvider;
 import com.dexer.aquanaut.common.drone.DroneHeadlightServerProvider;
@@ -46,6 +47,9 @@ public class Aquanaut {
         ParticleRegistry.register(modEventBus);
         SoundRegistry.register(modEventBus);
         FeatureRegistry.register(modEventBus);
+        // The abyssal overworld height travels as an optional, discoverable data pack so players
+        // can see and disable an override this invasive; see WorldgenPackRegistry.
+        modEventBus.addListener(WorldgenPackRegistry::onAddPackFinders);
         ServerDynamicLightManager.registerProvider(SearchlightServerProvider.ID, new SearchlightServerProvider());
         ServerDynamicLightManager.registerProvider(DroneHeadlightServerProvider.ID,
                 new DroneHeadlightServerProvider());

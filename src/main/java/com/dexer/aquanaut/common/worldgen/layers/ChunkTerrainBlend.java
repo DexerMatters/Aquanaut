@@ -204,6 +204,13 @@ public final class ChunkTerrainBlend implements OceanColumnPlanner.PlanSource {
     }
 
     @Override
+    public double regionEdge(int blockX, int blockZ) {
+        int localX = blockX - (sampler.baseQuartX() << 2);
+        int localZ = blockZ - (sampler.baseQuartZ() << 2);
+        return sampler.edgeStrengthAtHaloBlock(localX, localZ);
+    }
+
+    @Override
     public double volcanicStrength(int blockX, int blockZ, double edge) {
         double weight = biomeWeightAtBlock(BrimstoneCalderaPlacement.location(), blockX, blockZ);
         return VolcanoGeometry.strength(weight, edge, terrain.blend().emergenceEdificeFull());

@@ -17,6 +17,7 @@ import com.dexer.aquanaut.common.block.DynamicLightBlock;
 import com.dexer.aquanaut.common.block.CrystalPlantBlock;
 import com.dexer.aquanaut.common.block.SeaweedBlock;
 import com.dexer.aquanaut.common.block.SeaweedStemBlock;
+import com.dexer.aquanaut.common.block.SieveBlock;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ColorRGBA;
 import net.minecraft.world.level.block.Block;
@@ -318,6 +319,15 @@ public final class BlockRegistry {
                     .sound(SoundType.METAL)
                     .noOcclusion()
                     .dynamicShape()
+                    .requiresCorrectToolForDrops()));
+
+    /** Sifting sieve: a shallow stone trough with a flat woven screen, one block wide. */
+    public static final DeferredBlock<SieveBlock> SIEVE = BLOCKS.register("sieve",
+            () -> new SieveBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.STONE)
+                    .strength(1.5F, 6.0F)
+                    .sound(SoundType.STONE)
+                    .noOcclusion()
                     .requiresCorrectToolForDrops()));
 
     private BlockRegistry() {

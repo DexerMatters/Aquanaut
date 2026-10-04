@@ -25,6 +25,7 @@ import com.dexer.aquanaut.client.renderer.DissectionTableBlockEntityRenderer;
 import com.dexer.aquanaut.client.renderer.DivingEquipmentRenderLayer;
 import com.dexer.aquanaut.client.renderer.GasPipeBlockEntityRenderer;
 import com.dexer.aquanaut.client.renderer.InvestigationBoardBlockEntityRenderer;
+import com.dexer.aquanaut.client.renderer.SieveBlockEntityRenderer;
 import com.dexer.aquanaut.client.renderer.CatfishRenderer;
 import com.dexer.aquanaut.client.renderer.CursorRenderer;
 import com.dexer.aquanaut.client.renderer.BiologicalDetectorRenderer;
@@ -233,6 +234,8 @@ public final class ClientModEvents {
                 DissectionTableBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(BlockEntityRegistry.INVESTIGATION_BOARD.get(),
                 InvestigationBoardBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(BlockEntityRegistry.SIEVE.get(),
+                SieveBlockEntityRenderer::new);
     }
 
     @SubscribeEvent

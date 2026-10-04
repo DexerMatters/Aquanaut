@@ -5,6 +5,7 @@ import com.dexer.aquanaut.common.block.entity.DissectionTableBlockEntity;
 import com.dexer.aquanaut.common.block.entity.GasPipeBlockEntity;
 import com.dexer.aquanaut.common.block.entity.InvestigationBoardBlockEntity;
 import com.dexer.aquanaut.common.block.entity.PhotoRinsingBasinBlockEntity;
+import com.dexer.aquanaut.common.block.entity.SieveBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
@@ -36,6 +37,12 @@ public final class BlockEntityRegistry {
             .register("investigation_board",
                     () -> BlockEntityType.Builder
                             .of(InvestigationBoardBlockEntity::new, BlockRegistry.INVESTIGATION_BOARD.get())
+                            .build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SieveBlockEntity>> SIEVE = BLOCK_ENTITY_TYPES
+            .register("sieve",
+                    () -> BlockEntityType.Builder
+                            .of(SieveBlockEntity::new, BlockRegistry.SIEVE.get())
                             .build(null));
 
     private BlockEntityRegistry() {

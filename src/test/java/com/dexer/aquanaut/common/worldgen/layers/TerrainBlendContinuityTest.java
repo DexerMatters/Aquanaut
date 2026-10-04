@@ -27,7 +27,20 @@ public final class TerrainBlendContinuityTest {
 
     /** A sampler whose whole support field (chunk + halo) qualifies as deep ocean. */
     private static OceanGenSampler supportedSampler(int minX, int minZ) {
-        OceanLayerStack stack = OceanLayerStacks.defaultStack();
+        return supportedSampler(OceanLayerStacks.defaultStack(), minX, minZ);
+    }
+
+    private static OceanGenSampler supportedSampler(OceanLayerStack stack, int minX, int minZ) {
+        boolean[][] halo = new boolean[OceanGenSampler.FIELD_SIZE][OceanGenSampler.FIELD_SIZE];
+        for (boolean[] row : halo) {
+            java.util.Arrays.fill(row, true);
+        }
+        return samplerWithHalo(stack, halo, minX, minZ);
+    }
+
+    /** A sampler with an explicit support halo, for exercising the region border. */
+    private static OceanGenSampler samplerWithHalo(OceanLayerStack stack, boolean[][] halo,
+                                                   int minX, int minZ) {
         ResourceLocation[][] surfaceBiomes = new ResourceLocation[4][4];
         for (int x = 0; x < 4; x++) {
             for (int z = 0; z < 4; z++) {
@@ -36,10 +49,6 @@ public final class TerrainBlendContinuityTest {
         }
         boolean[] openWater = new boolean[16];
         java.util.Arrays.fill(openWater, true);
-        boolean[][] halo = new boolean[OceanGenSampler.FIELD_SIZE][OceanGenSampler.FIELD_SIZE];
-        for (boolean[] row : halo) {
-            java.util.Arrays.fill(row, true);
-        }
         return new OceanGenSampler(stack, surfaceBiomes, openWater, halo, minX >> 2, minZ >> 2);
     }
 
@@ -276,6 +285,106 @@ public final class TerrainBlendContinuityTest {
             }
         }
         assertTrue(checked > 0, "the probe region should contain volcanoes");
+    }
+
+    @Test
+    void abyssalFloorLeavesTheAuthoredChamberUntouched() {
+        // The deeper world only extends the Y range: the cap, the chamber floor, the reef slab and
+        // the guarding must come out identical to the vanilla-height world. The one thing that
+        // follows the new depth is the bottom-anchored abyssal sediment floor.
+        int abyssal = -512;
+        OceanLayerStack stack = OceanLayerStacks.defaultStack().deepenedFor(abyssal);
+        ChunkTerrainBlend deepBlend = ChunkTerrainBlend.build(
+                supportedSampler(stack, 48, -32), TerrainModule.reefCap(), abyssal, 48, -32);
+        ChunkTerrainBlend referenceBlend = blend(48, -32);
+
+        for (int x = 0; x < 16; x += 3) {
+            for (int z = 0; z < 16; z += 3) {
+                OceanColumnPlanner.ColumnPlan deepPlan = deepBlend.planAt(x, z);
+                OceanColumnPlanner.ColumnPlan referencePlan = referenceBlend.planAt(x, z);
+                assertEquals(referencePlan.profile().cavityFloorY(), deepPlan.profile().cavityFloorY(),
+                        "the chamber floor must not move at (" + x + "," + z + ")");
+                assertEquals(referencePlan.cavityFloorY(), deepPlan.cavityFloorY(),
+                        "the blended chamber floor must not move at (" + x + "," + z + ")");
+                assertEquals(referencePlan.profile().capBottomY(), deepPlan.profile().capBottomY(),
+                        "the reef cap must not move at (" + x + "," + z + ")");
+                assertEquals(referencePlan.reefBottomY(), deepPlan.reefBottomY(),
+                        "the reef slab must not move at (" + x + "," + z + ")");
+                assertEquals(referencePlan.reef().thickness(), deepPlan.reef().thickness(), 1e-9,
+                        "reef geology is untouched");
+                assertEquals(referencePlan.capOpenness(), deepPlan.capOpenness(), 1e-12,
+                        "cap dissolution is untouched");
+                assertTrue(deepPlan.deepFloorY() >= abyssal + 2,
+                        "the abyss floor never leaves the world (" + deepPlan.deepFloorY() + ")");
+                assertTrue(deepPlan.deepFloorY() <= referencePlan.deepFloorY(),
+                        "the abyss floor follows the new world floor downward");
+                assertTrue(deepPlan.deepFloorY() <= deepPlan.reefBottomY(),
+                        "the abyss floor always sits below the reef slab");
+            }
+        }
+
+        for (int x = 0; x < 15; x++) {
+            for (int z = 0; z < 16; z++) {
+                int left = deepBlend.planAt(x, z).cavityFloorY();
+                int right = deepBlend.planAt(x + 1, z).cavityFloorY();
+                assertTrue(Math.abs(left - right) <= 2,
+                        "floor cliff at (" + x + "," + z + "): " + left + " -> " + right);
+            }
+        }
+    }
+
+    @Test
+    void abyssalPlainStaysFlatAcrossTheBasin() {
+        // The deep-sea floor is the placeholder reserved for future abyssal biomes: every column of
+        // a fully supported chunk must sit on the same sediment level, at any world height, instead
+        // of inheriting the middle sea's chamber-wall relief as a mountain range.
+        for (int minBuildHeight : new int[] {MIN_BUILD_HEIGHT, -512}) {
+            ChunkTerrainBlend blend = ChunkTerrainBlend.build(
+                    supportedSampler(0, 0), TerrainModule.reefCap(), minBuildHeight, 0, 0);
+            for (int x = 0; x < 16; x++) {
+                for (int z = 0; z < 16; z++) {
+                    assertEquals(minBuildHeight + 4, blend.planAt(x, z).deepFloorY(),
+                            "flat abyssal plain expected at (" + x + "," + z + ") in a "
+                                    + minBuildHeight + " world");
+                }
+            }
+        }
+    }
+
+    @Test
+    void abyssalPlainClosesOnlyAtTheRegionBorder() {
+        int abyssal = -512;
+        int plain = abyssal + 4;
+        OceanLayerStack stack = OceanLayerStacks.defaultStack().deepenedFor(abyssal);
+
+        // Support stops right beside the chunk: the columns nearest the border climb out of the
+        // plain, the columns furthest inside stay flat, and the climb is monotone and never rises
+        // past the reef underside (which closes the basin against the surrounding crust).
+        boolean[][] halo = new boolean[OceanGenSampler.FIELD_SIZE][OceanGenSampler.FIELD_SIZE];
+        for (boolean[] row : halo) {
+            java.util.Arrays.fill(row, true);
+        }
+        for (int qx = 0; qx < OceanGenSampler.HALO_QUART_RADIUS; qx++) {
+            java.util.Arrays.fill(halo[qx], false);
+        }
+        ChunkTerrainBlend blend = ChunkTerrainBlend.build(
+                samplerWithHalo(stack, halo, 0, 0), TerrainModule.reefCap(), abyssal, 0, 0);
+
+        for (int z = 0; z < 16; z++) {
+            assertEquals(plain, blend.planAt(15, z).deepFloorY(),
+                    "the plain must survive away from the border");
+            assertTrue(blend.planAt(0, z).deepFloorY() > plain + 300,
+                    "the border must climb out of the plain, not stay flat into the crust");
+            int previous = Integer.MAX_VALUE;
+            for (int x = 0; x < 16; x++) {
+                OceanColumnPlanner.ColumnPlan plan = blend.planAt(x, z);
+                assertTrue(plan.deepFloorY() <= previous,
+                        "the floor may only rise toward the border at (" + x + "," + z + ")");
+                assertTrue(plan.deepFloorY() <= plan.reefBottomY(),
+                        "the floor never rises past the reef underside at (" + x + "," + z + ")");
+                previous = plan.deepFloorY();
+            }
+        }
     }
 
     @Test

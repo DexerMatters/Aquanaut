@@ -93,7 +93,7 @@ public final class OceanColumnPlanner {
 
         ReefComposition reef = source.reefCompositionAt(blockX, blockZ);
         int reefBottomY = floorY - (int) Math.round(reef.thickness());
-        int deepFloorY = deepFloorY(edge, reefBottomY, minBuildHeight, blockX, blockZ);
+        int deepFloorY = deepFloorY(source.regionEdge(blockX, blockZ), reefBottomY, minBuildHeight);
         int mountainTopY = MiddleLevelOceanTerrainProfile.mountainTopLimit(
                 profile.capBottomY(), profile.cavityFloorY());
 
@@ -277,18 +277,20 @@ public final class OceanColumnPlanner {
     }
 
     /**
-     * Top of the abyssal floor: broad sediment hills near the bottom of the world, which
-     * takes the whole remaining depth below the reef. At the region edge the floor rises
-     * to meet the reef underside and closes the deep chamber, so transition columns stay
-     * solid all the way to bedrock.
+     * Top of the abyssal floor: a flat sediment plain a few blocks above the bottom of the world,
+     * which rises to the reef underside only in the last blocks before the region border.
+     *
+     * <p>
+     * The plain itself is deliberately featureless. It is the placeholder floor of the deep sea,
+     * reserved for future abyssal biomes: an even surface leaves that future work free to lay out
+     * its own relief. The closure is driven by the region-edge fade alone ({@code regionEdge}) and
+     * never by the chamber-wall noise that shoals the middle sea — that noise used to lift the
+     * whole abyss into a mountain range once a world grew hundreds of blocks deeper.
+     * </p>
      */
-    private static int deepFloorY(double edgeStrength, int reefBottomY, int minBuildHeight,
-                                  int blockX, int blockZ) {
-        double hills = SoftMixNoise.valueNoise(blockX, blockZ, 96, DEEP_FLOOR_SEED);
-        double drift = SoftMixNoise.valueNoise(blockX, blockZ, 26, DEEP_FLOOR_SEED ^ 0x5A5AL);
-        int abyssY = minBuildHeight + 4 + (int) Math.round(hills * 3.5D + drift * 1.5D);
-        abyssY = Math.max(minBuildHeight + 2, Math.min(abyssY, minBuildHeight + 12));
-        return (int) Math.round(SoftMixNoise.lerp(SoftMixNoise.smoothstep(edgeStrength), reefBottomY, abyssY));
+    private static int deepFloorY(double regionEdge, int reefBottomY, int minBuildHeight) {
+        int plainY = minBuildHeight + 4;
+        return (int) Math.round(SoftMixNoise.lerp(SoftMixNoise.smoothstep(regionEdge), reefBottomY, plainY));
     }
 
     /**
@@ -301,6 +303,14 @@ public final class OceanColumnPlanner {
         int minBuildHeight();
 
         double columnEdge(int blockX, int blockZ);
+
+        /**
+         * Region-edge strength of one column, in [0, 1]: 0 at the border of the supported region,
+         * 1 from {@code region_edge_fade_blocks} inside it. This is the boundary of the planned
+         * sea, not the middle sea's chamber-wall noise, which is why the abyssal plain stays flat
+         * and only the border closes it.
+         */
+        double regionEdge(int blockX, int blockZ);
 
         double volcanicStrength(int blockX, int blockZ, double edge);
 
@@ -356,6 +366,13 @@ public final class OceanColumnPlanner {
             int localZ = blockZ - (sampler.baseQuartZ() << 2);
             return Math.min(sampler.edgeStrengthAtHaloBlock(localX, localZ),
                     MiddleLevelOceanTerrainProfile.chamberWallFade(blockX, blockZ, terrain));
+        }
+
+        @Override
+        public double regionEdge(int blockX, int blockZ) {
+            int localX = blockX - (sampler.baseQuartX() << 2);
+            int localZ = blockZ - (sampler.baseQuartZ() << 2);
+            return sampler.edgeStrengthAtHaloBlock(localX, localZ);
         }
 
         @Override

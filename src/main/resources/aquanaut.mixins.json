@@ -24,7 +24,8 @@
         "HumanoidModelMixin",
         "LevelRendererMixin",
         "EntityRendererMixin",
-        "LightTextureMixin"
+        "LightTextureMixin",
+        "PellucidSightMixin"
     ],
     "injectors": {
         "defaultRequire": 1

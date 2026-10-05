@@ -22,8 +22,8 @@
       "probability": 0.02
     },
     "sky_color": 8103167,
-    "water_color": 2502444,
-    "water_fog_color": 1710101
+    "water_color": 3369592,
+    "water_fog_color": 1454138
   },
   "features": [
     [],
@@ -58,9 +58,7 @@
       "minecraft:ore_lapis",
       "minecraft:ore_lapis_buried",
       "minecraft:ore_copper",
-      "minecraft:disk_sand",
       "minecraft:disk_clay",
-      "minecraft:disk_gravel",
       "aquanaut:mud_zone_sediment",
       "aquanaut:mud_mound",
       "aquanaut:fossil_outcrop",

@@ -47,6 +47,23 @@ public final class GlowMushroomBuilder {
                 }
             }
         }
+        // A couple of mud lamps glow on the floor at the mushroom's foot.
+        int lamps = 1 + random.nextInt(2);
+        int placedLamps = 0;
+        for (int attempt = 0; attempt < 6 && placedLamps < lamps; attempt++) {
+            int dx = random.nextInt(3) - 1;
+            int dz = random.nextInt(3) - 1;
+            if (dx == 0 && dz == 0) {
+                continue;
+            }
+            BlockPos lamp = base.offset(dx, 1, dz);
+            if (!level.getBlockState(lamp).canBeReplaced()
+                    || level.getBlockState(lamp.below()).canBeReplaced()) {
+                continue;
+            }
+            level.setBlock(lamp, BlockRegistry.MUD_LAMP.get().defaultBlockState(), 2);
+            placedLamps++;
+        }
         return true;
     }
 }

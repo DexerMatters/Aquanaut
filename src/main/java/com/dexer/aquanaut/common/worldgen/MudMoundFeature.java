@@ -3,8 +3,6 @@ package com.dexer.aquanaut.common.worldgen;
 import com.dexer.aquanaut.core.BiomeRegistry;
 import com.dexer.aquanaut.core.BlockRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.state.BlockState;
@@ -13,10 +11,9 @@ import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 /**
- * Low, slumped mud mounds on the mud-zone floor. Soft sediment piles spread out instead of
- * standing up, so the profile is a rounded dome that flattens toward its rim — never the
- * vertical cliffs a rock feature would throw. Surfaces read as mud; the buried core banded
- * mudstone and varve shale.
+ * Low, slumped mud mounds on the mud zone floor. Soft sediment piles spread out instead of
+ * standing up, so the profile is a rounded dome that flattens toward its rim. The surface reads
+ * as mud over a siltstone core — a coherent pile, not a per-block confetti of materials.
  */
 public final class MudMoundFeature extends Feature<NoneFeatureConfiguration> {
     public MudMoundFeature() {
@@ -31,8 +28,11 @@ public final class MudMoundFeature extends Feature<NoneFeatureConfiguration> {
         if (!level.getBiome(origin).is(BiomeRegistry.MUD_ZONE)) {
             return false;
         }
+        BlockPos floor = MudZoneFloor.find(level, origin);
+        if (floor == null) {
+            return false;
+        }
 
-        BlockPos floor = findFloor(level, origin);
         int radius = 4 + random.nextInt(4);
         int peak = 2 + random.nextInt(4);
         boolean placed = false;
@@ -47,18 +47,16 @@ public final class MudMoundFeature extends Feature<NoneFeatureConfiguration> {
                 if (height <= 0) {
                     continue;
                 }
-                int baseY = floor.getY();
                 for (int dy = 1; dy <= height; dy++) {
-                    int y = baseY + dy;
+                    int y = floor.getY() + dy;
                     if (y >= level.getMaxBuildHeight()) {
                         break;
                     }
                     cursor.set(floor.getX() + dx, y, floor.getZ() + dz);
-                    BlockState existing = level.getBlockState(cursor);
-                    if (!existing.canBeReplaced() && !level.getFluidState(cursor).is(FluidTags.WATER)) {
+                    if (!level.getBlockState(cursor).canBeReplaced()) {
                         break;
                     }
-                    level.setBlock(cursor, moundState(level, cursor, random), 2);
+                    level.setBlock(cursor, moundState(dy, height), 2);
                     placed = true;
                 }
             }
@@ -66,24 +64,11 @@ public final class MudMoundFeature extends Feature<NoneFeatureConfiguration> {
         return placed;
     }
 
-    private static BlockState moundState(WorldGenLevel level, BlockPos pos, RandomSource random) {
-        if (level.getFluidState(pos.above()).is(FluidTags.WATER)) {
-            if (random.nextFloat() < 0.10F) {
-                return BlockRegistry.NUTRIENT_RICH_MUD.get().defaultBlockState();
-            }
+    /** Mud skin over a siltstone core, banded by height so the mound reads as one pile. */
+    private static BlockState moundState(int dy, int height) {
+        if (dy >= height - 1) {
             return BlockRegistry.MUD.get().defaultBlockState();
         }
-        return random.nextFloat() < 0.35F
-                ? BlockRegistry.VARVE_SHALE.get().defaultBlockState()
-                : BlockRegistry.MUD.get().defaultBlockState();
-    }
-
-    private static BlockPos findFloor(WorldGenLevel level, BlockPos origin) {
-        BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos(origin.getX(), origin.getY() + 16,
-                origin.getZ());
-        while (mutable.getY() > origin.getY() - 16 && level.getFluidState(mutable).is(FluidTags.WATER)) {
-            mutable.move(Direction.DOWN);
-        }
-        return mutable.immutable();
+        return BlockRegistry.SILTSTONE.get().defaultBlockState();
     }
 }

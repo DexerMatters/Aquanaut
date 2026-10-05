@@ -3,8 +3,6 @@ package com.dexer.aquanaut.common.worldgen;
 import com.dexer.aquanaut.core.BiomeRegistry;
 import com.dexer.aquanaut.core.BlockRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.state.BlockState;
@@ -13,9 +11,9 @@ import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 /**
- * A low fossil-bearing outcrop: varve shale eroded out of the mud, banded with fossil beds
- * and crowned with an exposed fossil node. The mud zone's resource landmark — rarer and
- * more deliberate than the drifting sediment patches.
+ * A low fossil outcrop: a dome of siltstone with soft mud at its skirt, capped by a single
+ * coherent fossil bed. The mud zone's landmark — layered, never a per-block speckle, and rooted
+ * on the real floor so it can never float.
  */
 public final class FossilOutcropFeature extends Feature<NoneFeatureConfiguration> {
     public FossilOutcropFeature() {
@@ -30,10 +28,13 @@ public final class FossilOutcropFeature extends Feature<NoneFeatureConfiguration
         if (!level.getBiome(origin).is(BiomeRegistry.MUD_ZONE)) {
             return false;
         }
+        BlockPos floor = MudZoneFloor.find(level, origin);
+        if (floor == null) {
+            return false;
+        }
 
-        BlockPos floor = findFloor(level, origin);
-        int radius = 2 + random.nextInt(2);
-        int peak = 1 + random.nextInt(2);
+        int radius = 2 + random.nextInt(3);
+        int peak = 2 + random.nextInt(2);
         boolean placed = false;
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
         for (int dx = -radius; dx <= radius; dx++) {
@@ -53,37 +54,25 @@ public final class FossilOutcropFeature extends Feature<NoneFeatureConfiguration
                     }
                     cursor.set(floor.getX() + dx, y, floor.getZ() + dz);
                     BlockState existing = level.getBlockState(cursor);
-                    if (!existing.canBeReplaced() && !level.getFluidState(cursor).is(FluidTags.WATER)) {
+                    if (!existing.canBeReplaced()) {
                         break;
                     }
-                    level.setBlock(cursor, outcropState(random), 2);
+                    level.setBlock(cursor, outcropState(dy, height), 2);
                     placed = true;
                 }
             }
         }
-        if (placed && random.nextFloat() < 0.4F) {
-            // Expose one fossil node at the crest.
-            cursor.set(floor.getX(), floor.getY() + 1, floor.getZ());
-            level.setBlock(cursor, BlockRegistry.FOSSIL_BED.get().defaultBlockState(), 2);
-        }
         return placed;
     }
 
-    private static BlockState outcropState(RandomSource random) {
-        if (random.nextFloat() < 0.12F) {
+    /** Banded by height: mud at the skirt, siltstone in the body, one fossil bed on the cap. */
+    private static BlockState outcropState(int dy, int height) {
+        if (dy >= height) {
             return BlockRegistry.FOSSIL_BED.get().defaultBlockState();
         }
-        return random.nextFloat() < 0.6F
-                ? BlockRegistry.VARVE_SHALE.get().defaultBlockState()
-                : BlockRegistry.MUD.get().defaultBlockState();
-    }
-
-    private static BlockPos findFloor(WorldGenLevel level, BlockPos origin) {
-        BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos(origin.getX(), origin.getY() + 16,
-                origin.getZ());
-        while (mutable.getY() > origin.getY() - 16 && level.getFluidState(mutable).is(FluidTags.WATER)) {
-            mutable.move(Direction.DOWN);
+        if (dy == 1) {
+            return BlockRegistry.MUD.get().defaultBlockState();
         }
-        return mutable.immutable();
+        return BlockRegistry.SILTSTONE.get().defaultBlockState();
     }
 }

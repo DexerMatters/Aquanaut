@@ -656,6 +656,8 @@
   "gui.aquanaut.notebook.waterlife.garden_eel.paragraph_2": "The colony retreats below the seabed when disturbed, leaving almost no trace above the mud.",
   "gui.aquanaut.notebook.waterlife.hermit_crab.paragraph_1": "This shell-bearing scavenger patrols sediment edges and keeps close to abandoned shell piles.",
   "gui.aquanaut.notebook.waterlife.hermit_crab.paragraph_2": "When threatened it withdraws behind its shell; larger shells appear after repeated access to shell deposits.",
+  "gui.aquanaut.notebook.waterlife.trilobite.paragraph_1": "A living fossil that trundles across the mud on paired legs, grazing the sediment for scraps.",
+  "gui.aquanaut.notebook.waterlife.trilobite.paragraph_2": "When struck it curls into an armored ball, shrugging off most of the blow.",
   "gui.aquanaut.notebook.waterlife.mud_silverfish.paragraph_1": "The parasite emerges from compromised mud and immediately searches for a living host.",
   "gui.aquanaut.notebook.waterlife.mud_silverfish.paragraph_2": "Bright light interrupts its pursuit, confirming that the species is adapted to buried, low-light sediment.",
   "gui.aquanaut.notebook.waterlife.sediment_worm.paragraph_1": "The seabed shifts without warning, and a segmented body lunges out from the disturbed mud.",

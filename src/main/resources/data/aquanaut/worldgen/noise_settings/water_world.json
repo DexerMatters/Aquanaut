@@ -273,10 +273,12 @@
                   {
                     "type": "minecraft:condition",
                     "if_true": {
-                      "type": "minecraft:biome",
-                      "biome_is": [
-                        "aquanaut:mud_zone"
-                      ]
+                      "type": "minecraft:y_above",
+                      "anchor": {
+                        "absolute": 28
+                      },
+                      "add_stone_depth": false,
+                      "surface_depth_multiplier": 0
                     },
                     "then_run": {
                       "type": "minecraft:sequence",
@@ -293,7 +295,7 @@
                           "then_run": {
                             "type": "minecraft:block",
                             "result_state": {
-                              "Name": "aquanaut:mud"
+                              "Name": "aquanaut:coral_sand"
                             }
                           }
                         },
@@ -303,29 +305,13 @@
                             "type": "minecraft:stone_depth",
                             "add_surface_depth": true,
                             "offset": 1,
-                            "secondary_depth_range": 4,
+                            "secondary_depth_range": 3,
                             "surface_type": "floor"
                           },
                           "then_run": {
                             "type": "minecraft:block",
                             "result_state": {
-                              "Name": "aquanaut:mud"
-                            }
-                          }
-                        },
-                        {
-                          "type": "minecraft:condition",
-                          "if_true": {
-                            "type": "minecraft:stone_depth",
-                            "add_surface_depth": true,
-                            "offset": 5,
-                            "secondary_depth_range": 4,
-                            "surface_type": "floor"
-                          },
-                          "then_run": {
-                            "type": "minecraft:block",
-                            "result_state": {
-                              "Name": "minecraft:packed_mud"
+                              "Name": "aquanaut:limestone"
                             }
                           }
                         }

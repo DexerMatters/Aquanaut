@@ -37,13 +37,13 @@ public final class MudZoneSedimentFeature extends Feature<NoneFeatureConfigurati
             return false;
         }
 
-        int radius = 4 + random.nextInt(4);
-        int depth = 3 + random.nextInt(3);
+        int radius = 5 + random.nextInt(5);
+        int depth = 4 + random.nextInt(3);
         boolean placed = false;
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
-                if (dx * dx + dz * dz > radius * radius || random.nextFloat() < 0.10F) {
+                if (dx * dx + dz * dz > radius * radius || random.nextFloat() < 0.04F) {
                     continue;
                 }
                 for (int dy = 0; dy < depth; dy++) {

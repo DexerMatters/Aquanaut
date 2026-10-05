@@ -60,8 +60,8 @@ public final class HumusJellyEntity extends BaseFishEntity implements GeoEntity 
 
     @Override protected FishResponseMode getResponseMode() { return FishResponseMode.PASSIVE; }
     @Override protected FishAttackMode getAttackMode() { return FishAttackMode.NONE; }
-    @Override protected double getCruiseMaxSpeed() { return 0.025D; }
-    @Override protected double getCruiseAcceleration() { return 0.001D; }
+    @Override protected double getCruiseMaxSpeed() { return 0.04D; }
+    @Override protected double getCruiseAcceleration() { return 0.0025D; }
     @Override protected double getCruiseFloorBias() { return 0.6D; }
     @Override protected double getCruiseDepthRange() { return 2.0D; }
 }

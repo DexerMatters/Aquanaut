@@ -27,7 +27,7 @@ public final class GardenEelEntity extends BaseFishEntity implements GeoEntity {
     @Override protected boolean getSchoolingEnabled() { return true; }
     @Override protected double getSchoolingSearchRadius() { return 6.0D; }
     @Override protected double getCruiseMaxSpeed() { return MudZoneConfig.GARDEN_EEL_CRUISE_SPEED; }
-    @Override protected double getCruiseAcceleration() { return 0.001D; }
+    @Override protected double getCruiseAcceleration() { return 0.003D; }
     @Override protected double getEscapeMaxSpeed() { return 0.12D; }
     @Override protected double getCruiseFloorBias() { return 1.0D; }
     @Override protected double getCruiseDepthRange() { return 0.8D; }

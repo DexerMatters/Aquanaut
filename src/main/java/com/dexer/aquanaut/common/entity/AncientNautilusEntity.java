@@ -64,8 +64,8 @@ public final class AncientNautilusEntity extends BaseFishEntity implements GeoEn
     }
     @Override protected FishResponseMode getResponseMode() { return FishResponseMode.PASSIVE; }
     @Override protected FishAttackMode getAttackMode() { return FishAttackMode.NONE; }
-    @Override protected double getCruiseMaxSpeed() { return 0.02D; }
-    @Override protected double getCruiseAcceleration() { return 0.0008D; }
+    @Override protected double getCruiseMaxSpeed() { return 0.05D; }
+    @Override protected double getCruiseAcceleration() { return 0.003D; }
     @Override protected double getCruiseFloorBias() { return 0.85D; }
     @Override protected double getCruiseDepthRange() { return 1.8D; }
 }

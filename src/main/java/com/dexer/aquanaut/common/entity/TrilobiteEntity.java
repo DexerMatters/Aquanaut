@@ -79,8 +79,8 @@ public final class TrilobiteEntity extends BaseFishEntity implements GeoEntity {
 
     @Override protected FishResponseMode getResponseMode() { return FishResponseMode.PASSIVE; }
     @Override protected FishAttackMode getAttackMode() { return FishAttackMode.NONE; }
-    @Override protected double getCruiseMaxSpeed() { return 0.03D; }
-    @Override protected double getCruiseAcceleration() { return 0.0012D; }
+    @Override protected double getCruiseMaxSpeed() { return 0.06D; }
+    @Override protected double getCruiseAcceleration() { return 0.004D; }
     @Override protected double getCruiseFloorBias() { return 1.0D; }
     @Override protected double getCruiseDepthRange() { return 0.6D; }
 }

@@ -17,6 +17,8 @@ public class FishMovementController {
     private static final double BARRIER_CHECK_STEP = 0.7D;
     private static final double WALL_PROXIMITY_SLOWDOWN = 1.8D;
     private static final double WALL_PROXIMITY_STRONG = 0.9D;
+    /** Floor bias at or above which a species is treated as a seabed crawler. */
+    private static final double FLOOR_BIAS_SETTLED = 0.5D;
 
     private final MovementState state = new MovementState();
     private final FishSchoolingAI schoolingAI = new FishSchoolingAI();
@@ -709,6 +711,10 @@ public class FishMovementController {
         if (!this.hasWaterAbove(fish)) {
             this.state.setCruiseTargetY(
                     Mth.lerp(0.5D, this.state.cruiseTargetY(), fish.getY() - fish.cruiseDepthEmergencyOffset()));
+        } else if (fish.cruiseFloorBias() >= FLOOR_BIAS_SETTLED) {
+            // A bottom-dweller rides the seabed: aim straight at the floor and skip the hover
+            // guards below, which would otherwise lift it off the sediment it lives on.
+            this.applyFloorBias(fish);
         } else if (this.isNearSurface(fish)) {
             double pushDown = fish.getY() - fish.cruiseDepthEmergencyOffset() * 0.5D;
             this.state.setCruiseTargetY(

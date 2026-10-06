@@ -121,8 +121,13 @@ public final class OceanColumnShading {
         }
         int depth = floorY - blockY;
         if (plan.islandMask() >= 1.0D) {
-            // The flat building core: vanilla-style grassland profile, trees take root here.
+            // The broad building plateau: vanilla-style grassland profile, trees take root
+            // here; seeded sand patches speckle the grass so the ground is not a perfect disc.
             if (depth == 0) {
+                if (com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.sandPatchAt(
+                        plan.islandSeed(), plan.blockX(), plan.blockZ())) {
+                    return BlockRegistry.CORAL_SAND.get().defaultBlockState();
+                }
                 return Blocks.GRASS_BLOCK.defaultBlockState();
             }
             if (depth <= 3) {

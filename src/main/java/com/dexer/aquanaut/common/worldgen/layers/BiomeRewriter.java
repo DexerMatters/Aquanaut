@@ -17,35 +17,46 @@ import java.util.Map;
  * plateau, beach on the flanks) so vanilla features grow trees, grass and flowers there.
  */
 public final class BiomeRewriter {
-    /** Lowest quart Y the island surface biome claims (block Y 60, below the Y70 plateau). */
-    static final int ISLAND_MIN_QUART_Y = 15;
+    /** Lowest quart Y the island surface biome claims (block Y 40, the beach shelf). */
+    static final int ISLAND_MIN_QUART_Y = 10;
     /** Highest quart Y the island surface biome claims (block Y 71, the plateau top). */
     static final int ISLAND_MAX_QUART_Y = 17;
     private static final ResourceLocation ISLAND_SURFACE_BIOME =
             ResourceLocation.fromNamespaceAndPath("minecraft", "sunflower_plains");
     private static final ResourceLocation ISLAND_SHORE_BIOME =
             ResourceLocation.fromNamespaceAndPath("minecraft", "beach");
+    private static final ResourceLocation ISLAND_STONY_SHORE_BIOME =
+            ResourceLocation.fromNamespaceAndPath("minecraft", "stony_shore");
 
     private BiomeRewriter() {
     }
 
     /** The land biome an island quart cell takes, or {@code null} for the normal stack. */
     enum IslandSurface {
-        PLATEAU, SHORE
+        PLATEAU, SHORE, STONY_SHORE
     }
 
     /**
-     * Pure island-biome decision: {@link IslandSurface#PLATEAU} on the fully emerged flat
-     * core (trees and flowers grow there), {@link IslandSurface#SHORE} on the beach flanks,
-     * {@code null} outside the island's surface band or when the island is inactive.
+     * Pure island-biome decision: the stony-shore mining region renders as
+     * {@link IslandSurface#STONY_SHORE} (vanilla stone-and-gravel surface rule), the flat
+     * grassland core as {@link IslandSurface#PLATEAU}, the beach flanks and shelf as
+     * {@link IslandSurface#SHORE}; {@code null} falls through to the normal stack. The band
+     * runs from block Y 40 up so frozen-ocean iceberg features can never take root on any
+     * island column - their placement biome is always a land biome here.
      */
     static IslandSurface islandSurfaceAt(boolean spawnIsland, long islandSeed,
                                          int worldQuartX, int worldQuartZ, int quartY) {
         if (!spawnIsland || quartY < ISLAND_MIN_QUART_Y || quartY > ISLAND_MAX_QUART_Y) {
             return null;
         }
-        double mask = com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.maskAt(islandSeed,
-                (worldQuartX << 2) + 2, (worldQuartZ << 2) + 2);
+        int blockX = (worldQuartX << 2) + 2;
+        int blockZ = (worldQuartZ << 2) + 2;
+        if (com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.stoneShoreWeight(
+                islandSeed, blockX, blockZ) >= 0.5D) {
+            return IslandSurface.STONY_SHORE;
+        }
+        double mask = com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.maskAt(
+                islandSeed, blockX, blockZ);
         if (mask >= 1.0D) {
             return IslandSurface.PLATEAU;
         }
@@ -134,6 +145,9 @@ public final class BiomeRewriter {
         }
         if (island == IslandSurface.SHORE) {
             return ISLAND_SHORE_BIOME;
+        }
+        if (island == IslandSurface.STONY_SHORE) {
+            return ISLAND_STONY_SHORE_BIOME;
         }
         if (quartY > stack.maxRewriteQuartY()) {
             return null;

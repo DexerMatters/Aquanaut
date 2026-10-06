@@ -121,6 +121,33 @@ public final class OceanColumnShading {
         }
         int depth = floorY - blockY;
         if (plan.islandMask() >= 1.0D) {
+            // The stony-shore region: bare rock with exposed low-tier ore veins and small
+            // lava ponds; the vanilla surface rule (stony_shore branch) lays the gravel.
+            if (com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.stoneShoreWeight(
+                    plan.islandSeed(), plan.blockX(), plan.blockZ()) >= 0.5D) {
+                if (com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.lavaPoolAt(
+                        plan.islandSeed(), plan.blockX(), plan.blockZ()) && depth <= 1) {
+                    return Blocks.LAVA.defaultBlockState();
+                }
+                if (depth == 0) {
+                    double ore = com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.oreSpeckleAt(
+                            plan.islandSeed(), plan.blockX(), plan.blockZ());
+                    if (ore > 0.62D) {
+                        return Blocks.COAL_ORE.defaultBlockState();
+                    }
+                    if (ore > 0.42D) {
+                        return Blocks.IRON_ORE.defaultBlockState();
+                    }
+                    if (ore > 0.26D) {
+                        return Blocks.COPPER_ORE.defaultBlockState();
+                    }
+                    return Blocks.STONE.defaultBlockState();
+                }
+                if (depth <= 3) {
+                    return Blocks.STONE.defaultBlockState();
+                }
+                return floorStateFor(plan.blockX(), blockY, plan.blockZ(), floorY);
+            }
             // The broad building plateau: vanilla-style grassland profile, trees take root
             // here; seeded sand patches speckle the grass so the ground is not a perfect disc.
             if (depth == 0) {

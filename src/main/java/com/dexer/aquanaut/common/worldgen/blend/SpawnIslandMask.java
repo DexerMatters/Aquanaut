@@ -55,6 +55,70 @@ public final class SpawnIslandMask {
     /** Cell (blocks) of the sand patches speckled across the grassland plateau. */
     public static final double SAND_PATCH_CELL = 22.0D;
     private static final double SAND_PATCH_THRESHOLD = 0.55D;
+
+    /** Salts of the stony-shore region ("STON"), its boundary wobble and its lava pond. */
+    private static final long STONE_SHORE_SALT = 0x5700L;
+    private static final long STONE_WOBBLE_SALT = 0x5701L;
+    private static final long LAVA_POOL_SALT = 0x5702L;
+    private static final long ORE_SPECKLE_SALT = 0x5703L;
+    /** Distance (blocks) of the stony-shore centre from the spawn column. */
+    private static final double STONE_SHORE_DISTANCE = 50.0D;
+    /** Radius (blocks) of the stony-shore region and half-width of its boundary wobble. */
+    private static final double STONE_SHORE_RADIUS = 22.0D;
+    private static final double STONE_SHORE_WOBBLE = 4.0D;
+    /** Radius (blocks) of the small lava pond and half-width of its ragged edge. */
+    private static final double LAVA_POOL_RADIUS = 7.0D;
+    private static final double LAVA_POOL_WOBBLE = 2.0D;
+
+    /**
+     * Centre of the stony-shore region: every island carries one, at a fixed distance from
+     * the spawn column on a seed-chosen azimuth, so the mining spot is guaranteed to exist
+     * while its bearing varies per world.
+     */
+    public static double[] stoneShoreCenter(long islandSeed) {
+        double angle = unit01(scramble(islandSeed, STONE_SHORE_SALT)) * 2.0D * Math.PI;
+        return new double[]{
+                Math.cos(angle) * STONE_SHORE_DISTANCE,
+                Math.sin(angle) * STONE_SHORE_DISTANCE};
+    }
+
+    /**
+     * Blend weight of the stony-shore region at this column, in [0, 1]: 1 deep inside the
+     * rocky ground, 0 outside its noise-wobbled boundary. The caller only shades where the
+     * column is fully emerged plateau, so the region can never spill into water.
+     */
+    public static double stoneShoreWeight(long islandSeed, int blockX, int blockZ) {
+        double[] center = stoneShoreCenter(islandSeed);
+        double dx = blockX - center[0];
+        double dz = blockZ - center[1];
+        double dist = Math.sqrt(dx * dx + dz * dz);
+        double wobble = SoftMixNoise.valueNoise(blockX, blockZ, 19.0D,
+                scramble(islandSeed, STONE_WOBBLE_SALT)) * STONE_SHORE_WOBBLE;
+        return SoftMixNoise.smoothstep((STONE_SHORE_RADIUS + wobble - dist) / 6.0D);
+    }
+
+    /** Whether this column is one of the small lava ponds sunken into the stony shore. */
+    public static boolean lavaPoolAt(long islandSeed, int blockX, int blockZ) {
+        double theta = unit01(scramble(islandSeed, STONE_SHORE_SALT)) * 2.0D * Math.PI;
+        double poolAngle = theta + 0.08D + unit01(scramble(islandSeed, LAVA_POOL_SALT)) * 0.10D;
+        double px = Math.cos(poolAngle) * STONE_SHORE_DISTANCE;
+        double pz = Math.sin(poolAngle) * STONE_SHORE_DISTANCE;
+        double dx = blockX - px;
+        double dz = blockZ - pz;
+        double dist = Math.sqrt(dx * dx + dz * dz);
+        double wobble = SoftMixNoise.valueNoise(blockX, blockZ, 11.0D,
+                scramble(islandSeed, LAVA_POOL_SALT)) * LAVA_POOL_WOBBLE;
+        double pool = SoftMixNoise.smoothstep((LAVA_POOL_RADIUS + wobble - dist) / 3.0D);
+        return pool >= 0.6D && stoneShoreWeight(islandSeed, blockX, blockZ) >= 0.55D;
+    }
+
+    /**
+     * High-frequency speckle field of the stony-shore surface: the caller maps its value
+     * onto exposed low-tier ores (coal, iron, copper) so the rock shows visible veins.
+     */
+    public static double oreSpeckleAt(long islandSeed, int blockX, int blockZ) {
+        return SoftMixNoise.valueNoise(blockX, blockZ, 3.0D, scramble(islandSeed, ORE_SPECKLE_SALT));
+    }
     /** Noise-space radii of the two coastline octaves: ~6 broad lobes, ~13 fine ones. */
     private static final double COAST_BROAD_K = 0.95D;
     private static final double COAST_FINE_K = 2.1D;

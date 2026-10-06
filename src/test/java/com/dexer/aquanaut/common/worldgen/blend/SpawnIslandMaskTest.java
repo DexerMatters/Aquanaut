@@ -176,6 +176,30 @@ class SpawnIslandMaskTest {
     }
 
     @Test
+    void stonyShoreZoneIsAlwaysPresentWithItsLavaPond() {
+        // Every island carries the mining region: around the zone centre the weight crosses
+        // 0.5 and the lava pond exists inside it, for every world seed.
+        for (long seed : SEEDS) {
+            double[] center = SpawnIslandMask.stoneShoreCenter(seed);
+            int cx = (int) Math.round(center[0]);
+            int cz = (int) Math.round(center[1]);
+            assertTrue(SpawnIslandMask.stoneShoreWeight(seed, cx, cz) >= 0.5D,
+                    "stony shore missing at its centre, seed " + seed);
+            assertTrue(SpawnIslandMask.stoneShoreWeight(seed, cx, cz) <= 1.0D, "weight out of range");
+            boolean lava = false;
+            for (int x = cx - 16; x <= cx + 16 && !lava; x += 2) {
+                for (int z = cz - 16; z <= cz + 16 && !lava; z += 2) {
+                    lava = SpawnIslandMask.lavaPoolAt(seed, x, z);
+                }
+            }
+            assertTrue(lava, "no lava pond inside the stony shore, seed " + seed);
+            // The zone sits on the plateau: its centre must be fully emerged ground.
+            assertTrue(SpawnIslandMask.maskAt(seed, cx, cz) >= 1.0D,
+                    "stony shore centre off the plateau, seed " + seed);
+        }
+    }
+
+    @Test
     void blendFloorNeverLowersGround() {
         double[] raws = {-40.0D, -20.0D, 0.0D, 35.0D, SpawnIslandMask.ISLAND_TOP_Y,
                 SpawnIslandMask.ISLAND_TOP_Y + 15.0D};

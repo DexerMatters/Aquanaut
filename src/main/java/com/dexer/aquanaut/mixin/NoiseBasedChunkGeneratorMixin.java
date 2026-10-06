@@ -13,6 +13,7 @@ import com.dexer.aquanaut.common.worldgen.layers.TerrainModule;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
@@ -40,6 +41,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(NoiseBasedChunkGenerator.class)
 public abstract class NoiseBasedChunkGeneratorMixin {
     private static final BlockState AIR = Blocks.AIR.defaultBlockState();
+    private static final ResourceLocation WATER_WORLD_SETTINGS =
+            ResourceLocation.fromNamespaceAndPath("aquanaut", "water_world");
 
     @Shadow
     @Final
@@ -48,6 +51,13 @@ public abstract class NoiseBasedChunkGeneratorMixin {
     @Shadow
     protected abstract NoiseChunk createNoiseChunk(ChunkAccess chunk, StructureManager structureManager,
             Blender blender, RandomState randomState);
+
+    /** Whether this generator runs the water world preset, whose terrain plans the spawn island. */
+    private boolean aquanaut$isWaterWorld() {
+        return this.settings.unwrapKey()
+                .map(key -> key.location().equals(WATER_WORLD_SETTINGS))
+                .orElse(false);
+    }
 
     @Inject(method = "doFill", at = @At("HEAD"), cancellable = true, remap = false)
     private void aquanaut$integratedFill(Blender blender,
@@ -77,11 +87,13 @@ public abstract class NoiseBasedChunkGeneratorMixin {
         TerrainModule terrain = OceanChunkSampler.stackTerrain(stack);
         ChunkGeneratorAccessor generatorAccessor = (ChunkGeneratorAccessor) this;
         int surfaceQuartY = MiddleLevelOceanPlacement.surfaceSampleQuartY();
+        boolean spawnIsland = aquanaut$isWaterWorld();
 
         OceanGenSampler sampler = OceanChunkSampler.sample(
                 chunk,
                 stack,
                 terrain.topWaterY(),
+                spawnIsland,
                 minCellY,
                 cellCountY,
                 cellWidth,
@@ -213,6 +225,8 @@ public abstract class NoiseBasedChunkGeneratorMixin {
         return OceanChunkSampler.isCovered(
                 chunk,
                 stack,
+                OceanChunkSampler.topWaterY(stack),
+                aquanaut$isWaterWorld(),
                 minCellY,
                 cellCountY,
                 cellWidth,

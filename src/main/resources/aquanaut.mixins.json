@@ -8,6 +8,7 @@
         "EntityMixin",
         "LivingEntityMixin",
         "InventoryMenuMixin",
+        "NoiseBasedChunkGeneratorAccessor",
         "NoiseBasedChunkGeneratorMixin",
         "PlayerMixin",
         "ItemStackMixin",

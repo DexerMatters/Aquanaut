@@ -27,6 +27,12 @@ public final class OceanColumnShading {
     public static BlockState stateForY(OceanColumnPlanner.ColumnPlan plan, int blockY) {
         int blockX = plan.blockX();
         int blockZ = plan.blockZ();
+        // The water-world spawn island claims its columns outright: the seamount plugs the
+        // chamber, so there is no cavity, reef slab or abyss left to shade — solid land up to
+        // the plateau floor, water above it.
+        if (plan.island()) {
+            return islandStateFor(plan, blockY);
+        }
         // The reef between the two seas claims its full depth first: a real rock layer
         // with geology and thickness, then the deep sea and its abyssal floor below.
         if (blockY <= plan.cavityFloorY()) {
@@ -92,6 +98,33 @@ public final class OceanColumnShading {
             return WATER;
         }
         return state;
+    }
+
+    /**
+     * The water-world spawn island: a solid seamount with a coral-sand beach cap over
+     * limestone and the regional lithology core. The sand/limestone bands reuse the reef
+     * cap's palette so the shore reads as an emerged reef rather than an alien intrusion.
+     */
+    private static BlockState islandStateFor(OceanColumnPlanner.ColumnPlan plan, int blockY) {
+        int floorY = plan.cavityFloorY();
+        if (blockY > floorY) {
+            return WATER;
+        }
+        int depth = floorY - blockY;
+        if (depth == 0) {
+            double mud = SoftMixNoise.valueNoise(plan.blockX(), plan.blockZ(), 12, 0x5A4DL);
+            if (mud > 0.72D) {
+                return BlockRegistry.NUTRIENT_RICH_MUD.get().defaultBlockState();
+            }
+            return BlockRegistry.CORAL_SAND.get().defaultBlockState();
+        }
+        if (depth <= 2) {
+            return BlockRegistry.CORAL_SAND.get().defaultBlockState();
+        }
+        if (depth <= 4) {
+            return BlockRegistry.LIMESTONE.get().defaultBlockState();
+        }
+        return floorStateFor(plan.blockX(), blockY, plan.blockZ(), floorY);
     }
 
     private static BlockState belowFloorStateFor(OceanColumnPlanner.ColumnPlan plan,

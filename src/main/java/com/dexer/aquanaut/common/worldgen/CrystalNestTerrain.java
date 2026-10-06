@@ -110,7 +110,10 @@ public final class CrystalNestTerrain {
                 plans[px * padded + pz] = plan;
                 double weight = blend.biomeWeightAtBlock(CrystalNestPlacement.location(),
                         minX + localX, minZ + localZ);
-                double strengthHere = strengthFor(weight, plan.edgeStrength(), plan.capOpenness());
+                // The spawn island plugs the chamber, so the lattice never reaches its columns.
+                double strengthHere = plan.island()
+                        ? 0.0D
+                        : strengthFor(weight, plan.edgeStrength(), plan.capOpenness());
                 strength[px * padded + pz] = strengthHere;
                 maxStrength = Math.max(maxStrength, strengthHere);
             }

@@ -22,6 +22,7 @@ public final class OceanChunkSampler {
     public static OceanGenSampler sample(ChunkAccess chunk,
                                          OceanLayerStack stack,
                                          int topWaterY,
+                                         boolean spawnIsland,
                                          int minCellY,
                                          int cellCountY,
                                          int cellWidth,
@@ -93,11 +94,16 @@ public final class OceanChunkSampler {
                     continue;
                 }
                 ResourceLocation biome = haloBiomeAt.apply(baseQuartX + localX, baseQuartZ + localZ);
-                haloParent[qx][qz] = stack.isParentBiome(biome);
+                // Same island override as the sampler's own quart cells, so the edge-fade field
+                // sees identical support on both sides of a chunk border.
+                haloParent[qx][qz] = stack.isParentBiome(biome)
+                        || (spawnIsland && com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask
+                                .maskAt((baseQuartX + localX) << 2, (baseQuartZ + localZ) << 2) > 0.0D);
             }
         }
 
-        return new OceanGenSampler(stack, surfaceBiomes, quartOpenWater, haloParent, baseQuartX, baseQuartZ);
+        return new OceanGenSampler(stack, surfaceBiomes, quartOpenWater, haloParent,
+                baseQuartX, baseQuartZ, spawnIsland);
     }
 
     public static int topWaterY(OceanLayerStack stack) {
@@ -118,6 +124,8 @@ public final class OceanChunkSampler {
      */
     public static boolean isCovered(ChunkAccess chunk,
                                     OceanLayerStack stack,
+                                    int topWaterY,
+                                    boolean spawnIsland,
                                     int minCellY,
                                     int cellCountY,
                                     int cellWidth,
@@ -145,7 +153,7 @@ public final class OceanChunkSampler {
         if (!parentPresent) {
             return false;
         }
-        return sample(chunk, stack, topWaterY(stack), minCellY, cellCountY, cellWidth, cellHeight,
+        return sample(chunk, stack, topWaterY, spawnIsland, minCellY, cellCountY, cellWidth, cellHeight,
                 defaultBlock, probeFactory, haloBiomeAt).anySupported();
     }
 

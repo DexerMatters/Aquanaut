@@ -126,7 +126,7 @@ class SpawnIslandMaskTest {
     }
 
     @Test
-    void dunesOnlyRideThePlateauAndNeverStack() {
+    void dunesOnlyRideTheOuterPlateauAndNeverStack() {
         for (long seed : SEEDS) {
             for (int x = -96; x <= 96; x += 5) {
                 for (int z = -96; z <= 96; z += 5) {
@@ -136,17 +136,22 @@ class SpawnIslandMaskTest {
                     if (mask < 1.0D) {
                         assertEquals(0, dune, "dune on the beach flank at (" + x + ", " + z + ")");
                     }
+                    if ((double) x * x + (double) z * z
+                            <= (double) SpawnIslandMask.FLAT_RADIUS * SpawnIslandMask.FLAT_RADIUS) {
+                        assertEquals(0, dune, "dune inside the flat building core at ("
+                                + x + ", " + z + ")");
+                    }
                 }
             }
         }
-        // Some plateau ground must actually grow dunes, or the relief field is dead.
+        // Some outer-plateau ground must actually grow dunes, or the relief field is dead.
         int duneColumns = 0;
-        for (int x = -SAFE_PLATEAU_RADIUS; x <= SAFE_PLATEAU_RADIUS && duneColumns == 0; x += 3) {
-            for (int z = -SAFE_PLATEAU_RADIUS; z <= SAFE_PLATEAU_RADIUS; z += 3) {
+        for (int x = SpawnIslandMask.FLAT_RADIUS + 1; x <= SpawnIslandMask.FULL_RADIUS; x += 2) {
+            for (int z = SpawnIslandMask.FLAT_RADIUS + 1; z <= SpawnIslandMask.FULL_RADIUS; z += 2) {
                 duneColumns += SpawnIslandMask.duneLift(42L, x, z, 1.0D);
             }
         }
-        assertTrue(duneColumns > 0, "no dunes anywhere on the plateau");
+        assertTrue(duneColumns > 0, "no dunes anywhere on the outer plateau");
     }
 
     @Test

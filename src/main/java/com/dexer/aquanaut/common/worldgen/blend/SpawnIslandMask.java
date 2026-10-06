@@ -30,6 +30,11 @@ import com.dexer.aquanaut.common.worldgen.layers.SoftMixNoise;
 public final class SpawnIslandMask {
     /** Plateau floor target; the water world preset's sea level is 63. */
     public static final int ISLAND_TOP_Y = 70;
+    /**
+     * Radius (blocks) of the dead-flat building core: dune relief is suppressed inside, so the
+     * middle of the island stays a clean construction site.
+     */
+    public static final int FLAT_RADIUS = 24;
     /** Mean radius (blocks) of the fully emerged plateau around the spawn column (0, 0). */
     public static final int FULL_RADIUS = 48;
     /** Nominal radius at which the lift reaches zero (kept for the mean outline). */
@@ -110,11 +115,16 @@ public final class SpawnIslandMask {
 
     /**
      * Seeded dune relief of the plateau: 1 extra block of sand on roughly a quarter of the
-     * fully emerged ground, and nothing on the beach flanks (any {@code mask < 1}), so the
-     * waterline stays smooth. The cliff guard downstream relaxes the one-block steps.
+     * fully emerged outer ground, and nothing on the beach flanks (any {@code mask < 1}) or
+     * inside the flat building core, so the waterline and the construction site stay smooth.
+     * The cliff guard downstream relaxes the one-block steps.
      */
     public static int duneLift(long islandSeed, int blockX, int blockZ, double mask) {
         if (mask < 1.0D) {
+            return 0;
+        }
+        if ((double) blockX * blockX + (double) blockZ * blockZ
+                <= (double) FLAT_RADIUS * FLAT_RADIUS) {
             return 0;
         }
         double dune = SoftMixNoise.valueNoise(blockX, blockZ, DUNE_CELL,
@@ -136,7 +146,7 @@ public final class SpawnIslandMask {
     }
 
     /** SplitMix64-style scramble so unrelated world seeds give unrelated island characters. */
-    private static long scramble(long worldSeed, long salt) {
+    static long scramble(long worldSeed, long salt) {
         long z = (worldSeed ^ salt) * 0x9E3779B97F4A7C15L;
         z ^= z >>> 30;
         z *= 0xBF58476D1CE4E5B9L;
@@ -146,7 +156,7 @@ public final class SpawnIslandMask {
         return z;
     }
 
-    private static double unit01(long scrambled) {
+    static double unit01(long scrambled) {
         return (scrambled >>> 11) / (double) (1L << 53);
     }
 }

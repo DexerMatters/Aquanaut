@@ -13,10 +13,14 @@ import com.dexer.aquanaut.common.worldgen.layers.TerrainModule;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -75,6 +79,23 @@ public abstract class NoiseBasedChunkGeneratorMixin {
         return 0L;
     }
 
+    /**
+     * Resolves any biome id (including vanilla-only island surface biomes that the water
+     * world's biome source never carries) against the world's biome registry; {@code null}
+     * when the manager exposes no level, letting the caller skip gracefully.
+     */
+    private java.util.function.Function<ResourceLocation, Holder<Biome>> aquanaut$biomeLookup(
+            StructureManager structureManager) {
+        if (structureManager instanceof StructureManagerAccessor accessor
+                && accessor.aquanaut$getLevel() != null) {
+            Registry<Biome> biomes = accessor.aquanaut$getLevel()
+                    .registryAccess()
+                    .registryOrThrow(Registries.BIOME);
+            return id -> biomes.getHolder(ResourceKey.create(Registries.BIOME, id)).orElse(null);
+        }
+        return id -> null;
+    }
+
     @Inject(method = "doFill", at = @At("HEAD"), cancellable = true, remap = false)
     private void aquanaut$integratedFill(Blender blender,
             StructureManager structureManager,
@@ -124,7 +145,8 @@ public abstract class NoiseBasedChunkGeneratorMixin {
                         .map(key -> key.location())
                         .orElse(null));
 
-        BiomeRewriter.rewrite(chunk, sampler, generatorAccessor.aquanaut$getBiomeSource());
+        BiomeRewriter.rewrite(chunk, sampler, generatorAccessor.aquanaut$getBiomeSource(),
+                aquanaut$biomeLookup(structureManager));
         // One blend grid per chunk: district weights, the guarded geological floor and the
         // composed reef fields are evaluated once per column and shared by every consumer.
         com.dexer.aquanaut.common.worldgen.layers.ChunkTerrainBlend blend =

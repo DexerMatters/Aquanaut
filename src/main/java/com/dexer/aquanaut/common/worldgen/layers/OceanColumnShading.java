@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public final class OceanColumnShading {
     private static final BlockState WATER = Blocks.WATER.defaultBlockState();
+    private static final BlockState AIR = Blocks.AIR.defaultBlockState();
 
     private OceanColumnShading() {
     }
@@ -101,16 +102,38 @@ public final class OceanColumnShading {
     }
 
     /**
-     * The water-world spawn island: a solid seamount with a coral-sand beach cap over
-     * limestone and the regional lithology core. The sand/limestone bands reuse the reef
-     * cap's palette so the shore reads as an emerged reef rather than an alien intrusion.
+     * The water-world spawn island. The plateau core ({@code mask >= 1}) is vanilla land:
+     * grass over three layers of dirt over limestone and the regional lithology, flat for
+     * building and able to hold trees. The beach flanks ({@code mask < 1}) keep the coral-sand
+     * shore. Below the surface, seeded cave voids open inside the solid seamount — strictly
+     * dry by construction (see {@link com.dexer.aquanaut.common.worldgen.blend.SpawnIslandCaves}).
      */
     private static BlockState islandStateFor(OceanColumnPlanner.ColumnPlan plan, int blockY) {
         int floorY = plan.cavityFloorY();
         if (blockY > floorY) {
             return WATER;
         }
+        if (plan.islandMask() >= 1.0D
+                && blockY <= floorY - com.dexer.aquanaut.common.worldgen.blend.SpawnIslandCaves.SURFACE_PROTECT_MARGIN
+                && com.dexer.aquanaut.common.worldgen.blend.SpawnIslandCaves.isCave(
+                        plan.islandSeed(), plan.blockX(), blockY, plan.blockZ())) {
+            return AIR;
+        }
         int depth = floorY - blockY;
+        if (plan.islandMask() >= 1.0D) {
+            // The flat building core: vanilla-style grassland profile, trees take root here.
+            if (depth == 0) {
+                return Blocks.GRASS_BLOCK.defaultBlockState();
+            }
+            if (depth <= 3) {
+                return Blocks.DIRT.defaultBlockState();
+            }
+            if (depth <= 4) {
+                return BlockRegistry.LIMESTONE.get().defaultBlockState();
+            }
+            return floorStateFor(plan.blockX(), blockY, plan.blockZ(), floorY);
+        }
+        // The beach flanks keep the emerged-reef identity: coral sand over limestone.
         if (depth == 0) {
             double mud = SoftMixNoise.valueNoise(plan.blockX(), plan.blockZ(), 12, 0x5A4DL);
             if (mud > 0.72D) {

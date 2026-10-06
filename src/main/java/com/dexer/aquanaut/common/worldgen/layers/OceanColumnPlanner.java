@@ -76,6 +76,7 @@ public final class OceanColumnPlanner {
         int minBuildHeight = source.minBuildHeight();
         int floorY = (int) Math.round(guardedFloor);
         double islandMask = source.spawnIslandMaskAt(blockX, blockZ);
+        long islandSeed = source.spawnIslandSeed();
         // Island columns carry solid ground above sea level, so the carve window must reach
         // the plateau top; everywhere else it stops at the open-water line like before.
         int topCarveY = islandMask > 0.0D ? Math.max(terrain.topWaterY(), floorY) : terrain.topWaterY();
@@ -123,7 +124,7 @@ public final class OceanColumnPlanner {
 
         return new ColumnPlan(blockX, blockZ, topCarveY, floorY, minBuildHeight - 1,
                 edge, profile, terrain, volcanic, reef, reefBottomY, deepFloorY, mountainTopY,
-                capOpenness, capBand, outcropRelief, outcropTopY, grounded, islandMask,
+                capOpenness, capBand, outcropRelief, outcropTopY, grounded, islandMask, islandSeed,
                 karstNoise, brineField, dissolution, terrain.blend().contactMaterial());
     }
 
@@ -475,6 +476,7 @@ public final class OceanColumnPlanner {
                              int outcropTopY,
                              boolean grounded,
                              double islandMask,
+                             long islandSeed,
                              double karstNoise,
                              double brineField,
                              DissolutionField dissolution,

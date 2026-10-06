@@ -3,10 +3,15 @@ package com.dexer.aquanaut.common.entity;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.control.SmoothSwimmingMoveControl;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
@@ -58,6 +63,14 @@ public final class SedimentWormEntity extends Silverfish implements GeoEntity {
     public SedimentWormEntity(EntityType<? extends Silverfish> type, Level level) {
         super(type, level);
         setNoAi(true);
+        // Land navigation cannot path through water; without the drowned's water rig the worm
+        // could only rise and sink on buoyancy instead of lunging at what disturbed it.
+        this.moveControl = new SmoothSwimmingMoveControl(this, 85, 10, 0.02F, 0.1F, false);
+    }
+
+    @Override
+    protected PathNavigation createNavigation(Level level) {
+        return new WaterBoundPathNavigation(this, level);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -113,6 +126,10 @@ public final class SedimentWormEntity extends Silverfish implements GeoEntity {
     @Override
     public void aiStep() {
         if (!level().isClientSide) {
+            // An arthropod cannot breathe water on its own; keep it supplied while it is buried.
+            if (!hasEffect(MobEffects.WATER_BREATHING)) {
+                addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, -1, 0, true, false));
+            }
             if (attackTimer() > 0) {
                 entityData.set(ATTACK_TIMER, attackTimer() - 1);
             }

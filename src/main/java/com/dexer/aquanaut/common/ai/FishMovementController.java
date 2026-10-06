@@ -120,6 +120,14 @@ public class FishMovementController {
         }
     }
 
+    /**
+     * Kicks off a short escape burst with no player involved — a startle, not a chase. The fish
+     * swims off at escape speed for the given number of ticks, then goes back to cruising.
+     */
+    public void startle(int ticks) {
+        this.escapeMinimumTicks = Math.max(this.escapeMinimumTicks, Math.max(1, ticks));
+    }
+
     public boolean isSprintingAway() {
         return this.state.isSprintingAway();
     }

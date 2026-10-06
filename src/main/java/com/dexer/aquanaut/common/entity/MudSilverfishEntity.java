@@ -6,8 +6,13 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.control.SmoothSwimmingMoveControl;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
 import net.minecraft.world.entity.monster.Silverfish;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.Level;
@@ -37,6 +42,14 @@ public final class MudSilverfishEntity extends Silverfish implements GeoEntity {
 
     public MudSilverfishEntity(EntityType<? extends Silverfish> type, Level level) {
         super(type, level);
+        // A land monster would only bob on the buoyancy: give it the drowned's water rig so it
+        // can actually hunt across the mud flat.
+        this.moveControl = new SmoothSwimmingMoveControl(this, 85, 10, 0.02F, 0.1F, false);
+    }
+
+    @Override
+    protected PathNavigation createNavigation(Level level) {
+        return new WaterBoundPathNavigation(this, level);
     }
 
     @Override
@@ -75,6 +88,11 @@ public final class MudSilverfishEntity extends Silverfish implements GeoEntity {
         super.aiStep();
         if (level().isClientSide) {
             return;
+        }
+        // It is still an arthropod, so it cannot breathe water on its own; keep it supplied so a
+        // hunt across the flat never ends in drowning.
+        if (!hasEffect(MobEffects.WATER_BREATHING)) {
+            addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, -1, 0, true, false));
         }
         if (attackTimer() > 0) {
             entityData.set(ATTACK_TIMER, attackTimer() - 1);

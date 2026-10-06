@@ -19,6 +19,12 @@ public final class AmbushFishEntity extends BaseFishEntity implements GeoEntity 
     private static final RawAnimation BURST_ESCAPE = RawAnimation.begin().thenPlay("burst_escape");
     /** Below this horizontal speed the fish reads as lying in wait rather than cruising. */
     private static final double MOVE_SPEED_SQR = 4.0E-4D;
+    /** Ticks a resting flounder waits before it shuffles to a new spot. */
+    private static final int DART_MIN_TICKS = 120;
+    private static final int DART_RANDOM_TICKS = 260;
+    /** Ticks the startle burst lasts. */
+    private static final int DART_TICKS = 10;
+    private int dartCooldown = DART_MIN_TICKS + 60;
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public AmbushFishEntity(EntityType<? extends WaterAnimal> type, Level level) { super(type, level); }
@@ -45,5 +51,22 @@ public final class AmbushFishEntity extends BaseFishEntity implements GeoEntity 
                     getDeltaMovement().horizontalDistanceSqr() > MOVE_SPEED_SQR ? SWIM : IDLE);
         }));
     }
+    @Override public void tick() {
+        super.tick();
+        if (level().isClientSide) {
+            return;
+        }
+        // Already bolting: hold the rest until it has settled again.
+        if (isSprintingAway() || isEscapeLaunching()) {
+            dartCooldown = DART_MIN_TICKS + random.nextInt(DART_RANDOM_TICKS);
+            return;
+        }
+        if (--dartCooldown > 0) {
+            return;
+        }
+        dartCooldown = DART_MIN_TICKS + random.nextInt(DART_RANDOM_TICKS);
+        startle(DART_TICKS);
+    }
+
     @Override public AnimatableInstanceCache getAnimatableInstanceCache() { return cache; }
 }

@@ -65,6 +65,11 @@ public abstract class BaseFishEntity extends WaterAnimal {
         return hurt;
     }
 
+    /** Startles the fish into a short burst of escape swimming, with no attacker needed. */
+    public void startle(int ticks) {
+        this.movementController.startle(ticks);
+    }
+
     public boolean isSprintingAway() {
         if (this.level().isClientSide) {
             return this.entityData.get(SPRINTING_AWAY);

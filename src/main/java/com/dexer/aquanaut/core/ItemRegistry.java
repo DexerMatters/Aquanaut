@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.mud.DeathCapItem;
+import com.dexer.aquanaut.common.mud.NutrientMudBallItem;
 import com.dexer.aquanaut.common.diving.DivingEquipmentSlotType;
 import com.dexer.aquanaut.common.inventory.CreativeTabHeader;
 import com.dexer.aquanaut.common.inventory.SectionedTabOutput;
@@ -58,7 +59,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public final class ItemRegistry {
         public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Aquanaut.MODID);
         public static final DeferredItem<Item> MUD_BALL = ITEMS.registerSimpleItem("mud_ball");
-        public static final DeferredItem<Item> NUTRIENT_MUD_BALL = ITEMS.registerSimpleItem("nutrient_mud_ball");
+        public static final DeferredItem<NutrientMudBallItem> NUTRIENT_MUD_BALL = ITEMS.registerItem(
+                        "nutrient_mud_ball", NutrientMudBallItem::new);
         public static final DeferredItem<Item> FOSSIL_FRAGMENT = ITEMS.registerSimpleItem("fossil_fragment");
         public static final DeferredItem<BlockItem> MUD = blockItem("mud", BlockRegistry.MUD);
         public static final DeferredItem<BlockItem> MUD_BRICKS = blockItem("mud_bricks", BlockRegistry.MUD_BRICKS);

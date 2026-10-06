@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [" # ", "#X#", " # "],
+  "key": {
+    "#": {"item": "aquanaut:mud_bricks"},
+    "X": {"item": "aquanaut:glow_fungus"}
+  },
+  "result": {"id": "aquanaut:mud_lamp", "count": 1}
+}

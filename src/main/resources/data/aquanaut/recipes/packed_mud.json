@@ -1,0 +1,6 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["##", "##"],
+  "key": {"#": {"item": "aquanaut:mud_ball"}},
+  "result": {"id": "aquanaut:packed_mud", "count": 1}
+}

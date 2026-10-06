@@ -83,6 +83,6 @@ public final class MudZoneConfig {
 
     // --- Garden eel ---
 
-    /** Cruise speed of the garden eel as it drifts along the sediment. */
-    public static final double GARDEN_EEL_CRUISE_SPEED = 0.03D;
+    /** Cruise speed of the garden eel, which roots itself in the sediment and barely drifts. */
+    public static final double GARDEN_EEL_CRUISE_SPEED = 0.008D;
 }

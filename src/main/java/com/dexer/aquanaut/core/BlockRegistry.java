@@ -21,6 +21,7 @@ import com.dexer.aquanaut.common.block.DynamicLightBlock;
 import com.dexer.aquanaut.common.block.CrystalPlantBlock;
 import com.dexer.aquanaut.common.block.SeaweedBlock;
 import com.dexer.aquanaut.common.block.SeaweedStemBlock;
+import com.dexer.aquanaut.common.block.SeaMossBlock;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ColorRGBA;
 import net.minecraft.world.level.block.Block;
@@ -128,6 +129,7 @@ public final class BlockRegistry {
             () -> new NutrientRichMudBlock(BlockBehaviour.Properties.of()
                     .mapColor(MapColor.TERRACOTTA_BROWN)
                     .strength(0.7F, 0.9F)
+                    .randomTicks()
                     .sound(SoundType.MUD)));
     public static final DeferredBlock<DroopingSeaweedBlock> DROOPING_SEAWEED = seaweed("drooping_seaweed");
     public static final DeferredBlock<Block> SHALE = cube("shale",
@@ -169,6 +171,11 @@ public final class BlockRegistry {
             MapColor.COLOR_GREEN);
     public static final DeferredBlock<CrystalPlantBlock> PALE_PUFFBALL = crystalPlant("pale_puffball", 4,
             MapColor.QUARTZ);
+    /** A quarter-block mat of moss that creeps over nutrient-rich mud. */
+    public static final DeferredBlock<SeaMossBlock> SEA_MOSS = BLOCKS.register("sea_moss",
+            () -> new SeaMossBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.COLOR_GREEN).strength(0.2F, 0.2F)
+                    .sound(SoundType.MOSS).randomTicks()));
 
     // Brine Mirror Gorge - evaporite minerals and crystal flora
     public static final DeferredBlock<Block> HALITE_CRUST = cube("halite_crust",

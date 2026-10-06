@@ -1,9 +1,12 @@
 package com.dexer.aquanaut.common.block;
 
 import com.dexer.aquanaut.common.mud.MudZoneConfig;
+import com.dexer.aquanaut.core.BlockRegistry;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -37,6 +40,20 @@ public final class NutrientRichMudBlock extends Block {
                     true));
         }
         super.stepOn(level, pos, state, entity);
+    }
+
+    @Override
+    public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        if (random.nextFloat() >= MudZoneConfig.SEA_MOSS_GROW_CHANCE) {
+            return;
+        }
+        BlockPos above = pos.above();
+        if (!level.getFluidState(above).is(FluidTags.WATER)
+                || !level.getBlockState(above).canBeReplaced()) {
+            return;
+        }
+        // The moss default state is already waterlogged, which is what a submerged flat wants.
+        level.setBlock(above, BlockRegistry.SEA_MOSS.get().defaultBlockState(), 3);
     }
 
     @Override

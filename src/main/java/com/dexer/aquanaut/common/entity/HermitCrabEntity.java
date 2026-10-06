@@ -1,6 +1,7 @@
 package com.dexer.aquanaut.common.entity;
 
 import com.dexer.aquanaut.common.mud.MudZoneConfig;
+import com.dexer.aquanaut.common.mud.SeaMossGrazeGoal;
 import com.dexer.aquanaut.core.BlockRegistry;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -62,6 +63,7 @@ public final class HermitCrabEntity extends WaterAnimal implements GeoEntity {
         super.registerGoals();
         // Neutral: it only fights back after being hurt.
         goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.2D, true));
+        goalSelector.addGoal(3, new SeaMossGrazeGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
     }
     @Override protected void defineSynchedData(SynchedEntityData.Builder builder) {

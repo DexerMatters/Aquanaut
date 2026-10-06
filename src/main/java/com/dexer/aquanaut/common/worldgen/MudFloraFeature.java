@@ -56,6 +56,10 @@ public final class MudFloraFeature extends Feature<NoneFeatureConfiguration> {
         for (int i = 0; i < 1 + random.nextInt(3); i++) {
             placedAny |= placeLeaf(level, sampleFloor(level, origin, random), BlockRegistry.PALE_PUFFBALL.get());
         }
+        // Sea moss only takes hold on the nutrient-rich mud it feeds on.
+        for (int i = 0; i < 8; i++) {
+            placedAny |= placeMoss(level, sampleFloor(level, origin, random));
+        }
         // Shells are a seasoning, not a bed: one small patch at most, and usually none.
         if (random.nextFloat() < 0.2F) {
             placedAny |= placeShellDebris(level, sampleFloor(level, origin, random), random);
@@ -70,6 +74,19 @@ public final class MudFloraFeature extends Feature<NoneFeatureConfiguration> {
             return false;
         }
         level.setBlock(target, block.defaultBlockState().setValue(BlockStateProperties.WATERLOGGED, true), 2);
+        return true;
+    }
+
+    /** A sea moss mat on nutrient-rich mud, waterlogged like the rest of the biome. */
+    private static boolean placeMoss(WorldGenLevel level, BlockPos floor) {
+        if (!level.getBlockState(floor).is(BlockRegistry.NUTRIENT_RICH_MUD.get())) {
+            return false;
+        }
+        BlockPos target = floor.above();
+        if (!level.getFluidState(target).is(FluidTags.WATER)) {
+            return false;
+        }
+        level.setBlock(target, BlockRegistry.SEA_MOSS.get().defaultBlockState(), 2);
         return true;
     }
 

@@ -2,6 +2,7 @@ package com.dexer.aquanaut.common.entity;
 
 import com.dexer.aquanaut.common.mud.MudZoneConfig;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -10,6 +11,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Silverfish;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -27,7 +29,11 @@ public final class MudSilverfishEntity extends Silverfish implements GeoEntity {
     /** Ticks the bite clip plays for after a landed hit. */
     private static final int ATTACK_ANIM_TICKS = 10;
     private static final double WALK_SPEED_SQR = 4.0E-4D;
+    /** Ticks between light probes while fleeing a bright spot. */
+    private static final int FLEE_SCAN_INTERVAL = 10;
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    private int fleeScanCooldown;
+    private Vec3 fleeDirection = Vec3.ZERO;
 
     public MudSilverfishEntity(EntityType<? extends Silverfish> type, Level level) {
         super(type, level);
@@ -67,16 +73,48 @@ public final class MudSilverfishEntity extends Silverfish implements GeoEntity {
     @Override
     public void aiStep() {
         super.aiStep();
-        if (!level().isClientSide) {
-            if (attackTimer() > 0) {
-                entityData.set(ATTACK_TIMER, attackTimer() - 1);
+        if (level().isClientSide) {
+            return;
+        }
+        if (attackTimer() > 0) {
+            entityData.set(ATTACK_TIMER, attackTimer() - 1);
+        }
+        if (isInBrightLight()) {
+            // Strong light drives it off: drop the hunt, then scuttle toward the darkest
+            // neighbouring direction instead of drifting straight up.
+            getNavigation().stop();
+            setTarget(null);
+            if (--fleeScanCooldown <= 0) {
+                fleeScanCooldown = FLEE_SCAN_INTERVAL;
+                fleeDirection = darkestDirection();
             }
-            if (level().getBrightness(LightLayer.BLOCK, BlockPos.containing(position()))
-                    >= MudZoneConfig.BRIGHT_LIGHT_THRESHOLD) {
-                setDeltaMovement(getDeltaMovement().add(0.0D, 0.02D, 0.0D));
-                getNavigation().stop();
+            setDeltaMovement(getDeltaMovement().add(fleeDirection.scale(0.02D))
+                    .add(0.0D, 0.004D, 0.0D));
+        }
+    }
+
+    private boolean isInBrightLight() {
+        return level().getBrightness(LightLayer.BLOCK, BlockPos.containing(position()))
+                >= MudZoneConfig.BRIGHT_LIGHT_THRESHOLD;
+    }
+
+    /** The neighbouring direction the block light is weakest in, preferring deeper water. */
+    private Vec3 darkestDirection() {
+        BlockPos origin = BlockPos.containing(position());
+        Vec3 best = new Vec3(0.0D, 0.0D, 0.0D);
+        int bestLight = Integer.MAX_VALUE;
+        for (Direction direction : Direction.values()) {
+            if (direction == Direction.UP) {
+                continue;
+            }
+            BlockPos probe = origin.relative(direction);
+            int light = level().getBrightness(LightLayer.BLOCK, probe);
+            if (light < bestLight) {
+                bestLight = light;
+                best = new Vec3(direction.getStepX(), direction.getStepY(), direction.getStepZ());
             }
         }
+        return best;
     }
 
     private int attackTimer() {

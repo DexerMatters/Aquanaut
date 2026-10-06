@@ -81,8 +81,16 @@ public final class MudZoneConfig {
     /** Range at which the ambush fish bursts out of hiding. */
     public static final double AMBUSH_TRIGGER_RANGE = 1.0D;
 
+    // --- Sea moss ---
+
+    /** Chance per random tick that nutrient-rich mud sprouts a sea moss mat on top. */
+    public static final float SEA_MOSS_GROW_CHANCE = 0.12F;
+
+    /** Chance per random tick that a sea moss mat creeps onto neighbouring nutrient mud. */
+    public static final float SEA_MOSS_SPREAD_CHANCE = 0.10F;
+
     // --- Garden eel ---
 
-    /** Cruise speed of the garden eel, which roots itself in the sediment and barely drifts. */
-    public static final double GARDEN_EEL_CRUISE_SPEED = 0.008D;
+    /** Cruise speed of the garden eel, which roots itself in the sediment and never moves. */
+    public static final double GARDEN_EEL_CRUISE_SPEED = 0.0D;
 }

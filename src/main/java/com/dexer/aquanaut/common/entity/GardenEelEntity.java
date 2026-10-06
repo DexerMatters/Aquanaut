@@ -24,7 +24,12 @@ public final class GardenEelEntity extends BaseFishEntity implements GeoEntity {
                 .add(Attributes.MOVEMENT_SPEED, MudZoneConfig.GARDEN_EEL_CRUISE_SPEED).build();
     }
     @Override protected FishResponseMode getResponseMode() { return FishResponseMode.AVOIDANCE; }
-    @Override protected boolean getSchoolingEnabled() { return true; }
+    /**
+     * The colony roots itself in the sediment: it never cruises, so the schooling steering is
+     * off and the group comes from the spawner releasing several eels at once. The floor bias
+     * keeps every one of them planted on the mud, and only a nearby player makes them hide.
+     */
+    @Override protected boolean getSchoolingEnabled() { return false; }
     @Override protected double getSchoolingSearchRadius() { return 6.0D; }
     @Override protected double getCruiseMaxSpeed() { return MudZoneConfig.GARDEN_EEL_CRUISE_SPEED; }
     @Override protected double getCruiseAcceleration() { return 0.003D; }

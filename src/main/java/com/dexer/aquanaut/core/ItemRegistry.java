@@ -361,6 +361,7 @@ public final class ItemRegistry {
                         BlockRegistry.CORAL_SAND);
         public static final DeferredItem<BlockItem> NUTRIENT_RICH_MUD = blockItem("nutrient_rich_mud",
                         BlockRegistry.NUTRIENT_RICH_MUD);
+        public static final DeferredItem<BlockItem> SEA_MOSS = blockItem("sea_moss", BlockRegistry.SEA_MOSS);
         public static final DeferredItem<BlockItem> DROOPING_SEAWEED = blockItem("drooping_seaweed",
                         BlockRegistry.DROOPING_SEAWEED);
         public static final DeferredItem<BlockItem> SHALE = blockItem("shale",
@@ -990,6 +991,7 @@ public final class ItemRegistry {
                                 output.header(CreativeTabHeader.biome(BiomeRegistry.MUD_ZONE));
                                 output.accept(MUD.get());
                                 output.accept(NUTRIENT_RICH_MUD.get());
+                                output.accept(SEA_MOSS.get());
                                 output.accept(PARASITIC_MUD.get());
                                 output.accept(MUD_BRICKS.get());
                                 output.accept(MUD_BRICK_STAIRS.get());

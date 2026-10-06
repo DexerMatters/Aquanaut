@@ -432,6 +432,7 @@
   "biome.aquanaut.coral_forest": "Coral Forest",
   "gui.aquanaut.aquarium": "Aquarium",
   "gui.aquanaut.aquarium.health": "Health:",
+  "gui.aquanaut.aquarium.capacity": "%s / %s",
   "gui.aquanaut.inventory": "Inventory",
   "command.aquanaut.givefish.unknown_fish": "Unknown fish type: %s",
   "command.aquanaut.givefish.no_room": "No room in %s's aquarium for %s",

@@ -25,7 +25,9 @@ public final class AquariumContainerMenu extends AbstractContainerMenu {
     static final int HOTBAR_START = MAIN_END;
     static final int HOTBAR_END = HOTBAR_START + HOTBAR_COUNT;
 
-    public static final int AQUARIUM_GRID_Y = 30;
+    /** Top-left cell of the tank, in the same 8 pixel margin the player inventory slots use. */
+    public static final int AQUARIUM_GRID_X = 8;
+    public static final int AQUARIUM_GRID_Y = 26;
     public static final int MAIN_INV_Y = 84;
     public static final int HOTBAR_Y = 142;
 

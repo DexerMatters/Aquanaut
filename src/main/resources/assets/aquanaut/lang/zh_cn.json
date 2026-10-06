@@ -432,6 +432,7 @@
   "gaze.aquanaut.floating.desc": "降低鱼叉重力；III 级完全无重力。",
   "gui.aquanaut.aquarium": "水族馆",
   "gui.aquanaut.aquarium.health": "生命值：",
+  "gui.aquanaut.aquarium.capacity": "%s / %s",
   "gui.aquanaut.inventory": "背包",
   "command.aquanaut.givefish.unknown_fish": "未知鱼类类型：%s",
   "command.aquanaut.givefish.no_room": "%s的水族馆没有空位容纳%s",

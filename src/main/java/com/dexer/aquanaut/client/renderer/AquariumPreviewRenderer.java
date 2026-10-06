@@ -15,7 +15,11 @@ import java.util.Map;
 
 public final class AquariumPreviewRenderer {
 
-    public static final int VERTICAL_OVERFLOW = 9;
+    /**
+     * How far a fish may poke past its own grid cells, top and bottom. The tank water is sized from
+     * this, so a tall model still fits inside the glass.
+     */
+    public static final int VERTICAL_OVERFLOW = 6;
     private static final int SLOT_SIZE = 18;
 
     private static final Map<String, LivingEntity> ENTITY_CACHE = new HashMap<>();

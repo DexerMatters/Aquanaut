@@ -12,8 +12,12 @@ class SpawnIslandMaskTest {
     private static final int SEA_LEVEL = 63;
     /** A representative raw cavity floor of a covered column near the origin. */
     private static final double RAW_FLOOR = -30.0D;
-    /** Comfortably inside the tightest bay of any seed's randomized plateau. */
+    /** Comfortably inside the tightest bay of any seed (MIN_PLATEAU_RADIUS = 85). */
     private static final int SAFE_PLATEAU_RADIUS = 32;
+    /** Comfortably inside the organic flat building core (never below FLAT_RADIUS * 0.75). */
+    private static final int GUARANTEED_FLAT_RADIUS = 18;
+    /** Land threshold of the squared blend: floor reaches sea level at mask 0.9644 (raw -30). */
+    private static final double LAND_MASK = 0.9644D;
     /** Every world seed the per-seed property tests walk. */
     private static final long[] SEEDS = {0L, 1L, 42L, -99L, 0x9E3779B97F4A7C15L};
 
@@ -85,51 +89,86 @@ class SpawnIslandMaskTest {
     }
 
     @Test
-    void coastlineIsContinuousAroundTheOriginAndActuallyRandom() {
-        // Walking a circle at the mean plateau radius must not jump: the noise is sampled on
-        // the unit circle, so the outline wraps the ±pi seam without tearing.
-        double previous = SpawnIslandMask.maskAt(SpawnIslandMask.FULL_RADIUS, 0);
-        double first = previous;
-        int samples = 180;
-        double changedDirections = 0;
-        for (int i = 1; i <= samples; i++) {
-            double rad = 2.0D * Math.PI * i / samples;
-            int x = (int) Math.round(Math.cos(rad) * SpawnIslandMask.FULL_RADIUS);
-            int z = (int) Math.round(Math.sin(rad) * SpawnIslandMask.FULL_RADIUS);
-            double mask = SpawnIslandMask.maskAt(x, z);
-            assertTrue(Math.abs(mask - previous) <= 0.05D, "coastline jumped at sample " + i);
-            if (Math.abs(mask - first) > 1.0e-6D) {
-                changedDirections++;
+    void coastIsMeanderingNotACircle() {
+        // The maintainer's bar: the coastline must not read as a circle. Walk 72 rays and
+        // measure where each one crosses the waterline; the spread has to be far beyond the
+        // couple of blocks a circular coast would produce.
+        int minLand = Integer.MAX_VALUE;
+        int maxLand = 0;
+        for (int deg = 0; deg < 360; deg += 5) {
+            double rad = Math.toRadians(deg);
+            double ux = Math.cos(rad);
+            double uz = Math.sin(rad);
+            int land = 0;
+            for (int d = (int) SpawnIslandMask.MIN_PLATEAU_RADIUS;
+                    d <= (int) SpawnIslandMask.COAST_MEAN_RADIUS + SpawnIslandMask.COAST_AMPLITUDE + 10; d++) {
+                int x = (int) Math.round(ux * d);
+                int z = (int) Math.round(uz * d);
+                if (SpawnIslandMask.maskAt(42L, x, z) >= LAND_MASK) {
+                    land = d;
+                }
             }
-            previous = mask;
+            assertTrue(land > 0, "no land on the " + deg + " deg ray");
+            minLand = Math.min(minLand, land);
+            maxLand = Math.max(maxLand, land);
         }
-        // The outline is genuinely irregular: a ring through the fade band leaves the
-        // plateau-level blend in some directions but not others.
-        int ring = SpawnIslandMask.FULL_RADIUS + SpawnIslandMask.FADE_WIDTH / 2;
-        assertNotEquals(SpawnIslandMask.maskAt(ring, 0), SpawnIslandMask.maskAt(0, ring), EPS);
+        assertTrue(maxLand - minLand >= 30,
+                "coastline spread only " + (maxLand - minLand) + " blocks - still a circle");
     }
 
     @Test
-    void coastlineDiffersBetweenWorldSeeds() {
-        // The same ring, two worlds: the seeded coastline phase must produce different bays.
-        long seedA = 0x9E3779B97F4A7C15L;
-        long seedB = 0xBF58476D1CE4E5B9L;
-        int differences = 0;
-        for (int deg = 0; deg < 360; deg += 5) {
-            double rad = Math.toRadians(deg);
-            int x = (int) Math.round(Math.cos(rad) * SpawnIslandMask.FULL_RADIUS);
-            int z = (int) Math.round(Math.sin(rad) * SpawnIslandMask.FULL_RADIUS);
-            if (Math.abs(SpawnIslandMask.maskAt(seedA, x, z) - SpawnIslandMask.maskAt(seedB, x, z)) > 1.0e-6D) {
-                differences++;
+    void coastlineIsContinuousAroundTheOriginAndDiffersPerSeed() {
+        // Walking a ring at the mean coast radius must not jump: the warped multi-octave
+        // field is continuous, so the coastline never tears at a chunk border or the ±pi seam.
+        int ring = SpawnIslandMask.COAST_MEAN_RADIUS;
+        double previous = SpawnIslandMask.maskAt(ring, 0);
+        for (int i = 1; i <= 180; i++) {
+            double rad = 2.0D * Math.PI * i / 180;
+            int x = (int) Math.round(Math.cos(rad) * ring);
+            int z = (int) Math.round(Math.sin(rad) * ring);
+            double mask = SpawnIslandMask.maskAt(x, z);
+            assertTrue(Math.abs(mask - previous) <= 0.08D, "coastline jumped at sample " + i);
+            previous = mask;
+        }
+        // Two world seeds meander differently.
+        assertNotEquals(SpawnIslandMask.maskAt(42L, ring, 0),
+                SpawnIslandMask.maskAt(-77L, ring, 0), EPS);
+    }
+
+    @Test
+    void interiorLiftRollsTheOuterPlateauButNeverTheFlatCore() {
+        for (long seed : SEEDS) {
+            for (int x = -96; x <= 96; x += 4) {
+                for (int z = -96; z <= 96; z += 4) {
+                    double mask = SpawnIslandMask.maskAt(seed, x, z);
+                    double lift = SpawnIslandMask.interiorLift(seed, x, z, mask);
+                    assertTrue(lift >= -3.0D - EPS && lift <= 3.0D + EPS,
+                            "interior lift out of range at (" + x + ", " + z + ")");
+                    if (mask < 1.0D) {
+                        assertEquals(0.0D, lift, EPS, "relief on the beach flank");
+                    }
+                    double dist = Math.sqrt((double) x * x + (double) z * z);
+                    if (dist <= GUARANTEED_FLAT_RADIUS) {
+                        assertEquals(0.0D, lift, EPS, "relief inside the flat core");
+                    }
+                }
             }
         }
-        assertTrue(differences > 0, "two world seeds produced identical coastlines");
+        // The outer plateau must actually roll, or the island stays a featureless disc.
+        double maxLift = 0.0D;
+        double minLift = 0.0D;
+        for (int x = -SpawnIslandMask.COAST_MEAN_RADIUS; x <= SpawnIslandMask.COAST_MEAN_RADIUS; x += 3) {
+            for (int z = -SpawnIslandMask.COAST_MEAN_RADIUS; z <= SpawnIslandMask.COAST_MEAN_RADIUS; z += 3) {
+                double lift = SpawnIslandMask.interiorLift(42L, x, z, 1.0D);
+                maxLift = Math.max(maxLift, lift);
+                minLift = Math.min(minLift, lift);
+            }
+        }
+        assertTrue(maxLift - minLift >= 1.5D, "plateau relief is dead flat");
     }
 
     @Test
     void dunesOnlyRideTheOuterPlateauAndNeverStack() {
-        // The organic flat core never shrinks below FLAT_RADIUS * 0.75.
-        int guaranteedFlat = (int) (SpawnIslandMask.FLAT_RADIUS * 0.75D);
         for (long seed : SEEDS) {
             for (int x = -96; x <= 96; x += 5) {
                 for (int z = -96; z <= 96; z += 5) {
@@ -139,7 +178,8 @@ class SpawnIslandMaskTest {
                     if (mask < 1.0D) {
                         assertEquals(0, dune, "dune on the beach flank at (" + x + ", " + z + ")");
                     }
-                    if ((double) x * x + (double) z * z <= (double) guaranteedFlat * guaranteedFlat) {
+                    double dist = Math.sqrt((double) x * x + (double) z * z);
+                    if (dist <= GUARANTEED_FLAT_RADIUS) {
                         assertEquals(0, dune, "dune inside the flat building core at ("
                                 + x + ", " + z + ")");
                     }
@@ -148,8 +188,8 @@ class SpawnIslandMaskTest {
         }
         // Some outer-plateau ground must actually grow dunes, or the relief field is dead.
         int duneColumns = 0;
-        for (int x = SpawnIslandMask.FLAT_RADIUS + 6; x <= SpawnIslandMask.FULL_RADIUS; x += 2) {
-            for (int z = SpawnIslandMask.FLAT_RADIUS + 6; z <= SpawnIslandMask.FULL_RADIUS; z += 2) {
+        for (int x = SpawnIslandMask.FLAT_RADIUS + 6; x <= SpawnIslandMask.COAST_MEAN_RADIUS; x += 2) {
+            for (int z = SpawnIslandMask.FLAT_RADIUS + 6; z <= SpawnIslandMask.COAST_MEAN_RADIUS; z += 2) {
                 duneColumns += SpawnIslandMask.duneLift(42L, x, z, 1.0D);
             }
         }
@@ -186,6 +226,8 @@ class SpawnIslandMaskTest {
             assertTrue(SpawnIslandMask.stoneShoreWeight(seed, cx, cz) >= 0.5D,
                     "stony shore missing at its centre, seed " + seed);
             assertTrue(SpawnIslandMask.stoneShoreWeight(seed, cx, cz) <= 1.0D, "weight out of range");
+            assertTrue(SpawnIslandMask.maskAt(seed, cx, cz) >= 1.0D,
+                    "stony shore centre off the plateau, seed " + seed);
             boolean lava = false;
             for (int x = cx - 16; x <= cx + 16 && !lava; x += 2) {
                 for (int z = cz - 16; z <= cz + 16 && !lava; z += 2) {
@@ -193,9 +235,6 @@ class SpawnIslandMaskTest {
                 }
             }
             assertTrue(lava, "no lava pond inside the stony shore, seed " + seed);
-            // The zone sits on the plateau: its centre must be fully emerged ground.
-            assertTrue(SpawnIslandMask.maskAt(seed, cx, cz) >= 1.0D,
-                    "stony shore centre off the plateau, seed " + seed);
         }
     }
 
@@ -227,9 +266,8 @@ class SpawnIslandMaskTest {
 
     @Test
     void floorSlopeStaysGentleThroughTheFade() {
-        // The blend runs on the squared mask, so the mid-flank (where the beach steepens into
-        // the waterline) can legally swing ~100 * 2.16 / 100... bounded here at 3.0 blocks per
-        // block including integer-sampling wobble of the coastline direction. This test guards
+        // The squared blend's steepest mid-flank swings ~2.2 blocks per block, and the coast
+        // field gradient plus integer ray sampling add a little on top. This test guards
         // against tearing (multi-block jumps); relaxing slopes beyond 1.0 is CliffGuard's
         // contract on the guarded grid.
         for (long seed : SEEDS) {
@@ -242,7 +280,7 @@ class SpawnIslandMaskTest {
                     int x = (int) Math.round(ux * d);
                     int z = (int) Math.round(uz * d);
                     double floor = SpawnIslandMask.blendFloor(RAW_FLOOR, SpawnIslandMask.maskAt(seed, x, z));
-                    assertTrue(Math.abs(floor - previous) <= 3.0D,
+                    assertTrue(Math.abs(floor - previous) <= 3.5D,
                             "cliff in the blended island flank on the " + deg + " deg ray at d=" + d
                                     + ", seed " + seed);
                     previous = floor;

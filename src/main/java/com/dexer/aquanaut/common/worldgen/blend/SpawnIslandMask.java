@@ -3,59 +3,77 @@ package com.dexer.aquanaut.common.worldgen.blend;
 import com.dexer.aquanaut.common.worldgen.layers.SoftMixNoise;
 
 /**
- * Radial mask of the water-world spawn island with a randomized, world-seeded coastline.
+ * Coast field of the water-world spawn island, with a meandering world-seeded coastline.
  *
  * <p>
  * The water world preset turns every column into open ocean, so a fresh spawn would drown
  * (design note {@code Aquanaut-Design/Changes.md}). This mask raises the planned geological
- * floor near the world origin to a dry plateau: the floor is pinned to at least
+ * floor near the world origin to dry ground: the floor is pinned to at least
  * {@link #ISLAND_TOP_Y}, a few blocks above the preset's sea level 63, and the target fades
- * out over a smoothstep ramp so the seamount flanks merge into the ordinary ocean floor
- * without a contour cliff. The planner's cliff guard runs over the blended field like over
- * any other raw floor, so chunk borders and the analytic single-column path stay
- * bit-identical.
+ * out over the fade width so the seamount flanks merge into the ordinary ocean floor. The
+ * planner's cliff guard runs over the blended field like over any other raw floor, so chunk
+ * borders and the analytic single-column path stay bit-identical.
  * </p>
  *
  * <p>
- * The outline is not a circle: the plateau and fade radii are stretched per direction by two
- * octaves of value noise sampled on the unit circle in noise space, which is periodic by
- * construction and therefore cannot tear at the ±π seam. Both the coastline phase and the
- * modulation amplitudes are scrambled from the world seed, so every world gets its own bay
- * and peninsula layout with its own coastal character, while the smallest plateau radius
- * {@link #MIN_PLATEAU_RADIUS} still covers the spawn chunk (0, 0) that the world-spawn scan
- * relies on. Seed 0 keeps a fixed mid-amplitude silhouette for tests and seedless fallbacks.
- * A low dune relief on the plateau ({@link #duneLift}) is seeded the same way.
+ * The coastline is <b>not</b> a radius: {@code coastFieldAt} evaluates a domain-warped,
+ * three-octave value-noise field around the mean coast radius, so bays and peninsulas
+ * meander at three scales (broad swells, mid coves, fine crinkle) and no direction repeats
+ * another. The blend only starts past the local coast field, so the whole interior keeps the
+ * full plateau height - there is no moat between the building core and the shore. On top of
+ * the plateau, {@link #interiorLift} adds a seeded rolling relief (suppressed inside the
+ * organic flat building core), {@link #duneLift} speckles one-block knolls, and
+ * {@link #sandPatchAt} breaks the grass into an irregular speckle. All modulation is
+ * scrambled from the world seed.
  * </p>
  */
 public final class SpawnIslandMask {
     /** Plateau floor target; the water world preset's sea level is 63. */
     public static final int ISLAND_TOP_Y = 70;
     /**
-     * Radius (blocks) of the dead-flat building core: dune relief is suppressed inside, so the
-     * middle of the island stays a clean construction site. The boundary is noise-wobbled per
-     * world so the flat zone reads as a natural clearing instead of a drawn circle.
+     * Radius (blocks) of the dead-flat building core: dune relief is suppressed inside, so
+     * the middle of the island stays a clean construction site. The boundary is noise-wobbled
+     * per world so the flat zone reads as a natural clearing instead of a drawn circle.
      */
     public static final int FLAT_RADIUS = 24;
-    /** Mean radius (blocks) of the fully emerged plateau around the spawn column (0, 0). */
-    public static final int FULL_RADIUS = 100;
-    /** Fade width (blocks) from the plateau edge down to untouched ocean floor. */
+    /** Mean coastline radius (blocks): the meandering coast field oscillates around it. */
+    public static final int COAST_MEAN_RADIUS = 125;
+    /** Peak deviation (blocks) of the coastline from its mean radius. */
+    public static final int COAST_AMPLITUDE = 40;
+    /** Fade width (blocks) from the local coastline down to untouched ocean floor. */
     public static final int FADE_WIDTH = 144;
-    /** Nominal radius at which the lift reaches zero (kept for the mean outline). */
-    public static final int FADE_RADIUS = FULL_RADIUS + FADE_WIDTH;
+    /** Nominal radius at which the lift reaches zero on the mean outline. */
+    public static final int FADE_RADIUS = COAST_MEAN_RADIUS + FADE_WIDTH;
+    /** Smallest radius that is still fully emerged, in the tightest bay of any seed. */
+    public static final double MIN_PLATEAU_RADIUS = COAST_MEAN_RADIUS - COAST_AMPLITUDE;
+    /** Beyond this radius the lift is exactly zero for every seed and direction. */
+    public static final double MAX_FADE_RADIUS =
+            COAST_MEAN_RADIUS + COAST_AMPLITUDE + FADE_WIDTH;
 
-    /** Salt of the coastline phase ("ISLA"). */
-    private static final long COAST_SEED_SALT = 0x51A0C1A7L;
-    /** Salt of the amplitude scramble and of the fine coastline octave. */
-    private static final long COAST_FINE_SEED_SALT = 0x5AL;
-    private static final long DUNE_SEED_SALT = 0xD0A7L;
+    /** Salt of the coast field ("ISLA") and of its domain warp. */
+    private static final long COAST_FIELD_SALT = 0x51A0C1A7L;
+    private static final long COAST_WARP_SALT = 0x1B2CL;
+    /** Salt of the seeded plateau/flat-core/beach modulation fields. */
     private static final long FLAT_EDGE_SALT = 0x7A31L;
+    private static final long DUNE_SEED_SALT = 0xD0A7L;
     private static final long SAND_PATCH_SALT = 0x5A1DL;
-    /** Cell (blocks) of the wobble that makes the flat-core boundary organic. */
+    private static final long INTERIOR_BROAD_SALT = 0x11AAL;
+    private static final long INTERIOR_MID_SALT = 0x22BBL;
+    /** Noise-space cells of the three warped coastline octaves. */
+    private static final double COAST_BROAD_CELL = 150.0D;
+    private static final double COAST_MID_CELL = 64.0D;
+    private static final double COAST_FINE_CELL = 27.0D;
+    /** Peak amplitude (blocks) of the domain warp applied before sampling the coast field. */
+    private static final double COAST_WARP_AMPLITUDE = 25.0D;
+    /** Cells (blocks) of the flat-core boundary wobble and of the dune/sand speckle. */
     private static final double FLAT_EDGE_CELL = 31.0D;
-    /** Cell (blocks) of the sand patches speckled across the grassland plateau. */
+    private static final double DUNE_CELL = 9.0D;
+    private static final double DUNE_THRESHOLD = 0.5D;
     public static final double SAND_PATCH_CELL = 22.0D;
     private static final double SAND_PATCH_THRESHOLD = 0.55D;
-
+    /** Cells and amplitude of the seeded rolling relief on the outer plateau. */
+    private static final double INTERIOR_BROAD_CELL = 64.0D;
+    private static final double INTERIOR_MID_CELL = 26.0D;
     /** Salts of the stony-shore region ("STON"), its boundary wobble and its lava pond. */
     private static final long STONE_SHORE_SALT = 0x5700L;
     private static final long STONE_WOBBLE_SALT = 0x5701L;
@@ -69,6 +87,9 @@ public final class SpawnIslandMask {
     /** Radius (blocks) of the small lava pond and half-width of its ragged edge. */
     private static final double LAVA_POOL_RADIUS = 7.0D;
     private static final double LAVA_POOL_WOBBLE = 2.0D;
+
+    private SpawnIslandMask() {
+    }
 
     /**
      * Centre of the stony-shore region: every island carries one, at a fixed distance from
@@ -119,30 +140,6 @@ public final class SpawnIslandMask {
     public static double oreSpeckleAt(long islandSeed, int blockX, int blockZ) {
         return SoftMixNoise.valueNoise(blockX, blockZ, 3.0D, scramble(islandSeed, ORE_SPECKLE_SALT));
     }
-    /** Noise-space radii of the two coastline octaves: ~6 broad lobes, ~13 fine ones. */
-    private static final double COAST_BROAD_K = 0.95D;
-    private static final double COAST_FINE_K = 2.1D;
-    /** Authored amplitude bounds; the world seed picks a value inside each. */
-    private static final double COAST_BROAD_AMPLITUDE_MIN = 0.10D;
-    private static final double COAST_BROAD_AMPLITUDE_MAX = 0.18D;
-    private static final double COAST_FINE_AMPLITUDE_MIN = 0.04D;
-    private static final double COAST_FINE_AMPLITUDE_MAX = 0.08D;
-    /** Mid amplitudes of the seedless (seed 0) silhouette. */
-    private static final double COAST_BROAD_AMPLITUDE_DEFAULT = 0.14D;
-    private static final double COAST_FINE_AMPLITUDE_DEFAULT = 0.06D;
-    /** Cell (blocks) and coverage of the seeded plateau dunes. */
-    private static final double DUNE_CELL = 9.0D;
-    private static final double DUNE_THRESHOLD = 0.5D;
-
-    /** Smallest fully emerged radius any world seed can produce, in the tightest bay. */
-    public static final double MIN_PLATEAU_RADIUS = FULL_RADIUS * (1.0D
-            - COAST_BROAD_AMPLITUDE_MAX - COAST_FINE_AMPLITUDE_MAX);
-    /** Beyond this radius (in the longest peninsula of any seed) the lift is exactly zero. */
-    public static final double MAX_FADE_RADIUS = FULL_RADIUS * (1.0D
-            + COAST_BROAD_AMPLITUDE_MAX + COAST_FINE_AMPLITUDE_MAX) + FADE_WIDTH;
-
-    private SpawnIslandMask() {
-    }
 
     /** Seedless overload: the fixed mid-amplitude silhouette (tests, seedless fallbacks). */
     public static double maskAt(int blockX, int blockZ) {
@@ -152,55 +149,77 @@ public final class SpawnIslandMask {
     /** Continuous blend weight in [0, 1]: 1 on the plateau, 0 at and beyond the coastline fade. */
     public static double maskAt(long islandSeed, int blockX, int blockZ) {
         double distSq = (double) blockX * blockX + (double) blockZ * blockZ;
-        double maxFadeSq = MAX_FADE_RADIUS * MAX_FADE_RADIUS;
-        if (distSq >= maxFadeSq) {
+        if (distSq >= MAX_FADE_RADIUS * MAX_FADE_RADIUS) {
             return 0.0D;
         }
         double dist = Math.sqrt(distSq);
         if (dist < 1.0e-9D) {
             return 1.0D;
         }
-        // Direction on the unit circle, sampled in noise space: periodic, so bays and
-        // peninsulas wrap smoothly around the seam at ±π.
-        double unitX = blockX / dist;
-        double unitZ = blockZ / dist;
-        long phaseSeed = scramble(islandSeed, COAST_SEED_SALT);
-        double broad = SoftMixNoise.valueNoise(unitX * COAST_BROAD_K, unitZ * COAST_BROAD_K,
-                1.0D, phaseSeed);
-        double fine = SoftMixNoise.valueNoise(unitX * COAST_FINE_K, unitZ * COAST_FINE_K,
-                1.0D, phaseSeed ^ COAST_FINE_SEED_SALT);
-        double broadAmplitude;
-        double fineAmplitude;
-        if (islandSeed == 0L) {
-            broadAmplitude = COAST_BROAD_AMPLITUDE_DEFAULT;
-            fineAmplitude = COAST_FINE_AMPLITUDE_DEFAULT;
-        } else {
-            broadAmplitude = COAST_BROAD_AMPLITUDE_MIN
-                    + (COAST_BROAD_AMPLITUDE_MAX - COAST_BROAD_AMPLITUDE_MIN) * unit01(scramble(islandSeed, 0x101L));
-            fineAmplitude = COAST_FINE_AMPLITUDE_MIN
-                    + (COAST_FINE_AMPLITUDE_MAX - COAST_FINE_AMPLITUDE_MIN) * unit01(scramble(islandSeed, 0x202L));
+        double coastField = coastFieldAt(islandSeed, blockX, blockZ);
+        return SoftMixNoise.smoothstep((coastField + FADE_WIDTH - dist) / FADE_WIDTH);
+    }
+
+    /**
+     * The local coastline radius: mean radius plus a domain-warped, three-octave excursion of
+     * up to {@link #COAST_AMPLITUDE} blocks. Warp plus octaves make the coast meander at three
+     * scales - swells, coves and crinkle - so no direction repeats another and nothing reads
+     * as a circle. Pure in (seed, x, z); the blend starts only past this field, so the whole
+     * interior holds the full plateau height.
+     */
+    public static double coastFieldAt(long islandSeed, int blockX, int blockZ) {
+        BoundaryWarp warp = new BoundaryWarp.Fbm(COAST_WARP_AMPLITUDE, 120.0D, 40.0D,
+                scramble(islandSeed, COAST_WARP_SALT));
+        double[] warped = warp.warp(blockX, blockZ, new double[2]);
+        long fieldSeed = scramble(islandSeed, COAST_FIELD_SALT);
+        double broad = SoftMixNoise.valueNoise(warped[0], warped[1], COAST_BROAD_CELL, fieldSeed);
+        double mid = SoftMixNoise.valueNoise(warped[0], warped[1], COAST_MID_CELL, fieldSeed ^ 0x9E3L);
+        double fine = SoftMixNoise.valueNoise(warped[0], warped[1], COAST_FINE_CELL, fieldSeed ^ 0x51DL);
+        return COAST_MEAN_RADIUS
+                + COAST_AMPLITUDE * (0.55D * broad + 0.30D * mid + 0.15D * fine);
+    }
+
+    /**
+     * Seeded rolling relief of the plateau: broad swells up to ±3 blocks that give the ground
+     * its large-scale character, fading to zero inside the organic flat building core (the
+     * construction site stays exactly at {@link #ISLAND_TOP_Y}) and on the beach flanks. The
+     * cliff guard downstream relaxes the slopes.
+     */
+    public static double interiorLift(long islandSeed, int blockX, int blockZ, double mask) {
+        if (mask < 1.0D) {
+            return 0.0D;
         }
-        double coastScale = 1.0D + broadAmplitude * broad + fineAmplitude * fine;
-        double fullRadius = FULL_RADIUS * coastScale;
-        return SoftMixNoise.smoothstep((fullRadius + FADE_WIDTH - dist) / FADE_WIDTH);
+        double dist = Math.sqrt((double) blockX * blockX + (double) blockZ * blockZ);
+        double wobble = (SoftMixNoise.valueNoise(blockX, blockZ, FLAT_EDGE_CELL,
+                scramble(islandSeed, FLAT_EDGE_SALT)) + 1.0D) * 0.5D;
+        double flatRadius = FLAT_RADIUS * (0.75D + 0.5D * wobble);
+        double ramp = SoftMixNoise.smoothstep((dist - flatRadius) / 10.0D);
+        if (ramp <= 0.0D) {
+            return 0.0D;
+        }
+        double broad = SoftMixNoise.valueNoise(blockX, blockZ, INTERIOR_BROAD_CELL,
+                scramble(islandSeed, INTERIOR_BROAD_SALT));
+        double mid = SoftMixNoise.valueNoise(blockX, blockZ, INTERIOR_MID_CELL,
+                scramble(islandSeed, INTERIOR_MID_SALT));
+        double lift = broad * 3.0D + mid * 1.25D;
+        lift = Math.max(-3.0D, Math.min(3.0D, lift));
+        return lift * ramp;
     }
 
     /**
      * Seeded micro relief of the plateau: 1 extra block on roughly a quarter of the outer
      * ground as low grassy knolls, and nothing on the beach flanks (any {@code mask < 1}) or
-     * inside the organic flat building core, so the waterline and the construction site stay
-     * smooth. The cliff guard downstream relaxes the one-block steps.
+     * inside the organic flat building core. The cliff guard downstream relaxes the steps.
      */
     public static int duneLift(long islandSeed, int blockX, int blockZ, double mask) {
         if (mask < 1.0D) {
             return 0;
         }
-        // The flat core's boundary is wobbled per world: a natural clearing, not a circle.
-        double flatWobble = (SoftMixNoise.valueNoise(blockX, blockZ, FLAT_EDGE_CELL,
+        double dist = Math.sqrt((double) blockX * blockX + (double) blockZ * blockZ);
+        double wobble = (SoftMixNoise.valueNoise(blockX, blockZ, FLAT_EDGE_CELL,
                 scramble(islandSeed, FLAT_EDGE_SALT)) + 1.0D) * 0.5D;
-        double flatRadius = FLAT_RADIUS * (0.75D + 0.5D * flatWobble);
-        double distSq = (double) blockX * blockX + (double) blockZ * blockZ;
-        if (distSq <= flatRadius * flatRadius) {
+        double flatRadius = FLAT_RADIUS * (0.75D + 0.5D * wobble);
+        if (dist <= flatRadius) {
             return 0;
         }
         double dune = SoftMixNoise.valueNoise(blockX, blockZ, DUNE_CELL,
@@ -220,10 +239,10 @@ public final class SpawnIslandMask {
 
     /**
      * Blends the raw geological floor toward the island plateau. The target is
-     * {@code max(rawFloor, ISLAND_TOP_Y)} so the mask never lowers ground that already
-     * rises above the plateau on its own (e.g. volcanic relief riding the same field).
-     * The blend runs on the squared mask, which steepens the drop just past the plateau
-     * edge and keeps the sandy beach a narrow fringe instead of a wide shelf.
+     * {@code max(rawFloor, ISLAND_TOP_Y)} so the mask never lowers ground that already rises
+     * above the plateau on its own (e.g. volcanic relief riding the same field). The blend
+     * runs on the squared mask, which steepens the drop just past the coastline and keeps
+     * the sandy beach a narrow fringe instead of a wide shelf.
      */
     public static double blendFloor(double rawFloor, double mask) {
         if (mask <= 0.0D) {

@@ -161,7 +161,9 @@ public final class OceanColumnPlanner {
         }
         double blended = SpawnIslandMask.blendFloor(floor, islandMask);
         if (islandMask > 0.0D) {
-            // Seeded dune relief rides on top of the blended plateau; the beach flanks stay smooth.
+            // Seeded plateau relief: broad rolling swells plus one-block knolls on the outer
+            // ground; both fade to zero inside the organic flat building core and on the beach.
+            blended += SpawnIslandMask.interiorLift(source.spawnIslandSeed(), blockX, blockZ, islandMask);
             blended += SpawnIslandMask.duneLift(source.spawnIslandSeed(), blockX, blockZ, islandMask);
         }
         return blended;

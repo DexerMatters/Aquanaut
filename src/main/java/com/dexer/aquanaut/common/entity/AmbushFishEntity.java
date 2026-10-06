@@ -20,11 +20,11 @@ public final class AmbushFishEntity extends BaseFishEntity implements GeoEntity 
     /** Below this horizontal speed the fish reads as lying in wait rather than cruising. */
     private static final double MOVE_SPEED_SQR = 4.0E-4D;
     /** Ticks a resting flounder waits before it shuffles to a new spot. */
-    private static final int DART_MIN_TICKS = 120;
-    private static final int DART_RANDOM_TICKS = 260;
-    /** Ticks the startle burst lasts: a long dash, not a hop. */
-    private static final int DART_TICKS = 45;
-    private int dartCooldown = DART_MIN_TICKS + 60;
+    private static final int DART_MIN_TICKS = 30;
+    private static final int DART_RANDOM_TICKS = 70;
+    /** Ticks one bolt lasts: about five blocks of travel. */
+    private static final int DART_TICKS = 16;
+    private int dartCooldown = DART_MIN_TICKS + 20;
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
     public AmbushFishEntity(EntityType<? extends WaterAnimal> type, Level level) { super(type, level); }
@@ -33,18 +33,19 @@ public final class AmbushFishEntity extends BaseFishEntity implements GeoEntity 
                 .add(Attributes.MOVEMENT_SPEED, 0.24D).build();
     }
     @Override protected FishResponseMode getResponseMode() { return FishResponseMode.AVOIDANCE; }
-    /** Only a player right on top of it — one block — springs the ambush. */
-    @Override protected double getPlayerDetectionRange() { return 1.0D; }
-    @Override protected double getEscapeMaxSpeed() { return 0.70D; }
+    /** Real-time watch: a player inside three blocks springs the ambush. */
+    @Override protected double getPlayerDetectionRange() { return 3.0D; }
+    @Override protected double getEscapeMaxSpeed() { return 0.50D; }
     @Override protected double getEscapeAcceleration() { return 0.09D; }
-    /** A flounder bolts: an instant burst, then a long sustained dash. */
+    @Override protected int getEscapeMinimumTicks() { return DART_TICKS; }
+    /** One bolt: a two-tick wind-up, then a burst that carries it about five blocks. */
     @Override protected boolean getEscapeLaunchBehaviorEnabled() { return true; }
-    @Override protected int getEscapeLaunchAnimationTicks() { return 26; }
-    @Override protected int getEscapeLaunchBurstLeadTicks() { return 3; }
-    @Override protected double getEscapeLaunchBurstSpeed() { return 0.95D; }
-    @Override protected double getEscapeLaunchSustainAcceleration() { return 0.08D; }
-    @Override protected double getEscapeLaunchMaxSpeed() { return 0.95D; }
-    @Override protected int getEscapeLaunchSteeringLockTicks() { return 6; }
+    @Override protected int getEscapeLaunchAnimationTicks() { return DART_TICKS; }
+    @Override protected int getEscapeLaunchBurstLeadTicks() { return DART_TICKS - 2; }
+    @Override protected double getEscapeLaunchBurstSpeed() { return 0.45D; }
+    @Override protected double getEscapeLaunchSustainAcceleration() { return 0.03D; }
+    @Override protected double getEscapeLaunchMaxSpeed() { return 0.50D; }
+    @Override protected int getEscapeLaunchSteeringLockTicks() { return 4; }
     /** Lies in wait on the sediment like a lump of sand; only the burst gives it away. */
     @Override protected double getCruiseMaxSpeed() { return 0.01D; }
     @Override protected double getCruiseAcceleration() { return 0.004D; }

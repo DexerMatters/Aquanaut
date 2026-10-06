@@ -195,7 +195,7 @@ public class FishMovementController {
         if (responseMode.isEscapeMode()) {
             Player escapeTarget = responseMode == FishResponseMode.STRESS ? reactiveTarget : nearestTarget;
             if (escapeTarget != null) {
-                this.escapeMinimumTicks = 40;
+                this.escapeMinimumTicks = fish.escapeMinimumTicks();
                 return new BehaviorDecision(MovementMode.ESCAPE, escapeTarget);
             }
             if (this.isEscapeLaunchActive(fish)) {

@@ -85,6 +85,15 @@ public abstract class BaseFishEntity extends WaterAnimal {
         return hurt;
     }
 
+    /** Ticks a fish keeps fleeing once it has spotted a threat. */
+    public final int escapeMinimumTicks() {
+        return this.getEscapeMinimumTicks();
+    }
+
+    protected int getEscapeMinimumTicks() {
+        return 40;
+    }
+
     /** Startles the fish into a short burst of escape swimming, with no attacker needed. */
     public void startle(int ticks) {
         this.movementController.startle(ticks);

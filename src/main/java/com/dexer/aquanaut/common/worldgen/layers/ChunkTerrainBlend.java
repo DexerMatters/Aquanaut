@@ -212,8 +212,14 @@ public final class ChunkTerrainBlend implements OceanColumnPlanner.PlanSource {
     @Override
     public double spawnIslandMaskAt(int blockX, int blockZ) {
         return sampler.spawnIsland()
-                ? com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.maskAt(blockX, blockZ)
+                ? com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask
+                        .maskAt(sampler.islandSeed(), blockX, blockZ)
                 : 0.0D;
+    }
+
+    @Override
+    public long spawnIslandSeed() {
+        return sampler.islandSeed();
     }
 
     @Override

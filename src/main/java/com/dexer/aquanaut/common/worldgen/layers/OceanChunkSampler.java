@@ -23,6 +23,7 @@ public final class OceanChunkSampler {
                                          OceanLayerStack stack,
                                          int topWaterY,
                                          boolean spawnIsland,
+                                         long islandSeed,
                                          int minCellY,
                                          int cellCountY,
                                          int cellWidth,
@@ -98,12 +99,12 @@ public final class OceanChunkSampler {
                 // sees identical support on both sides of a chunk border.
                 haloParent[qx][qz] = stack.isParentBiome(biome)
                         || (spawnIsland && com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask
-                                .maskAt((baseQuartX + localX) << 2, (baseQuartZ + localZ) << 2) > 0.0D);
+                                .maskAt(islandSeed, (baseQuartX + localX) << 2, (baseQuartZ + localZ) << 2) > 0.0D);
             }
         }
 
         return new OceanGenSampler(stack, surfaceBiomes, quartOpenWater, haloParent,
-                baseQuartX, baseQuartZ, spawnIsland);
+                baseQuartX, baseQuartZ, spawnIsland, islandSeed);
     }
 
     public static int topWaterY(OceanLayerStack stack) {
@@ -126,6 +127,7 @@ public final class OceanChunkSampler {
                                     OceanLayerStack stack,
                                     int topWaterY,
                                     boolean spawnIsland,
+                                    long islandSeed,
                                     int minCellY,
                                     int cellCountY,
                                     int cellWidth,
@@ -153,8 +155,8 @@ public final class OceanChunkSampler {
         if (!parentPresent) {
             return false;
         }
-        return sample(chunk, stack, topWaterY, spawnIsland, minCellY, cellCountY, cellWidth, cellHeight,
-                defaultBlock, probeFactory, haloBiomeAt).anySupported();
+        return sample(chunk, stack, topWaterY, spawnIsland, islandSeed, minCellY, cellCountY,
+                cellWidth, cellHeight, defaultBlock, probeFactory, haloBiomeAt).anySupported();
     }
 
     public static TerrainModule stackTerrain(OceanLayerStack stack) {

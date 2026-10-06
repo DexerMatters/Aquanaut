@@ -158,7 +158,12 @@ public final class OceanColumnPlanner {
         if (volcanicStrength > 0.0D) {
             floor += VolcanoGeometry.floorOffset(blockX, blockZ) * volcanicStrength * (1.0D - islandMask);
         }
-        return SpawnIslandMask.blendFloor(floor, islandMask);
+        double blended = SpawnIslandMask.blendFloor(floor, islandMask);
+        if (islandMask > 0.0D) {
+            // Seeded dune relief rides on top of the blended plateau; the beach flanks stay smooth.
+            blended += SpawnIslandMask.duneLift(source.spawnIslandSeed(), blockX, blockZ, islandMask);
+        }
+        return blended;
     }
 
     /** Smoothstep the openness so floor does not tear at mid-strength edges. */
@@ -321,6 +326,11 @@ public final class OceanColumnPlanner {
             return 0.0D;
         }
 
+        /** The world seed behind {@link #spawnIslandMaskAt(int, int)}; 0 for seedless sources. */
+        default long spawnIslandSeed() {
+            return 0L;
+        }
+
         ReefComposition reefCompositionAt(int blockX, int blockZ);
 
         MiddleLevelOceanTerrainProfile.ColumnProfile profileAt(int blockX, int blockZ);
@@ -383,7 +393,14 @@ public final class OceanColumnPlanner {
 
         @Override
         public double spawnIslandMaskAt(int blockX, int blockZ) {
-            return sampler.spawnIsland() ? SpawnIslandMask.maskAt(blockX, blockZ) : 0.0D;
+            return sampler.spawnIsland()
+                    ? SpawnIslandMask.maskAt(sampler.islandSeed(), blockX, blockZ)
+                    : 0.0D;
+        }
+
+        @Override
+        public long spawnIslandSeed() {
+            return sampler.islandSeed();
         }
 
         @Override

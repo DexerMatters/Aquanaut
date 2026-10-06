@@ -29,6 +29,7 @@ import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseChunk;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.WorldOptions;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -57,6 +58,21 @@ public abstract class NoiseBasedChunkGeneratorMixin {
         return this.settings.unwrapKey()
                 .map(key -> key.location().equals(WATER_WORLD_SETTINGS))
                 .orElse(false);
+    }
+
+    /**
+     * The level seed the island's coastline, amplitudes and dunes are scrambled from. The worldgen
+     * structure manager carries the world's options; a foreign manager degrades to the seedless
+     * fixed silhouette rather than guessing.
+     */
+    private long aquanaut$islandSeed(StructureManager structureManager) {
+        if (structureManager instanceof StructureManagerAccessor accessor) {
+            WorldOptions worldOptions = accessor.aquanaut$getWorldOptions();
+            if (worldOptions != null) {
+                return worldOptions.seed();
+            }
+        }
+        return 0L;
     }
 
     @Inject(method = "doFill", at = @At("HEAD"), cancellable = true, remap = false)
@@ -88,12 +104,14 @@ public abstract class NoiseBasedChunkGeneratorMixin {
         ChunkGeneratorAccessor generatorAccessor = (ChunkGeneratorAccessor) this;
         int surfaceQuartY = MiddleLevelOceanPlacement.surfaceSampleQuartY();
         boolean spawnIsland = aquanaut$isWaterWorld();
+        long islandSeed = aquanaut$islandSeed(structureManager);
 
         OceanGenSampler sampler = OceanChunkSampler.sample(
                 chunk,
                 stack,
                 terrain.topWaterY(),
                 spawnIsland,
+                islandSeed,
                 minCellY,
                 cellCountY,
                 cellWidth,
@@ -227,6 +245,7 @@ public abstract class NoiseBasedChunkGeneratorMixin {
                 stack,
                 OceanChunkSampler.topWaterY(stack),
                 aquanaut$isWaterWorld(),
+                worldGenRegion.getSeed(),
                 minCellY,
                 cellCountY,
                 cellWidth,

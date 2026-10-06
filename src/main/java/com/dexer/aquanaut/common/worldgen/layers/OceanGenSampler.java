@@ -20,6 +20,7 @@ public final class OceanGenSampler {
     private final int baseQuartX;
     private final int baseQuartZ;
     private final boolean spawnIsland;
+    private final long islandSeed;
 
     public OceanGenSampler(OceanLayerStack stack,
                            ResourceLocation[][] surfaceBiomes,
@@ -27,7 +28,7 @@ public final class OceanGenSampler {
                            boolean[][] haloParentBiome,
                            int baseQuartX,
                            int baseQuartZ) {
-        this(stack, surfaceBiomes, quartOpenWater, haloParentBiome, baseQuartX, baseQuartZ, false);
+        this(stack, surfaceBiomes, quartOpenWater, haloParentBiome, baseQuartX, baseQuartZ, false, 0L);
     }
 
     public OceanGenSampler(OceanLayerStack stack,
@@ -37,10 +38,23 @@ public final class OceanGenSampler {
                            int baseQuartX,
                            int baseQuartZ,
                            boolean spawnIsland) {
+        this(stack, surfaceBiomes, quartOpenWater, haloParentBiome, baseQuartX, baseQuartZ,
+                spawnIsland, 0L);
+    }
+
+    public OceanGenSampler(OceanLayerStack stack,
+                           ResourceLocation[][] surfaceBiomes,
+                           boolean[] quartOpenWater,
+                           boolean[][] haloParentBiome,
+                           int baseQuartX,
+                           int baseQuartZ,
+                           boolean spawnIsland,
+                           long islandSeed) {
         this.stack = stack;
         this.baseQuartX = baseQuartX;
         this.baseQuartZ = baseQuartZ;
         this.spawnIsland = spawnIsland;
+        this.islandSeed = islandSeed;
         for (int x = 0; x < QUARTS; x++) {
             System.arraycopy(surfaceBiomes[x], 0, this.surfaceBiomes[x], 0, QUARTS);
             for (int z = 0; z < QUARTS; z++) {
@@ -56,7 +70,7 @@ public final class OceanGenSampler {
                     // The spawn island plans solid land regardless of the surface biome the
                     // water world's climate noise picked, so its quart cells always claim support.
                     boolean islandCell = spawnIsland && com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask
-                            .maskAt((baseQuartX + localX) << 2, (baseQuartZ + localZ) << 2) > 0.0D;
+                            .maskAt(islandSeed, (baseQuartX + localX) << 2, (baseQuartZ + localZ) << 2) > 0.0D;
                     support[qx][qz] = islandCell || stack.supportsQuartCell(
                             this.surfaceBiomes[localX][localZ],
                             this.openWaterCounts[localX][localZ]);
@@ -109,6 +123,11 @@ public final class OceanGenSampler {
     /** Whether the water-world spawn island claims columns near the origin for this generator. */
     public boolean spawnIsland() {
         return spawnIsland;
+    }
+
+    /** The world seed the island's coastline, amplitudes and dunes are scrambled from. */
+    public long islandSeed() {
+        return islandSeed;
     }
 
     public ResourceLocation surfaceBiome(int localQuartX, int localQuartZ) {

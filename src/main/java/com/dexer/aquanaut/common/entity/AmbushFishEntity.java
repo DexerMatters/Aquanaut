@@ -22,8 +22,8 @@ public final class AmbushFishEntity extends BaseFishEntity implements GeoEntity 
     /** Ticks a resting flounder waits before it shuffles to a new spot. */
     private static final int DART_MIN_TICKS = 120;
     private static final int DART_RANDOM_TICKS = 260;
-    /** Ticks the startle burst lasts. */
-    private static final int DART_TICKS = 10;
+    /** Ticks the startle burst lasts: a long dash, not a hop. */
+    private static final int DART_TICKS = 45;
     private int dartCooldown = DART_MIN_TICKS + 60;
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -35,8 +35,16 @@ public final class AmbushFishEntity extends BaseFishEntity implements GeoEntity 
     @Override protected FishResponseMode getResponseMode() { return FishResponseMode.AVOIDANCE; }
     /** Only a player right on top of it — one block — springs the ambush. */
     @Override protected double getPlayerDetectionRange() { return 1.0D; }
-    @Override protected double getEscapeMaxSpeed() { return 0.62D; }
-    @Override protected double getEscapeAcceleration() { return 0.065D; }
+    @Override protected double getEscapeMaxSpeed() { return 0.70D; }
+    @Override protected double getEscapeAcceleration() { return 0.09D; }
+    /** A flounder bolts: an instant burst, then a long sustained dash. */
+    @Override protected boolean getEscapeLaunchBehaviorEnabled() { return true; }
+    @Override protected int getEscapeLaunchAnimationTicks() { return 26; }
+    @Override protected int getEscapeLaunchBurstLeadTicks() { return 3; }
+    @Override protected double getEscapeLaunchBurstSpeed() { return 0.95D; }
+    @Override protected double getEscapeLaunchSustainAcceleration() { return 0.08D; }
+    @Override protected double getEscapeLaunchMaxSpeed() { return 0.95D; }
+    @Override protected int getEscapeLaunchSteeringLockTicks() { return 6; }
     /** Lies in wait on the sediment like a lump of sand; only the burst gives it away. */
     @Override protected double getCruiseMaxSpeed() { return 0.01D; }
     @Override protected double getCruiseAcceleration() { return 0.004D; }

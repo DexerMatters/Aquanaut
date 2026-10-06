@@ -1,16 +1,18 @@
 package com.dexer.aquanaut.common.worldgen;
 
+import com.dexer.aquanaut.core.BlockRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Locates the real sediment floor beneath a water column. The biome features used to stop at
- * the first non-water block, which is air whenever the column is broken, so a feature could be
- * planted in open water and leave floating blocks. This walks down to the first solid block
- * instead, skipping air and water plants.
+ * Locates the real sediment floor beneath a water column. Only terrain counts: plants, corals and
+ * the biome's own mushrooms are skipped, so a feature is never planted on top of an earlier
+ * structure — the fossil beds used to end up sitting on a glow mushroom's cap for want of this
+ * check. Air and water are skipped for the same reason as before, so nothing floats.
  */
 public final class MudZoneFloor {
     private static final int ABOVE = 16;
@@ -19,7 +21,7 @@ public final class MudZoneFloor {
     private MudZoneFloor() {
     }
 
-    /** The first solid block under the column, or {@code null} when the column is open. */
+    /** The first terrain block under the column, or {@code null} when the column is open. */
     public static BlockPos find(WorldGenLevel level, BlockPos origin) {
         int top = Math.min(origin.getY() + ABOVE, level.getMaxBuildHeight() - 1);
         int bottom = Math.max(level.getMinBuildHeight(), origin.getY() - BELOW);
@@ -35,6 +37,28 @@ public final class MudZoneFloor {
 
     private static boolean isFloor(BlockState state) {
         return !state.isAir() && !state.canBeReplaced()
-                && !state.getFluidState().is(FluidTags.WATER);
+                && !state.getFluidState().is(FluidTags.WATER)
+                && isTerrain(state);
+    }
+
+    /** The materials a feature may stand on: the biome's sediment, its shelf skin and rock. */
+    private static boolean isTerrain(BlockState state) {
+        return state.is(BlockRegistry.MUD.get())
+                || state.is(BlockRegistry.NUTRIENT_RICH_MUD.get())
+                || state.is(BlockRegistry.PARASITIC_MUD.get())
+                || state.is(BlockRegistry.PACKED_MUD.get())
+                || state.is(BlockRegistry.CRACKED_MUD.get())
+                || state.is(BlockRegistry.SILTSTONE.get())
+                || state.is(BlockRegistry.FOSSIL_BED.get())
+                || state.is(BlockRegistry.CORAL_SAND.get())
+                || state.is(BlockRegistry.LIMESTONE.get())
+                || state.is(BlockRegistry.SHALE.get())
+                || state.is(Blocks.GRAVEL)
+                || state.is(Blocks.SAND)
+                || state.is(Blocks.CLAY)
+                || state.is(Blocks.DIRT)
+                || state.is(Blocks.COARSE_DIRT)
+                || state.is(Blocks.STONE)
+                || state.is(Blocks.DEEPSLATE);
     }
 }

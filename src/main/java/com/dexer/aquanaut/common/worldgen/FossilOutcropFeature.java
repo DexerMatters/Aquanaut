@@ -5,15 +5,16 @@ import com.dexer.aquanaut.core.BlockRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 /**
- * A low fossil outcrop: a dome of siltstone with soft mud at its skirt, capped by a single
- * coherent fossil bed. The mud zone's landmark — layered, never a per-block speckle, and rooted
- * on the real floor so it can never float.
+ * An exposed fossil bed: a flat patch of fossil bed let into the sediment surface, flush with the
+ * floor around it. Nothing is stacked on top, so the fossil hugs the ground instead of riding a
+ * mound the way the old domed outcrop did.
  */
 public final class FossilOutcropFeature extends Feature<NoneFeatureConfiguration> {
     public FossilOutcropFeature() {
@@ -34,45 +35,35 @@ public final class FossilOutcropFeature extends Feature<NoneFeatureConfiguration
         }
 
         int radius = 2 + random.nextInt(3);
-        int peak = 2 + random.nextInt(2);
         boolean placed = false;
-        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
-                double dist = Math.sqrt(dx * dx + dz * dz);
-                if (dist > radius) {
+                if (dx * dx + dz * dz > radius * radius || random.nextFloat() < 0.15F) {
                     continue;
                 }
-                int height = (int) Math.round(peak * (1.0D - (dist / radius) * (dist / radius)));
-                if (height <= 0) {
+                BlockPos column = MudZoneFloor.find(level, floor.offset(dx, 1, dz));
+                if (column == null || !isBedMaterial(level.getBlockState(column))) {
                     continue;
                 }
-                for (int dy = 1; dy <= height; dy++) {
-                    int y = floor.getY() + dy;
-                    if (y >= level.getMaxBuildHeight()) {
-                        break;
-                    }
-                    cursor.set(floor.getX() + dx, y, floor.getZ() + dz);
-                    BlockState existing = level.getBlockState(cursor);
-                    if (!existing.canBeReplaced()) {
-                        break;
-                    }
-                    level.setBlock(cursor, outcropState(dy, height), 2);
-                    placed = true;
+                // Replace the surface block: the bed is let into the floor, not laid on top.
+                level.setBlock(column, BlockRegistry.FOSSIL_BED.get().defaultBlockState(), 2);
+                if (random.nextFloat() < 0.35F) {
+                    level.setBlock(column.below(), BlockRegistry.FOSSIL_BED.get().defaultBlockState(), 2);
                 }
+                placed = true;
             }
         }
         return placed;
     }
 
-    /** Banded by height: mud at the skirt, siltstone in the body, one fossil bed on the cap. */
-    private static BlockState outcropState(int dy, int height) {
-        if (dy >= height) {
-            return BlockRegistry.FOSSIL_BED.get().defaultBlockState();
-        }
-        if (dy == 1) {
-            return BlockRegistry.MUD.get().defaultBlockState();
-        }
-        return BlockRegistry.SILTSTONE.get().defaultBlockState();
+    /** The sediment a fossil bed can show through: the flat's mud and its sandy shelf skin. */
+    private static boolean isBedMaterial(BlockState state) {
+        return state.is(BlockRegistry.MUD.get())
+                || state.is(BlockRegistry.NUTRIENT_RICH_MUD.get())
+                || state.is(BlockRegistry.PARASITIC_MUD.get())
+                || state.is(BlockRegistry.PACKED_MUD.get())
+                || state.is(BlockRegistry.CORAL_SAND.get())
+                || state.is(Blocks.SAND)
+                || state.is(Blocks.GRAVEL);
     }
 }

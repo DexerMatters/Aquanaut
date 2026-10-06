@@ -1,23 +1,16 @@
 package com.dexer.aquanaut.common.entity;
 
+import com.dexer.aquanaut.common.ai.FishAttackMode;
+import com.dexer.aquanaut.common.ai.FishResponseMode;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.control.SmoothSwimmingMoveControl;
-import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
-import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.monster.Silverfish;
+import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -28,14 +21,13 @@ import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 /**
- * A buried ambush predator released by disturbed sediment. Its life is a small state
- * machine: it surges up out of the mud (EMERGING), strikes for a while (ATTACKING), sinks
- * back in (RETREATING) and lies dormant (COOLDOWN) before it either strikes again or
- * dissolves back into the sediment. AI is only live during ATTACKING, so the buried phases
- * read as a still, half-buried body. The clip names line up with the states: emerge /
- * idle / retreat, plus a one-shot bite.
+ * A buried ambush predator released by disturbed sediment. It keeps its life as a small state
+ * machine — surge up (EMERGING), strike (ATTACKING), sink back (RETREATING), lie dormant
+ * (COOLDOWN) — but the strike itself is driven by the shared fish brain, so it lunges at what
+ * disturbed it instead of paddling vertically. Outside the strike the brain is suspended and the
+ * rise or sink is steered directly, which keeps the buried phases perfectly still.
  */
-public final class SedimentWormEntity extends Silverfish implements GeoEntity {
+public final class SedimentWormEntity extends BaseFishEntity implements GeoEntity {
     private static final EntityDataAccessor<Integer> STRIKE = SynchedEntityData.defineId(
             SedimentWormEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> STRIKE_TIMER = SynchedEntityData.defineId(
@@ -60,22 +52,20 @@ public final class SedimentWormEntity extends Silverfish implements GeoEntity {
     private static final Strike[] STRIKES = Strike.values();
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    public SedimentWormEntity(EntityType<? extends Silverfish> type, Level level) {
+    public SedimentWormEntity(EntityType<? extends WaterAnimal> type, Level level) {
         super(type, level);
-        setNoAi(true);
-        // Land navigation cannot path through water; without the drowned's water rig the worm
-        // could only rise and sink on buoyancy instead of lunging at what disturbed it.
-        this.moveControl = new SmoothSwimmingMoveControl(this, 85, 10, 0.02F, 0.1F, false);
-    }
-
-    @Override
-    protected PathNavigation createNavigation(Level level) {
-        return new WaterBoundPathNavigation(this, level);
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Silverfish.createAttributes().add(Attributes.MAX_HEALTH, 8.0D)
-                .add(Attributes.ATTACK_DAMAGE, 2.0D).add(Attributes.MOVEMENT_SPEED, 0.18D);
+        return WaterAnimal.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 8.0D)
+                .add(Attributes.ATTACK_DAMAGE, 2.0D)
+                .add(Attributes.MOVEMENT_SPEED, 0.18D);
+    }
+
+    @Override
+    protected boolean shouldDespawnInPeaceful() {
+        return true;
     }
 
     @Override
@@ -87,12 +77,10 @@ public final class SedimentWormEntity extends Silverfish implements GeoEntity {
     }
 
     @Override
-    public boolean doHurtTarget(Entity target) {
-        boolean hit = super.doHurtTarget(target);
-        if (hit && !level().isClientSide) {
+    public void onSuccessfulBite(Player player) {
+        if (!level().isClientSide) {
             entityData.set(ATTACK_TIMER, ATTACK_ANIM_TICKS);
         }
-        return hit;
     }
 
     @Override
@@ -115,19 +103,10 @@ public final class SedimentWormEntity extends Silverfish implements GeoEntity {
     }
 
     @Override
-    protected void registerGoals() {
-        goalSelector.addGoal(0, new FloatGoal(this));
-        goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.1D, false));
-        goalSelector.addGoal(7, new RandomStrollGoal(this, 0.6D));
-        targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
-    }
-
-    @Override
     public void aiStep() {
         if (!level().isClientSide) {
-            // An arthropod cannot breathe water on its own; keep it supplied while it is buried.
             if (!hasEffect(MobEffects.WATER_BREATHING)) {
+                // An arthropod cannot breathe water on its own; keep it supplied while it burrows.
                 addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, -1, 0, true, false));
             }
             if (attackTimer() > 0) {
@@ -138,7 +117,10 @@ public final class SedimentWormEntity extends Silverfish implements GeoEntity {
                 timer--;
                 entityData.set(STRIKE_TIMER, timer);
             }
-            switch (strike()) {
+            Strike current = strike();
+            // The strike swims on the shared brain; every buried phase is steered here.
+            setMovementSuspended(current != Strike.ATTACKING);
+            switch (current) {
                 case EMERGING -> {
                     setDeltaMovement(getDeltaMovement().x, RISE_SPEED, getDeltaMovement().z);
                     if (timer <= 0) {
@@ -178,7 +160,6 @@ public final class SedimentWormEntity extends Silverfish implements GeoEntity {
     private void enter(Strike next, int ticks) {
         entityData.set(STRIKE, next.ordinal());
         entityData.set(STRIKE_TIMER, ticks);
-        setNoAi(next != Strike.ATTACKING);
     }
 
     private Strike strike() {
@@ -191,6 +172,56 @@ public final class SedimentWormEntity extends Silverfish implements GeoEntity {
 
     private int attackTimer() {
         return entityData.get(ATTACK_TIMER);
+    }
+
+    @Override
+    protected FishResponseMode getResponseMode() {
+        return FishResponseMode.CHARGE;
+    }
+
+    @Override
+    protected FishAttackMode getAttackMode() {
+        return FishAttackMode.TRACKING_BITE;
+    }
+
+    @Override
+    protected double getBaseBiteDamage() {
+        return 2.0D;
+    }
+
+    @Override
+    protected double getCruiseMaxSpeed() {
+        return 0.10D;
+    }
+
+    @Override
+    protected double getCruiseAcceleration() {
+        return 0.008D;
+    }
+
+    @Override
+    protected double getChargeMaxSpeed() {
+        return 0.30D;
+    }
+
+    @Override
+    protected double getChargeAcceleration() {
+        return 0.03D;
+    }
+
+    @Override
+    protected double getPlayerDetectionRange() {
+        return 12.0D;
+    }
+
+    @Override
+    protected double getCruiseFloorBias() {
+        return 0.9D;
+    }
+
+    @Override
+    protected double getCruiseDepthRange() {
+        return 0.8D;
     }
 
     private enum Strike {

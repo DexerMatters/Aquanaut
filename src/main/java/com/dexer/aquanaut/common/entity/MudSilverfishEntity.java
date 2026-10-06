@@ -1,5 +1,7 @@
 package com.dexer.aquanaut.common.entity;
 
+import com.dexer.aquanaut.common.ai.FishAttackMode;
+import com.dexer.aquanaut.common.ai.FishResponseMode;
 import com.dexer.aquanaut.common.mud.MudZoneConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -8,12 +10,11 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ai.control.SmoothSwimmingMoveControl;
-import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
-import net.minecraft.world.entity.monster.Silverfish;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.WaterAnimal;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -24,8 +25,12 @@ import software.bernie.geckolib.animation.AnimationController;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-/** Silverfish variant released from parasitic mud. */
-public final class MudSilverfishEntity extends Silverfish implements GeoEntity {
+/**
+ * The mud zone's hostile arthropod, built on the shared fish body so it cruises, charges and
+ * bites exactly like the other swimmers instead of bobbing on the buoyancy. Its one special
+ * habit: strong light drives it off — it drops the hunt and scuttles toward the dark.
+ */
+public final class MudSilverfishEntity extends BaseFishEntity implements GeoEntity {
     private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     private static final RawAnimation WALK = RawAnimation.begin().thenLoop("walk");
     private static final RawAnimation ATTACK = RawAnimation.begin().thenPlay("attack");
@@ -40,16 +45,20 @@ public final class MudSilverfishEntity extends Silverfish implements GeoEntity {
     private int fleeScanCooldown;
     private Vec3 fleeDirection = Vec3.ZERO;
 
-    public MudSilverfishEntity(EntityType<? extends Silverfish> type, Level level) {
+    public MudSilverfishEntity(EntityType<? extends WaterAnimal> type, Level level) {
         super(type, level);
-        // A land monster would only bob on the buoyancy: give it the drowned's water rig so it
-        // can actually hunt across the mud flat.
-        this.moveControl = new SmoothSwimmingMoveControl(this, 85, 10, 0.02F, 0.1F, false);
+    }
+
+    public static AttributeSupplier.Builder createAttributes() {
+        return WaterAnimal.createMobAttributes()
+                .add(Attributes.MAX_HEALTH, 8.0D)
+                .add(Attributes.ATTACK_DAMAGE, 1.0D)
+                .add(Attributes.MOVEMENT_SPEED, 0.25D);
     }
 
     @Override
-    protected PathNavigation createNavigation(Level level) {
-        return new WaterBoundPathNavigation(this, level);
+    protected boolean shouldDespawnInPeaceful() {
+        return true;
     }
 
     @Override
@@ -59,12 +68,42 @@ public final class MudSilverfishEntity extends Silverfish implements GeoEntity {
     }
 
     @Override
-    public boolean doHurtTarget(Entity target) {
-        boolean hit = super.doHurtTarget(target);
-        if (hit && !level().isClientSide) {
+    public void onSuccessfulBite(Player player) {
+        if (!level().isClientSide) {
             entityData.set(ATTACK_TIMER, ATTACK_ANIM_TICKS);
         }
-        return hit;
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (!level().isClientSide && attackTimer() > 0) {
+            entityData.set(ATTACK_TIMER, attackTimer() - 1);
+        }
+    }
+
+    @Override
+    public void aiStep() {
+        boolean bright = !level().isClientSide && isInBrightLight();
+        if (!level().isClientSide && !hasEffect(MobEffects.WATER_BREATHING)) {
+            // An arthropod cannot breathe water on its own; keep it supplied so hunting never
+            // ends in drowning.
+            addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, -1, 0, true, false));
+        }
+        // In strong light the shared controller is suspended and the crab-sized body is steered
+        // straight toward the darkest neighbour; otherwise it runs the normal swim brain.
+        setMovementSuspended(bright);
+        super.aiStep();
+        if (bright) {
+            if (--fleeScanCooldown <= 0) {
+                fleeScanCooldown = FLEE_SCAN_INTERVAL;
+                fleeDirection = darkestDirection();
+            }
+            setDeltaMovement(getDeltaMovement().scale(0.6D).add(fleeDirection.scale(0.035D)));
+            hasImpulse = true;
+        } else {
+            fleeDirection = Vec3.ZERO;
+        }
     }
 
     @Override
@@ -73,42 +112,16 @@ public final class MudSilverfishEntity extends Silverfish implements GeoEntity {
             if (attackTimer() > 0) {
                 return state.setAndContinue(ATTACK);
             }
-            return state.setAndContinue(
-                    getDeltaMovement().horizontalDistanceSqr() > WALK_SPEED_SQR ? WALK : IDLE);
+            if (isMovementSuspended() || getDeltaMovement().horizontalDistanceSqr() > WALK_SPEED_SQR) {
+                return state.setAndContinue(WALK);
+            }
+            return state.setAndContinue(IDLE);
         }));
     }
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return cache;
-    }
-
-    @Override
-    public void aiStep() {
-        super.aiStep();
-        if (level().isClientSide) {
-            return;
-        }
-        // It is still an arthropod, so it cannot breathe water on its own; keep it supplied so a
-        // hunt across the flat never ends in drowning.
-        if (!hasEffect(MobEffects.WATER_BREATHING)) {
-            addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, -1, 0, true, false));
-        }
-        if (attackTimer() > 0) {
-            entityData.set(ATTACK_TIMER, attackTimer() - 1);
-        }
-        if (isInBrightLight()) {
-            // Strong light drives it off: drop the hunt, then scuttle toward the darkest
-            // neighbouring direction instead of drifting straight up.
-            getNavigation().stop();
-            setTarget(null);
-            if (--fleeScanCooldown <= 0) {
-                fleeScanCooldown = FLEE_SCAN_INTERVAL;
-                fleeDirection = darkestDirection();
-            }
-            setDeltaMovement(getDeltaMovement().add(fleeDirection.scale(0.02D))
-                    .add(0.0D, 0.004D, 0.0D));
-        }
     }
 
     private boolean isInBrightLight() {
@@ -137,5 +150,55 @@ public final class MudSilverfishEntity extends Silverfish implements GeoEntity {
 
     private int attackTimer() {
         return entityData.get(ATTACK_TIMER);
+    }
+
+    @Override
+    protected FishResponseMode getResponseMode() {
+        return FishResponseMode.CHARGE;
+    }
+
+    @Override
+    protected FishAttackMode getAttackMode() {
+        return FishAttackMode.TRACKING_BITE;
+    }
+
+    @Override
+    protected double getBaseBiteDamage() {
+        return 1.0D;
+    }
+
+    @Override
+    protected double getCruiseMaxSpeed() {
+        return 0.14D;
+    }
+
+    @Override
+    protected double getCruiseAcceleration() {
+        return 0.012D;
+    }
+
+    @Override
+    protected double getEscapeMaxSpeed() {
+        return 0.26D;
+    }
+
+    @Override
+    protected double getChargeMaxSpeed() {
+        return 0.30D;
+    }
+
+    @Override
+    protected double getPlayerDetectionRange() {
+        return 8.0D;
+    }
+
+    @Override
+    protected double getCruiseFloorBias() {
+        return 0.7D;
+    }
+
+    @Override
+    protected double getCruiseDepthRange() {
+        return 1.2D;
     }
 }

@@ -22,9 +22,23 @@ public abstract class BaseFishEntity extends WaterAnimal {
             EntityDataSerializers.BOOLEAN);
 
     private final FishMovementController movementController = new FishMovementController();
+    private boolean movementSuspended;
 
     protected BaseFishEntity(EntityType<? extends WaterAnimal> type, Level level) {
         super(type, level);
+    }
+
+    /**
+     * Hands movement over to the subclass: the shared cruise controller stops running and the
+     * caller drives {@code setDeltaMovement} itself. Used by the creatures whose special action
+     * is not swimming — the buried worm, and the silverfish fleeing a light.
+     */
+    public void setMovementSuspended(boolean suspended) {
+        this.movementSuspended = suspended;
+    }
+
+    public boolean isMovementSuspended() {
+        return this.movementSuspended;
     }
 
     @Override
@@ -46,6 +60,12 @@ public abstract class BaseFishEntity extends WaterAnimal {
                 this.entityData.set(CHARGING_PLAYER, false);
                 this.entityData.set(ESCAPE_LAUNCHING, false);
             }
+            return;
+        }
+
+        if (this.movementSuspended) {
+            // Still kill gravity while submerged so a suspended body holds its depth.
+            this.setNoGravity(this.isInWater());
             return;
         }
 

@@ -697,7 +697,10 @@ public class FishMovementController {
     private void updateCruiseDepthTarget(BaseFishEntity fish) {
         this.state.setCruiseDepthDecisionCooldown(this.state.cruiseDepthDecisionCooldown() - 1);
 
-        if (this.state.cruiseDepthDecisionCooldown() <= 0) {
+        // A seabed crawler does not take the random depth offsets: they would lift it off the
+        // sediment, and the floor bias would only pull half of it back. Its depth is the floor.
+        boolean seabedCrawler = fish.cruiseFloorBias() >= FLOOR_BIAS_SETTLED;
+        if (!seabedCrawler && this.state.cruiseDepthDecisionCooldown() <= 0) {
             this.state.setCruiseDepthDecisionCooldown(fish.cruisePitchDecisionMinTicks()
                     + fish.getRandom().nextInt(fish.cruisePitchDecisionRandomTicks()));
             double offsetMagnitude = 0.6D
@@ -758,7 +761,7 @@ public class FishMovementController {
             return;
         }
         double floorY = Double.NaN;
-        for (int down = 2; down <= 12; down++) {
+        for (int down = 2; down <= 24; down++) {
             BlockPos below = fish.blockPosition().below(down);
             if (!fish.level().getFluidState(below).is(FluidTags.WATER)) {
                 floorY = below.getY() + 1.0D;

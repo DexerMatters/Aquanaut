@@ -3,6 +3,7 @@ package com.dexer.aquanaut.common.entity;
 import com.dexer.aquanaut.common.ai.FishAttackMode;
 import com.dexer.aquanaut.common.ai.FishResponseMode;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -40,15 +41,14 @@ public final class HumusJellyEntity extends BaseFishEntity implements GeoEntity 
 
     @Override public boolean hurt(DamageSource source, float amount) {
         boolean hurt = super.hurt(source, amount);
-        if (hurt && !level().isClientSide && cloudCooldown <= 0) {
+        if (hurt && !level().isClientSide && cloudCooldown <= 0 && level() instanceof ServerLevel server) {
             cloudCooldown = 200;
-            for (int i = 0; i < 18; i++) {
-                level().addParticle(ParticleTypes.SPORE_BLOSSOM_AIR,
-                        getX() + (random.nextDouble() - 0.5D) * 2.0D,
-                        getY() + random.nextDouble(),
-                        getZ() + (random.nextDouble() - 0.5D) * 2.0D,
-                        0.0D, 0.01D, 0.0D);
-            }
+            server.sendParticles(ParticleTypes.SPORE_BLOSSOM_AIR,
+                    getX(), getY() + 0.4D, getZ(),
+                    28, 1.3D, 0.7D, 1.3D, 0.02D);
+            server.sendParticles(ParticleTypes.SCULK_SOUL,
+                    getX(), getY() + 0.3D, getZ(),
+                    10, 0.9D, 0.5D, 0.9D, 0.01D);
         }
         return hurt;
     }

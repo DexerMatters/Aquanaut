@@ -27,12 +27,15 @@ public final class AmbushFishEntity extends BaseFishEntity implements GeoEntity 
                 .add(Attributes.MOVEMENT_SPEED, 0.24D).build();
     }
     @Override protected FishResponseMode getResponseMode() { return FishResponseMode.AVOIDANCE; }
+    /** Only a player right on top of it — one block — springs the ambush. */
     @Override protected double getPlayerDetectionRange() { return 1.0D; }
     @Override protected double getEscapeMaxSpeed() { return 0.62D; }
     @Override protected double getEscapeAcceleration() { return 0.065D; }
-    @Override protected double getCruiseMaxSpeed() { return 0.08D; }
+    /** Lies in wait on the sediment like a lump of sand; only the burst gives it away. */
+    @Override protected double getCruiseMaxSpeed() { return 0.01D; }
+    @Override protected double getCruiseAcceleration() { return 0.004D; }
     @Override protected double getCruiseFloorBias() { return 0.95D; }
-    @Override protected double getCruiseDepthRange() { return 1.5D; }
+    @Override protected double getCruiseDepthRange() { return 1.2D; }
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, state -> {
             if (isEscapeLaunching() || isSprintingAway()) {

@@ -64,8 +64,10 @@ public final class AncientNautilusEntity extends BaseFishEntity implements GeoEn
     }
     @Override protected FishResponseMode getResponseMode() { return FishResponseMode.PASSIVE; }
     @Override protected FishAttackMode getAttackMode() { return FishAttackMode.NONE; }
-    @Override protected double getCruiseMaxSpeed() { return 0.05D; }
-    @Override protected double getCruiseAcceleration() { return 0.003D; }
-    @Override protected double getCruiseFloorBias() { return 0.85D; }
-    @Override protected double getCruiseDepthRange() { return 1.8D; }
+    @Override protected double getCruiseMaxSpeed() { return 0.09D; }
+    @Override protected double getCruiseAcceleration() { return 0.006D; }
+    @Override protected double getCruiseFloorBias() { return 0.5D; }
+    @Override protected double getCruiseDepthRange() { return 2.5D; }
+    /** Turns often enough that the drift reads as a living swimmer rather than a drifting prop. */
+    @Override protected float getCruiseTurnChance() { return 0.16F; }
 }

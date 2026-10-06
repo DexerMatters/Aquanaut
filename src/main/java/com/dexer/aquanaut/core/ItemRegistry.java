@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.mud.DeathCapItem;
+import com.dexer.aquanaut.common.mud.LargeHermitCrabSpawnEggItem;
 import com.dexer.aquanaut.common.mud.NutrientMudBallItem;
 import com.dexer.aquanaut.common.diving.DivingEquipmentSlotType;
 import com.dexer.aquanaut.common.inventory.CreativeTabHeader;
@@ -657,6 +658,8 @@ public final class ItemRegistry {
                         "garden_eel_spawn_egg", EntityRegistry.GARDEN_EEL, 0x8A7A43, 0x3B4A2B);
         public static final DeferredItem<DeferredSpawnEggItem> HERMIT_CRAB_SPAWN_EGG = spawnEgg(
                         "hermit_crab_spawn_egg", EntityRegistry.HERMIT_CRAB, 0xA56D45, 0x59402C);
+        public static final DeferredItem<LargeHermitCrabSpawnEggItem> HERMIT_CRAB_LARGE_SPAWN_EGG = ITEMS
+                        .registerItem("hermit_crab_large_spawn_egg", LargeHermitCrabSpawnEggItem::new);
         public static final DeferredItem<DeferredSpawnEggItem> SEDIMENT_WORM_SPAWN_EGG = spawnEgg(
                         "sediment_worm_spawn_egg", EntityRegistry.SEDIMENT_WORM, 0x59463D, 0x2E241F);
         public static final DeferredItem<DeferredSpawnEggItem> HUMUS_JELLY_SPAWN_EGG = spawnEgg(
@@ -784,6 +787,7 @@ public final class ItemRegistry {
                                 output.accept(AMBUSH_FISH_SPAWN_EGG.get());
                                 output.accept(GARDEN_EEL_SPAWN_EGG.get());
                                 output.accept(HERMIT_CRAB_SPAWN_EGG.get());
+                                output.accept(HERMIT_CRAB_LARGE_SPAWN_EGG.get());
                                 output.accept(SEDIMENT_WORM_SPAWN_EGG.get());
                                 output.accept(HUMUS_JELLY_SPAWN_EGG.get());
                                 output.accept(ANCIENT_NAUTILUS_SPAWN_EGG.get());

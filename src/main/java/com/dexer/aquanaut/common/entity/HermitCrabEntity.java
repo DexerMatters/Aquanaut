@@ -6,6 +6,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -119,16 +120,21 @@ public final class HermitCrabEntity extends WaterAnimal implements GeoEntity {
      * tougher body, and a fresh emerge so the swap reads as an event.
      */
     private void growShell() {
-        int tier = Math.min(shellSize() + 1, MudZoneConfig.SHELL_MAX_SIZE);
-        entityData.set(SHELL_SIZE, tier);
+        setShellSize(shellSize() + 1);
+        entityData.set(EMERGE_TIMER, EMERGE_TICKS);
+    }
+
+    /** Forces a shell tier; the test spawn egg uses this to drop a fully grown crab. */
+    public void setShellSize(int tier) {
+        int clamped = Mth.clamp(tier, 0, MudZoneConfig.SHELL_MAX_SIZE);
+        entityData.set(SHELL_SIZE, clamped);
         AttributeInstance health = getAttribute(Attributes.MAX_HEALTH);
         if (health != null) {
             health.removeModifier(SHELL_HEALTH_ID);
             health.addPermanentModifier(new AttributeModifier(SHELL_HEALTH_ID,
-                    tier * MudZoneConfig.SHELL_HEALTH_PER_TIER, AttributeModifier.Operation.ADD_VALUE));
+                    clamped * MudZoneConfig.SHELL_HEALTH_PER_TIER, AttributeModifier.Operation.ADD_VALUE));
             setHealth(getMaxHealth());
         }
-        entityData.set(EMERGE_TIMER, EMERGE_TICKS);
     }
     @Override public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(this, "controller", 0, state -> {

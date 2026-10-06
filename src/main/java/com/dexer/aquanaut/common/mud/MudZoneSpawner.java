@@ -37,7 +37,8 @@ public final class MudZoneSpawner {
     private static final int INTERVAL_TICKS = 200;
     private static final int ATTEMPTS_PER_PLAYER = 10;
     private static final int RADIUS = 56;
-    private static final int VERTICAL_RANGE = 12;
+    /** How far above the player the column search starts. */
+    private static final int SCAN_ABOVE = 16;
     private static final int MAX_PER_TYPE = 12;
     private static final int COUNT_RADIUS = 64;
     /** Monsters only surface where the light is dim, so the lit flats stay friendly. */
@@ -66,11 +67,11 @@ public final class MudZoneSpawner {
     private static void trySpawnAround(ServerLevel level, ServerPlayer player) {
         RandomSource random = level.random;
         boolean monsters = level.getDifficulty() != Difficulty.PEACEFUL;
+        int fromY = Math.min(player.getBlockY() + SCAN_ABOVE, level.getMaxBuildHeight() - 1);
         for (int attempt = 0; attempt < ATTEMPTS_PER_PLAYER; attempt++) {
             int x = player.getBlockX() + random.nextInt(RADIUS * 2 + 1) - RADIUS;
             int z = player.getBlockZ() + random.nextInt(RADIUS * 2 + 1) - RADIUS;
-            int y = player.getBlockY() + random.nextInt(VERTICAL_RANGE * 2 + 1) - VERTICAL_RANGE;
-            BlockPos water = findWaterOnMud(level, new BlockPos(x, y, z));
+            BlockPos water = findWaterOnMud(level, x, z, fromY);
             if (water == null) {
                 continue;
             }
@@ -87,26 +88,28 @@ public final class MudZoneSpawner {
         }
     }
 
-    /** The first water block with water above it that sits on a mud-zone floor, or {@code null}. */
-    private static BlockPos findWaterOnMud(ServerLevel level, BlockPos start) {
-        BlockPos.MutableBlockPos cursor = start.mutable();
-        cursor.move(Direction.DOWN, VERTICAL_RANGE);
-        for (int i = 0; i < VERTICAL_RANGE * 2; i++) {
-            if (cursor.getY() <= level.getMinBuildHeight() + 1) {
-                return null;
-            }
-            if (level.getFluidState(cursor).is(FluidTags.WATER)) {
-                if (!level.getFluidState(cursor.above()).is(FluidTags.WATER)) {
-                    return null;
-                }
-                BlockPos below = cursor.below();
-                if (isMudFloor(level.getBlockState(below))
-                        && level.getBiome(below).is(BiomeRegistry.MUD_ZONE)) {
-                    return cursor.immutable();
+    /**
+     * Walks the column down from {@code fromY}, past any air, and returns the first water block
+     * that has water above it and sits on a mud-zone floor. Stops at the first solid, non-water
+     * block, so nothing is ever placed inside the shelf or the middle sea.
+     */
+    private static BlockPos findWaterOnMud(ServerLevel level, int x, int z, int fromY) {
+        BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos(x, fromY, z);
+        int bottom = level.getMinBuildHeight() + 1;
+        while (cursor.getY() > bottom) {
+            BlockState state = level.getBlockState(cursor);
+            if (!state.getFluidState().is(FluidTags.WATER)) {
+                if (state.isAir()) {
+                    cursor.move(Direction.DOWN);
+                    continue;
                 }
                 return null;
             }
-            cursor.move(Direction.UP);
+            BlockPos floor = cursor.below();
+            if (isMudFloor(level.getBlockState(floor)) && level.getBiome(floor).is(BiomeRegistry.MUD_ZONE)) {
+                return level.getFluidState(floor).is(FluidTags.WATER) ? cursor.immutable() : null;
+            }
+            cursor.move(Direction.DOWN);
         }
         return null;
     }

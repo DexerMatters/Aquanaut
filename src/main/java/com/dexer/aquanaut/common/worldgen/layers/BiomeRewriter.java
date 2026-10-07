@@ -13,16 +13,22 @@ import java.util.Map;
 /**
  * Writes the stereoscopic biome stack into section palettes for supported quart columns.
  * Only configured rewrite Y bands (plus soft margins) are touched — not the full world height.
- * Spawn-island columns additionally get a land surface biome (sunflower plains over the
- * plateau, beach on the flanks) so vanilla features grow trees, grass and flowers there.
+ * Spawn-island columns additionally get land surface biomes that match the generated terrain
+ * (windswept hills over the hill country, sunflower plains over the low plateau, beach on the
+ * flanks) so vanilla features grow trees, grass and flowers there.
  */
 public final class BiomeRewriter {
     /** Lowest quart Y the island surface biome claims (block Y 40, the beach shelf). */
     static final int ISLAND_MIN_QUART_Y = 10;
-    /** Highest quart Y the island surface biome claims (block Y 71, the plateau top). */
-    static final int ISLAND_MAX_QUART_Y = 17;
+    /**
+     * Highest quart Y the island surface biome claims: hill tops reach plateau 70 + hill
+     * amplitude 12 + dune 1 = block Y 83, quart 20, plus one band of margin.
+     */
+    static final int ISLAND_MAX_QUART_Y = 21;
     private static final ResourceLocation ISLAND_SURFACE_BIOME =
             ResourceLocation.fromNamespaceAndPath("minecraft", "sunflower_plains");
+    private static final ResourceLocation ISLAND_HILL_BIOME =
+            ResourceLocation.fromNamespaceAndPath("minecraft", "windswept_hills");
     private static final ResourceLocation ISLAND_SHORE_BIOME =
             ResourceLocation.fromNamespaceAndPath("minecraft", "beach");
     private static final ResourceLocation ISLAND_STONY_SHORE_BIOME =
@@ -33,16 +39,19 @@ public final class BiomeRewriter {
 
     /** The land biome an island quart cell takes, or {@code null} for the normal stack. */
     enum IslandSurface {
-        PLATEAU, SHORE, STONY_SHORE
+        PLATEAU, HILLS, SHORE, STONY_SHORE
     }
 
     /**
      * Pure island-biome decision: the stony-shore mining region renders as
-     * {@link IslandSurface#STONY_SHORE} (vanilla stone-and-gravel surface rule), the flat
-     * grassland core as {@link IslandSurface#PLATEAU}, the beach flanks and shelf as
-     * {@link IslandSurface#SHORE}; {@code null} falls through to the normal stack. The band
-     * runs from block Y 40 up so frozen-ocean iceberg features can never take root on any
-     * island column - their placement biome is always a land biome here.
+     * {@link IslandSurface#STONY_SHORE} (vanilla stone-and-gravel surface rule), raised
+     * hill country as {@link IslandSurface#HILLS}, the low grassland as
+     * {@link IslandSurface#PLATEAU}, the beach flanks and shelf as
+     * {@link IslandSurface#SHORE}; {@code null} falls through to the normal stack. The hill
+     * split reads the same relief field the planner lifts the floor with, so the declared
+     * biome always matches the ground the player sees. The band runs from block Y 40 up so
+     * frozen-ocean iceberg features can never take root on any island column - their
+     * placement biome is always a land biome here.
      */
     static IslandSurface islandSurfaceAt(boolean spawnIsland, long islandSeed,
                                          int worldQuartX, int worldQuartZ, int quartY) {
@@ -58,7 +67,11 @@ public final class BiomeRewriter {
         double mask = com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.maskAt(
                 islandSeed, blockX, blockZ);
         if (mask >= 1.0D) {
-            return IslandSurface.PLATEAU;
+            double relief = com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.reliefAt(
+                    islandSeed, blockX, blockZ, mask);
+            return relief >= com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.HILL_BIOME_THRESHOLD
+                    ? IslandSurface.HILLS
+                    : IslandSurface.PLATEAU;
         }
         if (mask > 0.0D) {
             return IslandSurface.SHORE;
@@ -142,6 +155,9 @@ public final class BiomeRewriter {
                 worldQuartX, worldQuartZ, quartY);
         if (island == IslandSurface.PLATEAU) {
             return ISLAND_SURFACE_BIOME;
+        }
+        if (island == IslandSurface.HILLS) {
+            return ISLAND_HILL_BIOME;
         }
         if (island == IslandSurface.SHORE) {
             return ISLAND_SHORE_BIOME;

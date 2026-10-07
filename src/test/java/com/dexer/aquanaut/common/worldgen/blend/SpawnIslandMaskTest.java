@@ -136,35 +136,51 @@ class SpawnIslandMaskTest {
     }
 
     @Test
-    void interiorLiftRollsTheOuterPlateauButNeverTheFlatCore() {
+    void reliefBuildsRealHillsOutsideTheFlatCore() {
         for (long seed : SEEDS) {
             for (int x = -96; x <= 96; x += 4) {
                 for (int z = -96; z <= 96; z += 4) {
                     double mask = SpawnIslandMask.maskAt(seed, x, z);
-                    double lift = SpawnIslandMask.interiorLift(seed, x, z, mask);
-                    assertTrue(lift >= -3.0D - EPS && lift <= 3.0D + EPS,
-                            "interior lift out of range at (" + x + ", " + z + ")");
+                    double relief = SpawnIslandMask.reliefAt(seed, x, z, mask);
+                    assertTrue(relief >= -SpawnIslandMask.HILL_MAX_DIP - EPS
+                                    && relief <= SpawnIslandMask.HILL_AMPLITUDE + EPS,
+                            "relief out of range at (" + x + ", " + z + "): " + relief);
                     if (mask < 1.0D) {
-                        assertEquals(0.0D, lift, EPS, "relief on the beach flank");
+                        assertEquals(0.0D, relief, EPS, "relief on the beach flank");
                     }
                     double dist = Math.sqrt((double) x * x + (double) z * z);
                     if (dist <= GUARANTEED_FLAT_RADIUS) {
-                        assertEquals(0.0D, lift, EPS, "relief inside the flat core");
+                        assertEquals(0.0D, relief, EPS, "relief inside the flat core");
                     }
                 }
             }
         }
-        // The outer plateau must actually roll, or the island stays a featureless disc.
-        double maxLift = 0.0D;
-        double minLift = 0.0D;
+        // The outer plateau must carry real hills and valleys, or the island stays a
+        // featureless disc: at least one climbable hill and one real dip per world.
+        double maxRelief = 0.0D;
+        double minRelief = 0.0D;
+        int hillColumns = 0;
         for (int x = -SpawnIslandMask.COAST_MEAN_RADIUS; x <= SpawnIslandMask.COAST_MEAN_RADIUS; x += 3) {
             for (int z = -SpawnIslandMask.COAST_MEAN_RADIUS; z <= SpawnIslandMask.COAST_MEAN_RADIUS; z += 3) {
-                double lift = SpawnIslandMask.interiorLift(42L, x, z, 1.0D);
-                maxLift = Math.max(maxLift, lift);
-                minLift = Math.min(minLift, lift);
+                double relief = SpawnIslandMask.reliefAt(42L, x, z, 1.0D);
+                maxRelief = Math.max(maxRelief, relief);
+                minRelief = Math.min(minRelief, relief);
+                if (relief >= SpawnIslandMask.HILL_BIOME_THRESHOLD) {
+                    hillColumns++;
+                }
             }
         }
-        assertTrue(maxLift - minLift >= 1.5D, "plateau relief is dead flat");
+        assertTrue(maxRelief >= 5.0D, "no real hill on the plateau, max relief " + maxRelief);
+        assertTrue(maxRelief - minRelief >= 8.0D, "plateau relief is dead flat");
+        assertTrue(hillColumns >= 40, "hill country covers only " + hillColumns + " columns");
+        // The stony-shore quarry keeps near-flat working ground so its lava ponds hold.
+        for (long seed : SEEDS) {
+            double[] center = SpawnIslandMask.stoneShoreCenter(seed);
+            double relief = SpawnIslandMask.reliefAt(seed,
+                    (int) Math.round(center[0]), (int) Math.round(center[1]), 1.0D);
+            assertTrue(Math.abs(relief) <= 3.0D + EPS,
+                    "stony-shore centre is tilted, seed " + seed + ": " + relief);
+        }
     }
 
     @Test

@@ -21,10 +21,10 @@ import com.dexer.aquanaut.common.worldgen.layers.SoftMixNoise;
  * meander at three scales (broad swells, mid coves, fine crinkle) and no direction repeats
  * another. The blend only starts past the local coast field, so the whole interior keeps the
  * full plateau height - there is no moat between the building core and the shore. On top of
- * the plateau, {@link #interiorLift} adds a seeded rolling relief (suppressed inside the
- * organic flat building core), {@link #duneLift} speckles one-block knolls, and
- * {@link #sandPatchAt} breaks the grass into an irregular speckle. All modulation is
- * scrambled from the world seed.
+ * the plateau, {@link #reliefAt} raises seeded hills and sinks valleys (suppressed inside
+ * the organic flat building core and before the shoreline), {@link #duneLift} speckles
+ * one-block knolls, and {@link #sandPatchAt} breaks the grass into an irregular speckle.
+ * All modulation is scrambled from the world seed.
  * </p>
  */
 public final class SpawnIslandMask {
@@ -57,8 +57,10 @@ public final class SpawnIslandMask {
     private static final long FLAT_EDGE_SALT = 0x7A31L;
     private static final long DUNE_SEED_SALT = 0xD0A7L;
     private static final long SAND_PATCH_SALT = 0x5A1DL;
-    private static final long INTERIOR_BROAD_SALT = 0x11AAL;
-    private static final long INTERIOR_MID_SALT = 0x22BBL;
+    /** Salts of the three hill-field octaves. */
+    private static final long HILL_BROAD_SALT = 0x11AAL;
+    private static final long HILL_MID_SALT = 0x22BBL;
+    private static final long HILL_FINE_SALT = 0x33CCL;
     /** Noise-space cells of the three warped coastline octaves. */
     private static final double COAST_BROAD_CELL = 150.0D;
     private static final double COAST_MID_CELL = 64.0D;
@@ -71,9 +73,20 @@ public final class SpawnIslandMask {
     private static final double DUNE_THRESHOLD = 0.5D;
     public static final double SAND_PATCH_CELL = 22.0D;
     private static final double SAND_PATCH_THRESHOLD = 0.55D;
-    /** Cells and amplitude of the seeded rolling relief on the outer plateau. */
-    private static final double INTERIOR_BROAD_CELL = 64.0D;
-    private static final double INTERIOR_MID_CELL = 26.0D;
+    /** Cells and amplitude of the seeded hill/valley relief on the outer plateau. */
+    private static final double HILL_BROAD_CELL = 110.0D;
+    private static final double HILL_MID_CELL = 44.0D;
+    private static final double HILL_FINE_CELL = 17.0D;
+    /** Peak height (blocks) of a fully-ramped hill above the plateau target. */
+    public static final double HILL_AMPLITUDE = 12.0D;
+    /** Deepest valley floor (blocks) below the plateau, so dips stay above sea level 63. */
+    public static final double HILL_MAX_DIP = 6.0D;
+    /** Width (blocks) of the ramp that lifts hills out of the flat building core. */
+    private static final double HILL_RISE_WIDTH = 22.0D;
+    /** Width (blocks) over which hills sink back to shore level ahead of the coastline. */
+    private static final double HILL_COAST_FADE = 24.0D;
+    /** Plateau relief at or above this height claims the hill biome instead of plains. */
+    public static final double HILL_BIOME_THRESHOLD = 4.5D;
     /** Salts of the stony-shore region ("STON"), its boundary wobble and its lava pond. */
     private static final long STONE_SHORE_SALT = 0x5700L;
     private static final long STONE_WOBBLE_SALT = 0x5701L;
@@ -180,12 +193,16 @@ public final class SpawnIslandMask {
     }
 
     /**
-     * Seeded rolling relief of the plateau: broad swells up to ±3 blocks that give the ground
-     * its large-scale character, fading to zero inside the organic flat building core (the
-     * construction site stays exactly at {@link #ISLAND_TOP_Y}) and on the beach flanks. The
-     * cliff guard downstream relaxes the slopes.
+     * Seeded relief of the plateau: real hills and valleys outside the organic flat building
+     * core, from three octaves (a few broad hill masses, mid valley structure, fine texture).
+     * Hill tops reach {@link #HILL_AMPLITUDE} blocks above the plateau; valley floors are
+     * clamped at {@link #HILL_MAX_DIP} below it, so no dip can fall under sea level 63. The
+     * relief ramps up over {@link #HILL_RISE_WIDTH} out of the flat core, is damped inside the
+     * stony-shore quarry (its lava ponds need near-flat ground), and sinks back to shore
+     * level over {@link #HILL_COAST_FADE} ahead of the local coastline so no hill is sheared
+     * off at the beach. Zero on the beach flanks; the cliff guard downstream relaxes slopes.
      */
-    public static double interiorLift(long islandSeed, int blockX, int blockZ, double mask) {
+    public static double reliefAt(long islandSeed, int blockX, int blockZ, double mask) {
         if (mask < 1.0D) {
             return 0.0D;
         }
@@ -193,17 +210,22 @@ public final class SpawnIslandMask {
         double wobble = (SoftMixNoise.valueNoise(blockX, blockZ, FLAT_EDGE_CELL,
                 scramble(islandSeed, FLAT_EDGE_SALT)) + 1.0D) * 0.5D;
         double flatRadius = FLAT_RADIUS * (0.75D + 0.5D * wobble);
-        double ramp = SoftMixNoise.smoothstep((dist - flatRadius) / 10.0D);
+        double ramp = SoftMixNoise.smoothstep((dist - flatRadius) / HILL_RISE_WIDTH);
         if (ramp <= 0.0D) {
             return 0.0D;
         }
-        double broad = SoftMixNoise.valueNoise(blockX, blockZ, INTERIOR_BROAD_CELL,
-                scramble(islandSeed, INTERIOR_BROAD_SALT));
-        double mid = SoftMixNoise.valueNoise(blockX, blockZ, INTERIOR_MID_CELL,
-                scramble(islandSeed, INTERIOR_MID_SALT));
-        double lift = broad * 3.0D + mid * 1.25D;
-        lift = Math.max(-3.0D, Math.min(3.0D, lift));
-        return lift * ramp;
+        double broad = SoftMixNoise.valueNoise(blockX, blockZ, HILL_BROAD_CELL,
+                scramble(islandSeed, HILL_BROAD_SALT));
+        double mid = SoftMixNoise.valueNoise(blockX, blockZ, HILL_MID_CELL,
+                scramble(islandSeed, HILL_MID_SALT));
+        double fine = SoftMixNoise.valueNoise(blockX, blockZ, HILL_FINE_CELL,
+                scramble(islandSeed, HILL_FINE_SALT));
+        double shaped = 0.55D * broad + 0.30D * mid + 0.15D * fine;
+        double relief = Math.max(shaped * HILL_AMPLITUDE, -HILL_MAX_DIP);
+        relief *= 1.0D - 0.75D * stoneShoreWeight(islandSeed, blockX, blockZ);
+        double coastMargin = coastFieldAt(islandSeed, blockX, blockZ) - dist;
+        relief *= SoftMixNoise.smoothstep(coastMargin / HILL_COAST_FADE);
+        return relief * ramp;
     }
 
     /**
@@ -228,7 +250,7 @@ public final class SpawnIslandMask {
     }
 
     /**
-     * Whether the plateau grassland at this column is a speckled coral-sand patch: the sand
+     * Whether the plateau grassland at this column is a speckled vanilla-sand patch: the sand
      * spots are scattered by seeded noise instead of forming a ring, so the plateau reads as
      * irregular ground. Trees skip sand on their own (would_survive fails there).
      */

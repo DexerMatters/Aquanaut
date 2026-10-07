@@ -77,10 +77,16 @@ public final class OceanColumnPlanner {
         int floorY = (int) Math.round(guardedFloor);
         double islandMask = source.spawnIslandMaskAt(blockX, blockZ);
         long islandSeed = source.spawnIslandSeed();
+        MiddleLevelOceanTerrainProfile.ColumnProfile profile = source.profileAt(blockX, blockZ);
+        // The island branch claims only columns whose floor stands at or above the reef
+        // shelf (the chamber cap's top). Lower ring columns fall to the normal stack, which
+        // renders the cap and the middle sea intact beneath the shelf slope — without this
+        // gate the claimed ring once replaced the whole stack down to a deep blended floor,
+        // boring a ring-shaped pit through the reef ceiling around the island.
+        boolean islandColumn = islandMask > 0.0D && floorY >= profile.capTopY();
         // Island columns carry solid ground above sea level, so the carve window must reach
         // the plateau top; everywhere else it stops at the open-water line like before.
-        int topCarveY = islandMask > 0.0D ? Math.max(terrain.topWaterY(), floorY) : terrain.topWaterY();
-        MiddleLevelOceanTerrainProfile.ColumnProfile profile = source.profileAt(blockX, blockZ);
+        int topCarveY = islandColumn ? Math.max(terrain.topWaterY(), floorY) : terrain.topWaterY();
         double edge = source.columnEdge(blockX, blockZ);
 
         // Effective cap openness: shafts only dissolve well inside the region, and the
@@ -124,7 +130,8 @@ public final class OceanColumnPlanner {
 
         return new ColumnPlan(blockX, blockZ, topCarveY, floorY, minBuildHeight - 1,
                 edge, profile, terrain, volcanic, reef, reefBottomY, deepFloorY, mountainTopY,
-                capOpenness, capBand, outcropRelief, outcropTopY, grounded, islandMask, islandSeed,
+                capOpenness, capBand, outcropRelief, outcropTopY, grounded, islandColumn,
+                islandMask, islandSeed,
                 karstNoise, brineField, dissolution, terrain.blend().contactMaterial());
     }
 
@@ -159,14 +166,32 @@ public final class OceanColumnPlanner {
         if (volcanicStrength > 0.0D) {
             floor += VolcanoGeometry.floorOffset(blockX, blockZ) * volcanicStrength * (1.0D - islandMask);
         }
-        double blended = SpawnIslandMask.blendFloor(floor, islandMask);
+        double blended = SpawnIslandMask.blendFloor(islandShelfBase(floor, profile, islandMask), islandMask);
         if (islandMask > 0.0D) {
-            // Seeded plateau relief: broad rolling swells plus one-block knolls on the outer
-            // ground; both fade to zero inside the organic flat building core and on the beach.
-            blended += SpawnIslandMask.interiorLift(source.spawnIslandSeed(), blockX, blockZ, islandMask);
+            // Seeded plateau relief: hills and valleys outside the organic flat building core,
+            // sinking back to shore level ahead of the coastline, plus one-block knolls.
+            blended += SpawnIslandMask.reliefAt(source.spawnIslandSeed(), blockX, blockZ, islandMask);
             blended += SpawnIslandMask.duneLift(source.spawnIslandSeed(), blockX, blockZ, islandMask);
         }
         return blended;
+    }
+
+    /**
+     * The blend base of an island column: with rising mask the raw floor is lifted to the
+     * chamber cap's top, so the island flank lands on a reef shelf that merges flush into
+     * the surrounding reef ceiling instead of punching through it into the middle sea (the
+     * old base let the flank descend to the deep chamber floor, boring a ring-shaped pit
+     * through the cap and walling it off with a vertical seam). At mask 0 the base is the
+     * untouched raw floor, so the field stays continuous.
+     */
+    private static double islandShelfBase(double floor,
+                                          MiddleLevelOceanTerrainProfile.ColumnProfile profile,
+                                          double islandMask) {
+        if (islandMask <= 0.0D) {
+            return floor;
+        }
+        double shelfT = SoftMixNoise.smoothstep(islandMask);
+        return SoftMixNoise.lerp(shelfT, floor, Math.max(floor, profile.capTopY()));
     }
 
     /** Smoothstep the openness so floor does not tear at mid-strength edges. */
@@ -477,6 +502,7 @@ public final class OceanColumnPlanner {
                              double outcropRelief,
                              int outcropTopY,
                              boolean grounded,
+                             boolean islandColumn,
                              double islandMask,
                              long islandSeed,
                              double karstNoise,
@@ -486,7 +512,7 @@ public final class OceanColumnPlanner {
 
         /** Whether the water-world spawn island claims this column (shaded as solid land). */
         public boolean island() {
-            return islandMask > 0.0D;
+            return islandColumn;
         }
 
         /** Height of the sedimentary plinth the massif footprint grows out of. */

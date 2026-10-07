@@ -5,6 +5,7 @@
     "refmap": "aquanaut.refmap.json",
     "mixins": [
         "ChunkGeneratorAccessor",
+        "ChunkGeneratorStructureMixin",
         "EntityMixin",
         "LivingEntityMixin",
         "InventoryMenuMixin",

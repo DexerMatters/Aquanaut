@@ -41,7 +41,7 @@ public final class SpawnIslandMask {
      */
     public static final int FLAT_RADIUS = 24;
     /** Mean coastline radius (blocks): the meandering coast field oscillates around it. */
-    public static final int COAST_MEAN_RADIUS = 125;
+    public static final int COAST_MEAN_RADIUS = 115;
     /** Peak deviation (blocks) of the coastline from its mean radius. */
     public static final int COAST_AMPLITUDE = 56;
     /** Nominal fade width (blocks) from the local coastline down to untouched ocean floor. */
@@ -51,10 +51,30 @@ public final class SpawnIslandMask {
     public static final double FADE_MAX = FADE_WIDTH * 1.15D;
     /** Nominal radius at which the lift reaches zero on the mean outline. */
     public static final int FADE_RADIUS = COAST_MEAN_RADIUS + FADE_WIDTH;
-    /** Smallest radius that is still fully emerged, in the tightest bay of any seed. */
+    /**
+     * Smallest radius that is still fully emerged from the coast field alone; sea bays clamp
+     * the coastline further in, down to {@link #BAY_FLOOR}.
+     */
     public static final double MIN_PLATEAU_RADIUS = COAST_MEAN_RADIUS - COAST_AMPLITUDE;
     /** Beyond this radius the lift is exactly zero for every seed and direction. */
     public static final double MAX_FADE_RADIUS = COAST_MEAN_RADIUS + COAST_AMPLITUDE + FADE_MAX;
+    /**
+     * Exponent on the mask inside {@link #blendFloor}: slightly above one, so the floor
+     * leaves the plateau a touch faster than a linear blend and the waterline sits closer to
+     * the coastline — a narrower sand apron, more green. The edge grade stays around one and
+     * a quarter blocks per block, and the cliff guard eases the rest.
+     */
+    private static final double BLEND_SHAPE_EXPONENT = 1.3D;
+    /**
+     * Mask at which the blended shelf can still touch sea level at a structure anchor. Below
+     * this the planned floor of every plausible profile stays under water: the highest shelf
+     * a raw floor can carry is about 45 blocks (quarry cap 40 plus quarter-strength volcanic
+     * swell), and even that blends to 62.2 at the threshold — under the sea level 63. The
+     * structure guard refuses anchors above this mask, so no shipwreck can surface on land.
+     */
+    public static final double ISLAND_STRUCTURE_MASK = 0.75D;
+    /** Chunk dilation of the structure claim, so wide structures cannot straddle the island. */
+    private static final int STRUCTURE_CLAIM_DILATION_CHUNKS = 2;
 
     /** Salt of the coast field ("ISLA") and of its domain warp. */
     private static final long COAST_FIELD_SALT = 0x51A0C1A7L;
@@ -87,12 +107,13 @@ public final class SpawnIslandMask {
     private static final long BAY_ROTATION_SALT = 0x2FFL;
     private static final double BAY_EVEN_TOLERANCE_DEG = 30.0D;
     private static final double BAY_MIN_SEPARATION_DEG = 60.0D;
+    private static final double BAY_QUARRY_CLEARANCE_DEG = 60.0D;
     /**
-     * Rejection budget for the bay layout. A two-bay draw is only accepted ~26% of the time
-     * (one gap must miss 180 degrees by 30 or more), so the budget is sized for the tail:
-     * 32 attempts leave the fallback unreachable for any realistic seed.
+     * Draw budget for the bay layout. A draw must clear three rules at once (separation,
+     * even-grid deviation, quarry clearance), so clean passes are a minority; the budget
+     * covers the tail comfortably and, with the per-seed cache, costs nothing at runtime.
      */
-    private static final int BAY_ANGLE_ATTEMPTS = 32;
+    private static final int BAY_ANGLE_ATTEMPTS = 64;
     /** Salt of the seeded plateau/flat-core/beach modulation fields. */
     private static final long FLAT_EDGE_SALT = 0x7A31L;
     private static final long DUNE_SEED_SALT = 0xD0A7L;
@@ -128,7 +149,7 @@ public final class SpawnIslandMask {
     private static final double DUNE_CELL = 9.0D;
     private static final double DUNE_THRESHOLD = 0.5D;
     public static final double SAND_PATCH_CELL = 22.0D;
-    private static final double SAND_PATCH_THRESHOLD = 0.55D;
+    private static final double SAND_PATCH_THRESHOLD = 0.7D;
     /** Cells and amplitude of the seeded hill/valley relief on the outer plateau. */
     private static final double HILL_BROAD_CELL = 110.0D;
     private static final double HILL_MID_CELL = 44.0D;
@@ -136,8 +157,7 @@ public final class SpawnIslandMask {
     /** Base peak height (blocks) of a fully-ramped hill; cluster hills reach amplitude + boost. */
     public static final double HILL_AMPLITUDE = 12.0D;
     /** Deepest valley floor (blocks) below the plateau, so dips stay above sea level 63. */
-    public static final double HILL_MAX_DIP = 6.0D;
-    /** Width (blocks) of the ramp that lifts hills out of the flat building core. */
+    public static final double HILL_MAX_DIP = 6.0D;    /** Width (blocks) of the ramp that lifts hills out of the flat building core. */
     private static final double HILL_RISE_WIDTH = 22.0D;
     /** Width (blocks) over which hills sink back to shore level ahead of the coastline. */
     private static final double HILL_COAST_FADE = 24.0D;
@@ -273,18 +293,39 @@ public final class SpawnIslandMask {
     /**
      * Bearings (radians) of the island's 2-3 sea bays. The angular gaps are drawn
      * independently from {@code BAY_GAP_MIN}..{@code BAY_GAP_MIN + BAY_GAP_SPREAD} and
-     * normalized to the full circle around a seed-chosen rotation. Draws that would land on
-     * the even grid — two bays near 180 degrees apart or three near 120 — are rejected and
-     * redrawn from the next salt slots, so the layout is guaranteed to read irregular while
-     * staying fully deterministic. {@link #applyBays} and {@link #hillDomeCenter} share it,
-     * so every consumer sees the same bay layout.
+     * normalized to the full circle around a seed-chosen rotation. Every draw is scored
+     * against the three layout rules — bay separation, deviation from the even grid, and
+     * clearance from the quarry — and the best-scoring draw wins: a clean layout stops the
+     * search immediately, and even a seed whose draws never pass cleanly gets the most
+     * irregular layout the budget found instead of the last one drawn. Fully deterministic.
+     * The result is cached per seed because this runs from the per-block mask evaluation.
+     * {@link #applyBays} and {@link #hillDomeCenter} share it; do not mutate the result.
      */
     public static double[] bayCenterAngles(long islandSeed) {
+        if (bayCacheAngles != null && bayCacheSeed == islandSeed) {
+            return bayCacheAngles;
+        }
+        double[] angles = computeBayCenterAngles(islandSeed);
+        bayCacheAngles = angles;
+        bayCacheSeed = islandSeed;
+        return angles;
+    }
+
+    /** Single-entry memo of {@link #bayCenterAngles}: the seed is constant for a whole world. */
+    private static long bayCacheSeed;
+    private static double[] bayCacheAngles;
+
+    private static double[] computeBayCenterAngles(long islandSeed) {
         long hash = scramble(islandSeed, BAY_SALT);
         int count = BAY_MIN_COUNT + (int) ((hash >>> 33) % (BAY_MAX_COUNT - BAY_MIN_COUNT + 1));
-        double rotation = unit01(scramble(hash, BAY_ROTATION_SALT)) * 2.0D * Math.PI;
         double[] angles = new double[count];
+        double[] best = new double[count];
+        double bestScore = -Double.MAX_VALUE;
         for (int attempt = 0; attempt < BAY_ANGLE_ATTEMPTS; attempt++) {
+            // The rotation is redrawn per attempt: the first bay always sits exactly on it,
+            // so a fixed rotation would pin bay0 and veto every attempt whenever the quarry
+            // happens to sit near that one bearing.
+            double rotation = unit01(scramble(hash, BAY_ROTATION_SALT + attempt)) * 2.0D * Math.PI;
             double[] gaps = new double[count];
             double total = 0.0D;
             for (int i = 0; i < count; i++) {
@@ -297,31 +338,46 @@ public final class SpawnIslandMask {
                 angles[i] = accumulated;
                 accumulated += gaps[i] / total * 2.0D * Math.PI;
             }
-            if (baysSpreadIrregularly(angles)) {
+            double score = bayLayoutScore(islandSeed, angles);
+            if (score > bestScore) {
+                bestScore = score;
+                System.arraycopy(angles, 0, best, 0, count);
+            }
+            if (score >= 0.0D) {
                 break;
             }
         }
-        return angles;
+        return best;
     }
 
     /**
-     * Whether the bay layout is visibly irregular: every pair of neighbouring bays stays at
-     * least {@link #BAY_MIN_SEPARATION_DEG} apart, and at least one gap deviates from the
-     * even grid by {@link #BAY_EVEN_TOLERANCE_DEG} or more.
+     * The tightest margin (degrees) of a bay layout against the three rules: neighbouring
+     * bays at least {@link #BAY_MIN_SEPARATION_DEG} apart, some gap at least
+     * {@link #BAY_EVEN_TOLERANCE_DEG} off the even grid (so the layout never reads as a
+     * symmetric pair or star), and every bay centre at least {@link #BAY_QUARRY_CLEARANCE_DEG}
+     * from the quarry (a bay aimed at the mining region would clamp the coastline through it
+     * and drown its outer rock). Non-negative means the layout passes. The angles must be
+     * ascending around the circle.
      */
-    private static boolean baysSpreadIrregularly(double[] ascendingAngles) {
+    private static double bayLayoutScore(long islandSeed, double[] ascendingAngles) {
         double even = 2.0D * Math.PI / ascendingAngles.length;
-        boolean deviates = false;
+        double quarryAngle = unit01(scramble(islandSeed, STONE_SHORE_SALT)) * 2.0D * Math.PI;
+        double minSeparation = Double.MAX_VALUE;
+        double maxDeviation = 0.0D;
+        double minClearance = Double.MAX_VALUE;
         for (int i = 0; i < ascendingAngles.length; i++) {
             double gap = i + 1 < ascendingAngles.length
                     ? ascendingAngles[i + 1] - ascendingAngles[i]
                     : ascendingAngles[0] + 2.0D * Math.PI - ascendingAngles[i];
-            if (gap < Math.toRadians(BAY_MIN_SEPARATION_DEG)) {
-                return false;
-            }
-            deviates |= Math.abs(gap - even) >= Math.toRadians(BAY_EVEN_TOLERANCE_DEG);
+            minSeparation = Math.min(minSeparation, gap);
+            maxDeviation = Math.max(maxDeviation, Math.abs(gap - even));
+            minClearance = Math.min(minClearance,
+                    Math.abs(angleDelta(ascendingAngles[i], quarryAngle)));
         }
-        return deviates;
+        return Math.min(Math.min(
+                        Math.toDegrees(minSeparation) - BAY_MIN_SEPARATION_DEG,
+                        Math.toDegrees(maxDeviation) - BAY_EVEN_TOLERANCE_DEG),
+                Math.toDegrees(minClearance) - BAY_QUARRY_CLEARANCE_DEG);
     }
 
     /**
@@ -533,16 +589,36 @@ public final class SpawnIslandMask {
      * Blends the raw geological floor toward the island plateau. The target is
      * {@code max(rawFloor, ISLAND_TOP_Y)} so the mask never lowers ground that already rises
      * above the plateau on its own (e.g. volcanic relief riding the same field). The blend
-     * runs linearly in the mask: the smoothstep mask's flat shoulders neutralize both kinks,
-     * so the whole flank keeps one gentle, even slope — a long shallow beach instead of the
-     * steep wall the squared mask used to pile up just past the waterline.
+     * runs on the mask raised to {@link #BLEND_SHAPE_EXPONENT}: the smoothstep mask's flat
+     * shoulders neutralize the low kink, and the mild concavity pulls the sea a few blocks
+     * closer to the coastline — a narrower sand apron and more green — while the flank keeps
+     * one gentle, even grade instead of the wall the squared mask used to pile up. The cliff
+     * guard downstream evens out the last steps.
      */
     public static double blendFloor(double rawFloor, double mask) {
         if (mask <= 0.0D) {
             return rawFloor;
         }
         double target = Math.max(rawFloor, ISLAND_TOP_Y);
-        return SoftMixNoise.lerp(mask, rawFloor, target);
+        double shaped = Math.pow(mask, BLEND_SHAPE_EXPONENT);
+        return SoftMixNoise.lerp(shaped, rawFloor, target);
+    }
+
+    /**
+     * Whether this chunk is within the island's structure-exclusion zone. Structures anchor at
+     * their chunk centre, so the claim is sampled on a grid of chunk centres around this one;
+     * the ring beyond the zone keeps its wrecks, which are guaranteed to anchor under water.
+     */
+    public static boolean islandClaimsChunk(long islandSeed, int chunkMinBlockX, int chunkMinBlockZ) {
+        for (int dx = -STRUCTURE_CLAIM_DILATION_CHUNKS; dx <= STRUCTURE_CLAIM_DILATION_CHUNKS; dx++) {
+            for (int dz = -STRUCTURE_CLAIM_DILATION_CHUNKS; dz <= STRUCTURE_CLAIM_DILATION_CHUNKS; dz++) {
+                if (maskAt(islandSeed, chunkMinBlockX + 8 + (dx << 4),
+                        chunkMinBlockZ + 8 + (dz << 4)) > ISLAND_STRUCTURE_MASK) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /** SplitMix64-style scramble so unrelated world seeds give unrelated island characters. */

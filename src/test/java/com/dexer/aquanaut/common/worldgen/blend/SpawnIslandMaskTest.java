@@ -3,6 +3,7 @@ package com.dexer.aquanaut.common.worldgen.blend;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -16,8 +17,8 @@ class SpawnIslandMaskTest {
     private static final int SAFE_PLATEAU_RADIUS = 32;
     /** Comfortably inside the organic flat building core (never below FLAT_RADIUS * 0.75). */
     private static final int GUARANTEED_FLAT_RADIUS = 18;
-    /** Land threshold of the linear blend: floor reaches sea level at mask 0.93 (raw -30). */
-    private static final double LAND_MASK = 0.93D;
+    /** Land threshold of the shaped blend: floor reaches sea level at mask 0.9457 (raw -30). */
+    private static final double LAND_MASK = 0.9457D;
     /** Every world seed the per-seed property tests walk. */
     private static final long[] SEEDS = {0L, 1L, 42L, -99L, 0x9E3779B97F4A7C15L};
 
@@ -343,11 +344,11 @@ class SpawnIslandMaskTest {
     @Test
     void coastCutsDeepBaysIntoTheMeanCircle() {
         // Every island must carry real water bays: angular clusters where the waterline
-        // pushes far inland of the mean headland line. The bay clamp guarantees a waterline
-        // of at most bay target + fade * 0.3 (≈ 124); the mean headland line sits near
-        // coast field + fade * 0.25, so anything landing at or inside mean + 20 is a bay
-        // cut of 60+ blocks that no coast octave can swamp.
-        int bayLine = SpawnIslandMask.COAST_MEAN_RADIUS + 20;
+        // pushes far inland of the mean headland line. The bay clamp holds a bay's waterline
+        // to about target + 0.15 * fade (at most ~100 blocks), while the ordinary coastline
+        // rides near the mean radius plus the fade shoulder (~125+); the mean coast radius
+        // separates clamped bays from ordinary low coast with 15+ blocks of margin.
+        int bayLine = SpawnIslandMask.COAST_MEAN_RADIUS;
         for (long seed : SEEDS) {
             boolean[] bay = new boolean[360];
             for (int deg = 0; deg < 360; deg++) {
@@ -451,6 +452,35 @@ class SpawnIslandMaskTest {
             assertTrue(maxDeviation >= Math.toRadians(29.0D),
                     "bays sit on the even grid, seed " + seed + ": max deviation "
                             + Math.toDegrees(maxDeviation) + " deg");
+        }
+    }
+
+    @Test
+    void islandKeepsStructuresOffItsGround() {
+        // Structure anchors on the island would surface on the grass (a sunk shipwreck sits
+        // on the OCEAN_FLOOR heightmap, which the island fill raises to the plateau), so the
+        // claim zone must cover the spawn chunks and stop inside the fade.
+        int beyond = (int) Math.ceil(SpawnIslandMask.MAX_FADE_RADIUS) + 64;
+        for (long seed : SEEDS) {
+            assertTrue(SpawnIslandMask.islandClaimsChunk(seed, 0, 0),
+                    "the spawn chunk is not structure-free, seed " + seed);
+            assertTrue(SpawnIslandMask.islandClaimsChunk(seed, -16, -16),
+                    "the chunk west of spawn is not structure-free, seed " + seed);
+            assertFalse(SpawnIslandMask.islandClaimsChunk(seed, beyond, beyond),
+                    "structure suppression reaches past the fade, seed " + seed);
+        }
+    }
+
+    @Test
+    void wrecksOutsideTheClaimAnchorUnderWater() {
+        // The structure guard only clears anchors whose planned ground can be dry; the ring
+        // it leaves alone must stay under water so its wrecks stay sunken like vanilla. The
+        // shelf under an anchor tops out around 45 blocks high (quarry cap 40 plus
+        // quarter-strength volcanic swell), and even that stays under sea level 63.
+        for (double rawFloor = -60.0D; rawFloor <= 45.0D; rawFloor += 5.0D) {
+            assertTrue(SpawnIslandMask.blendFloor(rawFloor, SpawnIslandMask.ISLAND_STRUCTURE_MASK)
+                            < SEA_LEVEL,
+                    "anchor shelf " + rawFloor + " surfaces inside the wreck ring");
         }
     }
 }

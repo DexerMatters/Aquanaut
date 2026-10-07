@@ -87,6 +87,14 @@ public final class OceanColumnPlanner {
         // Island columns carry solid ground above sea level, so the carve window must reach
         // the plateau top; everywhere else it stops at the open-water line like before.
         int topCarveY = islandColumn ? Math.max(terrain.topWaterY(), floorY) : terrain.topWaterY();
+        // The plateau pond: basin columns whose floor lies below the pond water line get
+        // their carve window raised to that line, so the fill lays still water from the bed
+        // up to it — and only where the floor is below it, walled everywhere by ground that
+        // stands at or above it. The mask gate keeps the water on the full plateau.
+        if (islandColumn && islandMask >= 1.0D && floorY < SpawnIslandMask.POND_WATER_Y
+                && SpawnIslandMask.pondBasinAt(islandSeed, blockX, blockZ) > 0.0D) {
+            topCarveY = Math.max(topCarveY, SpawnIslandMask.POND_WATER_Y);
+        }
         double edge = source.columnEdge(blockX, blockZ);
 
         // Effective cap openness: shafts only dissolve well inside the region, and the

@@ -41,7 +41,7 @@ public final class SpawnIslandMask {
      */
     public static final int FLAT_RADIUS = 24;
     /** Mean coastline radius (blocks): the meandering coast field oscillates around it. */
-    public static final int COAST_MEAN_RADIUS = 115;
+    public static final int COAST_MEAN_RADIUS = 112;
     /** Peak deviation (blocks) of the coastline from its mean radius. */
     public static final int COAST_AMPLITUDE = 56;
     /** Nominal fade width (blocks) from the local coastline down to untouched ocean floor. */
@@ -91,8 +91,16 @@ public final class SpawnIslandMask {
      */
     private static final double BAY_FLOOR = 52.0D;
     private static final double BAY_TARGET_SPREAD = 20.0D;
-    private static final double BAY_MIN_HALF_ANGLE = 22.0D;
-    private static final double BAY_HALF_ANGLE_SPREAD = 8.0D;
+    private static final double BAY_MIN_HALF_ANGLE = 18.0D;
+    private static final double BAY_HALF_ANGLE_SPREAD = 26.0D;
+    /**
+     * Per-bay wall shape exponent applied to the falloff {@code (1 - smoothstep)}: below one
+     * the deep water holds wide and the headland corners turn abrupt, above one the bay
+     * tapers into a shallow throat with long shoulders. Drawn per bay, so neighbouring bays
+     * get visibly different widths and wall steepness.
+     */
+    private static final double BAY_FALLOFF_MIN = 0.5D;
+    private static final double BAY_FALLOFF_SPREAD = 0.85D;
     /**
      * Angular gaps between bays are drawn independently (each in
      * {@code BAY_GAP_MIN}..{@code BAY_GAP_MIN + BAY_GAP_SPREAD}) and normalized to the full
@@ -132,9 +140,36 @@ public final class SpawnIslandMask {
     public static final double HILL_MAX_HEIGHT = 26.0D;
     /** Salt, geometry and reach of the guaranteed hill dome every island carries. */
     private static final long HILL_DOME_SALT = 0x48111L;
+    private static final long HILL_DOME_SHAPE_SALT = 0x48113L;
+    /**
+     * The plateau pond: one small freshwater basin per island, sunk two blocks below the
+     * plateau top on the ring between the bays and the quarry. Its pad flattens the ground
+     * to a gentle bowl (valleys filled, hillocks capped), so the water surface always sits
+     * above every neighbour the splash can reach — {@link #POND_WATER_Y} is strictly below
+     * the padded rim's floor, so the pond can never leak.
+     */
+    public static final int POND_WATER_Y = ISLAND_TOP_Y - 2;
+    private static final long POND_SALT = 0x904DL;
+    private static final long POND_SHAPE_SALT = 0x904EL;
+    private static final long POND_WOBBLE_SALT = 0x904FL;
+    private static final double POND_DIST = 46.0D;
+    private static final double POND_MIN_RADIUS = 7.5D;
+    private static final double POND_RADIUS_SPREAD = 3.0D;
+    private static final double POND_WOBBLE = 1.5D;
+    private static final double POND_DEPTH = 5.0D;
+    private static final double POND_PAD_WIDTH = 6.0D;
+    private static final double POND_PAD_MIN = 0.0D;
+    private static final double POND_PAD_MAX = 2.0D;
+    private static final double POND_MIN_QUARRY_DIST = 45.0D;
+    private static final double POND_MIN_DOME_DIST = 50.0D;
+    /** Least plateau margin (coast exceed over the pond's distance) a site must show. */
+    private static final double POND_MIN_PLATEAU_MARGIN = 12.0D;
     private static final double HILL_DOME_DIST = 46.0D;
-    private static final double HILL_DOME_RADIUS = 40.0D;
-    public static final double HILL_DOME_AMPLITUDE = 13.0D;
+    /** Per-seed dome skirt radius and top height, so no two worlds share one hill profile. */
+    private static final double HILL_DOME_MIN_RADIUS = 34.0D;
+    private static final double HILL_DOME_RADIUS_SPREAD = 12.0D;
+    private static final double HILL_DOME_MIN_AMPLITUDE = 12.5D;
+    private static final double HILL_DOME_AMPLITUDE_SPREAD = 3.0D;
     /** Noise-space cells of the four warped coastline octaves: lobes, swells, coves, crinkle. */
     private static final double COAST_BROAD_CELL = 260.0D;
     private static final double COAST_SWELL_CELL = 110.0D;
@@ -384,26 +419,45 @@ public final class SpawnIslandMask {
      * Clamps the seed-placed sea bays into the coast field. Each bay owns an angular window
      * with a smooth falloff and pulls the field toward its own target depth
      * ({@link #BAY_FLOOR}..+spread), so its waterline pushes a guaranteed ~60-100 blocks
-     * inland between two headlands for every seed. The notch factor depends only on the
+     * inland between two headlands for every seed. Width, target depth and wall shape are
+     * drawn per bay (see {@link #bayProfiles}); the notch factor depends only on the
      * bearing, so the bay walls add no radial slope — the flank gradient stays the blend's
      * own.
      */
     private static double applyBays(long islandSeed, int blockX, int blockZ, double field) {
-        long hash = scramble(islandSeed, BAY_SALT);
         double[] centers = bayCenterAngles(islandSeed);
+        double[][] profiles = bayProfiles(islandSeed);
         double angle = Math.atan2(blockZ, blockX);
         for (int i = 0; i < centers.length; i++) {
-            long slot = scramble(hash, 0x100L + i);
-            double target = BAY_FLOOR + unit01(slot >>> 17) * BAY_TARGET_SPREAD;
-            double halfAngle = Math.toRadians(
-                    BAY_MIN_HALF_ANGLE + unit01(slot >>> 34) * BAY_HALF_ANGLE_SPREAD);
             double delta = Math.abs(angleDelta(angle, centers[i]));
+            double halfAngle = profiles[i][1];
             if (delta < halfAngle) {
-                double falloff = 1.0D - SoftMixNoise.smoothstep(delta / halfAngle);
-                field -= (field - target) * falloff;
+                double falloff = Math.pow(
+                        1.0D - SoftMixNoise.smoothstep(delta / halfAngle), profiles[i][2]);
+                field -= (field - profiles[i][0]) * falloff;
             }
         }
         return field;
+    }
+
+    /**
+     * Per-bay profile of every sea bay, in bay order: {@code [target depth, half angle
+     * (radians), wall shape exponent]}. The draws are independent per bay and seed, so one
+     * island gets a broad lagoon beside a narrow fjord notch, each with its own wall
+     * steepness. Package-private for the width/shape variety test.
+     */
+    static double[][] bayProfiles(long islandSeed) {
+        long hash = scramble(islandSeed, BAY_SALT);
+        double[][] profiles = new double[bayCenterAngles(islandSeed).length][3];
+        for (int i = 0; i < profiles.length; i++) {
+            long slot = scramble(hash, 0x100L + i);
+            profiles[i][0] = BAY_FLOOR + unit01(slot) * BAY_TARGET_SPREAD;
+            profiles[i][1] = Math.toRadians(BAY_MIN_HALF_ANGLE
+                    + unit01(scramble(slot, 0x101L)) * BAY_HALF_ANGLE_SPREAD);
+            profiles[i][2] = BAY_FALLOFF_MIN
+                    + unit01(scramble(slot, 0x2DDL)) * BAY_FALLOFF_SPREAD;
+        }
+        return profiles;
     }
 
     /** Signed angular distance from {@code a} to {@code b}, wrapped into [-π, π]. */
@@ -484,19 +538,100 @@ public final class SpawnIslandMask {
 
     /** Single-entry memo of {@link #hillDomeCenter}: the seed is constant for a whole world. */
     private static long domeCacheSeed;
-    private static double[] domeCacheCenter;
+    private static double[] domeCacheProfile;
 
-    private static double[] hillDomeCenterCached(long islandSeed) {
-        if (!domeCacheSet(islandSeed)) {
+    /** Cached per-seed dome profile: centre x, centre z, skirt radius, top height. */
+    private static double[] hillDomeProfileCached(long islandSeed) {
+        if (domeCacheProfile == null || domeCacheSeed != islandSeed) {
             // Benign race: the computation is pure, threads may just redo it.
-            domeCacheCenter = hillDomeCenter(islandSeed);
+            double[] center = hillDomeCenter(islandSeed);
+            long shape = scramble(islandSeed, HILL_DOME_SHAPE_SALT);
+            domeCacheProfile = new double[]{
+                    center[0], center[1],
+                    HILL_DOME_MIN_RADIUS + unit01(shape) * HILL_DOME_RADIUS_SPREAD,
+                    HILL_DOME_MIN_AMPLITUDE
+                            + unit01(scramble(shape, 0x33L)) * HILL_DOME_AMPLITUDE_SPREAD};
             domeCacheSeed = islandSeed;
         }
-        return domeCacheCenter;
+        return domeCacheProfile;
     }
 
-    private static boolean domeCacheSet(long islandSeed) {
-        return domeCacheCenter != null && domeCacheSeed == islandSeed;
+    /**
+     * Centre of the island's plateau pond: drawn from quarter-points of every gap between
+     * sea bays and their antipodes — the bearings with the most land — keeping clear of the
+     * quarry and preferring distance from the dome, and scored by the plateau margin at the
+     * bearing so the basin and its padded rim always sit on fully emerged ground.
+     */
+    public static double[] pondCenter(long islandSeed) {
+        double[] bays = bayCenterAngles(islandSeed);
+        double[] dome = hillDomeCenter(islandSeed);
+        double[] shore = stoneShoreCenter(islandSeed);
+        double jitter = (unit01(scramble(islandSeed, POND_SALT)) - 0.5D) * 0.25D;
+        double[] best = null;
+        double bestScore = -Double.MAX_VALUE;
+        for (int i = 0; i < bays.length; i++) {
+            double gap = angleDelta(bays[(i + 1) % bays.length], bays[i]);
+            for (int k = 1; k <= 3; k++) {
+                double bearing = bays[i] + gap * k / 4.0D + jitter;
+                for (int j = 0; j < 2; j++) {
+                    double angle = bearing + (j == 0 ? 0.0D : Math.PI);
+                    int x = (int) Math.round(Math.cos(angle) * POND_DIST);
+                    int z = (int) Math.round(Math.sin(angle) * POND_DIST);
+                    double margin = coastFieldAt(islandSeed, x, z) - POND_DIST;
+                    if (Math.hypot(x - shore[0], z - shore[1]) < POND_MIN_QUARRY_DIST
+                            || margin < POND_MIN_PLATEAU_MARGIN) {
+                        continue;
+                    }
+                    double domeDist = Math.hypot(x - dome[0], z - dome[1]);
+                    double score = margin
+                            - 2.0D * Math.max(0.0D, POND_MIN_DOME_DIST - domeDist);
+                    if (score > bestScore) {
+                        bestScore = score;
+                        best = new double[]{x, z};
+                    }
+                }
+            }
+        }
+        if (best != null) {
+            return best;
+        }
+        // Unreachable for realistic bay layouts: a dozen candidate bearings, a quarry four
+        // fifths of the ring away and one narrow coastal dip cannot exclude them all. The
+        // dome's antipode keeps a deterministic centre regardless; the fill's water gate
+        // still walls any basin the ground cannot hold.
+        return new double[]{-dome[0], -dome[1]};
+    }
+
+    private static long pondCacheSeed;
+    private static double[] pondCacheProfile;
+
+    /** Cached per-seed pond profile: centre x, centre z, basin radius. */
+    private static double[] pondProfileCached(long islandSeed) {
+        if (pondCacheProfile == null || pondCacheSeed != islandSeed) {
+            double[] center = pondCenter(islandSeed);
+            long shape = scramble(islandSeed, POND_SHAPE_SALT);
+            pondCacheProfile = new double[]{
+                    center[0], center[1],
+                    POND_MIN_RADIUS + unit01(shape) * POND_RADIUS_SPREAD};
+            pondCacheSeed = islandSeed;
+        }
+        return pondCacheProfile;
+    }
+
+    /**
+     * Smooth strength of the pond basin at this column, in [0, 1]: 1 in the deep centre
+     * (the fill lays water here when the floor is below {@link #POND_WATER_Y}), fading to 0
+     * at the basin's wobbled rim. Pure and deterministic.
+     */
+    public static double pondBasinAt(long islandSeed, int blockX, int blockZ) {
+        double[] pond = pondProfileCached(islandSeed);
+        double dist = Math.hypot(blockX - pond[0], blockZ - pond[1]);
+        if (dist >= pond[2] + POND_WOBBLE) {
+            return 0.0D;
+        }
+        double wobble = SoftMixNoise.valueNoise(blockX, blockZ, 13.0D,
+                scramble(islandSeed, POND_WOBBLE_SALT)) * POND_WOBBLE;
+        return SoftMixNoise.smoothstep((pond[2] + wobble - dist) / 3.0D);
     }
 
     /**
@@ -547,10 +682,25 @@ public final class SpawnIslandMask {
         // The guaranteed hill dome rides on top. Its centre is pinned outside the flat core
         // and clear of every bay and the quarry, and the mask gate sinks everything past the
         // shoreline, so the dome needs neither coast fade nor extra shaping.
-        double[] dome = hillDomeCenterCached(islandSeed);
+        double[] dome = hillDomeProfileCached(islandSeed);
         double domeDist = Math.hypot(blockX - dome[0], blockZ - dome[1]);
-        double domeRise = SoftMixNoise.smoothstep((HILL_DOME_RADIUS - domeDist) / HILL_DOME_RADIUS);
-        relief += domeRise * HILL_DOME_AMPLITUDE * ramp;
+        double domeRise = SoftMixNoise.smoothstep((dome[2] - domeDist) / dome[2]);
+        relief += domeRise * dome[3] * ramp;
+        // The pond rides on top of everything else: first its pad flattens the ring into a
+        // gentle bowl (valleys filled up to the pad floor, hillocks capped to the pad
+        // ceiling), then the basin dips the centre. The pad guarantees the rim stands at or
+        // above the plateau top, so the water line below it is walled wherever it reaches —
+        // the pond can never spill down the flank.
+        double[] pond = pondProfileCached(islandSeed);
+        double pondDist = Math.hypot(blockX - pond[0], blockZ - pond[1]);
+        double pondZone = SoftMixNoise.smoothstep(
+                (pond[2] + POND_WOBBLE + POND_PAD_WIDTH - pondDist) / 4.0D);
+        if (pondZone > 0.0D) {
+            double padded = Math.max(POND_PAD_MIN, Math.min(POND_PAD_MAX, relief));
+            relief = SoftMixNoise.lerp(pondZone, relief, padded);
+        }
+        relief -= POND_DEPTH * pondBasinAt(islandSeed, blockX, blockZ);
+        relief = Math.max(relief, -HILL_MAX_DIP);
         return Math.min(relief, HILL_MAX_HEIGHT);
     }
 

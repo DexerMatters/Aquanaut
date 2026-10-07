@@ -155,7 +155,9 @@ public final class OceanColumnShading {
             // perfect disc.
             if (depth == 0) {
                 if (com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.sandPatchAt(
-                        plan.islandSeed(), plan.blockX(), plan.blockZ())) {
+                                plan.islandSeed(), plan.blockX(), plan.blockZ())
+                        || com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.pondBasinAt(
+                                plan.islandSeed(), plan.blockX(), plan.blockZ()) > 0.0D) {
                     return Blocks.SAND.defaultBlockState();
                 }
                 return Blocks.GRASS_BLOCK.defaultBlockState();

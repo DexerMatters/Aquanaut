@@ -483,4 +483,82 @@ class SpawnIslandMaskTest {
                     "anchor shelf " + rawFloor + " surfaces inside the wreck ring");
         }
     }
+
+    @Test
+    void pondNeverLeaksDownThePlateau() {
+        // The pond sits on the plateau with a padded bowl: every basin column whose floor
+        // lies below the water line is a water column, and every dry neighbour of the basin
+        // stands at or above the line, walling the water in. Sampling the whole pond area
+        // must never find a below-line floor that is not covered by the fill.
+        assertTrue(SpawnIslandMask.POND_WATER_Y < SpawnIslandMask.ISLAND_TOP_Y, "pond above the plateau");
+        assertTrue(SpawnIslandMask.POND_WATER_Y > SEA_LEVEL, "pond below the sea");
+        for (long seed : SEEDS) {
+            double[] center = SpawnIslandMask.pondCenter(seed);
+            assertTrue(Math.abs(Math.hypot(center[0], center[1]) - 46.0D) < 2.0D,
+                    "pond centre off its ring, seed " + seed);
+            int cx = (int) Math.round(center[0]);
+            int cz = (int) Math.round(center[1]);
+            assertEquals(1.0D, SpawnIslandMask.pondBasinAt(seed, cx, cz), 0.01D,
+                    "pond centre is not deep basin, seed " + seed);
+            double centerFloor = SpawnIslandMask.ISLAND_TOP_Y
+                    + SpawnIslandMask.reliefAt(seed, cx, cz, 1.0D);
+            assertTrue(centerFloor <= SpawnIslandMask.POND_WATER_Y - 1.0D,
+                    "pond centre floor above the water line, seed " + seed);
+            double[] shore = SpawnIslandMask.stoneShoreCenter(seed);
+            assertTrue(Math.hypot(center[0] - shore[0], center[1] - shore[1]) >= 44.0D,
+                    "pond overlaps the quarry, seed " + seed);
+            for (int deg = 0; deg < 360; deg += 10) {
+                double rad = Math.toRadians(deg);
+                double ux = Math.cos(rad);
+                double uz = Math.sin(rad);
+                for (double d = 1.0D; d <= 34.0D; d += 0.5D) {
+                    int x = (int) Math.round(center[0] + ux * d);
+                    int z = (int) Math.round(center[1] + uz * d);
+                    if (SpawnIslandMask.pondBasinAt(seed, x, z) > 0.0D) {
+                        continue;
+                    }
+                    boolean touchesBasin = false;
+                    for (int ox = -1; ox <= 1 && !touchesBasin; ox++) {
+                        for (int oz = -1; oz <= 1; oz++) {
+                            if (SpawnIslandMask.pondBasinAt(seed, x + ox, z + oz) > 0.0D) {
+                                touchesBasin = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (touchesBasin) {
+                        double floor = SpawnIslandMask.ISLAND_TOP_Y
+                                + SpawnIslandMask.reliefAt(seed, x, z, 1.0D);
+                        assertTrue(floor >= SpawnIslandMask.POND_WATER_Y,
+                                "pond rim below the water line at (" + x + ", " + z
+                                        + "), seed " + seed);
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    void bayWidthsAndWallsVary() {
+        // Width, target depth and wall shape are drawn per bay, so islands carry coves and
+        // fjords side by side instead of one uniformly shaped notch repeated around the
+        // coast. Across the fixed seeds the widths must span a wide arc and the wall shapes
+        // must both appear.
+        double minHalfAngle = 999.0D;
+        double maxHalfAngle = 0.0D;
+        double minFalloff = 9.0D;
+        double maxFalloff = 0.0D;
+        for (long seed : SEEDS) {
+            for (double[] profile : SpawnIslandMask.bayProfiles(seed)) {
+                minHalfAngle = Math.min(minHalfAngle, Math.toDegrees(profile[1]));
+                maxHalfAngle = Math.max(maxHalfAngle, Math.toDegrees(profile[1]));
+                minFalloff = Math.min(minFalloff, profile[2]);
+                maxFalloff = Math.max(maxFalloff, profile[2]);
+            }
+        }
+        assertTrue(minHalfAngle <= 23.0D && maxHalfAngle >= 34.0D,
+                "bay widths do not vary: " + minHalfAngle + ".." + maxHalfAngle + " deg");
+        assertTrue(maxFalloff - minFalloff >= 0.5D,
+                "bay wall shapes do not vary: " + minFalloff + ".." + maxFalloff);
+    }
 }

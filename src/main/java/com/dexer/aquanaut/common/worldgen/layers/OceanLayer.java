@@ -36,7 +36,7 @@ public record OceanLayer(ResourceLocation id,
                         // coral and jelly provinces, so the mud zone sits at the same depth.
                         MixEntry.patch(ResourceLocation.fromNamespaceAndPath("aquanaut", "mud_zone"),
                                 0.5D, 40, -19, 9, 71L)
-                ), 3.0D),
+                ), 4.0D),
                 ResourceLocation.fromNamespaceAndPath("aquanaut", "reef_cap"),
                 true);
     }

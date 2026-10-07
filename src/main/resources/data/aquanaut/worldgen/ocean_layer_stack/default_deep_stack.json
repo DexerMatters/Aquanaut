@@ -40,7 +40,7 @@
         "blend_up": 2.0
       },
       "biomes": {
-        "horizontal_blend_quarts": 3.0,
+        "horizontal_blend_quarts": 4.0,
         "entries": [
           {
             "biome": "aquanaut:coral_forest",

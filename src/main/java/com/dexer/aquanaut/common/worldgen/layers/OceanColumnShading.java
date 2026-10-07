@@ -154,11 +154,15 @@ public final class OceanColumnShading {
             // here; seeded vanilla-sand patches speckle the grass so the ground is not a
             // perfect disc.
             if (depth == 0) {
-                if (com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.sandPatchAt(
-                                plan.islandSeed(), plan.blockX(), plan.blockZ())
-                        || com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.pondBasinAt(
-                                plan.islandSeed(), plan.blockX(), plan.blockZ()) > 0.0D) {
+                if (com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.pondBasinAt(
+                        plan.islandSeed(), plan.blockX(), plan.blockZ()) > 0.0D
+                        || com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.sandPatchAt(
+                                plan.islandSeed(), plan.blockX(), plan.blockZ())) {
                     return Blocks.SAND.defaultBlockState();
+                }
+                if (com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.cragStoneAt(
+                        plan.islandSeed(), plan.blockX(), plan.blockZ())) {
+                    return Blocks.STONE.defaultBlockState();
                 }
                 return Blocks.GRASS_BLOCK.defaultBlockState();
             }

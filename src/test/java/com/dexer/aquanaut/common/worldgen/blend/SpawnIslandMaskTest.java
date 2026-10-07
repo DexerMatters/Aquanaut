@@ -561,4 +561,72 @@ class SpawnIslandMaskTest {
         assertTrue(maxFalloff - minFalloff >= 0.5D,
                 "bay wall shapes do not vary: " + minFalloff + ".." + maxFalloff);
     }
+
+    @Test
+    void harborInletCutsTheCoastDeepIntoTheIsland() {
+        // The first bay of every island is a harbour inlet: a narrow, deep notch the sea
+        // pours through. Its profile must stay inside the inlet ranges, and its waterline
+        // must cut well deeper than every ordinary bay's.
+        for (long seed : SEEDS) {
+            double[][] profiles = SpawnIslandMask.bayProfiles(seed);
+            assertTrue(Math.toDegrees(profiles[0][1]) <= 16.0D,
+                    "harbour inlet mouth too wide, seed " + seed);
+            assertTrue(profiles[0][0] <= 48.0D, "harbour inlet not deep, seed " + seed);
+            double[] bays = SpawnIslandMask.bayCenterAngles(seed);
+            int inletWaterline = waterlineAlong(seed, bays[0]);
+            assertTrue(inletWaterline <= 78,
+                    "harbour inlet does not cut deep, seed " + seed + ": " + inletWaterline);
+            for (int i = 1; i < bays.length; i++) {
+                assertTrue(waterlineAlong(seed, bays[i]) >= inletWaterline + 5,
+                        "harbour inlet is not the deepest bay, seed " + seed);
+            }
+        }
+    }
+
+    @Test
+    void cragsBreakThePlateauGrassland() {
+        // Rocky outcrops speckle the outer plateau as bare stone knobs lifted a few blocks;
+        // the flat building core stays clean, and the pond keeps its sand bed.
+        for (long seed : SEEDS) {
+            int crags = 0;
+            double maxCragRelief = 0.0D;
+            for (int x = -100; x <= 100; x += 2) {
+                for (int z = -100; z <= 100; z += 2) {
+                    if (Math.hypot(x, z) > 95) {
+                        continue;
+                    }
+                    if (SpawnIslandMask.cragStoneAt(seed, x, z)) {
+                        crags++;
+                        maxCragRelief = Math.max(maxCragRelief,
+                                SpawnIslandMask.reliefAt(seed, x, z, 1.0D));
+                    }
+                }
+            }
+            assertTrue(crags >= 50, "no outcrops on the plateau, seed " + seed + ": " + crags);
+            assertTrue(maxCragRelief >= 1.5D,
+                    "outcrops do not rise, seed " + seed + ": " + maxCragRelief);
+            for (int x = -15; x <= 15; x++) {
+                for (int z = -15; z <= 15; z++) {
+                    assertFalse(SpawnIslandMask.cragStoneAt(seed, x, z),
+                            "outcrop in the flat building core, seed " + seed);
+                }
+            }
+            double[] pond = SpawnIslandMask.pondCenter(seed);
+            assertFalse(SpawnIslandMask.cragStoneAt(seed,
+                            (int) Math.round(pond[0]), (int) Math.round(pond[1])),
+                    "outcrop in the pond bowl, seed " + seed);
+        }
+    }
+
+    private static int waterlineAlong(long seed, double bearing) {
+        int waterline = 0;
+        for (int d = 30; d <= 300; d++) {
+            int x = (int) Math.round(Math.cos(bearing) * d);
+            int z = (int) Math.round(Math.sin(bearing) * d);
+            if (SpawnIslandMask.maskAt(seed, x, z) >= LAND_MASK) {
+                waterline = d;
+            }
+        }
+        return waterline;
+    }
 }

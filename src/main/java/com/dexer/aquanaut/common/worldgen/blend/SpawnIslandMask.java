@@ -55,7 +55,25 @@ public final class SpawnIslandMask {
      * Smallest radius that is still fully emerged from the coast field alone; sea bays clamp
      * the coastline further in, down to {@link #BAY_FLOOR}.
      */
-    public static final double MIN_PLATEAU_RADIUS = COAST_MEAN_RADIUS - COAST_AMPLITUDE;
+    /**
+     * The harbour inlet: the first bay of every island is drawn as a narrow, deep notch — a
+     * genuine gap in the coastline the sea pours through — instead of an ordinary broad bay.
+     * Its target sits below {@link #BAY_FLOOR}, so its waterline cuts roughly seventy blocks
+     * deeper into the island than the surrounding coast.
+     */
+    private static final double BAY_INLET_TARGET_MIN = 40.0D;
+    private static final double BAY_INLET_TARGET_SPREAD = 8.0D;
+    private static final double BAY_INLET_HALF_ANGLE_MIN = 9.0D;
+    private static final double BAY_INLET_HALF_ANGLE_SPREAD = 6.0D;
+    private static final double BAY_INLET_FALLOFF_MIN = 0.5D;
+    private static final double BAY_INLET_FALLOFF_SPREAD = 0.4D;
+    /**
+     * Smallest radius that is still fully emerged from the coast field and its ordinary sea
+     * bays; the harbour inlet clamps the coastline further in, down to
+     * {@code BAY_INLET_TARGET_MIN}.
+     */
+    public static final double MIN_PLATEAU_RADIUS = Math.min(
+            COAST_MEAN_RADIUS - COAST_AMPLITUDE, BAY_INLET_TARGET_MIN);
     /** Beyond this radius the lift is exactly zero for every seed and direction. */
     public static final double MAX_FADE_RADIUS = COAST_MEAN_RADIUS + COAST_AMPLITUDE + FADE_MAX;
     /**
@@ -185,6 +203,14 @@ public final class SpawnIslandMask {
     private static final double DUNE_THRESHOLD = 0.5D;
     public static final double SAND_PATCH_CELL = 22.0D;
     private static final double SAND_PATCH_THRESHOLD = 0.7D;
+    /** Rocky outcrop field: stone knobs and low crags breaking the grassland texture. */
+    private static final long CRAG_SALT = 0xC7A6L;
+    private static final double CRAG_CELL = 15.0D;
+    private static final double CRAG_GATE = 0.45D;
+    private static final double CRAG_SPAN = 0.25D;
+    private static final double CRAG_LIFT = 3.0D;
+    /** Outcrops surface as bare rock above this lift weight. */
+    public static final double CRAG_STONE_AT = 0.7D;
     /** Cells and amplitude of the seeded hill/valley relief on the outer plateau. */
     private static final double HILL_BROAD_CELL = 110.0D;
     private static final double HILL_MID_CELL = 44.0D;
@@ -457,6 +483,14 @@ public final class SpawnIslandMask {
             profiles[i][2] = BAY_FALLOFF_MIN
                     + unit01(scramble(slot, 0x2DDL)) * BAY_FALLOFF_SPREAD;
         }
+        // The first bay is the island's harbour inlet: narrow, deep, and cut through the
+        // coastline so the open sea reaches far into the land.
+        long inletSlot = scramble(hash, 0x200L);
+        profiles[0][0] = BAY_INLET_TARGET_MIN + unit01(inletSlot) * BAY_INLET_TARGET_SPREAD;
+        profiles[0][1] = Math.toRadians(BAY_INLET_HALF_ANGLE_MIN
+                + unit01(scramble(inletSlot, 0x201L)) * BAY_INLET_HALF_ANGLE_SPREAD);
+        profiles[0][2] = BAY_INLET_FALLOFF_MIN
+                + unit01(scramble(inletSlot, 0x202L)) * BAY_INLET_FALLOFF_SPREAD;
         return profiles;
     }
 
@@ -675,6 +709,9 @@ public final class SpawnIslandMask {
         // need near-flat working ground, so the boost dies out with the shore weight while
         // the base relief keeps its usual light damping.
         relief += gate * cluster * HILL_CLUSTER_BOOST * (1.0D - shoreWeight);
+        // Rocky outcrops ride the same protections as every other relief term: damped in
+        // the quarry, faded at the coast, ramped off the flat core.
+        relief += cragWeightAt(islandSeed, blockX, blockZ) * CRAG_LIFT;
         relief *= 1.0D - 0.75D * shoreWeight;
         double coastMargin = coastFieldAt(islandSeed, blockX, blockZ) - dist;
         relief *= SoftMixNoise.smoothstep(coastMargin / HILL_COAST_FADE);
@@ -733,6 +770,29 @@ public final class SpawnIslandMask {
     public static boolean sandPatchAt(long islandSeed, int blockX, int blockZ) {
         return SoftMixNoise.valueNoise(blockX, blockZ, SAND_PATCH_CELL,
                 scramble(islandSeed, SAND_PATCH_SALT)) > SAND_PATCH_THRESHOLD;
+    }
+
+    /** Smooth weight of the rocky outcrop field, in [0, 1]. */
+    private static double cragWeightAt(long islandSeed, int blockX, int blockZ) {
+        double noise = SoftMixNoise.valueNoise(blockX, blockZ, CRAG_CELL,
+                scramble(islandSeed, CRAG_SALT));
+        return SoftMixNoise.smoothstep((noise - CRAG_GATE) / CRAG_SPAN);
+    }
+
+    /**
+     * Whether this plateau column surfaces as bare outcrop rock: the crag field is strong,
+     * the column lies outside the flat building core (matching the boundary the relief ramp
+     * uses), and it is not part of the pond bowl — the pond bed keeps its sand.
+     */
+    public static boolean cragStoneAt(long islandSeed, int blockX, int blockZ) {
+        if (cragWeightAt(islandSeed, blockX, blockZ) < CRAG_STONE_AT
+                || pondBasinAt(islandSeed, blockX, blockZ) > 0.0D) {
+            return false;
+        }
+        double dist = Math.sqrt((double) blockX * blockX + (double) blockZ * blockZ);
+        double wobble = (SoftMixNoise.valueNoise(blockX, blockZ, FLAT_EDGE_CELL,
+                scramble(islandSeed, FLAT_EDGE_SALT)) + 1.0D) * 0.5D;
+        return dist > FLAT_RADIUS * (0.75D + 0.5D * wobble);
     }
 
     /**

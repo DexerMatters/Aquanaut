@@ -2,6 +2,7 @@ package com.dexer.aquanaut.mixin;
 
 import com.dexer.aquanaut.common.worldgen.CrystalNestTerrain;
 import com.dexer.aquanaut.common.worldgen.MiddleLevelOceanPlacement;
+import com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask;
 import com.dexer.aquanaut.common.worldgen.layers.BiomeRewriter;
 import com.dexer.aquanaut.common.worldgen.layers.OceanChunkSampler;
 import com.dexer.aquanaut.common.worldgen.layers.OceanColumnPlanner;
@@ -19,6 +20,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.NaturalSpawner;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
@@ -29,11 +31,14 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.levelgen.Aquifer;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseChunk;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.RandomSupport;
 import net.minecraft.world.level.levelgen.WorldOptions;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -251,6 +256,37 @@ public abstract class NoiseBasedChunkGeneratorMixin {
                 dimProbe.cellWidth(), dimProbe.cellHeight())) {
             ci.cancel();
         }
+    }
+
+    /**
+     * Runs the vanilla herd pass against the island surface biome for chunks the island mask
+     * claims. Vanilla samples the biome at build-limit height, which the water world preset
+     * fills with climate ocean biomes whose creature list is empty — the island would
+     * otherwise never receive its initial animal herds (passive mobs only spawn in this
+     * pass, never replenish naturally). The random derivation replicates vanilla exactly.
+     */
+    @Inject(method = "spawnOriginalMobs", at = @At("HEAD"), cancellable = true, remap = false)
+    private void aquanaut$islandOriginalMobs(WorldGenRegion level, CallbackInfo ci) {
+        if (!aquanaut$isWaterWorld() || this.settings.value().disableMobGeneration()) {
+            return;
+        }
+        OceanLayerStack stack = OceanLayerStacks.active();
+        if (stack == null || stack.layers().isEmpty()) {
+            return;
+        }
+        ChunkPos chunkPos = level.getCenter();
+        if (SpawnIslandMask.maskAt(level.getSeed(),
+                chunkPos.getMinBlockX() + 8, chunkPos.getMinBlockZ() + 8) <= 0.0D) {
+            return;
+        }
+        // Sample the rewritten island palette at the plateau surface (in the island biome
+        // band), not the raw climate ocean sitting at the build limit.
+        Holder<Biome> biome = level.getBiome(new BlockPos(chunkPos.getMinBlockX() + 8,
+                SpawnIslandMask.ISLAND_TOP_Y - 4, chunkPos.getMinBlockZ() + 8));
+        WorldgenRandom random = new WorldgenRandom(new LegacyRandomSource(RandomSupport.generateUniqueSeed()));
+        random.setDecorationSeed(level.getSeed(), chunkPos.getMinBlockX(), chunkPos.getMinBlockZ());
+        NaturalSpawner.spawnMobsForChunkGeneration(level, biome, chunkPos, random);
+        ci.cancel();
     }
 
     private boolean aquanaut$isCoveredChunk(ChunkAccess chunk, StructureManager structureManager,

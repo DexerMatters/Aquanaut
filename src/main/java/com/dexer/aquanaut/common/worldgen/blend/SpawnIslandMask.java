@@ -73,6 +73,26 @@ public final class SpawnIslandMask {
     private static final double BAY_TARGET_SPREAD = 20.0D;
     private static final double BAY_MIN_HALF_ANGLE = 22.0D;
     private static final double BAY_HALF_ANGLE_SPREAD = 8.0D;
+    /**
+     * Angular gaps between bays are drawn independently (each in
+     * {@code BAY_GAP_MIN}..{@code BAY_GAP_MIN + BAY_GAP_SPREAD}) and normalized to the full
+     * circle around a seed-chosen rotation. A layout that lands within
+     * {@link #BAY_EVEN_TOLERANCE_DEG} of the even grid (180 degrees for two bays, 120 for
+     * three) is redrawn deterministically, so bay bearings never read as a symmetric pair or
+     * star. Every bay pair also keeps at least 60 degrees of separation.
+     */
+    private static final double BAY_GAP_MIN = 1.0D;
+    private static final double BAY_GAP_SPREAD = 1.0D;
+    private static final long BAY_GAP_SALT = 0x200L;
+    private static final long BAY_ROTATION_SALT = 0x2FFL;
+    private static final double BAY_EVEN_TOLERANCE_DEG = 30.0D;
+    private static final double BAY_MIN_SEPARATION_DEG = 60.0D;
+    /**
+     * Rejection budget for the bay layout. A two-bay draw is only accepted ~26% of the time
+     * (one gap must miss 180 degrees by 30 or more), so the budget is sized for the tail:
+     * 32 attempts leave the fallback unreachable for any realistic seed.
+     */
+    private static final int BAY_ANGLE_ATTEMPTS = 32;
     /** Salt of the seeded plateau/flat-core/beach modulation fields. */
     private static final long FLAT_EDGE_SALT = 0x7A31L;
     private static final long DUNE_SEED_SALT = 0xD0A7L;
@@ -136,6 +156,15 @@ public final class SpawnIslandMask {
     /** Radius (blocks) of the small lava pond and half-width of its ragged edge. */
     private static final double LAVA_POOL_RADIUS = 7.0D;
     private static final double LAVA_POOL_WOBBLE = 2.0D;
+    /**
+     * How far (radians) the pond centre may stray from the quarry centre: 0.02-0.06 rad is
+     * 1-3 blocks at the 50-block quarry distance, so the whole pond always sits in the deep
+     * stone core instead of poking out toward the grass fringe.
+     */
+    private static final double LAVA_POOL_AZIMUTH_MIN = 0.02D;
+    private static final double LAVA_POOL_AZIMUTH_SPREAD = 0.04D;
+    /** The pond may only open where the quarry is solid stone, so its basin is walled by rock. */
+    private static final double LAVA_POOL_STONE_GATE = 0.85D;
 
     private SpawnIslandMask() {
     }
@@ -167,10 +196,17 @@ public final class SpawnIslandMask {
         return SoftMixNoise.smoothstep((STONE_SHORE_RADIUS + wobble - dist) / 6.0D);
     }
 
-    /** Whether this column is one of the small lava ponds sunken into the stony shore. */
+    /**
+     * Whether this column is one of the small lava ponds sunken into the deep-stone core of
+     * the stony shore. The pond centre stays within 1-3 blocks of the quarry centre and the
+     * waterline only opens where the quarry is solid stone ({@code weight >= 0.85}), so the
+     * lava is always walled by rock: no grass — and nothing flammable — can touch it, and
+     * the quarry's own wobble can no longer raise grass islands inside the pool.
+     */
     public static boolean lavaPoolAt(long islandSeed, int blockX, int blockZ) {
         double theta = unit01(scramble(islandSeed, STONE_SHORE_SALT)) * 2.0D * Math.PI;
-        double poolAngle = theta + 0.08D + unit01(scramble(islandSeed, LAVA_POOL_SALT)) * 0.10D;
+        double poolAngle = theta + LAVA_POOL_AZIMUTH_MIN
+                + unit01(scramble(islandSeed, LAVA_POOL_SALT)) * LAVA_POOL_AZIMUTH_SPREAD;
         double px = Math.cos(poolAngle) * STONE_SHORE_DISTANCE;
         double pz = Math.sin(poolAngle) * STONE_SHORE_DISTANCE;
         double dx = blockX - px;
@@ -179,7 +215,8 @@ public final class SpawnIslandMask {
         double wobble = SoftMixNoise.valueNoise(blockX, blockZ, 11.0D,
                 scramble(islandSeed, LAVA_POOL_SALT)) * LAVA_POOL_WOBBLE;
         double pool = SoftMixNoise.smoothstep((LAVA_POOL_RADIUS + wobble - dist) / 3.0D);
-        return pool >= 0.6D && stoneShoreWeight(islandSeed, blockX, blockZ) >= 0.55D;
+        return pool >= 0.6D
+                && stoneShoreWeight(islandSeed, blockX, blockZ) >= LAVA_POOL_STONE_GATE;
     }
 
     /**
@@ -234,7 +271,61 @@ public final class SpawnIslandMask {
     }
 
     /**
-     * Clamps 2-3 seed-placed sea bays into the coast field. Each bay owns an angular window
+     * Bearings (radians) of the island's 2-3 sea bays. The angular gaps are drawn
+     * independently from {@code BAY_GAP_MIN}..{@code BAY_GAP_MIN + BAY_GAP_SPREAD} and
+     * normalized to the full circle around a seed-chosen rotation. Draws that would land on
+     * the even grid — two bays near 180 degrees apart or three near 120 — are rejected and
+     * redrawn from the next salt slots, so the layout is guaranteed to read irregular while
+     * staying fully deterministic. {@link #applyBays} and {@link #hillDomeCenter} share it,
+     * so every consumer sees the same bay layout.
+     */
+    public static double[] bayCenterAngles(long islandSeed) {
+        long hash = scramble(islandSeed, BAY_SALT);
+        int count = BAY_MIN_COUNT + (int) ((hash >>> 33) % (BAY_MAX_COUNT - BAY_MIN_COUNT + 1));
+        double rotation = unit01(scramble(hash, BAY_ROTATION_SALT)) * 2.0D * Math.PI;
+        double[] angles = new double[count];
+        for (int attempt = 0; attempt < BAY_ANGLE_ATTEMPTS; attempt++) {
+            double[] gaps = new double[count];
+            double total = 0.0D;
+            for (int i = 0; i < count; i++) {
+                gaps[i] = BAY_GAP_MIN + unit01(
+                        scramble(hash, BAY_GAP_SALT + attempt * 16L + i)) * BAY_GAP_SPREAD;
+                total += gaps[i];
+            }
+            double accumulated = rotation;
+            for (int i = 0; i < count; i++) {
+                angles[i] = accumulated;
+                accumulated += gaps[i] / total * 2.0D * Math.PI;
+            }
+            if (baysSpreadIrregularly(angles)) {
+                break;
+            }
+        }
+        return angles;
+    }
+
+    /**
+     * Whether the bay layout is visibly irregular: every pair of neighbouring bays stays at
+     * least {@link #BAY_MIN_SEPARATION_DEG} apart, and at least one gap deviates from the
+     * even grid by {@link #BAY_EVEN_TOLERANCE_DEG} or more.
+     */
+    private static boolean baysSpreadIrregularly(double[] ascendingAngles) {
+        double even = 2.0D * Math.PI / ascendingAngles.length;
+        boolean deviates = false;
+        for (int i = 0; i < ascendingAngles.length; i++) {
+            double gap = i + 1 < ascendingAngles.length
+                    ? ascendingAngles[i + 1] - ascendingAngles[i]
+                    : ascendingAngles[0] + 2.0D * Math.PI - ascendingAngles[i];
+            if (gap < Math.toRadians(BAY_MIN_SEPARATION_DEG)) {
+                return false;
+            }
+            deviates |= Math.abs(gap - even) >= Math.toRadians(BAY_EVEN_TOLERANCE_DEG);
+        }
+        return deviates;
+    }
+
+    /**
+     * Clamps the seed-placed sea bays into the coast field. Each bay owns an angular window
      * with a smooth falloff and pulls the field toward its own target depth
      * ({@link #BAY_FLOOR}..+spread), so its waterline pushes a guaranteed ~60-100 blocks
      * inland between two headlands for every seed. The notch factor depends only on the
@@ -243,15 +334,14 @@ public final class SpawnIslandMask {
      */
     private static double applyBays(long islandSeed, int blockX, int blockZ, double field) {
         long hash = scramble(islandSeed, BAY_SALT);
-        int count = BAY_MIN_COUNT + (int) ((hash >>> 33) % (BAY_MAX_COUNT - BAY_MIN_COUNT + 1));
+        double[] centers = bayCenterAngles(islandSeed);
         double angle = Math.atan2(blockZ, blockX);
-        for (int i = 0; i < count; i++) {
+        for (int i = 0; i < centers.length; i++) {
             long slot = scramble(hash, 0x100L + i);
-            double center = (i + 0.42D + 0.16D * unit01(slot)) * (2.0D * Math.PI / count);
             double target = BAY_FLOOR + unit01(slot >>> 17) * BAY_TARGET_SPREAD;
             double halfAngle = Math.toRadians(
                     BAY_MIN_HALF_ANGLE + unit01(slot >>> 34) * BAY_HALF_ANGLE_SPREAD);
-            double delta = Math.abs(angleDelta(angle, center));
+            double delta = Math.abs(angleDelta(angle, centers[i]));
             if (delta < halfAngle) {
                 double falloff = 1.0D - SoftMixNoise.smoothstep(delta / halfAngle);
                 field -= (field - target) * falloff;
@@ -293,13 +383,8 @@ public final class SpawnIslandMask {
      * coastline, so the dome needs no coast fade.
      */
     public static double[] hillDomeCenter(long islandSeed) {
-        long hash = scramble(islandSeed, BAY_SALT);
-        int count = BAY_MIN_COUNT + (int) ((hash >>> 33) % (BAY_MAX_COUNT - BAY_MIN_COUNT + 1));
-        double[] bays = new double[count];
-        for (int i = 0; i < count; i++) {
-            bays[i] = (i + 0.42D + 0.16D * unit01(scramble(hash, 0x100L + i)))
-                    * (2.0D * Math.PI / count);
-        }
+        double[] bays = bayCenterAngles(islandSeed);
+        int count = bays.length;
         long slot = scramble(islandSeed, HILL_DOME_SALT);
         double jitter = (unit01(slot) - 0.5D) * 0.35D;
         double[] shore = stoneShoreCenter(islandSeed);

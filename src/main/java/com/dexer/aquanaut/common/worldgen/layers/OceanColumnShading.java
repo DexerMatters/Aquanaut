@@ -104,8 +104,10 @@ public final class OceanColumnShading {
     /**
      * The water-world spawn island. The plateau core ({@code mask >= 1}) is vanilla land:
      * grass over three layers of dirt over limestone and the regional lithology, flat for
-     * building and able to hold trees. The beach flanks ({@code mask < 1}) keep the coral-sand
-     * shore. Below the surface, seeded cave voids open inside the solid seamount — strictly
+     * building and able to hold trees, speckled with vanilla sand patches. The beach flanks
+     * ({@code mask < 1}) are a vanilla sand shore: sand over sandstone, dug open exactly
+     * like a vanilla beach island — no mod blocks on any surface the player walks on.
+     * Below the surface, seeded cave voids open inside the solid seamount — strictly
      * dry by construction (see {@link com.dexer.aquanaut.common.worldgen.blend.SpawnIslandCaves}).
      */
     private static BlockState islandStateFor(OceanColumnPlanner.ColumnPlan plan, int blockY) {
@@ -149,11 +151,12 @@ public final class OceanColumnShading {
                 return floorStateFor(plan.blockX(), blockY, plan.blockZ(), floorY);
             }
             // The broad building plateau: vanilla-style grassland profile, trees take root
-            // here; seeded sand patches speckle the grass so the ground is not a perfect disc.
+            // here; seeded vanilla-sand patches speckle the grass so the ground is not a
+            // perfect disc.
             if (depth == 0) {
                 if (com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.sandPatchAt(
                         plan.islandSeed(), plan.blockX(), plan.blockZ())) {
-                    return BlockRegistry.CORAL_SAND.get().defaultBlockState();
+                    return Blocks.SAND.defaultBlockState();
                 }
                 return Blocks.GRASS_BLOCK.defaultBlockState();
             }
@@ -165,19 +168,13 @@ public final class OceanColumnShading {
             }
             return floorStateFor(plan.blockX(), blockY, plan.blockZ(), floorY);
         }
-        // The beach flanks keep the emerged-reef identity: coral sand over limestone.
-        if (depth == 0) {
-            double mud = SoftMixNoise.valueNoise(plan.blockX(), plan.blockZ(), 12, 0x5A4DL);
-            if (mud > 0.72D) {
-                return BlockRegistry.NUTRIENT_RICH_MUD.get().defaultBlockState();
-            }
-            return BlockRegistry.CORAL_SAND.get().defaultBlockState();
-        }
+        // The beach flanks are a vanilla sand shore: plain sand over sandstone, dug open
+        // exactly like a vanilla beach island — no coral sand, no nutrient mud.
         if (depth <= 2) {
-            return BlockRegistry.CORAL_SAND.get().defaultBlockState();
+            return Blocks.SAND.defaultBlockState();
         }
         if (depth <= 4) {
-            return BlockRegistry.LIMESTONE.get().defaultBlockState();
+            return Blocks.SANDSTONE.defaultBlockState();
         }
         return floorStateFor(plan.blockX(), blockY, plan.blockZ(), floorY);
     }

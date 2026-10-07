@@ -19,14 +19,16 @@ import com.dexer.aquanaut.common.worldgen.layers.SoftMixNoise;
  * The coastline is <b>not</b> a radius: {@code coastFieldAt} evaluates a domain-warped,
  * four-octave value-noise field around the mean coast radius — broad lobes swing whole
  * capes and bays, swells and coves meander them, a fine crinkle textures the shoreline —
- * and the fade width itself drifts per bearing, so neither the silhouette nor the shelf
- * contours around the island read as a circle. The blend only starts past the local coast
- * field, so the whole interior keeps the full plateau height - there is no moat between
- * the building core and the shore. On top of the plateau, {@link #reliefAt} raises seeded
- * hills and sinks valleys (suppressed inside the organic flat building core and before
- * the shoreline), {@link #duneLift} speckles one-block knolls, and {@link #sandPatchAt}
- * breaks the grass into an irregular speckle. All modulation is scrambled from the world
- * seed.
+ * and 2-3 seed-placed bays cut smooth angular notches deep into it, so the silhouette reads
+ * as capes, headlands and real water bays instead of a circle. The fade width itself drifts
+ * per bearing, so neither the silhouette nor the shelf contours around the island read as a
+ * circle. The blend only starts past the local coast field, so the whole interior keeps the
+ * full plateau height - there is no moat between the building core and the shore. On top of
+ * the plateau, {@link #reliefAt} raises seeded hills and sinks valleys (a few cluster-gated
+ * masses rise roughly twice the base amplitude; suppressed inside the organic flat building
+ * core and before the shoreline), {@link #duneLift} speckles one-block knolls, and
+ * {@link #sandPatchAt} breaks the grass into an irregular speckle. All modulation is
+ * scrambled from the world seed.
  * </p>
  */
 public final class SpawnIslandMask {
@@ -43,7 +45,7 @@ public final class SpawnIslandMask {
     /** Peak deviation (blocks) of the coastline from its mean radius. */
     public static final int COAST_AMPLITUDE = 56;
     /** Nominal fade width (blocks) from the local coastline down to untouched ocean floor. */
-    public static final int FADE_WIDTH = 144;
+    public static final int FADE_WIDTH = 176;
     /** Narrowest and widest the fade actually gets, per bearing and world seed. */
     public static final double FADE_MIN = FADE_WIDTH * 0.85D;
     public static final double FADE_MAX = FADE_WIDTH * 1.15D;
@@ -58,6 +60,19 @@ public final class SpawnIslandMask {
     private static final long COAST_FIELD_SALT = 0x51A0C1A7L;
     private static final long COAST_WARP_SALT = 0x1B2CL;
     private static final long FADE_WIDTH_SALT = 0xFADE1L;
+    /** Salt and geometry of the seed-placed sea bays carved into the coast field. */
+    private static final long BAY_SALT = 0xBA7E1L;
+    private static final int BAY_MIN_COUNT = 2;
+    private static final int BAY_MAX_COUNT = 3;
+    /**
+     * Every bay clamps the coast field down to its own target depth ({@link #BAY_FLOOR}..
+     * {@code BAY_FLOOR + BAY_TARGET_SPREAD}), so the waterline cut is guaranteed deep for
+     * every seed no matter how high the coast octaves ride at that bearing.
+     */
+    private static final double BAY_FLOOR = 52.0D;
+    private static final double BAY_TARGET_SPREAD = 20.0D;
+    private static final double BAY_MIN_HALF_ANGLE = 22.0D;
+    private static final double BAY_HALF_ANGLE_SPREAD = 8.0D;
     /** Salt of the seeded plateau/flat-core/beach modulation fields. */
     private static final long FLAT_EDGE_SALT = 0x7A31L;
     private static final long DUNE_SEED_SALT = 0xD0A7L;
@@ -66,6 +81,19 @@ public final class SpawnIslandMask {
     private static final long HILL_BROAD_SALT = 0x11AAL;
     private static final long HILL_MID_SALT = 0x22BBL;
     private static final long HILL_FINE_SALT = 0x33CCL;
+    /** Salt, cell and gate of the hill-cluster field that raises a few dome-shaped masses. */
+    private static final long HILL_CLUSTER_SALT = 0x44DDL;
+    private static final double HILL_CLUSTER_CELL = 80.0D;
+    private static final double HILL_CLUSTER_GATE = 0.30D;
+    private static final double HILL_CLUSTER_SPAN = 0.30D;
+    public static final double HILL_CLUSTER_BOOST = 22.0D;
+    /** Hard ceiling of the plateau relief, so hill tops stay inside the claimed biome band. */
+    public static final double HILL_MAX_HEIGHT = 26.0D;
+    /** Salt, geometry and reach of the guaranteed hill dome every island carries. */
+    private static final long HILL_DOME_SALT = 0x48111L;
+    private static final double HILL_DOME_DIST = 46.0D;
+    private static final double HILL_DOME_RADIUS = 40.0D;
+    public static final double HILL_DOME_AMPLITUDE = 13.0D;
     /** Noise-space cells of the four warped coastline octaves: lobes, swells, coves, crinkle. */
     private static final double COAST_BROAD_CELL = 260.0D;
     private static final double COAST_SWELL_CELL = 110.0D;
@@ -85,7 +113,7 @@ public final class SpawnIslandMask {
     private static final double HILL_BROAD_CELL = 110.0D;
     private static final double HILL_MID_CELL = 44.0D;
     private static final double HILL_FINE_CELL = 17.0D;
-    /** Peak height (blocks) of a fully-ramped hill above the plateau target. */
+    /** Base peak height (blocks) of a fully-ramped hill; cluster hills reach amplitude + boost. */
     public static final double HILL_AMPLITUDE = 12.0D;
     /** Deepest valley floor (blocks) below the plateau, so dips stay above sea level 63. */
     public static final double HILL_MAX_DIP = 6.0D;
@@ -184,8 +212,9 @@ public final class SpawnIslandMask {
 
     /**
      * The local coastline radius: mean radius plus a domain-warped, four-octave excursion of
-     * up to {@link #COAST_AMPLITUDE} blocks. The broad lobe octave (260-block cells) swings
-     * whole capes and bays, the swell and cove octaves meander them, and the crinkle octave
+     * up to {@link #COAST_AMPLITUDE} blocks, minus 2-3 seed-placed bay notches that cut real
+     * water bays between headlands. The broad lobe octave (260-block cells) swings whole
+     * capes and bays, the swell and cove octaves meander them, and the crinkle octave
      * textures the shoreline — together with the warp this keeps the silhouette and every
      * shelf contour off any circle. Pure in (seed, x, z); the blend starts only past this
      * field, so the whole interior holds the full plateau height.
@@ -199,8 +228,48 @@ public final class SpawnIslandMask {
         double swells = SoftMixNoise.valueNoise(warped[0], warped[1], COAST_SWELL_CELL, fieldSeed ^ 0x9E3L);
         double coves = SoftMixNoise.valueNoise(warped[0], warped[1], COAST_COVE_CELL, fieldSeed ^ 0x51DL);
         double crinkle = SoftMixNoise.valueNoise(warped[0], warped[1], COAST_CRINKLE_CELL, fieldSeed ^ 0x77L);
-        return COAST_MEAN_RADIUS
+        double field = COAST_MEAN_RADIUS
                 + COAST_AMPLITUDE * (0.42D * lobes + 0.30D * swells + 0.20D * coves + 0.08D * crinkle);
+        return applyBays(islandSeed, blockX, blockZ, field);
+    }
+
+    /**
+     * Clamps 2-3 seed-placed sea bays into the coast field. Each bay owns an angular window
+     * with a smooth falloff and pulls the field toward its own target depth
+     * ({@link #BAY_FLOOR}..+spread), so its waterline pushes a guaranteed ~60-100 blocks
+     * inland between two headlands for every seed. The notch factor depends only on the
+     * bearing, so the bay walls add no radial slope — the flank gradient stays the blend's
+     * own.
+     */
+    private static double applyBays(long islandSeed, int blockX, int blockZ, double field) {
+        long hash = scramble(islandSeed, BAY_SALT);
+        int count = BAY_MIN_COUNT + (int) ((hash >>> 33) % (BAY_MAX_COUNT - BAY_MIN_COUNT + 1));
+        double angle = Math.atan2(blockZ, blockX);
+        for (int i = 0; i < count; i++) {
+            long slot = scramble(hash, 0x100L + i);
+            double center = (i + 0.42D + 0.16D * unit01(slot)) * (2.0D * Math.PI / count);
+            double target = BAY_FLOOR + unit01(slot >>> 17) * BAY_TARGET_SPREAD;
+            double halfAngle = Math.toRadians(
+                    BAY_MIN_HALF_ANGLE + unit01(slot >>> 34) * BAY_HALF_ANGLE_SPREAD);
+            double delta = Math.abs(angleDelta(angle, center));
+            if (delta < halfAngle) {
+                double falloff = 1.0D - SoftMixNoise.smoothstep(delta / halfAngle);
+                field -= (field - target) * falloff;
+            }
+        }
+        return field;
+    }
+
+    /** Signed angular distance from {@code a} to {@code b}, wrapped into [-π, π]. */
+    private static double angleDelta(double a, double b) {
+        double delta = a - b;
+        while (delta > Math.PI) {
+            delta -= 2.0D * Math.PI;
+        }
+        while (delta < -Math.PI) {
+            delta += 2.0D * Math.PI;
+        }
+        return delta;
     }
 
     /**
@@ -216,14 +285,91 @@ public final class SpawnIslandMask {
     }
 
     /**
+     * Centre of the guaranteed hill dome: every island carries one tall hill. Candidates are
+     * the midpoints between consecutive sea bays and their antipodes — the bearings with the
+     * largest clearance from every bay — filtered to stay clear of bay mouths, then scored
+     * against the stony-shore quarry so the dome never collapses into it. The fixed radius
+     * 46 sits just outside the widest flat-core wobble and well inside the tightest
+     * coastline, so the dome needs no coast fade.
+     */
+    public static double[] hillDomeCenter(long islandSeed) {
+        long hash = scramble(islandSeed, BAY_SALT);
+        int count = BAY_MIN_COUNT + (int) ((hash >>> 33) % (BAY_MAX_COUNT - BAY_MIN_COUNT + 1));
+        double[] bays = new double[count];
+        for (int i = 0; i < count; i++) {
+            bays[i] = (i + 0.42D + 0.16D * unit01(scramble(hash, 0x100L + i)))
+                    * (2.0D * Math.PI / count);
+        }
+        long slot = scramble(islandSeed, HILL_DOME_SALT);
+        double jitter = (unit01(slot) - 0.5D) * 0.35D;
+        double[] shore = stoneShoreCenter(islandSeed);
+        double[] best = null;
+        double bestScore = -Double.MAX_VALUE;
+        for (int i = 0; i < count; i++) {
+            double mid = bays[i] + 0.5D * angleDelta(bays[(i + 1) % count], bays[i]);
+            for (int j = 0; j < 2; j++) {
+                double angle = mid + (j == 0 ? jitter : Math.PI + jitter);
+                double clearance = Double.MAX_VALUE;
+                for (double bay : bays) {
+                    clearance = Math.min(clearance, Math.abs(angleDelta(angle, bay)));
+                }
+                if (clearance < Math.toRadians(BAY_MIN_HALF_ANGLE) + 0.12D) {
+                    continue;
+                }
+                int x = (int) Math.round(Math.cos(angle) * HILL_DOME_DIST);
+                int z = (int) Math.round(Math.sin(angle) * HILL_DOME_DIST);
+                double shoreDx = x - shore[0];
+                double shoreDz = z - shore[1];
+                // The dome's skirt must not reach the quarry, whose lava ponds need flat ground.
+                if (shoreDx * shoreDx + shoreDz * shoreDz < 45.0D * 45.0D) {
+                    continue;
+                }
+                double score = Math.min(clearance, 1.0D)
+                        - stoneShoreWeight(islandSeed, x, z);
+                if (score > bestScore) {
+                    bestScore = score;
+                    best = new double[]{x, z};
+                }
+            }
+        }
+        if (best != null) {
+            return best;
+        }
+        // Unreachable while bay separations stay above ~100 degrees; fall back to the first
+        // bay midpoint so the dome always has a deterministic centre.
+        double mid = bays[0] + 0.5D * angleDelta(bays[1 % count], bays[0]);
+        return new double[]{Math.cos(mid) * HILL_DOME_DIST, Math.sin(mid) * HILL_DOME_DIST};
+    }
+
+    /** Single-entry memo of {@link #hillDomeCenter}: the seed is constant for a whole world. */
+    private static long domeCacheSeed;
+    private static double[] domeCacheCenter;
+
+    private static double[] hillDomeCenterCached(long islandSeed) {
+        if (!domeCacheSet(islandSeed)) {
+            // Benign race: the computation is pure, threads may just redo it.
+            domeCacheCenter = hillDomeCenter(islandSeed);
+            domeCacheSeed = islandSeed;
+        }
+        return domeCacheCenter;
+    }
+
+    private static boolean domeCacheSet(long islandSeed) {
+        return domeCacheCenter != null && domeCacheSeed == islandSeed;
+    }
+
+    /**
      * Seeded relief of the plateau: real hills and valleys outside the organic flat building
      * core, from three octaves (a few broad hill masses, mid valley structure, fine texture).
-     * Hill tops reach {@link #HILL_AMPLITUDE} blocks above the plateau; valley floors are
-     * clamped at {@link #HILL_MAX_DIP} below it, so no dip can fall under sea level 63. The
-     * relief ramps up over {@link #HILL_RISE_WIDTH} out of the flat core, is damped inside the
-     * stony-shore quarry (its lava ponds need near-flat ground), and sinks back to shore
-     * level over {@link #HILL_COAST_FADE} ahead of the local coastline so no hill is sheared
-     * off at the beach. Zero on the beach flanks; the cliff guard downstream relaxes slopes.
+     * A broad cluster field gates a boost where its noise peaks, and every island is also
+     * guaranteed one tall dome-shaped hill between its sea bays (see
+     * {@link #hillDomeCenter}); the total is capped at {@link #HILL_MAX_HEIGHT} so hill tops
+     * stay inside the claimed biome band. Valley floors are clamped at {@link #HILL_MAX_DIP}
+     * below the plateau, so no dip can fall under sea level 63. The relief ramps up over
+     * {@link #HILL_RISE_WIDTH} out of the flat core, is damped inside the stony-shore quarry
+     * (its lava ponds need near-flat ground), and sinks back to shore level over
+     * {@link #HILL_COAST_FADE} ahead of the local coastline so no hill is sheared off at the
+     * beach. Zero on the beach flanks; the cliff guard downstream relaxes slopes.
      */
     public static double reliefAt(long islandSeed, int blockX, int blockZ, double mask) {
         if (mask < 1.0D) {
@@ -244,11 +390,27 @@ public final class SpawnIslandMask {
         double fine = SoftMixNoise.valueNoise(blockX, blockZ, HILL_FINE_CELL,
                 scramble(islandSeed, HILL_FINE_SALT));
         double shaped = 0.55D * broad + 0.30D * mid + 0.15D * fine;
+        double cluster = SoftMixNoise.valueNoise(blockX, blockZ, HILL_CLUSTER_CELL,
+                scramble(islandSeed, HILL_CLUSTER_SALT));
+        double gate = SoftMixNoise.smoothstep((cluster - HILL_CLUSTER_GATE) / HILL_CLUSTER_SPAN);
+        double shoreWeight = stoneShoreWeight(islandSeed, blockX, blockZ);
         double relief = Math.max(shaped * HILL_AMPLITUDE, -HILL_MAX_DIP);
-        relief *= 1.0D - 0.75D * stoneShoreWeight(islandSeed, blockX, blockZ);
+        // The cluster boost must not pile hills into the stony-shore quarry: its lava ponds
+        // need near-flat working ground, so the boost dies out with the shore weight while
+        // the base relief keeps its usual light damping.
+        relief += gate * cluster * HILL_CLUSTER_BOOST * (1.0D - shoreWeight);
+        relief *= 1.0D - 0.75D * shoreWeight;
         double coastMargin = coastFieldAt(islandSeed, blockX, blockZ) - dist;
         relief *= SoftMixNoise.smoothstep(coastMargin / HILL_COAST_FADE);
-        return relief * ramp;
+        relief *= ramp;
+        // The guaranteed hill dome rides on top. Its centre is pinned outside the flat core
+        // and clear of every bay and the quarry, and the mask gate sinks everything past the
+        // shoreline, so the dome needs neither coast fade nor extra shaping.
+        double[] dome = hillDomeCenterCached(islandSeed);
+        double domeDist = Math.hypot(blockX - dome[0], blockZ - dome[1]);
+        double domeRise = SoftMixNoise.smoothstep((HILL_DOME_RADIUS - domeDist) / HILL_DOME_RADIUS);
+        relief += domeRise * HILL_DOME_AMPLITUDE * ramp;
+        return Math.min(relief, HILL_MAX_HEIGHT);
     }
 
     /**
@@ -286,16 +448,16 @@ public final class SpawnIslandMask {
      * Blends the raw geological floor toward the island plateau. The target is
      * {@code max(rawFloor, ISLAND_TOP_Y)} so the mask never lowers ground that already rises
      * above the plateau on its own (e.g. volcanic relief riding the same field). The blend
-     * runs on the squared mask, which steepens the drop just past the coastline and keeps
-     * the sandy beach a narrow fringe instead of a wide shelf.
+     * runs linearly in the mask: the smoothstep mask's flat shoulders neutralize both kinks,
+     * so the whole flank keeps one gentle, even slope — a long shallow beach instead of the
+     * steep wall the squared mask used to pile up just past the waterline.
      */
     public static double blendFloor(double rawFloor, double mask) {
         if (mask <= 0.0D) {
             return rawFloor;
         }
-        double steepened = mask * mask;
         double target = Math.max(rawFloor, ISLAND_TOP_Y);
-        return SoftMixNoise.lerp(steepened, rawFloor, target);
+        return SoftMixNoise.lerp(mask, rawFloor, target);
     }
 
     /** SplitMix64-style scramble so unrelated world seeds give unrelated island characters. */

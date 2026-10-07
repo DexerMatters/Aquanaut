@@ -14,25 +14,29 @@ import java.util.Map;
  * Writes the stereoscopic biome stack into section palettes for supported quart columns.
  * Only configured rewrite Y bands (plus soft margins) are touched — not the full world height.
  * Spawn-island columns additionally get land surface biomes that match the generated terrain
- * (windswept hills over the hill country, sunflower plains over the low plateau, beach on the
- * flanks) so vanilla features grow trees, grass and flowers there.
+ * (island hills over the hill country, island plains over the low plateau, beach on the
+ * flanks) so vanilla features grow trees, grass and flowers there. The island biomes are
+ * mod-owned copies of their vanilla counterparts with the lava lakes, lava springs and
+ * vanilla carvers stripped out, so the island keeps vanilla flora and fauna while its
+ * caves stay dry and analytically carved.
  */
 public final class BiomeRewriter {
     /** Lowest quart Y the island surface biome claims (block Y 40, the beach shelf). */
     static final int ISLAND_MIN_QUART_Y = 10;
     /**
-     * Highest quart Y the island surface biome claims: hill tops reach plateau 70 + hill
-     * amplitude 12 + dune 1 = block Y 83, quart 20, plus one band of margin.
+     * Highest quart Y the island surface biome claims: clustered hill tops reach plateau
+     * 70 + boosted hill amplitude 26 + dune 1 = block Y 97, quart 24, plus one band of
+     * margin.
      */
-    static final int ISLAND_MAX_QUART_Y = 21;
+    static final int ISLAND_MAX_QUART_Y = 25;
     private static final ResourceLocation ISLAND_SURFACE_BIOME =
-            ResourceLocation.fromNamespaceAndPath("minecraft", "sunflower_plains");
+            ResourceLocation.fromNamespaceAndPath("aquanaut", "island_plains");
     private static final ResourceLocation ISLAND_HILL_BIOME =
-            ResourceLocation.fromNamespaceAndPath("minecraft", "windswept_hills");
+            ResourceLocation.fromNamespaceAndPath("aquanaut", "island_hills");
     private static final ResourceLocation ISLAND_SHORE_BIOME =
-            ResourceLocation.fromNamespaceAndPath("minecraft", "beach");
+            ResourceLocation.fromNamespaceAndPath("aquanaut", "island_beach");
     private static final ResourceLocation ISLAND_STONY_SHORE_BIOME =
-            ResourceLocation.fromNamespaceAndPath("minecraft", "stony_shore");
+            ResourceLocation.fromNamespaceAndPath("aquanaut", "island_stony_shore");
 
     private BiomeRewriter() {
     }

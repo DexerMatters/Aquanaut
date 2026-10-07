@@ -13,7 +13,7 @@ class BiomeRewriterIslandSurfaceTest {
     void inactiveOutsideTheIslandSurfaceBand() {
         assertNull(BiomeRewriter.islandSurfaceAt(false, SEED, 0, 0, 16), "island biome while inactive");
         assertNull(BiomeRewriter.islandSurfaceAt(true, SEED, 0, 0, 9), "island biome below the band");
-        assertNull(BiomeRewriter.islandSurfaceAt(true, SEED, 0, 0, 22), "island biome above the band");
+        assertNull(BiomeRewriter.islandSurfaceAt(true, SEED, 0, 0, 26), "island biome above the band");
     }
 
     @Test

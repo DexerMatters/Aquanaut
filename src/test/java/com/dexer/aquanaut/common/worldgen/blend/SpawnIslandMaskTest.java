@@ -16,8 +16,8 @@ class SpawnIslandMaskTest {
     private static final int SAFE_PLATEAU_RADIUS = 32;
     /** Comfortably inside the organic flat building core (never below FLAT_RADIUS * 0.75). */
     private static final int GUARANTEED_FLAT_RADIUS = 18;
-    /** Land threshold of the squared blend: floor reaches sea level at mask 0.9644 (raw -30). */
-    private static final double LAND_MASK = 0.9644D;
+    /** Land threshold of the linear blend: floor reaches sea level at mask 0.93 (raw -30). */
+    private static final double LAND_MASK = 0.93D;
     /** Every world seed the per-seed property tests walk. */
     private static final long[] SEEDS = {0L, 1L, 42L, -99L, 0x9E3779B97F4A7C15L};
 
@@ -148,7 +148,7 @@ class SpawnIslandMaskTest {
                     double mask = SpawnIslandMask.maskAt(seed, x, z);
                     double relief = SpawnIslandMask.reliefAt(seed, x, z, mask);
                     assertTrue(relief >= -SpawnIslandMask.HILL_MAX_DIP - EPS
-                                    && relief <= SpawnIslandMask.HILL_AMPLITUDE + EPS,
+                                    && relief <= SpawnIslandMask.HILL_MAX_HEIGHT + EPS,
                             "relief out of range at (" + x + ", " + z + "): " + relief);
                     if (mask < 1.0D) {
                         assertEquals(0.0D, relief, EPS, "relief on the beach flank");
@@ -287,10 +287,11 @@ class SpawnIslandMaskTest {
 
     @Test
     void floorSlopeStaysGentleThroughTheFade() {
-        // The squared blend's steepest mid-flank swings ~2.2 blocks per block, and the
-        // lobed coast field's gradient plus integer ray sampling add on top. The bound
-        // guards against tearing (multi-block jumps); sustained slopes beyond 1.0 remain
-        // CliffGuard's contract on the guarded grid.
+        // The linear blend keeps the whole flank near one gentle grade (~0.8 blocks per
+        // block at FADE_WIDTH 176); the bay notches and the coast field's own gradient add
+        // on top, and integer ray sampling jitters the steps. The bound guards against
+        // tearing (multi-block jumps); sustained slopes remain CliffGuard's contract on the
+        // guarded grid.
         for (long seed : SEEDS) {
             for (int deg = 0; deg < 180; deg += 22) {
                 double rad = Math.toRadians(deg);
@@ -301,12 +302,92 @@ class SpawnIslandMaskTest {
                     int x = (int) Math.round(ux * d);
                     int z = (int) Math.round(uz * d);
                     double floor = SpawnIslandMask.blendFloor(RAW_FLOOR, SpawnIslandMask.maskAt(seed, x, z));
-                    assertTrue(Math.abs(floor - previous) <= 4.5D,
+                    assertTrue(Math.abs(floor - previous) <= 3.0D,
                             "cliff in the blended island flank on the " + deg + " deg ray at d=" + d
                                     + ", seed " + seed);
                     previous = floor;
                 }
             }
+        }
+    }
+
+    @Test
+    void clusterHillsRiseAboveTheBaseRelief() {
+        // A handful of hill masses must rise well past the base 12-block amplitude, so the
+        // plateau reads as distinct hills instead of uniform bumps: every island carries the
+        // guaranteed dome between its bays, and most seeds also grow boosted cluster hills.
+        // The seeds are fixed, so the thresholds are calibrated with margin.
+        int tallSeeds = 0;
+        for (long seed : SEEDS) {
+            double maxRelief = 0.0D;
+            for (int x = -110; x <= 110; x += 3) {
+                for (int z = -110; z <= 110; z += 3) {
+                    maxRelief = Math.max(maxRelief, SpawnIslandMask.reliefAt(seed, x, z, 1.0D));
+                }
+            }
+            assertTrue(maxRelief >= 10.0D, "no real hill on the plateau, seed " + seed);
+            if (maxRelief >= 14.0D) {
+                tallSeeds++;
+            }
+            // The guaranteed dome must rise on its own ground, for every seed.
+            double[] dome = SpawnIslandMask.hillDomeCenter(seed);
+            double domeRelief = SpawnIslandMask.reliefAt(seed,
+                    (int) Math.round(dome[0]), (int) Math.round(dome[1]), 1.0D);
+            assertTrue(domeRelief >= 8.0D, "guaranteed hill dome collapsed, seed " + seed);
+        }
+        assertTrue(tallSeeds >= 3, "tall hills missing on most seeds: " + tallSeeds + "/5");
+    }
+
+    @Test
+    void coastCutsDeepBaysIntoTheMeanCircle() {
+        // Every island must carry real water bays: angular clusters where the waterline
+        // pushes far inland of the mean headland line. The bay clamp guarantees a waterline
+        // of at most bay target + fade * 0.3 (≈ 124); the mean headland line sits near
+        // coast field + fade * 0.25, so anything landing at or inside mean + 20 is a bay
+        // cut of 60+ blocks that no coast octave can swamp.
+        int bayLine = SpawnIslandMask.COAST_MEAN_RADIUS + 20;
+        for (long seed : SEEDS) {
+            boolean[] bay = new boolean[360];
+            for (int deg = 0; deg < 360; deg++) {
+                double rad = Math.toRadians(deg);
+                double ux = Math.cos(rad);
+                double uz = Math.sin(rad);
+                int waterline = 0;
+                for (int d = 40; d <= 300; d++) {
+                    int x = (int) Math.round(ux * d);
+                    int z = (int) Math.round(uz * d);
+                    if (SpawnIslandMask.maskAt(seed, x, z) >= LAND_MASK) {
+                        waterline = d;
+                    }
+                }
+                assertTrue(waterline > 0, "no land on the " + deg + " deg ray, seed " + seed);
+                bay[deg] = waterline <= bayLine;
+            }
+            // Count circular runs of consecutive bay bearings, each at least 10 degrees wide.
+            java.util.ArrayList<Integer> runs = new java.util.ArrayList<>();
+            int run = 0;
+            for (int deg = 0; deg < 360; deg++) {
+                if (bay[deg]) {
+                    run++;
+                } else if (run > 0) {
+                    runs.add(run);
+                    run = 0;
+                }
+            }
+            if (run > 0) {
+                if (!runs.isEmpty() && bay[0]) {
+                    runs.set(0, runs.get(0) + run);
+                } else {
+                    runs.add(run);
+                }
+            }
+            int wideBays = 0;
+            for (int length : runs) {
+                if (length >= 10) {
+                    wideBays++;
+                }
+            }
+            assertTrue(wideBays >= 2, "island has only " + wideBays + " deep bays, seed " + seed);
         }
     }
 }

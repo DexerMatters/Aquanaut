@@ -152,6 +152,14 @@ public final class OceanChunkSampler {
                 }
             }
         }
+        if (!parentPresent && spawnIsland) {
+            // Island quart cells are rewritten to the mod-owned island biomes before the
+            // carvers status runs, so the surface probe no longer shows a parent biome on
+            // fully-land chunks. The island mask itself is the coverage claim there —
+            // without this, vanilla carvers would tunnel through the island core.
+            parentPresent = com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask
+                    .maskAt(islandSeed, chunkPos.getMinBlockX() + 8, chunkPos.getMinBlockZ() + 8) > 0.0D;
+        }
         if (!parentPresent) {
             return false;
         }

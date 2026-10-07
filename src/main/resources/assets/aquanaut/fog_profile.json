@@ -50,6 +50,27 @@
       "near": -1.0,
       "far": 40.0,
       "cast": 0.72
+    },
+    "aquanaut:island_plains": {
+      "__comment": "The spawn island's open air: no medium, the eye reaches like vanilla plains.",
+      "near": -4.0,
+      "far": 256.0,
+      "cast": 0.0
+    },
+    "aquanaut:island_hills": {
+      "near": -4.0,
+      "far": 256.0,
+      "cast": 0.0
+    },
+    "aquanaut:island_beach": {
+      "near": -4.0,
+      "far": 256.0,
+      "cast": 0.0
+    },
+    "aquanaut:island_stony_shore": {
+      "near": -4.0,
+      "far": 256.0,
+      "cast": 0.0
     }
   }
 }

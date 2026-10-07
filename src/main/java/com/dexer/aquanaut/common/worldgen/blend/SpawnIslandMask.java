@@ -17,14 +17,16 @@ import com.dexer.aquanaut.common.worldgen.layers.SoftMixNoise;
  *
  * <p>
  * The coastline is <b>not</b> a radius: {@code coastFieldAt} evaluates a domain-warped,
- * three-octave value-noise field around the mean coast radius, so bays and peninsulas
- * meander at three scales (broad swells, mid coves, fine crinkle) and no direction repeats
- * another. The blend only starts past the local coast field, so the whole interior keeps the
- * full plateau height - there is no moat between the building core and the shore. On top of
- * the plateau, {@link #reliefAt} raises seeded hills and sinks valleys (suppressed inside
- * the organic flat building core and before the shoreline), {@link #duneLift} speckles
- * one-block knolls, and {@link #sandPatchAt} breaks the grass into an irregular speckle.
- * All modulation is scrambled from the world seed.
+ * four-octave value-noise field around the mean coast radius — broad lobes swing whole
+ * capes and bays, swells and coves meander them, a fine crinkle textures the shoreline —
+ * and the fade width itself drifts per bearing, so neither the silhouette nor the shelf
+ * contours around the island read as a circle. The blend only starts past the local coast
+ * field, so the whole interior keeps the full plateau height - there is no moat between
+ * the building core and the shore. On top of the plateau, {@link #reliefAt} raises seeded
+ * hills and sinks valleys (suppressed inside the organic flat building core and before
+ * the shoreline), {@link #duneLift} speckles one-block knolls, and {@link #sandPatchAt}
+ * breaks the grass into an irregular speckle. All modulation is scrambled from the world
+ * seed.
  * </p>
  */
 public final class SpawnIslandMask {
@@ -39,20 +41,23 @@ public final class SpawnIslandMask {
     /** Mean coastline radius (blocks): the meandering coast field oscillates around it. */
     public static final int COAST_MEAN_RADIUS = 125;
     /** Peak deviation (blocks) of the coastline from its mean radius. */
-    public static final int COAST_AMPLITUDE = 40;
-    /** Fade width (blocks) from the local coastline down to untouched ocean floor. */
+    public static final int COAST_AMPLITUDE = 56;
+    /** Nominal fade width (blocks) from the local coastline down to untouched ocean floor. */
     public static final int FADE_WIDTH = 144;
+    /** Narrowest and widest the fade actually gets, per bearing and world seed. */
+    public static final double FADE_MIN = FADE_WIDTH * 0.85D;
+    public static final double FADE_MAX = FADE_WIDTH * 1.15D;
     /** Nominal radius at which the lift reaches zero on the mean outline. */
     public static final int FADE_RADIUS = COAST_MEAN_RADIUS + FADE_WIDTH;
     /** Smallest radius that is still fully emerged, in the tightest bay of any seed. */
     public static final double MIN_PLATEAU_RADIUS = COAST_MEAN_RADIUS - COAST_AMPLITUDE;
     /** Beyond this radius the lift is exactly zero for every seed and direction. */
-    public static final double MAX_FADE_RADIUS =
-            COAST_MEAN_RADIUS + COAST_AMPLITUDE + FADE_WIDTH;
+    public static final double MAX_FADE_RADIUS = COAST_MEAN_RADIUS + COAST_AMPLITUDE + FADE_MAX;
 
     /** Salt of the coast field ("ISLA") and of its domain warp. */
     private static final long COAST_FIELD_SALT = 0x51A0C1A7L;
     private static final long COAST_WARP_SALT = 0x1B2CL;
+    private static final long FADE_WIDTH_SALT = 0xFADE1L;
     /** Salt of the seeded plateau/flat-core/beach modulation fields. */
     private static final long FLAT_EDGE_SALT = 0x7A31L;
     private static final long DUNE_SEED_SALT = 0xD0A7L;
@@ -61,12 +66,15 @@ public final class SpawnIslandMask {
     private static final long HILL_BROAD_SALT = 0x11AAL;
     private static final long HILL_MID_SALT = 0x22BBL;
     private static final long HILL_FINE_SALT = 0x33CCL;
-    /** Noise-space cells of the three warped coastline octaves. */
-    private static final double COAST_BROAD_CELL = 150.0D;
-    private static final double COAST_MID_CELL = 64.0D;
-    private static final double COAST_FINE_CELL = 27.0D;
+    /** Noise-space cells of the four warped coastline octaves: lobes, swells, coves, crinkle. */
+    private static final double COAST_BROAD_CELL = 260.0D;
+    private static final double COAST_SWELL_CELL = 110.0D;
+    private static final double COAST_COVE_CELL = 46.0D;
+    private static final double COAST_CRINKLE_CELL = 20.0D;
     /** Peak amplitude (blocks) of the domain warp applied before sampling the coast field. */
-    private static final double COAST_WARP_AMPLITUDE = 25.0D;
+    private static final double COAST_WARP_AMPLITUDE = 30.0D;
+    /** Cell (blocks) of the per-bearing fade-width variation. */
+    private static final double FADE_WIDTH_CELL = 190.0D;
     /** Cells (blocks) of the flat-core boundary wobble and of the dune/sand speckle. */
     private static final double FLAT_EDGE_CELL = 31.0D;
     private static final double DUNE_CELL = 9.0D;
@@ -170,26 +178,41 @@ public final class SpawnIslandMask {
             return 1.0D;
         }
         double coastField = coastFieldAt(islandSeed, blockX, blockZ);
-        return SoftMixNoise.smoothstep((coastField + FADE_WIDTH - dist) / FADE_WIDTH);
+        double fade = fadeWidthAt(islandSeed, blockX, blockZ);
+        return SoftMixNoise.smoothstep((coastField + fade - dist) / fade);
     }
 
     /**
-     * The local coastline radius: mean radius plus a domain-warped, three-octave excursion of
-     * up to {@link #COAST_AMPLITUDE} blocks. Warp plus octaves make the coast meander at three
-     * scales - swells, coves and crinkle - so no direction repeats another and nothing reads
-     * as a circle. Pure in (seed, x, z); the blend starts only past this field, so the whole
-     * interior holds the full plateau height.
+     * The local coastline radius: mean radius plus a domain-warped, four-octave excursion of
+     * up to {@link #COAST_AMPLITUDE} blocks. The broad lobe octave (260-block cells) swings
+     * whole capes and bays, the swell and cove octaves meander them, and the crinkle octave
+     * textures the shoreline — together with the warp this keeps the silhouette and every
+     * shelf contour off any circle. Pure in (seed, x, z); the blend starts only past this
+     * field, so the whole interior holds the full plateau height.
      */
     public static double coastFieldAt(long islandSeed, int blockX, int blockZ) {
         BoundaryWarp warp = new BoundaryWarp.Fbm(COAST_WARP_AMPLITUDE, 120.0D, 40.0D,
                 scramble(islandSeed, COAST_WARP_SALT));
         double[] warped = warp.warp(blockX, blockZ, new double[2]);
         long fieldSeed = scramble(islandSeed, COAST_FIELD_SALT);
-        double broad = SoftMixNoise.valueNoise(warped[0], warped[1], COAST_BROAD_CELL, fieldSeed);
-        double mid = SoftMixNoise.valueNoise(warped[0], warped[1], COAST_MID_CELL, fieldSeed ^ 0x9E3L);
-        double fine = SoftMixNoise.valueNoise(warped[0], warped[1], COAST_FINE_CELL, fieldSeed ^ 0x51DL);
+        double lobes = SoftMixNoise.valueNoise(warped[0], warped[1], COAST_BROAD_CELL, fieldSeed);
+        double swells = SoftMixNoise.valueNoise(warped[0], warped[1], COAST_SWELL_CELL, fieldSeed ^ 0x9E3L);
+        double coves = SoftMixNoise.valueNoise(warped[0], warped[1], COAST_COVE_CELL, fieldSeed ^ 0x51DL);
+        double crinkle = SoftMixNoise.valueNoise(warped[0], warped[1], COAST_CRINKLE_CELL, fieldSeed ^ 0x77L);
         return COAST_MEAN_RADIUS
-                + COAST_AMPLITUDE * (0.55D * broad + 0.30D * mid + 0.15D * fine);
+                + COAST_AMPLITUDE * (0.42D * lobes + 0.30D * swells + 0.20D * coves + 0.08D * crinkle);
+    }
+
+    /**
+     * The local fade width in blocks: a seeded, slowly drifting fraction of
+     * {@link #FADE_WIDTH} ({@link #FADE_MIN}..{@link #FADE_MAX}), so the shelf ring around
+     * the island is a wide beach plain on one bearing and a narrow fringe on the next
+     * instead of an even, concentric band.
+     */
+    private static double fadeWidthAt(long islandSeed, int blockX, int blockZ) {
+        double v = (SoftMixNoise.valueNoise(blockX, blockZ, FADE_WIDTH_CELL,
+                scramble(islandSeed, FADE_WIDTH_SALT)) + 1.0D) * 0.5D;
+        return FADE_WIDTH * (0.85D + 0.30D * v);
     }
 
     /**

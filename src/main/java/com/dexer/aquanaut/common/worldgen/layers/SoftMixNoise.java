@@ -94,6 +94,47 @@ public final class SoftMixNoise {
         return (Math.floorMod(hash, 2001L) / 1000.0D) - 1.0D;
     }
 
+    /**
+     * True 3D value noise in [-1, 1]: an integer lattice hashed per corner and trilinearly
+     * interpolated with smoothstep easing. Unlike sheared 2D fields, every axis carries
+     * independent variation, so iso-surfaces curve through all three dimensions instead of
+     * reading as bent planes.
+     */
+    public static double valueNoise3(double x, double y, double z, double cellSize, long seed) {
+        if (cellSize <= 0.0D) {
+            return 0.0D;
+        }
+        double cellX = x / cellSize;
+        double cellY = y / cellSize;
+        double cellZ = z / cellSize;
+        int baseX = (int) Math.floor(cellX);
+        int baseY = (int) Math.floor(cellY);
+        int baseZ = (int) Math.floor(cellZ);
+        double sx = smoothstep(cellX - baseX);
+        double sy = smoothstep(cellY - baseY);
+        double sz = smoothstep(cellZ - baseZ);
+
+        double n000 = cornerNoise3(baseX, baseY, baseZ, seed);
+        double n100 = cornerNoise3(baseX + 1, baseY, baseZ, seed);
+        double n010 = cornerNoise3(baseX, baseY + 1, baseZ, seed);
+        double n110 = cornerNoise3(baseX + 1, baseY + 1, baseZ, seed);
+        double n001 = cornerNoise3(baseX, baseY, baseZ + 1, seed);
+        double n101 = cornerNoise3(baseX + 1, baseY, baseZ + 1, seed);
+        double n011 = cornerNoise3(baseX, baseY + 1, baseZ + 1, seed);
+        double n111 = cornerNoise3(baseX + 1, baseY + 1, baseZ + 1, seed);
+        double nx00 = lerp(sx, n000, n100);
+        double nx10 = lerp(sx, n010, n110);
+        double nx01 = lerp(sx, n001, n101);
+        double nx11 = lerp(sx, n011, n111);
+        return lerp(sz, lerp(sy, nx00, nx10), lerp(sy, nx01, nx11));
+    }
+
+    private static double cornerNoise3(int cellX, int cellY, int cellZ, long seed) {
+        long hash = mix(cellX, cellY, seed);
+        hash = mix((int) hash, cellZ, seed ^ 0x51ED270BL);
+        return (Math.floorMod(hash, 2001L) / 1000.0D) - 1.0D;
+    }
+
     public static long mix(int cellX, int cellZ, long salt) {
         long value = 0x9E3779B97F4A7C15L;
         value ^= (long) cellX * 341873128712L;

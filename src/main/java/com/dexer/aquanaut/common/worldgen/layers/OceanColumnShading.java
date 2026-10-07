@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public final class OceanColumnShading {
     private static final BlockState WATER = Blocks.WATER.defaultBlockState();
+    private static final BlockState AIR = Blocks.AIR.defaultBlockState();
 
     private OceanColumnShading() {
     }
@@ -27,6 +28,12 @@ public final class OceanColumnShading {
     public static BlockState stateForY(OceanColumnPlanner.ColumnPlan plan, int blockY) {
         int blockX = plan.blockX();
         int blockZ = plan.blockZ();
+        // The water-world spawn island claims its columns outright: the seamount plugs the
+        // chamber, so there is no cavity, reef slab or abyss left to shade — solid land up to
+        // the plateau floor, water above it.
+        if (plan.island()) {
+            return islandStateFor(plan, blockY);
+        }
         // The reef between the two seas claims its full depth first: a real rock layer
         // with geology and thickness, then the deep sea and its abyssal floor below.
         if (blockY <= plan.cavityFloorY()) {
@@ -92,6 +99,90 @@ public final class OceanColumnShading {
             return WATER;
         }
         return state;
+    }
+
+    /**
+     * The water-world spawn island. The plateau core ({@code mask >= 1}) is vanilla land:
+     * grass over three layers of dirt over limestone and the regional lithology, flat for
+     * building and able to hold trees, speckled with vanilla sand patches. The beach flanks
+     * ({@code mask < 1}) are a vanilla sand shore: sand over sandstone, dug open exactly
+     * like a vanilla beach island — no mod blocks on any surface the player walks on.
+     * Below the surface, seeded cave voids open inside the solid seamount — strictly
+     * dry by construction (see {@link com.dexer.aquanaut.common.worldgen.blend.SpawnIslandCaves}).
+     */
+    private static BlockState islandStateFor(OceanColumnPlanner.ColumnPlan plan, int blockY) {
+        int floorY = plan.cavityFloorY();
+        if (blockY > floorY) {
+            return WATER;
+        }
+        if (plan.islandMask() >= 1.0D
+                && blockY <= floorY - com.dexer.aquanaut.common.worldgen.blend.SpawnIslandCaves.SURFACE_PROTECT_MARGIN
+                && com.dexer.aquanaut.common.worldgen.blend.SpawnIslandCaves.isCave(
+                        plan.islandSeed(), plan.blockX(), blockY, plan.blockZ())) {
+            return AIR;
+        }
+        int depth = floorY - blockY;
+        if (plan.islandMask() >= 1.0D) {
+            // The stony-shore region: bare rock with exposed low-tier ore veins and small
+            // lava ponds; the vanilla surface rule (stony_shore branch) lays the gravel.
+            if (com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.stoneShoreWeight(
+                    plan.islandSeed(), plan.blockX(), plan.blockZ()) >= 0.5D) {
+                if (com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.lavaPoolAt(
+                        plan.islandSeed(), plan.blockX(), plan.blockZ()) && depth <= 1) {
+                    return Blocks.LAVA.defaultBlockState();
+                }
+                if (depth == 0) {
+                    double ore = com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.oreSpeckleAt(
+                            plan.islandSeed(), plan.blockX(), plan.blockZ());
+                    if (ore > 0.62D) {
+                        return Blocks.COAL_ORE.defaultBlockState();
+                    }
+                    if (ore > 0.42D) {
+                        return Blocks.IRON_ORE.defaultBlockState();
+                    }
+                    if (ore > 0.26D) {
+                        return Blocks.COPPER_ORE.defaultBlockState();
+                    }
+                    return Blocks.STONE.defaultBlockState();
+                }
+                if (depth <= 3) {
+                    return Blocks.STONE.defaultBlockState();
+                }
+                return floorStateFor(plan.blockX(), blockY, plan.blockZ(), floorY);
+            }
+            // The broad building plateau: vanilla-style grassland profile, trees take root
+            // here; seeded vanilla-sand patches speckle the grass so the ground is not a
+            // perfect disc.
+            if (depth == 0) {
+                if (com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.pondBasinAt(
+                        plan.islandSeed(), plan.blockX(), plan.blockZ()) > 0.0D
+                        || com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.sandPatchAt(
+                                plan.islandSeed(), plan.blockX(), plan.blockZ())) {
+                    return Blocks.SAND.defaultBlockState();
+                }
+                if (com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask.cragStoneAt(
+                        plan.islandSeed(), plan.blockX(), plan.blockZ())) {
+                    return Blocks.STONE.defaultBlockState();
+                }
+                return Blocks.GRASS_BLOCK.defaultBlockState();
+            }
+            if (depth <= 3) {
+                return Blocks.DIRT.defaultBlockState();
+            }
+            if (depth <= 4) {
+                return BlockRegistry.LIMESTONE.get().defaultBlockState();
+            }
+            return floorStateFor(plan.blockX(), blockY, plan.blockZ(), floorY);
+        }
+        // The beach flanks are a vanilla sand shore: plain sand over sandstone, dug open
+        // exactly like a vanilla beach island — no coral sand, no nutrient mud.
+        if (depth <= 2) {
+            return Blocks.SAND.defaultBlockState();
+        }
+        if (depth <= 4) {
+            return Blocks.SANDSTONE.defaultBlockState();
+        }
+        return floorStateFor(plan.blockX(), blockY, plan.blockZ(), floorY);
     }
 
     private static BlockState belowFloorStateFor(OceanColumnPlanner.ColumnPlan plan,

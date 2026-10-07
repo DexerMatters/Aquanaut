@@ -24,7 +24,7 @@
           {
             "biome": "minecraft:deep_ocean",
             "weight": 1.0,
-            "inherit_surface": true
+            "inherit_surface": false
           }
         ]
       },

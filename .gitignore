@@ -51,3 +51,4 @@ scripts/blockbench/src/
 
 ## Python $$
 **/__pycache__/*
+/.mimosa

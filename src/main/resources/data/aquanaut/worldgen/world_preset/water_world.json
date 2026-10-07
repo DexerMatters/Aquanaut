@@ -8,21 +8,9 @@
           "type": "minecraft:multi_noise",
           "biomes": [
             {
-              "biome": "minecraft:deep_frozen_ocean",
-              "parameters": {
-                "temperature": [-2.0, -0.45],
-                "humidity": [-2.0, 2.0],
-                "continentalness": [-2.0, 2.0],
-                "erosion": [-2.0, 2.0],
-                "depth": [-2.0, 2.0],
-                "weirdness": [-2.0, 2.0],
-                "offset": 0.0
-              }
-            },
-            {
               "biome": "minecraft:deep_cold_ocean",
               "parameters": {
-                "temperature": [-0.45, 0.05],
+                "temperature": [-2.0, 0.05],
                 "humidity": [-2.0, 2.0],
                 "continentalness": [-2.0, 2.0],
                 "erosion": [-2.0, 2.0],
@@ -129,6 +117,54 @@
             },
             {
               "biome": "aquanaut:deep_sea",
+              "parameters": {
+                "temperature": 2.0,
+                "humidity": 2.0,
+                "continentalness": 2.0,
+                "erosion": 2.0,
+                "depth": 2.0,
+                "weirdness": 2.0,
+                "offset": 1.0
+              }
+            },
+            {
+              "biome": "aquanaut:island_plains",
+              "parameters": {
+                "temperature": 2.0,
+                "humidity": 2.0,
+                "continentalness": 2.0,
+                "erosion": 2.0,
+                "depth": 2.0,
+                "weirdness": 2.0,
+                "offset": 1.0
+              }
+            },
+            {
+              "biome": "aquanaut:island_hills",
+              "parameters": {
+                "temperature": 2.0,
+                "humidity": 2.0,
+                "continentalness": 2.0,
+                "erosion": 2.0,
+                "depth": 2.0,
+                "weirdness": 2.0,
+                "offset": 1.0
+              }
+            },
+            {
+              "biome": "aquanaut:island_beach",
+              "parameters": {
+                "temperature": 2.0,
+                "humidity": 2.0,
+                "continentalness": 2.0,
+                "erosion": 2.0,
+                "depth": 2.0,
+                "weirdness": 2.0,
+                "offset": 1.0
+              }
+            },
+            {
+              "biome": "aquanaut:island_stony_shore",
               "parameters": {
                 "temperature": 2.0,
                 "humidity": 2.0,

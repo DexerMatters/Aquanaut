@@ -23,10 +23,13 @@ public final class OceanLayerStackTest {
     }
 
     @Test
-    void rewriteRangeCoversReefAndMiddleSeaOnly() {
+    void rewriteRangeCoversTheFullWaterColumn() {
+        // The surface ocean band rewrites to an explicit biome (instead of inheriting the
+        // vanilla climate biome), so frozen-ocean features like icebergs can never root in
+        // the surface water column; the deep sea keeps the lower bound at the world floor.
         OceanLayerStack stack = OceanLayerStacks.defaultStack();
         assertEquals(-64, stack.minRewriteBlockY());
-        assertEquals(39, stack.maxRewriteBlockY());
+        assertEquals(320, stack.maxRewriteBlockY());
     }
 
     @Test

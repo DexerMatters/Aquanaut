@@ -5,13 +5,16 @@
     "refmap": "aquanaut.refmap.json",
     "mixins": [
         "ChunkGeneratorAccessor",
+        "ChunkGeneratorStructureMixin",
         "EntityMixin",
         "LivingEntityMixin",
         "InventoryMenuMixin",
+        "NoiseBasedChunkGeneratorAccessor",
         "NoiseBasedChunkGeneratorMixin",
         "PlayerMixin",
         "ItemStackMixin",
         "RandomStateMixin",
+        "StructureManagerAccessor",
         "WaterAnimalMixin"
     ],
     "client": [

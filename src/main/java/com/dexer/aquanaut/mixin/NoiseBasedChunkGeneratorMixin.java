@@ -2,6 +2,7 @@ package com.dexer.aquanaut.mixin;
 
 import com.dexer.aquanaut.common.worldgen.CrystalNestTerrain;
 import com.dexer.aquanaut.common.worldgen.MiddleLevelOceanPlacement;
+import com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask;
 import com.dexer.aquanaut.common.worldgen.layers.BiomeRewriter;
 import com.dexer.aquanaut.common.worldgen.layers.OceanChunkSampler;
 import com.dexer.aquanaut.common.worldgen.layers.OceanColumnPlanner;
@@ -13,9 +14,15 @@ import com.dexer.aquanaut.common.worldgen.layers.TerrainModule;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.NaturalSpawner;
 import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,10 +31,14 @@ import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.levelgen.Aquifer;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseChunk;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
 import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.RandomSupport;
+import net.minecraft.world.level.levelgen.WorldOptions;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -40,6 +51,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(NoiseBasedChunkGenerator.class)
 public abstract class NoiseBasedChunkGeneratorMixin {
     private static final BlockState AIR = Blocks.AIR.defaultBlockState();
+    private static final ResourceLocation WATER_WORLD_SETTINGS =
+            ResourceLocation.fromNamespaceAndPath("aquanaut", "water_world");
 
     @Shadow
     @Final
@@ -48,6 +61,45 @@ public abstract class NoiseBasedChunkGeneratorMixin {
     @Shadow
     protected abstract NoiseChunk createNoiseChunk(ChunkAccess chunk, StructureManager structureManager,
             Blender blender, RandomState randomState);
+
+    /** Whether this generator runs the water world preset, whose terrain plans the spawn island. */
+    private boolean aquanaut$isWaterWorld() {
+        return this.settings.unwrapKey()
+                .map(key -> key.location().equals(WATER_WORLD_SETTINGS))
+                .orElse(false);
+    }
+
+    /**
+     * The level seed the island's coastline, amplitudes and dunes are scrambled from. The worldgen
+     * structure manager carries the world's options; a foreign manager degrades to the seedless
+     * fixed silhouette rather than guessing.
+     */
+    private long aquanaut$islandSeed(StructureManager structureManager) {
+        if (structureManager instanceof StructureManagerAccessor accessor) {
+            WorldOptions worldOptions = accessor.aquanaut$getWorldOptions();
+            if (worldOptions != null) {
+                return worldOptions.seed();
+            }
+        }
+        return 0L;
+    }
+
+    /**
+     * Resolves any biome id (including vanilla-only island surface biomes that the water
+     * world's biome source never carries) against the world's biome registry; {@code null}
+     * when the manager exposes no level, letting the caller skip gracefully.
+     */
+    private java.util.function.Function<ResourceLocation, Holder<Biome>> aquanaut$biomeLookup(
+            StructureManager structureManager) {
+        if (structureManager instanceof StructureManagerAccessor accessor
+                && accessor.aquanaut$getLevel() != null) {
+            Registry<Biome> biomes = accessor.aquanaut$getLevel()
+                    .registryAccess()
+                    .registryOrThrow(Registries.BIOME);
+            return id -> biomes.getHolder(ResourceKey.create(Registries.BIOME, id)).orElse(null);
+        }
+        return id -> null;
+    }
 
     @Inject(method = "doFill", at = @At("HEAD"), cancellable = true, remap = false)
     private void aquanaut$integratedFill(Blender blender,
@@ -77,11 +129,15 @@ public abstract class NoiseBasedChunkGeneratorMixin {
         TerrainModule terrain = OceanChunkSampler.stackTerrain(stack);
         ChunkGeneratorAccessor generatorAccessor = (ChunkGeneratorAccessor) this;
         int surfaceQuartY = MiddleLevelOceanPlacement.surfaceSampleQuartY();
+        boolean spawnIsland = aquanaut$isWaterWorld();
+        long islandSeed = aquanaut$islandSeed(structureManager);
 
         OceanGenSampler sampler = OceanChunkSampler.sample(
                 chunk,
                 stack,
                 terrain.topWaterY(),
+                spawnIsland,
+                islandSeed,
                 minCellY,
                 cellCountY,
                 cellWidth,
@@ -94,7 +150,8 @@ public abstract class NoiseBasedChunkGeneratorMixin {
                         .map(key -> key.location())
                         .orElse(null));
 
-        BiomeRewriter.rewrite(chunk, sampler, generatorAccessor.aquanaut$getBiomeSource());
+        BiomeRewriter.rewrite(chunk, sampler, generatorAccessor.aquanaut$getBiomeSource(),
+                aquanaut$biomeLookup(structureManager));
         // One blend grid per chunk: district weights, the guarded geological floor and the
         // composed reef fields are evaluated once per column and shared by every consumer.
         com.dexer.aquanaut.common.worldgen.layers.ChunkTerrainBlend blend =
@@ -201,6 +258,37 @@ public abstract class NoiseBasedChunkGeneratorMixin {
         }
     }
 
+    /**
+     * Runs the vanilla herd pass against the island surface biome for chunks the island mask
+     * claims. Vanilla samples the biome at build-limit height, which the water world preset
+     * fills with climate ocean biomes whose creature list is empty — the island would
+     * otherwise never receive its initial animal herds (passive mobs only spawn in this
+     * pass, never replenish naturally). The random derivation replicates vanilla exactly.
+     */
+    @Inject(method = "spawnOriginalMobs", at = @At("HEAD"), cancellable = true, remap = false)
+    private void aquanaut$islandOriginalMobs(WorldGenRegion level, CallbackInfo ci) {
+        if (!aquanaut$isWaterWorld() || this.settings.value().disableMobGeneration()) {
+            return;
+        }
+        OceanLayerStack stack = OceanLayerStacks.active();
+        if (stack == null || stack.layers().isEmpty()) {
+            return;
+        }
+        ChunkPos chunkPos = level.getCenter();
+        if (SpawnIslandMask.maskAt(level.getSeed(),
+                chunkPos.getMinBlockX() + 8, chunkPos.getMinBlockZ() + 8) <= 0.0D) {
+            return;
+        }
+        // Sample the rewritten island palette at the plateau surface (in the island biome
+        // band), not the raw climate ocean sitting at the build limit.
+        Holder<Biome> biome = level.getBiome(new BlockPos(chunkPos.getMinBlockX() + 8,
+                SpawnIslandMask.ISLAND_TOP_Y - 4, chunkPos.getMinBlockZ() + 8));
+        WorldgenRandom random = new WorldgenRandom(new LegacyRandomSource(RandomSupport.generateUniqueSeed()));
+        random.setDecorationSeed(level.getSeed(), chunkPos.getMinBlockX(), chunkPos.getMinBlockZ());
+        NaturalSpawner.spawnMobsForChunkGeneration(level, biome, chunkPos, random);
+        ci.cancel();
+    }
+
     private boolean aquanaut$isCoveredChunk(ChunkAccess chunk, StructureManager structureManager,
             WorldGenRegion worldGenRegion, RandomState randomState, int cellWidth, int cellHeight) {
         OceanLayerStack stack = OceanLayerStacks.active();
@@ -213,6 +301,9 @@ public abstract class NoiseBasedChunkGeneratorMixin {
         return OceanChunkSampler.isCovered(
                 chunk,
                 stack,
+                OceanChunkSampler.topWaterY(stack),
+                aquanaut$isWaterWorld(),
+                worldGenRegion.getSeed(),
                 minCellY,
                 cellCountY,
                 cellWidth,

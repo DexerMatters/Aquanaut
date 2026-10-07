@@ -22,6 +22,8 @@ public final class OceanChunkSampler {
     public static OceanGenSampler sample(ChunkAccess chunk,
                                          OceanLayerStack stack,
                                          int topWaterY,
+                                         boolean spawnIsland,
+                                         long islandSeed,
                                          int minCellY,
                                          int cellCountY,
                                          int cellWidth,
@@ -93,11 +95,16 @@ public final class OceanChunkSampler {
                     continue;
                 }
                 ResourceLocation biome = haloBiomeAt.apply(baseQuartX + localX, baseQuartZ + localZ);
-                haloParent[qx][qz] = stack.isParentBiome(biome);
+                // Same island override as the sampler's own quart cells, so the edge-fade field
+                // sees identical support on both sides of a chunk border.
+                haloParent[qx][qz] = stack.isParentBiome(biome)
+                        || (spawnIsland && com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask
+                                .maskAt(islandSeed, (baseQuartX + localX) << 2, (baseQuartZ + localZ) << 2) > 0.0D);
             }
         }
 
-        return new OceanGenSampler(stack, surfaceBiomes, quartOpenWater, haloParent, baseQuartX, baseQuartZ);
+        return new OceanGenSampler(stack, surfaceBiomes, quartOpenWater, haloParent,
+                baseQuartX, baseQuartZ, spawnIsland, islandSeed);
     }
 
     public static int topWaterY(OceanLayerStack stack) {
@@ -118,6 +125,9 @@ public final class OceanChunkSampler {
      */
     public static boolean isCovered(ChunkAccess chunk,
                                     OceanLayerStack stack,
+                                    int topWaterY,
+                                    boolean spawnIsland,
+                                    long islandSeed,
                                     int minCellY,
                                     int cellCountY,
                                     int cellWidth,
@@ -142,11 +152,19 @@ public final class OceanChunkSampler {
                 }
             }
         }
+        if (!parentPresent && spawnIsland) {
+            // Island quart cells are rewritten to the mod-owned island biomes before the
+            // carvers status runs, so the surface probe no longer shows a parent biome on
+            // fully-land chunks. The island mask itself is the coverage claim there —
+            // without this, vanilla carvers would tunnel through the island core.
+            parentPresent = com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask
+                    .maskAt(islandSeed, chunkPos.getMinBlockX() + 8, chunkPos.getMinBlockZ() + 8) > 0.0D;
+        }
         if (!parentPresent) {
             return false;
         }
-        return sample(chunk, stack, topWaterY(stack), minCellY, cellCountY, cellWidth, cellHeight,
-                defaultBlock, probeFactory, haloBiomeAt).anySupported();
+        return sample(chunk, stack, topWaterY, spawnIsland, islandSeed, minCellY, cellCountY,
+                cellWidth, cellHeight, defaultBlock, probeFactory, haloBiomeAt).anySupported();
     }
 
     public static TerrainModule stackTerrain(OceanLayerStack stack) {

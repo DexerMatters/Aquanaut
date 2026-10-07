@@ -10,6 +10,7 @@ import com.dexer.aquanaut.common.worldgen.blend.CellSource;
 import com.dexer.aquanaut.common.worldgen.blend.ContactMaterial;
 import com.dexer.aquanaut.common.worldgen.blend.DissolutionField;
 import com.dexer.aquanaut.common.worldgen.blend.DistrictWeightField;
+import com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.chunk.ChunkAccess;
 
@@ -74,7 +75,26 @@ public final class OceanColumnPlanner {
         TerrainModule terrain = source.terrain();
         int minBuildHeight = source.minBuildHeight();
         int floorY = (int) Math.round(guardedFloor);
+        double islandMask = source.spawnIslandMaskAt(blockX, blockZ);
+        long islandSeed = source.spawnIslandSeed();
         MiddleLevelOceanTerrainProfile.ColumnProfile profile = source.profileAt(blockX, blockZ);
+        // The island branch claims only columns whose floor stands at or above the reef
+        // shelf (the chamber cap's top). Lower ring columns fall to the normal stack, which
+        // renders the cap and the middle sea intact beneath the shelf slope — without this
+        // gate the claimed ring once replaced the whole stack down to a deep blended floor,
+        // boring a ring-shaped pit through the reef ceiling around the island.
+        boolean islandColumn = islandMask > 0.0D && floorY >= profile.capTopY();
+        // Island columns carry solid ground above sea level, so the carve window must reach
+        // the plateau top; everywhere else it stops at the open-water line like before.
+        int topCarveY = islandColumn ? Math.max(terrain.topWaterY(), floorY) : terrain.topWaterY();
+        // The plateau pond: basin columns whose floor lies below the pond water line get
+        // their carve window raised to that line, so the fill lays still water from the bed
+        // up to it — and only where the floor is below it, walled everywhere by ground that
+        // stands at or above it. The mask gate keeps the water on the full plateau.
+        if (islandColumn && islandMask >= 1.0D && floorY < SpawnIslandMask.POND_WATER_Y
+                && SpawnIslandMask.pondBasinAt(islandSeed, blockX, blockZ) > 0.0D) {
+            topCarveY = Math.max(topCarveY, SpawnIslandMask.POND_WATER_Y);
+        }
         double edge = source.columnEdge(blockX, blockZ);
 
         // Effective cap openness: shafts only dissolve well inside the region, and the
@@ -116,9 +136,10 @@ public final class OceanColumnPlanner {
                 && reefOpenness(reef, dissolution, karstNoise, brineField,
                         blockX, floorY, blockZ, floorY, reefBottomY) < 0.5D;
 
-        return new ColumnPlan(blockX, blockZ, terrain.topWaterY(), floorY, minBuildHeight - 1,
+        return new ColumnPlan(blockX, blockZ, topCarveY, floorY, minBuildHeight - 1,
                 edge, profile, terrain, volcanic, reef, reefBottomY, deepFloorY, mountainTopY,
-                capOpenness, capBand, outcropRelief, outcropTopY, grounded,
+                capOpenness, capBand, outcropRelief, outcropTopY, grounded, islandColumn,
+                islandMask, islandSeed,
                 karstNoise, brineField, dissolution, terrain.blend().contactMaterial());
     }
 
@@ -146,12 +167,39 @@ public final class OceanColumnPlanner {
         double edge = source.columnEdge(blockX, blockZ);
         // Floor Y only uses smooth edge (no high-freq); cavity depth is already broad-scale.
         double floor = lerpFloor(profile.capBottomY(), profile.cavityFloorY(), edge);
-        // Brimstone Caldera's volcanic plains: swells and rifts ride the same fade.
+        double islandMask = source.spawnIslandMaskAt(blockX, blockZ);
+        // Brimstone Caldera's volcanic plains: swells and rifts ride the same fade. They yield
+        // to the spawn island so their swells never tower out of the blended plateau.
         double volcanicStrength = source.volcanicStrength(blockX, blockZ, edge);
         if (volcanicStrength > 0.0D) {
-            floor += VolcanoGeometry.floorOffset(blockX, blockZ) * volcanicStrength;
+            floor += VolcanoGeometry.floorOffset(blockX, blockZ) * volcanicStrength * (1.0D - islandMask);
         }
-        return floor;
+        double blended = SpawnIslandMask.blendFloor(islandShelfBase(floor, profile, islandMask), islandMask);
+        if (islandMask > 0.0D) {
+            // Seeded plateau relief: hills and valleys outside the organic flat building core,
+            // sinking back to shore level ahead of the coastline, plus one-block knolls.
+            blended += SpawnIslandMask.reliefAt(source.spawnIslandSeed(), blockX, blockZ, islandMask);
+            blended += SpawnIslandMask.duneLift(source.spawnIslandSeed(), blockX, blockZ, islandMask);
+        }
+        return blended;
+    }
+
+    /**
+     * The blend base of an island column: with rising mask the raw floor is lifted to the
+     * chamber cap's top, so the island flank lands on a reef shelf that merges flush into
+     * the surrounding reef ceiling instead of punching through it into the middle sea (the
+     * old base let the flank descend to the deep chamber floor, boring a ring-shaped pit
+     * through the cap and walling it off with a vertical seam). At mask 0 the base is the
+     * untouched raw floor, so the field stays continuous.
+     */
+    private static double islandShelfBase(double floor,
+                                          MiddleLevelOceanTerrainProfile.ColumnProfile profile,
+                                          double islandMask) {
+        if (islandMask <= 0.0D) {
+            return floor;
+        }
+        double shelfT = SoftMixNoise.smoothstep(islandMask);
+        return SoftMixNoise.lerp(shelfT, floor, Math.max(floor, profile.capTopY()));
     }
 
     /** Smoothstep the openness so floor does not tear at mid-strength edges. */
@@ -304,6 +352,21 @@ public final class OceanColumnPlanner {
 
         double volcanicStrength(int blockX, int blockZ, double edge);
 
+        /**
+         * Blend weight of the water-world spawn island at this column, in [0, 1]. Zero when the
+         * active noise settings are not the water world preset or the column lies beyond the
+         * island's fade radius. Both source implementations evaluate the same pure mask, so the
+         * chunk grid and the analytic path blend identically.
+         */
+        default double spawnIslandMaskAt(int blockX, int blockZ) {
+            return 0.0D;
+        }
+
+        /** The world seed behind {@link #spawnIslandMaskAt(int, int)}; 0 for seedless sources. */
+        default long spawnIslandSeed() {
+            return 0L;
+        }
+
         ReefComposition reefCompositionAt(int blockX, int blockZ);
 
         MiddleLevelOceanTerrainProfile.ColumnProfile profileAt(int blockX, int blockZ);
@@ -362,6 +425,18 @@ public final class OceanColumnPlanner {
         public double volcanicStrength(int blockX, int blockZ, double edge) {
             double weight = biomeWeightAtBlock(BrimstoneCalderaPlacement.location(), blockX, blockZ);
             return VolcanoGeometry.strength(weight, edge, terrain.blend().emergenceEdificeFull());
+        }
+
+        @Override
+        public double spawnIslandMaskAt(int blockX, int blockZ) {
+            return sampler.spawnIsland()
+                    ? SpawnIslandMask.maskAt(sampler.islandSeed(), blockX, blockZ)
+                    : 0.0D;
+        }
+
+        @Override
+        public long spawnIslandSeed() {
+            return sampler.islandSeed();
         }
 
         @Override
@@ -435,10 +510,18 @@ public final class OceanColumnPlanner {
                              double outcropRelief,
                              int outcropTopY,
                              boolean grounded,
+                             boolean islandColumn,
+                             double islandMask,
+                             long islandSeed,
                              double karstNoise,
                              double brineField,
                              DissolutionField dissolution,
                              ContactMaterial contact) {
+
+        /** Whether the water-world spawn island claims this column (shaded as solid land). */
+        public boolean island() {
+            return islandColumn;
+        }
 
         /** Height of the sedimentary plinth the massif footprint grows out of. */
         public int skirtBlocks() {

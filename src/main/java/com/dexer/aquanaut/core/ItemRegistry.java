@@ -4,6 +4,9 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import com.dexer.aquanaut.Aquanaut;
+import com.dexer.aquanaut.common.mud.DeathCapItem;
+import com.dexer.aquanaut.common.mud.LargeHermitCrabSpawnEggItem;
+import com.dexer.aquanaut.common.mud.NutrientMudBallItem;
 import com.dexer.aquanaut.common.diving.DivingEquipmentSlotType;
 import com.dexer.aquanaut.common.inventory.CreativeTabHeader;
 import com.dexer.aquanaut.common.inventory.SectionedTabOutput;
@@ -56,6 +59,23 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ItemRegistry {
         public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Aquanaut.MODID);
+        public static final DeferredItem<Item> MUD_BALL = ITEMS.registerSimpleItem("mud_ball");
+        public static final DeferredItem<NutrientMudBallItem> NUTRIENT_MUD_BALL = ITEMS.registerItem(
+                        "nutrient_mud_ball", NutrientMudBallItem::new);
+        public static final DeferredItem<Item> FOSSIL_FRAGMENT = ITEMS.registerSimpleItem("fossil_fragment");
+        public static final DeferredItem<BlockItem> MUD = blockItem("mud", BlockRegistry.MUD);
+        public static final DeferredItem<BlockItem> MUD_BRICKS = blockItem("mud_bricks", BlockRegistry.MUD_BRICKS);
+        public static final DeferredItem<BlockItem> MUD_BRICK_STAIRS = blockItem("mud_brick_stairs",
+                        BlockRegistry.MUD_BRICK_STAIRS);
+        public static final DeferredItem<BlockItem> MUD_BRICK_SLAB = blockItem("mud_brick_slab",
+                        BlockRegistry.MUD_BRICK_SLAB);
+        public static final DeferredItem<BlockItem> MUD_BRICK_WALL = blockItem("mud_brick_wall",
+                        BlockRegistry.MUD_BRICK_WALL);
+        public static final DeferredItem<BlockItem> PARASITIC_MUD = blockItem("parasitic_mud", BlockRegistry.PARASITIC_MUD);
+        public static final DeferredItem<BlockItem> FOSSIL_BED = blockItem("fossil_bed", BlockRegistry.FOSSIL_BED);
+        public static final DeferredItem<BlockItem> SHELL_PILE = blockItem("shell_pile", BlockRegistry.SHELL_PILE);
+        public static final DeferredItem<BlockItem> SEDIMENT_COLUMN = blockItem("sediment_column", BlockRegistry.SEDIMENT_COLUMN);
+        public static final DeferredItem<BlockItem> FOSSIL_DISPLAY = blockItem("fossil_display", BlockRegistry.FOSSIL_DISPLAY);
         public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(
                         Registries.CREATIVE_MODE_TAB, Aquanaut.MODID);
 
@@ -66,6 +86,17 @@ public final class ItemRegistry {
         public static final DeferredItem<Item> SARDINE = ITEMS.registerSimpleItem("sardine");
         public static final DeferredItem<Item> COOKED_SARDINE = ITEMS.registerSimpleItem("cooked_sardine",
                         food(4, 0.6F));
+        public static final DeferredItem<Item> CRAB_MEAT = ITEMS.registerSimpleItem("crab_meat",
+                        food(3, 0.3F));
+        public static final DeferredItem<Item> COOKED_CRAB_MEAT = ITEMS.registerSimpleItem("cooked_crab_meat",
+                        food(6, 0.8F));
+        public static final DeferredItem<Item> WORM_MUSCLE = ITEMS.registerSimpleItem("worm_muscle", food(3, 0.3F));
+        public static final DeferredItem<Item> MUD_BEAN = ITEMS.registerSimpleItem("mud_bean", food(2, 0.4F));
+        public static final DeferredItem<Item> DEATH_CAP = ITEMS.register("death_cap",
+                        () -> new DeathCapItem(food(2, 0.3F)));
+        public static final DeferredItem<Item> HUMUS_GEL = ITEMS.registerSimpleItem("humus_gel");
+        public static final DeferredItem<Item> ANCIENT_SHELL_FRAGMENT = ITEMS.registerSimpleItem("ancient_shell_fragment");
+        public static final DeferredItem<DivingEquipmentItem> MUDWALKER_CHARM = flippersItem("mudwalker_charm", 256, 1.0F);
 
         public static final DeferredItem<Item> SHARK_FINS = ITEMS.registerSimpleItem("shark_fins");
         public static final DeferredItem<Item> COOKED_SHARK_FINS = ITEMS.registerSimpleItem("cooked_shark_fins",
@@ -330,6 +361,7 @@ public final class ItemRegistry {
                         BlockRegistry.CORAL_SAND);
         public static final DeferredItem<BlockItem> NUTRIENT_RICH_MUD = blockItem("nutrient_rich_mud",
                         BlockRegistry.NUTRIENT_RICH_MUD);
+        public static final DeferredItem<BlockItem> SEA_MOSS = blockItem("sea_moss", BlockRegistry.SEA_MOSS);
         public static final DeferredItem<BlockItem> DROOPING_SEAWEED = blockItem("drooping_seaweed",
                         BlockRegistry.DROOPING_SEAWEED);
         public static final DeferredItem<BlockItem> SHALE = blockItem("shale",
@@ -453,6 +485,29 @@ public final class ItemRegistry {
                         BlockRegistry.SEAWEED_FRUIT);
         public static final DeferredItem<BlockItem> SEAWEED_STEM = blockItem("seaweed_stem",
                         BlockRegistry.SEAWEED_STEM);
+        public static final DeferredItem<BlockItem> MUD_BLOOM = blockItem("mud_bloom",
+                        BlockRegistry.MUD_BLOOM);
+        public static final DeferredItem<BlockItem> BEAN_KELP = blockItem("bean_kelp",
+                        BlockRegistry.BEAN_KELP);
+        public static final DeferredItem<BlockItem> GLOW_FUNGUS = blockItem("glow_fungus",
+                        BlockRegistry.GLOW_FUNGUS);
+        public static final DeferredItem<BlockItem> GLOW_FUNGUS_AMBER = blockItem("glow_fungus_amber",
+                        BlockRegistry.GLOW_FUNGUS_AMBER);
+        public static final DeferredItem<BlockItem> GLOW_FUNGUS_VIOLET = blockItem("glow_fungus_violet",
+                        BlockRegistry.GLOW_FUNGUS_VIOLET);
+        public static final DeferredItem<BlockItem> GLOW_MUSHROOM_STEM = blockItem("glow_mushroom_stem",
+                        BlockRegistry.GLOW_MUSHROOM_STEM);
+        public static final DeferredItem<BlockItem> GLOW_MUSHROOM_CAP = blockItem("glow_mushroom_cap",
+                        BlockRegistry.GLOW_MUSHROOM_CAP);
+        public static final DeferredItem<BlockItem> GLOW_MUSHROOM_INSIDE = blockItem("glow_mushroom_inside",
+                        BlockRegistry.GLOW_MUSHROOM_INSIDE);
+        public static final DeferredItem<BlockItem> PACKED_MUD = blockItem("packed_mud", BlockRegistry.PACKED_MUD);
+        public static final DeferredItem<BlockItem> CRACKED_MUD = blockItem("cracked_mud", BlockRegistry.CRACKED_MUD);
+        public static final DeferredItem<BlockItem> SILTSTONE = blockItem("siltstone", BlockRegistry.SILTSTONE);
+        public static final DeferredItem<BlockItem> MUD_LAMP = blockItem("mud_lamp", BlockRegistry.MUD_LAMP);
+        public static final DeferredItem<BlockItem> SILT_REED = blockItem("silt_reed", BlockRegistry.SILT_REED);
+        public static final DeferredItem<BlockItem> PALE_PUFFBALL = blockItem("pale_puffball",
+                        BlockRegistry.PALE_PUFFBALL);
         // Jelly blocks
         public static final DeferredItem<BlockItem> LIGHT_RED_JELLY_BLOCK = blockItem("light_red_jelly_block",
                         BlockRegistry.LIGHT_RED_JELLY_BLOCK);
@@ -596,6 +651,24 @@ public final class ItemRegistry {
         public static final DeferredItem<DeferredSpawnEggItem> FLATFISH_SPAWN_EGG = spawnEgg(
                         "flatfish_spawn_egg",
                         EntityRegistry.FLATFISH, 0x6E6C4B, 0xC3B9A0);
+        public static final DeferredItem<DeferredSpawnEggItem> MUD_SILVERFISH_SPAWN_EGG = spawnEgg(
+                        "mud_silverfish_spawn_egg", EntityRegistry.MUD_SILVERFISH, 0x4B3A2C, 0x1E1713);
+        public static final DeferredItem<DeferredSpawnEggItem> AMBUSH_FISH_SPAWN_EGG = spawnEgg(
+                        "ambush_fish_spawn_egg", EntityRegistry.AMBUSH_FISH, 0x6B6250, 0x30281F);
+        public static final DeferredItem<DeferredSpawnEggItem> GARDEN_EEL_SPAWN_EGG = spawnEgg(
+                        "garden_eel_spawn_egg", EntityRegistry.GARDEN_EEL, 0x8A7A43, 0x3B4A2B);
+        public static final DeferredItem<DeferredSpawnEggItem> HERMIT_CRAB_SPAWN_EGG = spawnEgg(
+                        "hermit_crab_spawn_egg", EntityRegistry.HERMIT_CRAB, 0xA56D45, 0x59402C);
+        public static final DeferredItem<LargeHermitCrabSpawnEggItem> HERMIT_CRAB_LARGE_SPAWN_EGG = ITEMS
+                        .registerItem("hermit_crab_large_spawn_egg", LargeHermitCrabSpawnEggItem::new);
+        public static final DeferredItem<DeferredSpawnEggItem> SEDIMENT_WORM_SPAWN_EGG = spawnEgg(
+                        "sediment_worm_spawn_egg", EntityRegistry.SEDIMENT_WORM, 0x59463D, 0x2E241F);
+        public static final DeferredItem<DeferredSpawnEggItem> HUMUS_JELLY_SPAWN_EGG = spawnEgg(
+                        "humus_jelly_spawn_egg", EntityRegistry.HUMUS_JELLY, 0x4D663B, 0x26351F);
+        public static final DeferredItem<DeferredSpawnEggItem> ANCIENT_NAUTILUS_SPAWN_EGG = spawnEgg(
+                        "ancient_nautilus_spawn_egg", EntityRegistry.ANCIENT_NAUTILUS, 0xA89C83, 0x574A3C);
+        public static final DeferredItem<DeferredSpawnEggItem> TRILOBITE_SPAWN_EGG = spawnEgg(
+                        "trilobite_spawn_egg", EntityRegistry.TRILOBITE, 0x6B6A55, 0x3A3A2A);
 
         public static final DeferredItem<DeferredSpawnEggItem> VAMPREY_SPAWN_EGG = spawnEgg(
                         "vamprey_spawn_egg",
@@ -657,6 +730,11 @@ public final class ItemRegistry {
                         COOKED_SARDINE, output -> {
                                 output.accept(COOKED_OCTOPUS_SHREDS.get());
                                 output.accept(COOKED_SARDINE.get());
+                                output.accept(CRAB_MEAT.get());
+                                output.accept(COOKED_CRAB_MEAT.get());
+                                output.accept(WORM_MUSCLE.get());
+                                output.accept(MUD_BEAN.get());
+                                output.accept(DEATH_CAP.get());
                                 output.accept(COOKED_SHARK_FINS.get());
                                 output.accept(FISHNUT.get());
                                 output.accept(COOKED_FISHNUT.get());
@@ -706,6 +784,15 @@ public final class ItemRegistry {
                                 output.accept(ECOFISH_SPAWN_EGG.get());
                                 output.accept(PALE_ABYSS_HYDRA_SPAWN_EGG.get());
                                 output.accept(THREE_HEADED_SHARK_SPAWN_EGG.get());
+                                output.accept(MUD_SILVERFISH_SPAWN_EGG.get());
+                                output.accept(AMBUSH_FISH_SPAWN_EGG.get());
+                                output.accept(GARDEN_EEL_SPAWN_EGG.get());
+                                output.accept(HERMIT_CRAB_SPAWN_EGG.get());
+                                output.accept(HERMIT_CRAB_LARGE_SPAWN_EGG.get());
+                                output.accept(SEDIMENT_WORM_SPAWN_EGG.get());
+                                output.accept(HUMUS_JELLY_SPAWN_EGG.get());
+                                output.accept(ANCIENT_NAUTILUS_SPAWN_EGG.get());
+                                output.accept(TRILOBITE_SPAWN_EGG.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MATERIALS_TAB = tab("materials",
@@ -752,6 +839,11 @@ public final class ItemRegistry {
                                 output.accept(THERMOPHILIC_SAMPLE_OLIVE.get());
                                 output.accept(PHOTOSENSITIVE_FILM.get());
                                 output.accept(BRINE_DEVELOPING_SALTS.get());
+                                output.accept(MUD_BALL.get());
+                                output.accept(NUTRIENT_MUD_BALL.get());
+                                output.accept(FOSSIL_FRAGMENT.get());
+                                output.accept(HUMUS_GEL.get());
+                                output.accept(ANCIENT_SHELL_FRAGMENT.get());
                         });
 
         public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TOOLS_TAB = tab("tools",
@@ -823,6 +915,7 @@ public final class ItemRegistry {
                                 output.accept(ANGLERFISH_MASK.get());
                                 output.accept(ENDER_MASK.get());
                                 output.accept(SLIME_MASK.get());
+                                output.accept(MUDWALKER_CHARM.get());
                         });
 
         /**
@@ -892,6 +985,36 @@ public final class ItemRegistry {
                                 output.accept(LIGHT_CYAN_JELLY_BLOCK_SEAWEED.get());
                                 output.accept(WHITE_JELLY_BLOCK_SEAWEED.get());
                                 output.accept(LIGHT_GOLDEN_JELLY_BLOCK_SEAWEED.get());
+
+                                // Mud Zone: the sediment floor, its mudstone builds, fossil beds
+                                // and shell litter -- filed under its own biome, not the jungle.
+                                output.header(CreativeTabHeader.biome(BiomeRegistry.MUD_ZONE));
+                                output.accept(MUD.get());
+                                output.accept(NUTRIENT_RICH_MUD.get());
+                                output.accept(SEA_MOSS.get());
+                                output.accept(PARASITIC_MUD.get());
+                                output.accept(MUD_BRICKS.get());
+                                output.accept(MUD_BRICK_STAIRS.get());
+                                output.accept(MUD_BRICK_SLAB.get());
+                                output.accept(MUD_BRICK_WALL.get());
+                                output.accept(FOSSIL_BED.get());
+                                output.accept(FOSSIL_DISPLAY.get());
+                                output.accept(SHELL_PILE.get());
+                                output.accept(SEDIMENT_COLUMN.get());
+                                output.accept(MUD_BLOOM.get());
+                                output.accept(BEAN_KELP.get());
+                                output.accept(GLOW_FUNGUS.get());
+                                output.accept(GLOW_FUNGUS_AMBER.get());
+                                output.accept(GLOW_FUNGUS_VIOLET.get());
+                                output.accept(GLOW_MUSHROOM_STEM.get());
+                                output.accept(GLOW_MUSHROOM_CAP.get());
+                                output.accept(GLOW_MUSHROOM_INSIDE.get());
+                                output.accept(PACKED_MUD.get());
+                                output.accept(CRACKED_MUD.get());
+                                output.accept(SILTSTONE.get());
+                                output.accept(MUD_LAMP.get());
+                                output.accept(SILT_REED.get());
+                                output.accept(PALE_PUFFBALL.get());
 
                                 // Brine Mirror Gorge: the evaporite terraces, diapirs and
                                 // crystal grottoes of the brine features.

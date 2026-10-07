@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "waterlogged=false": { "model": "aquanaut:block/sea_moss" },
+    "waterlogged=true": { "model": "aquanaut:block/sea_moss" }
+  }
+}

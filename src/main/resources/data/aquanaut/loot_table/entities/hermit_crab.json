@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:entity",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {"type":"minecraft:item","name":"aquanaut:shell","functions":[{"function":"minecraft:set_count","count":{"type":"minecraft:uniform","min":0.0,"max":2.0}}]},
+        {"type":"minecraft:item","name":"aquanaut:crab_meat","functions":[{"function":"minecraft:set_count","count":{"type":"minecraft:uniform","min":1.0,"max":3.0}}]}
+      ]
+    }
+  ]
+}

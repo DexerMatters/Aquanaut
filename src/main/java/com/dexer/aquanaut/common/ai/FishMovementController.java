@@ -17,6 +17,8 @@ public class FishMovementController {
     private static final double BARRIER_CHECK_STEP = 0.7D;
     private static final double WALL_PROXIMITY_SLOWDOWN = 1.8D;
     private static final double WALL_PROXIMITY_STRONG = 0.9D;
+    /** Floor bias at or above which a species is treated as a seabed crawler. */
+    private static final double FLOOR_BIAS_SETTLED = 0.5D;
 
     private final MovementState state = new MovementState();
     private final FishSchoolingAI schoolingAI = new FishSchoolingAI();
@@ -118,6 +120,14 @@ public class FishMovementController {
         }
     }
 
+    /**
+     * Kicks off a short escape burst with no player involved — a startle, not a chase. The fish
+     * swims off at escape speed for the given number of ticks, then goes back to cruising.
+     */
+    public void startle(int ticks) {
+        this.escapeMinimumTicks = Math.max(this.escapeMinimumTicks, Math.max(1, ticks));
+    }
+
     public boolean isSprintingAway() {
         return this.state.isSprintingAway();
     }
@@ -185,7 +195,7 @@ public class FishMovementController {
         if (responseMode.isEscapeMode()) {
             Player escapeTarget = responseMode == FishResponseMode.STRESS ? reactiveTarget : nearestTarget;
             if (escapeTarget != null) {
-                this.escapeMinimumTicks = 40;
+                this.escapeMinimumTicks = fish.escapeMinimumTicks();
                 return new BehaviorDecision(MovementMode.ESCAPE, escapeTarget);
             }
             if (this.isEscapeLaunchActive(fish)) {
@@ -687,7 +697,10 @@ public class FishMovementController {
     private void updateCruiseDepthTarget(BaseFishEntity fish) {
         this.state.setCruiseDepthDecisionCooldown(this.state.cruiseDepthDecisionCooldown() - 1);
 
-        if (this.state.cruiseDepthDecisionCooldown() <= 0) {
+        // A seabed crawler does not take the random depth offsets: they would lift it off the
+        // sediment, and the floor bias would only pull half of it back. Its depth is the floor.
+        boolean seabedCrawler = fish.cruiseFloorBias() >= FLOOR_BIAS_SETTLED;
+        if (!seabedCrawler && this.state.cruiseDepthDecisionCooldown() <= 0) {
             this.state.setCruiseDepthDecisionCooldown(fish.cruisePitchDecisionMinTicks()
                     + fish.getRandom().nextInt(fish.cruisePitchDecisionRandomTicks()));
             double offsetMagnitude = 0.6D
@@ -709,6 +722,10 @@ public class FishMovementController {
         if (!this.hasWaterAbove(fish)) {
             this.state.setCruiseTargetY(
                     Mth.lerp(0.5D, this.state.cruiseTargetY(), fish.getY() - fish.cruiseDepthEmergencyOffset()));
+        } else if (fish.cruiseFloorBias() >= FLOOR_BIAS_SETTLED) {
+            // A bottom-dweller rides the seabed: aim straight at the floor and skip the hover
+            // guards below, which would otherwise lift it off the sediment it lives on.
+            this.applyFloorBias(fish);
         } else if (this.isNearSurface(fish)) {
             double pushDown = fish.getY() - fish.cruiseDepthEmergencyOffset() * 0.5D;
             this.state.setCruiseTargetY(
@@ -721,6 +738,7 @@ public class FishMovementController {
             this.state.setCruiseTargetY(
                     Mth.lerp(0.4D, this.state.cruiseTargetY(), pushUp));
         } else {
+            this.applyFloorBias(fish);
             double targetY = this.state.cruiseTargetY();
             BlockPos targetPos = new BlockPos(
                     (int) Math.floor(fish.getX()), (int) Math.floor(targetY), (int) Math.floor(fish.getZ()));
@@ -730,6 +748,32 @@ public class FishMovementController {
                 this.state.setCruiseTargetY(Mth.lerp(0.35D, targetY, alt));
             }
         }
+    }
+
+    /**
+     * Pulls a bottom-dwelling fish's cruise target down toward the seabed. Scans a bounded
+     * number of blocks below, so it costs nothing in open water and never stalls on a deep
+     * column. The strength comes from the species' {@code cruiseFloorBias}.
+     */
+    private void applyFloorBias(BaseFishEntity fish) {
+        double bias = Mth.clamp(fish.cruiseFloorBias(), 0.0D, 1.0D);
+        if (bias <= 0.0D) {
+            return;
+        }
+        double floorY = Double.NaN;
+        for (int down = 2; down <= 24; down++) {
+            BlockPos below = fish.blockPosition().below(down);
+            if (!fish.level().getFluidState(below).is(FluidTags.WATER)) {
+                floorY = below.getY() + 1.0D;
+                break;
+            }
+        }
+        if (Double.isNaN(floorY)) {
+            return;
+        }
+        double desired = floorY + 0.5D;
+        this.state.setCruiseTargetY(
+                Mth.lerp(bias * 0.35D, this.state.cruiseTargetY(), desired));
     }
 
     private void updateCruisePitchTarget(BaseFishEntity fish) {

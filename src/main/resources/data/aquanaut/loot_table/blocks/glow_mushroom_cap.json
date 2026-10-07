@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [ { "type": "minecraft:item", "name": "aquanaut:glow_mushroom_cap" } ],
+      "conditions": [ { "condition": "minecraft:survives_explosion" } ]
+    },
+    {
+      "rolls": 1,
+      "entries": [ { "type": "minecraft:item", "name": "aquanaut:death_cap" } ],
+      "conditions": [
+        { "condition": "minecraft:random_chance", "chance": 0.08 },
+        { "condition": "minecraft:survives_explosion" }
+      ]
+    }
+  ]
+}

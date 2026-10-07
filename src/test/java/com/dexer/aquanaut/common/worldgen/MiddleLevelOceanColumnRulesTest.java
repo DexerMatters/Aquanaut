@@ -25,8 +25,9 @@ public final class MiddleLevelOceanColumnRulesTest {
         MiddleLevelOceanColumnRules.TargetBiome patchBiome = MiddleLevelOceanColumnRules.targetBiome(
                 minecraft("deep_ocean"), 16, 0, 9, 0);
         assertTrue(patchBiome == MiddleLevelOceanColumnRules.TargetBiome.CORAL_FOREST
-                        || patchBiome == MiddleLevelOceanColumnRules.TargetBiome.JELLY_JUNGLE,
-                "the transition band should route to either coral forest or jelly jungle");
+                        || patchBiome == MiddleLevelOceanColumnRules.TargetBiome.JELLY_JUNGLE
+                        || patchBiome == MiddleLevelOceanColumnRules.TargetBiome.MUD_ZONE,
+                "the transition band should route to coral forest, jelly jungle or the mud flats");
         assertEquals(patchBiome,
                 MiddleLevelOceanColumnRules.targetBiome(minecraft("deep_ocean"), 16, 2, 9, 2));
         assertEquals(patchBiome,

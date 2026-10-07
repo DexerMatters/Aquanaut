@@ -25,6 +25,9 @@ public final class ParticleRegistry {
     /** Falling ash: the ever-present dust of the caldera. */
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> ASH_MOTE =
             PARTICLE_TYPES.register("ash_mote", () -> new SimpleParticleType(true));
+    /** Suspended sediment drifting through the mud zone's murk. */
+    public static final DeferredHolder<ParticleType<?>, SimpleParticleType> MUD_MOTE =
+            PARTICLE_TYPES.register("mud_mote", () -> new SimpleParticleType(true));
 
     private ParticleRegistry() {
     }

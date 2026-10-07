@@ -1,0 +1,6 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["##", "##"],
+  "key": {"#": {"item": "aquanaut:nutrient_mud_ball"}},
+  "result": {"id": "aquanaut:nutrient_rich_mud", "count": 1}
+}

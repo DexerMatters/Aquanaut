@@ -1,0 +1,12 @@
+{
+  "species_id": "aquanaut:humus_jelly",
+  "entity_id": "aquanaut:humus_jelly",
+  "category": "friendly",
+  "diet": "energevorous",
+  "blocks": [
+    {"type":"paragraph","stage":"encountered","text":"gui.aquanaut.notebook.waterlife.humus_jelly.paragraph_1"},
+    {"type":"component","stage":"encountered","component_kind":"sprite","resource":"aquanaut:item/humus_jelly_spawn_egg","caption":"gui.aquanaut.notebook.caption.identification_plate"},
+    {"type":"paragraph","stage":"captured","text":"gui.aquanaut.notebook.waterlife.humus_jelly.paragraph_2"},
+    {"type":"component","stage":"captured","component_kind":"model","resource":"aquanaut:humus_jelly","caption":"gui.aquanaut.notebook.caption.morphology_record"}
+  ]
+}

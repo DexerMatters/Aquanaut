@@ -1,0 +1,12 @@
+{
+  "species_id": "aquanaut:hermit_crab",
+  "entity_id": "aquanaut:hermit_crab",
+  "category": "friendly",
+  "diet": "omnivorous",
+  "blocks": [
+    {"type":"paragraph","stage":"encountered","text":"gui.aquanaut.notebook.waterlife.hermit_crab.paragraph_1"},
+    {"type":"component","stage":"encountered","component_kind":"sprite","resource":"aquanaut:item/hermit_crab_spawn_egg","caption":"gui.aquanaut.notebook.caption.identification_plate"},
+    {"type":"paragraph","stage":"captured","text":"gui.aquanaut.notebook.waterlife.hermit_crab.paragraph_2"},
+    {"type":"component","stage":"captured","component_kind":"model","resource":"aquanaut:hermit_crab","caption":"gui.aquanaut.notebook.caption.morphology_record"}
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "parent": "minecraft:block/wall_inventory",
+  "textures": {"wall": "aquanaut:block/mud_bricks"}
+}

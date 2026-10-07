@@ -1,0 +1,13 @@
+{
+  "multipart": [
+    {"apply": {"model": "aquanaut:block/mud_brick_wall_post"}},
+    {"when": {"north": "low"}, "apply": {"model": "aquanaut:block/mud_brick_wall_side"}},
+    {"when": {"east": "low"}, "apply": {"model": "aquanaut:block/mud_brick_wall_side", "y": 90}},
+    {"when": {"south": "low"}, "apply": {"model": "aquanaut:block/mud_brick_wall_side", "y": 180}},
+    {"when": {"west": "low"}, "apply": {"model": "aquanaut:block/mud_brick_wall_side", "y": 270}},
+    {"when": {"north": "tall"}, "apply": {"model": "aquanaut:block/mud_brick_wall_side_tall"}},
+    {"when": {"east": "tall"}, "apply": {"model": "aquanaut:block/mud_brick_wall_side_tall", "y": 90}},
+    {"when": {"south": "tall"}, "apply": {"model": "aquanaut:block/mud_brick_wall_side_tall", "y": 180}},
+    {"when": {"west": "tall"}, "apply": {"model": "aquanaut:block/mud_brick_wall_side_tall", "y": 270}}
+  ]
+}

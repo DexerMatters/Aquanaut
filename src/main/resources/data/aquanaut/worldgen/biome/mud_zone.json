@@ -1,0 +1,161 @@
+{
+  "carvers": {},
+  "downfall": 0.5,
+  "effects": {
+    "fog_color": 5394511,
+    "mood_sound": {
+      "block_search_extent": 8,
+      "offset": 2.0,
+      "sound": "minecraft:ambient.cave",
+      "tick_delay": 6000
+    },
+    "music": {
+      "max_delay": 24000,
+      "min_delay": 12000,
+      "replace_current_music": false,
+      "sound": "minecraft:music.under_water"
+    },
+    "particle": {
+      "options": {
+        "type": "aquanaut:mud_mote"
+      },
+      "probability": 0.02
+    },
+    "sky_color": 8103167,
+    "water_color": 4026496,
+    "water_fog_color": 1849924
+  },
+  "features": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [
+      "minecraft:ore_dirt",
+      "minecraft:ore_gravel",
+      "minecraft:ore_granite_upper",
+      "minecraft:ore_granite_lower",
+      "minecraft:ore_diorite_upper",
+      "minecraft:ore_diorite_lower",
+      "minecraft:ore_andesite_upper",
+      "minecraft:ore_andesite_lower",
+      "minecraft:ore_tuff",
+      "minecraft:ore_coal_upper",
+      "minecraft:ore_coal_lower",
+      "minecraft:ore_iron_upper",
+      "minecraft:ore_iron_middle",
+      "minecraft:ore_iron_small",
+      "minecraft:ore_gold",
+      "minecraft:ore_gold_lower",
+      "minecraft:ore_redstone",
+      "minecraft:ore_redstone_lower",
+      "minecraft:ore_diamond",
+      "minecraft:ore_diamond_medium",
+      "minecraft:ore_diamond_large",
+      "minecraft:ore_diamond_buried",
+      "minecraft:ore_lapis",
+      "minecraft:ore_lapis_buried",
+      "minecraft:ore_copper",
+      "minecraft:disk_clay",
+      "aquanaut:mud_zone_sediment",
+      "aquanaut:mud_mound",
+      "aquanaut:fossil_outcrop",
+      "aquanaut:glow_mushroom",
+      "aquanaut:bone_graveyard"
+    ],
+    [
+      "aquanaut:mud_crack"
+    ],
+    [
+      "minecraft:spring_water",
+      "minecraft:spring_lava"
+    ],
+    [
+      "minecraft:glow_lichen",
+      "minecraft:seagrass_deep",
+      "aquanaut:mud_flora"
+    ],
+    [
+      "minecraft:freeze_top_layer"
+    ]
+  ],
+  "has_precipitation": true,
+  "spawn_costs": {},
+  "spawners": {
+    "ambient": [],
+    "axolotls": [],
+    "creature": [],
+    "misc": [],
+    "monster": [
+      {
+        "type": "aquanaut:mud_silverfish",
+        "maxCount": 2,
+        "minCount": 1,
+        "weight": 4
+      },
+      {
+        "type": "aquanaut:sediment_worm",
+        "maxCount": 1,
+        "minCount": 1,
+        "weight": 5
+      }
+    ],
+    "underground_water_creature": [
+      {
+        "type": "minecraft:glow_squid",
+        "maxCount": 3,
+        "minCount": 1,
+        "weight": 6
+      }
+    ],
+    "water_ambient": [
+      {
+        "type": "minecraft:cod",
+        "maxCount": 4,
+        "minCount": 2,
+        "weight": 4
+      }
+    ],
+    "water_creature": [
+      {
+        "type": "aquanaut:hermit_crab",
+        "maxCount": 5,
+        "minCount": 2,
+        "weight": 8
+      },
+      {
+        "type": "aquanaut:ambush_fish",
+        "maxCount": 6,
+        "minCount": 3,
+        "weight": 9
+      },
+      {
+        "type": "aquanaut:garden_eel",
+        "maxCount": 9,
+        "minCount": 4,
+        "weight": 8
+      },
+      {
+        "type": "aquanaut:humus_jelly",
+        "maxCount": 5,
+        "minCount": 2,
+        "weight": 7
+      },
+      {
+        "type": "aquanaut:ancient_nautilus",
+        "maxCount": 2,
+        "minCount": 1,
+        "weight": 2
+      },
+      {
+        "type": "aquanaut:trilobite",
+        "maxCount": 5,
+        "minCount": 2,
+        "weight": 7
+      }
+    ]
+  },
+  "temperature": 0.4
+}

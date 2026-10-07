@@ -1,0 +1,12 @@
+{
+  "species_id": "aquanaut:sediment_worm",
+  "entity_id": "aquanaut:sediment_worm",
+  "category": "threatening",
+  "diet": "carnivorous",
+  "blocks": [
+    {"type":"paragraph","stage":"encountered","text":"gui.aquanaut.notebook.waterlife.sediment_worm.paragraph_1"},
+    {"type":"component","stage":"encountered","component_kind":"sprite","resource":"aquanaut:item/sediment_worm_spawn_egg","caption":"gui.aquanaut.notebook.caption.identification_plate"},
+    {"type":"paragraph","stage":"captured","text":"gui.aquanaut.notebook.waterlife.sediment_worm.paragraph_2"},
+    {"type":"component","stage":"captured","component_kind":"model","resource":"aquanaut:sediment_worm","caption":"gui.aquanaut.notebook.caption.morphology_record"}
+  ]
+}

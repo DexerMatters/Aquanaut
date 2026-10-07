@@ -56,7 +56,7 @@ public final class OceanColumnShading {
         }
 
         if (blockY <= capTop && blockY >= capBottom) {
-            return capStateFor(blockX, blockY, blockZ, capTop, capBottom);
+            return capStateFor(plan, blockX, blockY, blockZ, capTop, capBottom);
         }
 
         // Sedimentary outcrops belong to the quiet middle sea. Volcanic ground grows its
@@ -105,6 +105,28 @@ public final class OceanColumnShading {
         return deepFloorStateFor(plan, blockX, blockY, blockZ);
     }
 
+    /**
+     * The reef family of one column. Mud is claimed only where it is a genuine majority of the
+     * composed weights; elsewhere it is dropped before the contact dither, so the other
+     * districts never sprout stray mud. The remaining rock families still interbed.
+     */
+    private static ReefDescriptor.Family familyFor(OceanColumnPlanner.ColumnPlan plan,
+                                                   int blockX, int blockY, int blockZ) {
+        double[] weights = plan.reef().familyWeights();
+        int mud = ReefDescriptor.Family.MUD.ordinal();
+        if (weights[mud] >= 0.5D) {
+            return ReefDescriptor.Family.MUD;
+        }
+        double[] dither = weights;
+        if (weights[mud] > 0.0D) {
+            dither = weights.clone();
+            dither[mud] = 0.0D;
+        }
+        return ReefDescriptor.Family.VALUES[
+                plan.contact().pickFamily(dither, blockX, blockY, blockZ,
+                        OceanColumnPlanner.REEF_DITHER_SEED)];
+    }
+
     /** The reef slab between the two seas: dissolved by voids, fissured by brine, dithered by contact. */
     private static BlockState reefStateFor(OceanColumnPlanner.ColumnPlan plan,
                                            int blockX, int blockY, int blockZ) {
@@ -116,14 +138,13 @@ public final class OceanColumnShading {
             // lattice hangs between them. Brine fissures widen downward the same way.
             return WATER;
         }
-        ReefDescriptor.Family family = ReefDescriptor.Family.VALUES[
-                plan.contact().pickFamily(plan.reef().familyWeights(),
-                        blockX, blockY, blockZ, OceanColumnPlanner.REEF_DITHER_SEED)];
+        ReefDescriptor.Family family = familyFor(plan, blockX, blockY, blockZ);
         return switch (family) {
             // Volcanic ground: the monolithic concrete apron.
             case VOLCANIC -> BlockRegistry.VOLCANIC_AGGLOMERATE.get().defaultBlockState();
             // The brine gorge: varve shale with halite-crust lenses.
             case HALITE -> brineFloorStateFor(blockX, blockY, blockZ, plan.cavityFloorY());
+            case MUD -> mudFloorStateFor(blockX, blockY, blockZ, plan.cavityFloorY());
             case SEDIMENTARY -> floorStateFor(blockX, blockY, blockZ, plan.cavityFloorY());
         };
     }
@@ -161,6 +182,41 @@ public final class OceanColumnShading {
             case 0 -> BlockRegistry.VARVE_SHALE.get().defaultBlockState();
             case 1 -> BlockRegistry.SHALE.get().defaultBlockState();
             default -> BlockRegistry.HALITE_CRUST.get().defaultBlockState();
+        };
+    }
+
+    /**
+     * Mud-zone ground: a waterlogged mud veneer over banded mudstone with fossil beds.
+     * Nutrient-rich mud forms the humus patches; parasitic mud stays rare so it reads as
+     * an anomaly rather than the default.
+     */
+    private static BlockState mudFloorStateFor(int blockX, int blockY, int blockZ, int cavityFloorY) {
+        int depth = Math.max(0, cavityFloorY - blockY);
+        if (depth == 0) {
+            int patch = strataIndex(blockX, blockZ, blockY, 16,
+                    OceanColumnPlanner.LITH_STRATA_SEED ^ 0x3DL);
+            if (patch == 0) {
+                return BlockRegistry.PARASITIC_MUD.get().defaultBlockState();
+            }
+            if (patch <= 4) {
+                return BlockRegistry.NUTRIENT_RICH_MUD.get().defaultBlockState();
+            }
+            return BlockRegistry.MUD.get().defaultBlockState();
+        }
+        if (depth <= 2) {
+            double silt = SoftMixNoise.valueNoise(blockX, blockZ, 12,
+                    OceanColumnPlanner.LITH_REGION_SEED ^ 0x3DL);
+            return silt > 0.62D
+                    ? BlockRegistry.NUTRIENT_RICH_MUD.get().defaultBlockState()
+                    : BlockRegistry.MUD.get().defaultBlockState();
+        }
+        return switch (strataIndex(blockX, blockZ, blockY, 16,
+                OceanColumnPlanner.LITH_STRATA_SEED ^ 0x59L)) {
+            case 0 -> BlockRegistry.NUTRIENT_RICH_MUD.get().defaultBlockState();
+            case 1, 2 -> BlockRegistry.PACKED_MUD.get().defaultBlockState();
+            case 3 -> BlockRegistry.SILTSTONE.get().defaultBlockState();
+            case 15 -> BlockRegistry.FOSSIL_BED.get().defaultBlockState();
+            default -> BlockRegistry.MUD.get().defaultBlockState();
         };
     }
 
@@ -226,14 +282,16 @@ public final class OceanColumnShading {
         };
     }
 
-    private static BlockState capStateFor(int blockX, int blockY, int blockZ, int capTop, int capBottom) {
+    private static BlockState capStateFor(OceanColumnPlanner.ColumnPlan plan,
+                                          int blockX, int blockY, int blockZ, int capTop, int capBottom) {
+        // A mud district turns its stretch of the reef shelf into a mud flat instead of a
+        // sandy reef; the coral and jelly provinces keep their sand and limestone.
+        if (familyFor(plan, blockX, blockY, blockZ) == ReefDescriptor.Family.MUD) {
+            return mudFloorStateFor(blockX, blockY, blockZ, capTop);
+        }
         int depth = capTop - blockY;
 
         if (depth == 0) {
-            double mud = SoftMixNoise.valueNoise(blockX, blockZ, 12, 0x5A4DL);
-            if (mud > 0.72D) {
-                return BlockRegistry.NUTRIENT_RICH_MUD.get().defaultBlockState();
-            }
             return BlockRegistry.CORAL_SAND.get().defaultBlockState();
         }
 

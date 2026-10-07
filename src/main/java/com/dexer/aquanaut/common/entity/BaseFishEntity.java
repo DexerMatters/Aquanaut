@@ -22,9 +22,23 @@ public abstract class BaseFishEntity extends WaterAnimal {
             EntityDataSerializers.BOOLEAN);
 
     private final FishMovementController movementController = new FishMovementController();
+    private boolean movementSuspended;
 
     protected BaseFishEntity(EntityType<? extends WaterAnimal> type, Level level) {
         super(type, level);
+    }
+
+    /**
+     * Hands movement over to the subclass: the shared cruise controller stops running and the
+     * caller drives {@code setDeltaMovement} itself. Used by the creatures whose special action
+     * is not swimming — the buried worm, and the silverfish fleeing a light.
+     */
+    public void setMovementSuspended(boolean suspended) {
+        this.movementSuspended = suspended;
+    }
+
+    public boolean isMovementSuspended() {
+        return this.movementSuspended;
     }
 
     @Override
@@ -49,6 +63,12 @@ public abstract class BaseFishEntity extends WaterAnimal {
             return;
         }
 
+        if (this.movementSuspended) {
+            // Still kill gravity while submerged so a suspended body holds its depth.
+            this.setNoGravity(this.isInWater());
+            return;
+        }
+
         this.movementController.tick(this);
         this.entityData.set(SPRINTING_AWAY, this.movementController.isSprintingAway());
         this.entityData.set(CHARGING_PLAYER, this.movementController.isChargingPlayer());
@@ -63,6 +83,20 @@ public abstract class BaseFishEntity extends WaterAnimal {
         }
 
         return hurt;
+    }
+
+    /** Ticks a fish keeps fleeing once it has spotted a threat. */
+    public final int escapeMinimumTicks() {
+        return this.getEscapeMinimumTicks();
+    }
+
+    protected int getEscapeMinimumTicks() {
+        return 40;
+    }
+
+    /** Startles the fish into a short burst of escape swimming, with no attacker needed. */
+    public void startle(int ticks) {
+        this.movementController.startle(ticks);
     }
 
     public boolean isSprintingAway() {
@@ -544,6 +578,19 @@ public abstract class BaseFishEntity extends WaterAnimal {
 
     protected double getCruiseDepthRange() {
         return 4.5D;
+    }
+
+    /**
+     * 0 = free-swimming, 1 = pinned to the seabed. A positive bias pulls the cruise depth
+     * target downward toward the floor so bottom-dwelling species skim the sediment instead
+     * of drifting through the water column.
+     */
+    public final double cruiseFloorBias() {
+        return this.getCruiseFloorBias();
+    }
+
+    protected double getCruiseFloorBias() {
+        return 0.0D;
     }
 
     public final double cruiseDepthPitchDistance() {

@@ -58,6 +58,14 @@ import com.dexer.aquanaut.client.renderer.SpringfishRenderer;
 import com.dexer.aquanaut.client.renderer.SwirlMakerRenderer;
 import com.dexer.aquanaut.client.renderer.SwirlRenderer;
 import com.dexer.aquanaut.client.renderer.TripodRenderer;
+import com.dexer.aquanaut.client.renderer.AmbushFishRenderer;
+import com.dexer.aquanaut.client.renderer.GardenEelRenderer;
+import com.dexer.aquanaut.client.renderer.HermitCrabRenderer;
+import com.dexer.aquanaut.client.renderer.MudSilverfishRenderer;
+import com.dexer.aquanaut.client.renderer.SedimentWormRenderer;
+import com.dexer.aquanaut.client.renderer.HumusJellyRenderer;
+import com.dexer.aquanaut.client.renderer.AncientNautilusRenderer;
+import com.dexer.aquanaut.client.renderer.TrilobiteRenderer;
 import com.dexer.aquanaut.client.renderer.item.GasFlowMeterItemRenderer;
 import com.dexer.aquanaut.client.renderer.item.HandheldAirBladderItemRenderer;
 import com.dexer.aquanaut.client.renderer.item.HandheldSearchlightItemRenderer;
@@ -222,6 +230,14 @@ public final class ClientModEvents {
         event.registerEntityRenderer(EntityRegistry.ECOFISH.get(), EcofishRenderer::new);
         event.registerEntityRenderer(EntityRegistry.PALE_ABYSS_HYDRA.get(), PaleAbyssHydraRenderer::new);
         event.registerEntityRenderer(EntityRegistry.THREE_HEADED_SHARK.get(), ThreeHeadedSharkRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.MUD_SILVERFISH.get(), MudSilverfishRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.AMBUSH_FISH.get(), AmbushFishRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.GARDEN_EEL.get(), GardenEelRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.HERMIT_CRAB.get(), HermitCrabRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.SEDIMENT_WORM.get(), SedimentWormRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.HUMUS_JELLY.get(), HumusJellyRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.ANCIENT_NAUTILUS.get(), AncientNautilusRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.TRILOBITE.get(), TrilobiteRenderer::new);
         event.registerEntityRenderer(EntityRegistry.AIR_BUBBLE.get(), AirBubbleRenderer::new);
         event.registerEntityRenderer(EntityRegistry.CURSOR.get(), CursorRenderer::new);
         event.registerEntityRenderer(EntityRegistry.SUBMARINE_DRONE.get(), SubmarineDroneRenderer::new);
@@ -298,6 +314,9 @@ public final class ClientModEvents {
         event.registerSpriteSet(ParticleRegistry.ASH_MOTE.get(),
                 sprites -> new SoftWispParticle.Provider(sprites, 0.30F, 0.30F, 0.33F,
                         0.16F, 45, 0.004F, 0.75F));
+        event.registerSpriteSet(ParticleRegistry.MUD_MOTE.get(),
+                sprites -> new SoftWispParticle.Provider(sprites, 0.42F, 0.37F, 0.30F,
+                        0.22F, 50, 0.0008F, 0.7F));
     }
 
     private static IClientItemExtensions customRenderer(Supplier<BlockEntityWithoutLevelRenderer> renderer) {

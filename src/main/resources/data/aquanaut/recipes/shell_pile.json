@@ -1,0 +1,6 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["##", "##"],
+  "key": {"#": {"item": "aquanaut:shell"}},
+  "result": {"id": "aquanaut:shell_pile", "count": 1}
+}

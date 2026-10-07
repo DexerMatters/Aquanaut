@@ -92,6 +92,7 @@ public final class FogTable {
         biomes.put(id("middle_level_ocean"), new FogVisibility(-4.0F, 128.0F, 0.30F));
         biomes.put(id("coral_forest"), new FogVisibility(-4.0F, 120.0F, 0.26F));
         biomes.put(id("jelly_jungle"), new FogVisibility(-2.0F, 64.0F, 0.48F));
+        biomes.put(id("mud_zone"), new FogVisibility(-3.0F, 72.0F, 0.62F));
         biomes.put(id("brine_mirror_gorge"), new FogVisibility(-6.0F, 160.0F, 0.20F));
         biomes.put(id("brimstone_caldera"), new FogVisibility(-3.0F, 80.0F, 0.55F));
         biomes.put(id("crystal_nest"), new FogVisibility(-5.0F, 144.0F, 0.28F));

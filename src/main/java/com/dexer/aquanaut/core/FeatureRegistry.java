@@ -3,6 +3,7 @@ package com.dexer.aquanaut.core;
 import com.dexer.aquanaut.Aquanaut;
 import com.dexer.aquanaut.common.worldgen.CalderaLakeFeature;
 import com.dexer.aquanaut.common.worldgen.AshDriftFeature;
+import com.dexer.aquanaut.common.worldgen.BoneGraveyardFeature;
 import com.dexer.aquanaut.common.worldgen.BrimstoneGardenFeature;
 import com.dexer.aquanaut.common.worldgen.BrineMirrorFeature;
 import com.dexer.aquanaut.common.worldgen.BrineTerraceFeature;
@@ -26,6 +27,12 @@ import com.dexer.aquanaut.common.worldgen.SaltDiapirFeature;
 import com.dexer.aquanaut.common.worldgen.SmokerClusterFeature;
 import com.dexer.aquanaut.common.worldgen.SulfurVeinFeature;
 import com.dexer.aquanaut.common.worldgen.VentFloraFeature;
+import com.dexer.aquanaut.common.worldgen.FossilOutcropFeature;
+import com.dexer.aquanaut.common.worldgen.GlowMushroomFeature;
+import com.dexer.aquanaut.common.worldgen.MudCrackFeature;
+import com.dexer.aquanaut.common.worldgen.MudFloraFeature;
+import com.dexer.aquanaut.common.worldgen.MudMoundFeature;
+import com.dexer.aquanaut.common.worldgen.MudZoneSedimentFeature;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.neoforged.bus.api.IEventBus;
@@ -90,6 +97,20 @@ public final class FeatureRegistry {
             FEATURES.register("gypsum_garden", GypsumGardenFeature::new);
     public static final DeferredHolder<Feature<?>, SaltCascadeFeature> SALT_CASCADE =
             FEATURES.register("salt_cascade", SaltCascadeFeature::new);
+    public static final DeferredHolder<Feature<?>, MudZoneSedimentFeature> MUD_ZONE_SEDIMENT = FEATURES.register(
+            "mud_zone_sediment", MudZoneSedimentFeature::new);
+    public static final DeferredHolder<Feature<?>, MudMoundFeature> MUD_MOUND = FEATURES.register(
+            "mud_mound", MudMoundFeature::new);
+    public static final DeferredHolder<Feature<?>, FossilOutcropFeature> FOSSIL_OUTCROP = FEATURES.register(
+            "fossil_outcrop", FossilOutcropFeature::new);
+    public static final DeferredHolder<Feature<?>, MudCrackFeature> MUD_CRACK = FEATURES.register(
+            "mud_crack", MudCrackFeature::new);
+    public static final DeferredHolder<Feature<?>, MudFloraFeature> MUD_FLORA = FEATURES.register(
+            "mud_flora", MudFloraFeature::new);
+    public static final DeferredHolder<Feature<?>, GlowMushroomFeature> GLOW_MUSHROOM = FEATURES.register(
+            "glow_mushroom", GlowMushroomFeature::new);
+    public static final DeferredHolder<Feature<?>, BoneGraveyardFeature> BONE_GRAVEYARD = FEATURES.register(
+            "bone_graveyard", BoneGraveyardFeature::new);
 
     private FeatureRegistry() {
     }

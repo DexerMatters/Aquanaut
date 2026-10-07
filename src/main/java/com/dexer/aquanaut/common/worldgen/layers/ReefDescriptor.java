@@ -4,6 +4,7 @@ import com.dexer.aquanaut.common.worldgen.BrimstoneCalderaPlacement;
 import com.dexer.aquanaut.common.worldgen.BrineMirrorGorgePlacement;
 import com.dexer.aquanaut.common.worldgen.CrystalNestPlacement;
 import com.dexer.aquanaut.common.worldgen.MiddleLevelOceanPlacement;
+import com.dexer.aquanaut.common.worldgen.MudZonePlacement;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
@@ -47,7 +48,9 @@ public record ReefDescriptor(double baseThickness,
         /** Brimstone Caldera: the monolithic volcanic concrete apron. */
         VOLCANIC,
         /** Brine Mirror Gorge: varve shale with halite-crust lenses. */
-        HALITE;
+        HALITE,
+        /** Mud zone: waterlogged mud veneer over banded mudstone with fossil beds. */
+        MUD;
 
         public static final Family[] VALUES = values();
     }
@@ -67,6 +70,9 @@ public record ReefDescriptor(double baseThickness,
         // Crystal Nest: no floor at all — both seas run into one another.
         REGISTRY.put(CrystalNestPlacement.location(),
                 new ReefDescriptor(0.0D, 0.0D, 32, 0x5EEDFACE1L, 0.0D, 0.0D, Family.SEDIMENTARY));
+        // Mud zone: a soft, slightly thicker sediment pile — mudstone under a mud veneer.
+        REGISTRY.put(MudZonePlacement.location(),
+                new ReefDescriptor(10.0D, 3.0D, 40, 0x5EEDFACE1L, 1.0D, 0.0D, Family.MUD));
     }
 
     /** The descriptor registered for a district biome, or {@code null} when it does not drive the reef. */

@@ -2,15 +2,22 @@ package com.dexer.aquanaut.mixin;
 
 import com.dexer.aquanaut.common.worldgen.blend.SpawnIslandMask;
 import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.SectionPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
 import net.minecraft.world.level.levelgen.NoiseBasedChunkGenerator;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
+import net.minecraft.world.level.levelgen.RandomState;
+import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
+import net.minecraft.world.level.ChunkPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * Keeps vanilla structure starts off the water world's spawn island. Structure placement
@@ -19,24 +26,35 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  * OCEAN_FLOOR heightmap, which the mod's fill raises to the island surface. The wreck then
  * surfaces on the island's grass. Anchors whose planned ground can be dry are refused here;
  * the ring beyond keeps its wrecks, guaranteed to anchor under water.
+ *
+ * <p>The hook sits on {@code tryGenerateStructure} rather than on the placement check:
+ * vanilla runs that check inside a {@code forEach} lambda, and a redirect cannot reach
+ * across the lambda boundary. Refusing here is exactly vanilla's "this structure did not
+ * generate" result, so the weighted-pick loop simply moves on to the next candidate.</p>
  */
 @Mixin(ChunkGenerator.class)
 public abstract class ChunkGeneratorStructureMixin {
     private static final ResourceLocation WATER_WORLD_SETTINGS =
             ResourceLocation.fromNamespaceAndPath("aquanaut", "water_world");
 
-    @Redirect(method = "createStructures", remap = false,
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/levelgen/structure/placement/StructurePlacement;isStructureChunk(Lnet/minecraft/world/level/chunk/ChunkGeneratorStructureState;II)Z"))
-    private boolean aquanaut$keepStructuresOffTheIsland(StructurePlacement placement,
-            ChunkGeneratorStructureState structureState, int chunkX, int chunkZ) {
-        boolean placementChunk = placement.isStructureChunk(structureState, chunkX, chunkZ);
-        if (placementChunk && aquanaut$isWaterWorldGenerator(this)
-                && SpawnIslandMask.islandClaimsChunk(structureState.getLevelSeed(),
-                        chunkX << 4, chunkZ << 4)) {
-            return false;
+    @Inject(method = "tryGenerateStructure", at = @At("HEAD"), cancellable = true, remap = false)
+    private void aquanaut$keepStructuresOffTheIsland(
+            StructureSet.StructureSelectionEntry structureSelectionEntry,
+            StructureManager structureManager,
+            RegistryAccess registryAccess,
+            RandomState randomState,
+            StructureTemplateManager structureTemplateManager,
+            long seed,
+            ChunkAccess chunk,
+            ChunkPos chunkPos,
+            SectionPos sectionPos,
+            CallbackInfoReturnable<Boolean> cir) {
+        if (!aquanaut$isWaterWorldGenerator(this)
+                || !SpawnIslandMask.islandClaimsChunk(seed,
+                        chunkPos.getMinBlockX(), chunkPos.getMinBlockZ())) {
+            return;
         }
-        return placementChunk;
+        cir.setReturnValue(false);
     }
 
     private static boolean aquanaut$isWaterWorldGenerator(Object generator) {

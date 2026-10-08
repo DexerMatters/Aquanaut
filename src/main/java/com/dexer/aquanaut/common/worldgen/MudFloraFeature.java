@@ -35,17 +35,17 @@ public final class MudFloraFeature extends Feature<NoneFeatureConfiguration> {
         }
 
         boolean placedAny = false;
-        placedAny |= scatter(level, origin, random, BlockRegistry.MUD_BLOOM.get(), 1 + random.nextInt(2));
+        placedAny |= scatter(level, origin, random, BlockRegistry.MUD_BLOOM.get(), 2 + random.nextInt(2));
         placedAny |= scatter(level, origin, random, BlockRegistry.BEAN_KELP.get(), 1 + random.nextInt(2));
         placedAny |= scatter(level, origin, random, BlockRegistry.SILT_REED.get(), 1 + random.nextInt(2));
-        placedAny |= scatter(level, origin, random, BlockRegistry.GLOW_FUNGUS.get(), 1);
+        placedAny |= scatter(level, origin, random, BlockRegistry.GLOW_FUNGUS.get(), 1 + random.nextInt(2));
         if (random.nextBoolean()) {
             placedAny |= scatter(level, origin, random, BlockRegistry.GLOW_FUNGUS_AMBER.get(), 1);
         }
         if (random.nextBoolean()) {
             placedAny |= scatter(level, origin, random, BlockRegistry.GLOW_FUNGUS_VIOLET.get(), 1);
         }
-        if (random.nextInt(3) == 0) {
+        if (random.nextBoolean()) {
             placedAny |= scatter(level, origin, random, BlockRegistry.PALE_PUFFBALL.get(), 1);
         }
         // Sea moss only takes hold on the nutrient-rich mud it feeds on.

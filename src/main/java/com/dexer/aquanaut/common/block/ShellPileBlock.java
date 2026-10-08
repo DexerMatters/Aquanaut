@@ -14,11 +14,11 @@ public final class ShellPileBlock extends Block {
     public static final MapCodec<ShellPileBlock> CODEC = simpleCodec(ShellPileBlock::new);
     /**
      * Occluding full shape, so adjacent water is culled rather than drawn as flowing water
-     * over the pile's sides; the model is a full cube and matches it.
+     * over the pile's sides; the model is a full cube and matches it. The collision matches it
+     * too: with a short collision the visual upper half was solid-looking but passable, so
+     * creatures swam straight through the pile.
      */
     private static final VoxelShape SHAPE = Shapes.block();
-    /** Low collision so the pile still reads as a mound the crab can climb over. */
-    private static final VoxelShape COLLISION = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 8.0D, 15.0D);
 
     public ShellPileBlock(Properties properties) {
         super(properties);
@@ -37,6 +37,6 @@ public final class ShellPileBlock extends Block {
     @Override
     protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos,
             CollisionContext context) {
-        return COLLISION;
+        return SHAPE;
     }
 }

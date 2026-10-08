@@ -22,7 +22,6 @@ import com.dexer.aquanaut.common.block.CrystalPlantBlock;
 import com.dexer.aquanaut.common.block.SeaweedBlock;
 import com.dexer.aquanaut.common.block.SeaweedStemBlock;
 import com.dexer.aquanaut.common.block.SeaMossBlock;
-import com.dexer.aquanaut.common.block.MudLampBlock;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ColorRGBA;
 import net.minecraft.world.level.block.Block;
@@ -149,11 +148,11 @@ public final class BlockRegistry {
             MapColor.COLOR_GREEN);
     public static final DeferredBlock<CrystalPlantBlock> BEAN_KELP = crystalPlant("bean_kelp", 0,
             MapColor.COLOR_GREEN);
-    public static final DeferredBlock<CrystalPlantBlock> GLOW_FUNGUS = crystalPlant("glow_fungus", 7,
+    public static final DeferredBlock<CrystalPlantBlock> GLOW_FUNGUS = crystalPlant("glow_fungus", 10,
             MapColor.COLOR_CYAN);
-    public static final DeferredBlock<CrystalPlantBlock> GLOW_FUNGUS_AMBER = crystalPlant("glow_fungus_amber", 6,
+    public static final DeferredBlock<CrystalPlantBlock> GLOW_FUNGUS_AMBER = crystalPlant("glow_fungus_amber", 9,
             MapColor.COLOR_ORANGE);
-    public static final DeferredBlock<CrystalPlantBlock> GLOW_FUNGUS_VIOLET = crystalPlant("glow_fungus_violet", 5,
+    public static final DeferredBlock<CrystalPlantBlock> GLOW_FUNGUS_VIOLET = crystalPlant("glow_fungus_violet", 8,
             MapColor.COLOR_PURPLE);
     // The huge glow mushroom's parts, grown out of a glow fungus by bone meal.
     public static final DeferredBlock<Block> GLOW_MUSHROOM_STEM = glowBlock("glow_mushroom_stem", 0);
@@ -167,11 +166,6 @@ public final class BlockRegistry {
             MapColor.TERRACOTTA_BROWN, 0.8F, 1.2F, SoundType.MUD);
     public static final DeferredBlock<Block> SILTSTONE = cube("siltstone",
             MapColor.COLOR_GRAY, 1.6F, 3.0F, SoundType.STONE);
-    public static final DeferredBlock<MudLampBlock> MUD_LAMP = BLOCKS.register("mud_lamp",
-            () -> new MudLampBlock(BlockBehaviour.Properties.of()
-                    .mapColor(MapColor.TERRACOTTA_BROWN).strength(0.4F)
-                    .sound(SoundType.MUD).noOcclusion()
-                    .lightLevel(state -> 12)));
     public static final DeferredBlock<CrystalPlantBlock> SILT_REED = crystalPlant("silt_reed", 0,
             MapColor.COLOR_GREEN);
     public static final DeferredBlock<CrystalPlantBlock> PALE_PUFFBALL = crystalPlant("pale_puffball", 4,

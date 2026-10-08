@@ -74,7 +74,7 @@ public final class MudZoneSedimentFeature extends Feature<NoneFeatureConfigurati
     }
 
     private static BlockState mudState(int x, int z) {
-        if (patch01(x, z, 7, NUTRIENT_SEED) > 0.80D) {
+        if (patch01(x, z, 7, NUTRIENT_SEED) > 0.62D) {
             return BlockRegistry.NUTRIENT_RICH_MUD.get().defaultBlockState();
         }
         if (patch01(x, z, 5, PARASITIC_SEED) > 0.88D) {

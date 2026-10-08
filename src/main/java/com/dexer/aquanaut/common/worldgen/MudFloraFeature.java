@@ -51,7 +51,7 @@ public final class MudFloraFeature extends Feature<NoneFeatureConfiguration> {
         // Sea moss only takes hold on the nutrient-rich mud it feeds on.
         placedAny |= scatterMoss(level, origin, random, 3);
         // Shells are a seasoning, not a bed: one small patch at most, and usually none.
-        if (random.nextFloat() < 0.12F) {
+        if (random.nextFloat() < 0.30F) {
             BlockPos floor = sampleFloor(level, origin, random);
             if (floor != null) {
                 placedAny |= placeShellDebris(level, floor, random);
@@ -117,7 +117,7 @@ public final class MudFloraFeature extends Feature<NoneFeatureConfiguration> {
     /** A small, rare scatter of shell litter. */
     private static boolean placeShellDebris(WorldGenLevel level, BlockPos floor, RandomSource random) {
         boolean placedAny = false;
-        int extent = random.nextInt(2);
+        int extent = 1 + random.nextInt(2);
         for (int dx = -extent; dx <= extent; dx++) {
             for (int dz = -extent; dz <= extent; dz++) {
                 if (random.nextFloat() < 0.35F) {

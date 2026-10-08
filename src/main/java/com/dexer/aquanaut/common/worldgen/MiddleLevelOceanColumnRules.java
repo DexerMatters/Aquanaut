@@ -2,7 +2,6 @@ package com.dexer.aquanaut.common.worldgen;
 
 import com.dexer.aquanaut.common.worldgen.layers.OceanLayerStack;
 import com.dexer.aquanaut.common.worldgen.layers.OceanLayerStacks;
-import com.dexer.aquanaut.common.worldgen.layers.SoftMixNoise;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -56,23 +55,6 @@ public final class MiddleLevelOceanColumnRules {
             return TargetBiome.DEEP_SEA;
         }
         return TargetBiome.NONE;
-    }
-
-    /**
-     * Soft horizontal mix weight for jelly jungle on the reef band (1 = full jelly).
-     */
-    public static double jellyWeight(int quartX, int quartZ) {
-        OceanLayerStack stack = OceanLayerStacks.active();
-        for (var layer : stack.layers()) {
-            if (layer.mix().entries().size() >= 2
-                    && layer.mix().entries().get(0).biome().equals(CoralForestPlacement.location())) {
-                double[] weights = layer.mix().weightsAt(quartX + 11, quartZ - 7);
-                return weights[1];
-            }
-        }
-        return SoftMixNoise.softThreshold(
-                SoftMixNoise.valueNoise(quartX + 11, quartZ - 7, 32, 2L),
-                0.05D);
     }
 
     public enum TargetBiome {

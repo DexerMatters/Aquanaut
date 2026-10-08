@@ -22,6 +22,7 @@ import com.dexer.aquanaut.common.block.CrystalPlantBlock;
 import com.dexer.aquanaut.common.block.SeaweedBlock;
 import com.dexer.aquanaut.common.block.SeaweedStemBlock;
 import com.dexer.aquanaut.common.block.SeaMossBlock;
+import com.dexer.aquanaut.common.block.MudLampBlock;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ColorRGBA;
 import net.minecraft.world.level.block.Block;
@@ -166,7 +167,11 @@ public final class BlockRegistry {
             MapColor.TERRACOTTA_BROWN, 0.8F, 1.2F, SoundType.MUD);
     public static final DeferredBlock<Block> SILTSTONE = cube("siltstone",
             MapColor.COLOR_GRAY, 1.6F, 3.0F, SoundType.STONE);
-    public static final DeferredBlock<Block> MUD_LAMP = glowBlock("mud_lamp", 12);
+    public static final DeferredBlock<MudLampBlock> MUD_LAMP = BLOCKS.register("mud_lamp",
+            () -> new MudLampBlock(BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.TERRACOTTA_BROWN).strength(0.4F)
+                    .sound(SoundType.MUD).noOcclusion()
+                    .lightLevel(state -> 12)));
     public static final DeferredBlock<CrystalPlantBlock> SILT_REED = crystalPlant("silt_reed", 0,
             MapColor.COLOR_GREEN);
     public static final DeferredBlock<CrystalPlantBlock> PALE_PUFFBALL = crystalPlant("pale_puffball", 4,

@@ -38,7 +38,9 @@ public final class FossilOutcropFeature extends Feature<NoneFeatureConfiguration
         boolean placed = false;
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
-                if (dx * dx + dz * dz > radius * radius || random.nextFloat() < 0.15F) {
+                // No random holes: the bed has to read as one connected patch, not scattered
+                // single blocks.
+                if (dx * dx + dz * dz > radius * radius) {
                     continue;
                 }
                 BlockPos column = MudZoneFloor.find(level, floor.offset(dx, 1, dz));

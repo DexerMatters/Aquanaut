@@ -198,7 +198,7 @@ public final class OceanColumnShading {
             if (patch == 0) {
                 return BlockRegistry.PARASITIC_MUD.get().defaultBlockState();
             }
-            if (patch <= 4) {
+            if (patch <= 6) {
                 return BlockRegistry.NUTRIENT_RICH_MUD.get().defaultBlockState();
             }
             return BlockRegistry.MUD.get().defaultBlockState();
@@ -206,7 +206,7 @@ public final class OceanColumnShading {
         if (depth <= 2) {
             double silt = SoftMixNoise.valueNoise(blockX, blockZ, 12,
                     OceanColumnPlanner.LITH_REGION_SEED ^ 0x3DL);
-            return silt > 0.62D
+            return silt > 0.45D
                     ? BlockRegistry.NUTRIENT_RICH_MUD.get().defaultBlockState()
                     : BlockRegistry.MUD.get().defaultBlockState();
         }

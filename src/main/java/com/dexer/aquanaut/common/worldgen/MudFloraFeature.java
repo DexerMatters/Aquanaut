@@ -3,7 +3,6 @@ package com.dexer.aquanaut.common.worldgen;
 import com.dexer.aquanaut.core.BiomeRegistry;
 import com.dexer.aquanaut.core.BlockRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
@@ -14,11 +13,12 @@ import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
 
 /**
- * The mud zone's growth layer: the biome's own plants only -- mud bloom, bean kelp and
- * glow fungus -- plus a rare, small shell scatter. It deliberately does NOT place seaweed,
- * seaweed fruit, kelp or drooping seaweed: those belong to the seaweed/jelly provinces,
- * and reusing them here made the mud flats read as a second jelly jungle instead of their
- * own biome.
+ * The mud zone's growth layer: the biome's own plants only -- mud bloom, bean kelp, glow fungus,
+ * silt reed, pale puffball and the sea moss mat -- plus a rare, small shell scatter.
+ *
+ * <p>Every plant is rooted through {@link MudZoneFloor}, which only accepts real terrain, so a
+ * plant can never be parked in open water (the old column scan stopped on water and called it
+ * ground) and never lands on top of an earlier structure such as a glow mushroom.</p>
  */
 public final class MudFloraFeature extends Feature<NoneFeatureConfiguration> {
     public MudFloraFeature() {
@@ -35,36 +35,53 @@ public final class MudFloraFeature extends Feature<NoneFeatureConfiguration> {
         }
 
         boolean placedAny = false;
-        for (int i = 0; i < 6 + random.nextInt(5); i++) {
-            placedAny |= placeLeaf(level, sampleFloor(level, origin, random), BlockRegistry.MUD_BLOOM.get());
+        placedAny |= scatter(level, origin, random, BlockRegistry.MUD_BLOOM.get(), 2 + random.nextInt(2));
+        placedAny |= scatter(level, origin, random, BlockRegistry.BEAN_KELP.get(), 1 + random.nextInt(2));
+        placedAny |= scatter(level, origin, random, BlockRegistry.SILT_REED.get(), 1 + random.nextInt(2));
+        placedAny |= scatter(level, origin, random, BlockRegistry.GLOW_FUNGUS.get(), 1 + random.nextInt(2));
+        if (random.nextBoolean()) {
+            placedAny |= scatter(level, origin, random, BlockRegistry.GLOW_FUNGUS_AMBER.get(), 1);
         }
-        for (int i = 0; i < 4 + random.nextInt(4); i++) {
-            placedAny |= placeLeaf(level, sampleFloor(level, origin, random), BlockRegistry.BEAN_KELP.get());
+        if (random.nextBoolean()) {
+            placedAny |= scatter(level, origin, random, BlockRegistry.GLOW_FUNGUS_VIOLET.get(), 1);
         }
-        for (int i = 0; i < 2 + random.nextInt(3); i++) {
-            placedAny |= placeLeaf(level, sampleFloor(level, origin, random), BlockRegistry.GLOW_FUNGUS.get());
-        }
-        for (int i = 0; i < 1 + random.nextInt(2); i++) {
-            placedAny |= placeLeaf(level, sampleFloor(level, origin, random), BlockRegistry.GLOW_FUNGUS_AMBER.get());
-        }
-        for (int i = 0; i < 1 + random.nextInt(2); i++) {
-            placedAny |= placeLeaf(level, sampleFloor(level, origin, random), BlockRegistry.GLOW_FUNGUS_VIOLET.get());
-        }
-        for (int i = 0; i < 3 + random.nextInt(3); i++) {
-            placedAny |= placeLeaf(level, sampleFloor(level, origin, random), BlockRegistry.SILT_REED.get());
-        }
-        for (int i = 0; i < 1 + random.nextInt(3); i++) {
-            placedAny |= placeLeaf(level, sampleFloor(level, origin, random), BlockRegistry.PALE_PUFFBALL.get());
+        if (random.nextBoolean()) {
+            placedAny |= scatter(level, origin, random, BlockRegistry.PALE_PUFFBALL.get(), 1);
         }
         // Sea moss only takes hold on the nutrient-rich mud it feeds on.
-        for (int i = 0; i < 8; i++) {
-            placedAny |= placeMoss(level, sampleFloor(level, origin, random));
-        }
+        placedAny |= scatterMoss(level, origin, random, 3);
         // Shells are a seasoning, not a bed: one small patch at most, and usually none.
-        if (random.nextFloat() < 0.2F) {
-            placedAny |= placeShellDebris(level, sampleFloor(level, origin, random), random);
+        if (random.nextFloat() < 0.30F) {
+            BlockPos floor = sampleFloor(level, origin, random);
+            if (floor != null) {
+                placedAny |= placeShellDebris(level, floor, random);
+            }
         }
         return placedAny;
+    }
+
+    /** Tries to plant one species on its own random column, a few times over. */
+    private static boolean scatter(WorldGenLevel level, BlockPos origin, RandomSource random, Block block,
+            int attempts) {
+        boolean placed = false;
+        for (int i = 0; i < attempts; i++) {
+            BlockPos floor = sampleFloor(level, origin, random);
+            if (floor != null) {
+                placed |= placeLeaf(level, floor, block);
+            }
+        }
+        return placed;
+    }
+
+    private static boolean scatterMoss(WorldGenLevel level, BlockPos origin, RandomSource random, int attempts) {
+        boolean placed = false;
+        for (int i = 0; i < attempts; i++) {
+            BlockPos floor = sampleFloor(level, origin, random);
+            if (floor != null) {
+                placed |= placeMoss(level, floor);
+            }
+        }
+        return placed;
     }
 
     /** One waterlogged plant on the sediment, reusing the mod's plant blocks. */
@@ -90,27 +107,25 @@ public final class MudFloraFeature extends Feature<NoneFeatureConfiguration> {
         return true;
     }
 
+    /** The sediment under a random column of the patch, or {@code null} when it has none. */
     private static BlockPos sampleFloor(WorldGenLevel level, BlockPos origin, RandomSource random) {
         int x = origin.getX() + random.nextInt(13) - 6;
         int z = origin.getZ() + random.nextInt(13) - 6;
-        BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos(x, origin.getY() + 12, z);
-        while (mutable.getY() > origin.getY() - 12 && level.getFluidState(mutable).is(FluidTags.WATER)) {
-            mutable.move(Direction.DOWN);
-        }
-        return mutable.immutable();
+        return MudZoneFloor.find(level, new BlockPos(x, origin.getY() + 12, z));
     }
 
     /** A small, rare scatter of shell litter. */
     private static boolean placeShellDebris(WorldGenLevel level, BlockPos floor, RandomSource random) {
         boolean placedAny = false;
-        int extent = random.nextInt(2);
+        int extent = 1 + random.nextInt(2);
         for (int dx = -extent; dx <= extent; dx++) {
             for (int dz = -extent; dz <= extent; dz++) {
                 if (random.nextFloat() < 0.35F) {
                     continue;
                 }
                 BlockPos target = floor.offset(dx, 1, dz);
-                if (!level.getFluidState(target).is(FluidTags.WATER)) {
+                if (!level.getFluidState(target).is(FluidTags.WATER)
+                        || !isSediment(level.getBlockState(floor.offset(dx, 0, dz)))) {
                     continue;
                 }
                 level.setBlock(target, BlockRegistry.SHELL_PILE.get().defaultBlockState(), 2);
@@ -118,5 +133,13 @@ public final class MudFloraFeature extends Feature<NoneFeatureConfiguration> {
             }
         }
         return placedAny;
+    }
+
+    private static boolean isSediment(net.minecraft.world.level.block.state.BlockState state) {
+        return state.is(BlockRegistry.MUD.get())
+                || state.is(BlockRegistry.NUTRIENT_RICH_MUD.get())
+                || state.is(BlockRegistry.PARASITIC_MUD.get())
+                || state.is(BlockRegistry.PACKED_MUD.get())
+                || state.is(BlockRegistry.CORAL_SAND.get());
     }
 }

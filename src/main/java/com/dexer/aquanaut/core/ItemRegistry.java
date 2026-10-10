@@ -504,7 +504,6 @@ public final class ItemRegistry {
         public static final DeferredItem<BlockItem> PACKED_MUD = blockItem("packed_mud", BlockRegistry.PACKED_MUD);
         public static final DeferredItem<BlockItem> CRACKED_MUD = blockItem("cracked_mud", BlockRegistry.CRACKED_MUD);
         public static final DeferredItem<BlockItem> SILTSTONE = blockItem("siltstone", BlockRegistry.SILTSTONE);
-        public static final DeferredItem<BlockItem> MUD_LAMP = blockItem("mud_lamp", BlockRegistry.MUD_LAMP);
         public static final DeferredItem<BlockItem> SILT_REED = blockItem("silt_reed", BlockRegistry.SILT_REED);
         public static final DeferredItem<BlockItem> PALE_PUFFBALL = blockItem("pale_puffball",
                         BlockRegistry.PALE_PUFFBALL);
@@ -1012,7 +1011,6 @@ public final class ItemRegistry {
                                 output.accept(PACKED_MUD.get());
                                 output.accept(CRACKED_MUD.get());
                                 output.accept(SILTSTONE.get());
-                                output.accept(MUD_LAMP.get());
                                 output.accept(SILT_REED.get());
                                 output.accept(PALE_PUFFBALL.get());
 
